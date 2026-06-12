@@ -22,7 +22,7 @@
     nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 5vw; background:rgba(10,15,30,0.88); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
     .nav-logo { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.1rem; color:var(--text); text-decoration:none; letter-spacing:-0.02em; }
     .nav-logo span { color:var(--accent); }
-    .nav-links { display:flex; gap:2rem; list-style:none; }
+    .nav-links { display:flex; gap:1.6rem; list-style:none; }
     .nav-links a { color:var(--muted); text-decoration:none; font-size:0.88rem; font-weight:500; transition:color 0.2s; }
     .nav-links a:hover { color:var(--text); }
 
@@ -49,6 +49,8 @@
     .btn-primary:hover { background:#4f51e0; transform:translateY(-1px); box-shadow:0 8px 24px rgba(99,102,241,0.3); }
     .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
     .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    .btn-demo { background:rgba(20,184,166,0.15); color:var(--accent2); border:1px solid rgba(20,184,166,0.35); padding:0.55rem 1.1rem; font-size:0.82rem; border-radius:5px; font-family:'JetBrains Mono',monospace; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; transition:all 0.2s; }
+    .btn-demo:hover { background:rgba(20,184,166,0.28); transform:translateY(-1px); }
 
     /* SECTIONS */
     section { padding:6rem 5vw; }
@@ -90,14 +92,32 @@
 
     /* PROJECTS */
     #projects { background:var(--bg); }
-    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.6rem; }
+    .projects-section-label { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1rem; margin-top:2.5rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); }
+    .projects-section-label:first-of-type { margin-top:0; }
+    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.6rem; margin-bottom:1rem; }
     .project-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2rem; display:flex; flex-direction:column; gap:0.9rem; transition:transform 0.22s,border-color 0.22s,box-shadow 0.22s; backdrop-filter:blur(8px); }
     .project-card:hover { transform:translateY(-4px); border-color:rgba(99,102,241,0.4); box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+    /* Featured/spotlight project card */
+    .project-card.featured { border-color:rgba(99,102,241,0.35); background:rgba(30,35,60,0.9); grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
+    .project-card.featured:hover { border-color:rgba(99,102,241,0.6); box-shadow:0 24px 48px rgba(99,102,241,0.15); }
+    .project-card.featured .project-left { display:flex; flex-direction:column; gap:0.9rem; }
+    .project-card.featured .project-right { display:flex; flex-direction:column; gap:0.8rem; }
     .project-icon { width:44px; height:44px; border-radius:10px; background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.25); display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
+    .project-icon.roulette { background:rgba(20,184,166,0.12); border-color:rgba(20,184,166,0.28); }
     .project-title { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:600; color:var(--text); }
+    .project-card.featured .project-title { font-size:1.3rem; }
+    .project-badge { display:inline-flex; align-items:center; gap:0.35rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--accent2); background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.25); border-radius:20px; padding:0.2rem 0.65rem; width:fit-content; }
+    .project-badge::before { content:'●'; font-size:0.5rem; animation:pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
     .project-desc { font-size:0.9rem; color:var(--muted); line-height:1.65; flex:1; }
     .project-tech { display:flex; flex-wrap:wrap; gap:0.4rem; }
     .tech-badge { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.22rem 0.55rem; border-radius:3px; background:rgba(20,184,166,0.1); color:var(--accent2); border:1px solid rgba(20,184,166,0.2); }
+    .project-actions { display:flex; gap:0.7rem; align-items:center; flex-wrap:wrap; margin-top:0.2rem; }
+    .arch-list { list-style:none; display:flex; flex-direction:column; gap:0.6rem; }
+    .arch-list li { font-size:0.85rem; color:var(--muted); padding-left:1.3rem; position:relative; line-height:1.6; }
+    .arch-list li::before { content:'→'; position:absolute; left:0; color:var(--accent); font-size:0.75rem; top:0.12em; }
+    .arch-list li strong { color:var(--text); font-weight:500; }
+    .arch-label { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--accent2); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:0.5rem; }
 
     /* DEVOPS */
     #devops { background:var(--bg3); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
@@ -137,6 +157,14 @@
     .form-group label { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.06em; }
     .form-group input, .form-group textarea { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:0.75rem 1rem; color:var(--text); font-family:'Inter',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.2s; resize:vertical; }
     .form-group input:focus, .form-group textarea:focus { border-color:var(--accent); }
+    .form-status { font-family:'JetBrains Mono',monospace; font-size:0.78rem; padding:0.6rem 1rem; border-radius:5px; display:none; }
+    .form-status.success { display:block; background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.3); color:var(--accent2); }
+    .form-status.error { display:block; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#f87171; }
+
+    /* SCROLL TO TOP */
+    #scroll-top { position:fixed; bottom:2rem; right:2rem; width:44px; height:44px; border-radius:50%; background:rgba(99,102,241,0.85); border:1px solid rgba(99,102,241,0.5); color:#fff; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s,transform 0.2s; z-index:99; backdrop-filter:blur(8px); }
+    #scroll-top.visible { opacity:1; pointer-events:all; }
+    #scroll-top:hover { transform:translateY(-2px); background:var(--accent); }
 
     /* FOOTER */
     footer { background:var(--bg2); border-top:1px solid var(--border); padding:2rem 5vw; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
@@ -144,12 +172,16 @@
     footer .accent { color:var(--accent); }
 
     /* RESPONSIVE */
+    @media (max-width:900px) {
+      .project-card.featured { grid-template-columns:1fr; }
+    }
     @media (max-width:768px) {
       nav { padding:1rem 4vw; }
       .nav-links { gap:1rem; }
       .nav-links li:nth-child(n+5) { display:none; }
       .about-grid, .contact-wrap { grid-template-columns:1fr; gap:2.5rem; }
       section { padding:4rem 4vw; }
+      #scroll-top { bottom:1.2rem; right:1.2rem; }
     }
 
     /* FADE IN */
@@ -167,6 +199,7 @@
       <li><a href="#experience">Experience</a></li>
       <li><a href="#skills">Skills</a></li>
       <li><a href="#projects">Projects</a></li>
+      <li><a href="#devops">DevOps</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
@@ -206,6 +239,7 @@
       <div class="about-text fade-in">
         <p>I'm a <strong>Java Developer at Dexit Global Limited</strong>, where I've spent over three years developing and maintaining enterprise-scale web applications across the full SDLC — from requirement analysis and design through to production support and Agile releases.</p>
         <p>My work spans both legacy stacks (Java, J2EE, Struts, JSP, Apache Tiles) and modern architectures (Spring Boot microservices, RESTful APIs, containerised deployments on AWS). I care about <strong>performance, maintainability, and code quality</strong> — bringing that rigour whether I'm building something new or modernising something old.</p>
+        <p>Outside of work, I build side projects that scratch genuine curiosity: self-hosted on my homelab server, deployed via Cloudflare Tunnel, and wired up with full CI/CD. I like my hobby code to meet the same bar as my production code.</p>
         <p>I hold a <strong>B.E. in Electrical Engineering</strong> from Prof. Ram Meghe College of Engineering & Management, Amravati (Sant Gadge Baba Amravati University, 2021) — which taught me to think systematically long before I wrote a line of Java.</p>
       </div>
       <div class="fade-in">
@@ -271,7 +305,7 @@
       <div class="skill-group">
         <div class="skill-group-title">Java Technologies</div>
         <div class="skill-tags">
-          <span class="skill-tag">Core Java</span><span class="skill-tag">Advanced Java</span><span class="skill-tag">JSP</span><span class="skill-tag">Servlets</span><span class="skill-tag">JDBC</span><span class="skill-tag">Jasper Reports</span>
+          <span class="skill-tag">Core Java</span><span class="skill-tag">Advanced Java</span><span class="skill-tag">JSP</span><span class="skill-tag">Servlets</span><span class="skill-tag">JDBC</span><span class="skill-tag">Reflection API</span><span class="skill-tag">Jasper Reports</span>
         </div>
       </div>
       <div class="skill-group">
@@ -281,15 +315,15 @@
         </div>
       </div>
       <div class="skill-group">
-        <div class="skill-group-title">Web Technologies</div>
+        <div class="skill-group-title">Web & Frontend</div>
         <div class="skill-tags">
-          <span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span><span class="skill-tag">AJAX</span><span class="skill-tag">jQuery</span><span class="skill-tag">JSON</span>
+          <span class="skill-tag">React</span><span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span><span class="skill-tag">AJAX</span><span class="skill-tag">jQuery</span><span class="skill-tag">JSON</span>
         </div>
       </div>
       <div class="skill-group">
         <div class="skill-group-title">Cloud & DevOps</div>
         <div class="skill-tags">
-          <span class="skill-tag">AWS EC2</span><span class="skill-tag">AWS S3</span><span class="skill-tag">AWS RDS</span><span class="skill-tag">CloudWatch</span><span class="skill-tag">IAM</span><span class="skill-tag">VPC</span><span class="skill-tag">Docker</span><span class="skill-tag">Jenkins</span><span class="skill-tag">Linux</span><span class="skill-tag">Shell Scripting</span>
+          <span class="skill-tag">AWS EC2</span><span class="skill-tag">AWS S3</span><span class="skill-tag">AWS RDS</span><span class="skill-tag">CloudWatch</span><span class="skill-tag">IAM</span><span class="skill-tag">VPC</span><span class="skill-tag">Docker</span><span class="skill-tag">Jenkins</span><span class="skill-tag">GitHub Actions</span><span class="skill-tag">Linux</span><span class="skill-tag">Shell Scripting</span>
         </div>
       </div>
       <div class="skill-group">
@@ -313,6 +347,129 @@
       <p class="section-label">// what I've built</p>
       <h2 class="section-title">Projects</h2>
     </div>
+
+<!-- PERSONAL PROJECTS -->
+<div class="projects-section-label fade-in">⚗️ Personal Projects</div>
+
+<div class="projects-grid fade-in">
+
+  <!-- BUTTON ROULETTE — FEATURED -->
+  <div class="project-card featured">
+
+    <div class="project-left">
+
+      <div class="project-icon roulette">🎰</div>
+
+      <div>
+        <div class="project-badge">Live · roulette.praniknikose.top</div>
+      </div>
+
+      <div class="project-title">Button Roulette</div>
+
+      <div class="project-desc">
+        A full-stack application built to demonstrate end-to-end software delivery, combining modern Java development with practical DevOps implementation. The application generates random outcomes through a Spring Boot backend while a React frontend provides an interactive user experience.
+      </div>
+
+      <div class="project-desc" style="margin-top:-0.4rem;">
+        The project showcases complete ownership of the software lifecycle—from development and containerization to infrastructure provisioning, CI/CD automation, Docker image management, AWS deployment, domain integration, and automated application delivery using Infrastructure as Code principles.
+      </div>
+
+      <div class="project-actions">
+        <a href="https://roulette.praniknikose.top" target="_blank" rel="noopener" class="btn btn-demo">
+          ▶ Live Demo
+        </a>
+
+        <a href="https://github.com/PranikNikose/button-roulette" target="_blank" rel="noopener" class="btn-ghost btn" style="padding:0.55rem 1.1rem;font-size:0.82rem;">
+          GitHub →
+        </a>
+      </div>
+
+      <div class="project-tech">
+        <span class="tech-badge">React</span><span class="tech-badge">Spring Boot</span><span class="tech-badge">Java</span><span class="tech-badge">Java Reflection API</span><span class="tech-badge">Docker</span><span class="tech-badge">Docker Compose</span><span class="tech-badge">GitHub Actions</span><span class="tech-badge">Docker Hub</span><span class="tech-badge">Terraform</span><span class="tech-badge">AWS EC2</span><span class="tech-badge">AWS S3</span><span class="tech-badge">AWS DynamoDB</span><span class="tech-badge">Elastic IP</span><span class="tech-badge">Nginx</span><span class="tech-badge">CI/CD</span>
+      </div>
+
+    </div>
+
+    <div class="project-right">
+
+      <div class="arch-label">Architecture Highlights</div>
+
+      <ul class="arch-list">
+
+        <li>
+          <strong>React Frontend</strong> —
+          Single Page Application providing an interactive user interface and consuming backend REST APIs.
+        </li>
+
+        <li>
+          <strong>Spring Boot Backend</strong> —
+          REST API responsible for request processing, roulette execution logic, and application endpoints.
+        </li>
+
+        <li>
+          <strong>Java Reflection API</strong> —
+          Dynamically discovers and invokes spell implementations at runtime without hardcoded execution paths.
+        </li>
+
+        <li>
+          <strong>Dockerized Architecture</strong> —
+          Frontend, Backend, and Nginx services are containerized and orchestrated using Docker Compose.
+        </li>
+
+        <li>
+          <strong>GitHub Actions CI/CD</strong> —
+          Automated workflows build applications, create Docker images, publish images to Docker Hub, and deploy updates to AWS EC2.
+        </li>
+
+        <li>
+          <strong>Docker Hub Registry</strong> —
+          Stores application images used by the automated deployment pipeline.
+        </li>
+
+        <li>
+          <strong>Terraform Infrastructure as Code</strong> —
+          AWS infrastructure is provisioned and managed using Terraform with remote state storage in S3 and state locking through DynamoDB.
+        </li>
+
+        <li>
+          <strong>AWS Deployment</strong> —
+          Application hosted on EC2 with Elastic IP configuration providing stable public accessibility.
+        </li>
+
+        <li>
+          <strong>Nginx Reverse Proxy</strong> —
+          Routes incoming requests between frontend and backend services and exposes applications through a unified entry point.
+        </li>
+
+        <li>
+          <strong>Custom Domain Integration</strong> —
+          DNS configured to expose the application publicly through
+          <code style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent2)">
+            roulette.praniknikose.top
+          </code>.
+        </li>
+      </ul>
+
+      <div style="margin-top:1rem;padding:1rem;background:rgba(10,15,30,0.6);border-radius:8px;border:1px solid var(--border);">
+
+        <div class="arch-label" style="margin-bottom:0.6rem;">
+          Key Achievements
+        </div>
+
+        <p style="font-size:0.84rem;color:var(--muted);line-height:1.65;">
+          Designed, built, and deployed a complete production-style application covering full-stack development, Docker containerization, Infrastructure as Code, AWS provisioning, CI/CD automation, image lifecycle management, reverse proxy configuration, automated deployment, and domain integration. Demonstrates practical experience across Java development, DevOps engineering, Terraform, AWS, Docker, GitHub Actions, and modern software delivery practices.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+    <!-- PROFESSIONAL PROJECTS -->
+    <div class="projects-section-label fade-in">🏢 Professional Work (Dexit Global Limited)</div>
     <div class="projects-grid">
       <div class="project-card fade-in">
         <div class="project-icon">🏢</div>
@@ -367,9 +524,10 @@
       </div>
       <div class="pipeline-details">
         <div class="pipeline-detail"><div class="pipeline-detail-title">Build</div><p>Maven · Apache Tomcat</p></div>
-        <div class="pipeline-detail"><div class="pipeline-detail-title">CI/CD</div><p>Jenkins · automated pipelines</p></div>
-        <div class="pipeline-detail"><div class="pipeline-detail-title">Containerization</div><p>Docker · containerised Spring Boot apps</p></div>
+        <div class="pipeline-detail"><div class="pipeline-detail-title">CI/CD</div><p>Jenkins · GitHub Actions · automated pipelines</p></div>
+        <div class="pipeline-detail"><div class="pipeline-detail-title">Containerization</div><p>Docker · Docker Compose · Spring Boot apps</p></div>
         <div class="pipeline-detail"><div class="pipeline-detail-title">Cloud (AWS)</div><p>EC2 · S3 · RDS · IAM · VPC · CloudWatch</p></div>
+        <div class="pipeline-detail"><div class="pipeline-detail-title">Homelab</div><p>Ubuntu Server · Nginx · Cloudflare Tunnel</p></div>
         <div class="pipeline-detail"><div class="pipeline-detail-title">Version Control</div><p>Git · GitHub · GitLab · SVN</p></div>
         <div class="pipeline-detail"><div class="pipeline-detail-title">Agile</div><p>Sprint planning · impact analysis · production support</p></div>
       </div>
@@ -411,28 +569,46 @@
             <div class="contact-link-icon">🐙</div>
             <div class="contact-link-text"><div class="label">GITHUB</div><div class="value">github.com/PranikNikose</div></div>
           </a>
-          <a class="contact-link" href="https://linkedin.com/in/praniknikose" target="_blank" rel="noopener">
+          <a class="contact-link" href="https://www.linkedin.com/in/pranik-nikose/" target="_blank" rel="noopener">
             <div class="contact-link-icon">💼</div>
-            <div class="contact-link-text"><div class="label">LINKEDIN</div><div class="value">linkedin.com/in/praniknikose</div></div>
+            <div class="contact-link-text"><div class="label">LINKEDIN</div><div class="value">linkedin.com/in/pranik-nikose</div></div>
+          </a>
+          <a class="contact-link" href="https://praniknikose.top" target="_blank" rel="noopener">
+            <div class="contact-link-icon">🌐</div>
+            <div class="contact-link-text"><div class="label">WEBSITE</div><div class="value">praniknikose.top</div></div>
           </a>
         </div>
       </div>
       <div class="contact-form-area fade-in">
-        <div class="form-group"><label>NAME</label><input type="text" placeholder="Your name" /></div>
-        <div class="form-group"><label>EMAIL</label><input type="email" placeholder="your@email.com" /></div>
-        <div class="form-group"><label>MESSAGE</label><textarea rows="5" placeholder="What's on your mind?"></textarea></div>
-        <button class="btn btn-primary" style="align-self:flex-start;" onclick="handleSend(event)">Send Message →</button>
+        <div class="form-group">
+          <label>NAME</label>
+          <input type="text" id="form-name" placeholder="Your name" />
+        </div>
+        <div class="form-group">
+          <label>EMAIL</label>
+          <input type="email" id="form-email" placeholder="your@email.com" />
+        </div>
+        <div class="form-group">
+          <label>MESSAGE</label>
+          <textarea id="form-message" rows="5" placeholder="What's on your mind?"></textarea>
+        </div>
+        <div class="form-status" id="form-status"></div>
+        <button class="btn btn-primary" style="align-self:flex-start;" id="send-btn" onclick="handleSend(event)">Send Message →</button>
       </div>
     </div>
   </section>
 
   <footer>
-    <p>© 2026 <span class="accent">Pranik K Nikose</span> · Java Developer · Amravati, Maharashtra.</p>
+    <p>© <span id="footer-year"></span> <span class="accent">Pranik K Nikose</span> · Java Developer · Amravati, Maharashtra.</p>
     <p>Built with HTML, CSS & strong opinions about clean architecture.</p>
   </footer>
 
+  <!-- SCROLL TO TOP -->
+  <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
   <script>
-    const phrases = ['Java Developer · 5 Years','Spring Boot Architect','REST API Engineer','CI/CD & DevOps Practitioner','Enterprise Application Builder'];
+    // Typed animation
+    const phrases = ['Java Developer · 5 Years','Spring Boot Architect','React + Spring Boot Builder','REST API Engineer','CI/CD & DevOps Practitioner','Enterprise Application Builder'];
     let pi=0,ci=0,deleting=false;
     const el=document.getElementById('typed-text');
     function type(){
@@ -443,16 +619,57 @@
     }
     type();
 
+    // Intersection observer for fade-in
     const observer=new IntersectionObserver(entries=>{
       entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}});
-    },{threshold:0.1});
+    },{threshold:0.08});
     document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
 
+    // Contact form — opens mailto with pre-filled content
     function handleSend(event){
-      const btn=event.target;
-      btn.textContent='Sent ✓';btn.style.background='var(--accent2)';btn.disabled=true;
-      setTimeout(()=>{btn.textContent='Send Message →';btn.style.background='';btn.disabled=false;},3000);
+      const name = document.getElementById('form-name').value.trim();
+      const email = document.getElementById('form-email').value.trim();
+      const message = document.getElementById('form-message').value.trim();
+      const status = document.getElementById('form-status');
+      const btn = document.getElementById('send-btn');
+
+      if(!name || !email || !message){
+        status.textContent = '⚠ Please fill in all fields before sending.';
+        status.className = 'form-status error';
+        return;
+      }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        status.textContent = '⚠ Please enter a valid email address.';
+        status.className = 'form-status error';
+        return;
+      }
+
+      const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+      window.location.href = `mailto:praniknikose@gmail.com?subject=${subject}&body=${body}`;
+
+      btn.textContent = 'Opening mail client ✓';
+      btn.style.background = 'var(--accent2)';
+      btn.disabled = true;
+      status.textContent = '✓ Your email client should open now. If not, email me directly at praniknikose@gmail.com';
+      status.className = 'form-status success';
+
+      setTimeout(()=>{
+        btn.textContent = 'Send Message →';
+        btn.style.background = '';
+        btn.disabled = false;
+        status.className = 'form-status';
+      }, 5000);
     }
+
+    // Footer year — auto-updates
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    // Scroll to top button
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      scrollBtn.classList.toggle('visible', window.scrollY > 500);
+    });
   </script>
 </body>
 </html>
