@@ -249,10 +249,186 @@
   .cy { color: var(--cyan);   }
   .re { color: var(--red);    }
 
+  /* ── HASHMAP INTERNAL + COMPARABLE/COMPARATOR ─────────── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  /* Flow diagram */
+  .flow-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .flow-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .flow-col-title {
+    font-size: 8px;
+    font-weight: 600;
+    color: var(--purple);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+  }
+  .flow-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 7px;
+    font-size: 8px;
+    color: var(--text-bright);
+    text-align: center;
+    width: 100%;
+    font-weight: 500;
+  }
+  .flow-box.root   { border-color: var(--purple); color: var(--purple); font-weight: 700; }
+  .flow-box.action { border-color: var(--blue);   color: var(--blue);   }
+  .flow-box.hash   { border-color: var(--amber);  color: var(--amber);  }
+  .flow-box.bucket { border-color: var(--cyan);   color: var(--cyan);   }
+  .flow-box.store  { border-color: var(--green);  color: var(--green);  }
+  .flow-box.coll   { border-color: var(--red);    color: var(--red);    }
+  .flow-box.tree   { border-color: var(--amber);  color: var(--amber);  }
+  .flow-box.ll     { border-color: var(--blue);   color: var(--blue);   }
+  .flow-box.eq     { border-color: var(--green);  color: var(--green);  }
+  .flow-box.ret    { border-color: var(--purple);  color: var(--purple); }
+  .flow-arrow {
+    color: var(--dim);
+    font-size: 9px;
+    line-height: 1.2;
+    text-align: center;
+    margin: 1px 0;
+  }
+  .flow-branch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    width: 100%;
+    margin-top: 1px;
+  }
+  .flow-branch-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .flow-branch-label {
+    font-size: 7.5px;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  /* hashcode/equals rule */
+  .rule-box {
+    margin-top: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 5px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .rule-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 8px;
+  }
+  .rule-kw  { color: var(--amber);  font-weight: 700; white-space: nowrap; }
+  .rule-arr { color: var(--dim); }
+  .rule-desc { color: var(--muted); }
+  /* Comparable / Comparator panel */
+  .cmp-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cmp-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 8px;
+  }
+  .cmp-card.comparable  { border-left: 3px solid var(--blue);   }
+  .cmp-card.comparator  { border-left: 3px solid var(--purple); }
+  .cmp-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .cmp-name {
+    font-weight: 700;
+    font-size: 10px;
+  }
+  .cmp-name.bl { color: var(--blue); }
+  .cmp-name.pu { color: var(--purple); }
+  .cmp-badge {
+    font-size: 7.5px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+  .badge-interface { background: var(--blue-dim);   color: var(--blue);   }
+  .badge-method    { background: var(--purple-dim); color: var(--purple); }
+  .cmp-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cmp-row {
+    display: flex;
+    gap: 6px;
+    font-size: 8px;
+    align-items: baseline;
+  }
+  .cmp-key  { color: var(--dim); white-space: nowrap; min-width: 64px; }
+  .cmp-val  { color: var(--text); }
+  .cmp-val.code { color: var(--amber); font-weight: 600; }
+  .cmp-val.green { color: var(--green); }
+  .cmp-val.purple { color: var(--purple); }
+  .cmp-divider {
+    height: 1px;
+    background: var(--border);
+  }
+  .cmp-vs-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 8px;
+  }
+  .vs-pill {
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 7.5px;
+  }
+  .vs-pill.bl { background: var(--blue-dim);   color: var(--blue);   }
+  .vs-pill.pu { background: var(--purple-dim); color: var(--purple); }
+  .vs-sep { color: var(--dim); }
+  
   @media print {
     html, body { width: 210mm; }
     .page { page-break-inside: avoid; }
     .tree-panel { page-break-inside: avoid; }
+	.bottom-grid { page-break-inside: avoid; }
   }
 </style>
 </head>
@@ -386,7 +562,128 @@
     </div>
 
   </div><!-- /tree-section -->
-
+  <!-- BOTTOM SECTION: HashMap Internals + Comparable/Comparator -->
+  <div class="section-label" style="margin-top:8px;">HashMap Internals &amp; Sorting Interfaces</div>
+  <div class="bottom-grid">
+    <!-- HashMap Internal Working -->
+    <div class="flow-panel">
+      <div class="tree-title">HashMap Internal Working</div>
+      <div class="flow-cols">
+        <!-- PUT flow -->
+        <div>
+          <div class="flow-col-title">put(key, value)</div>
+          <div class="flow-step">
+            <div class="flow-box root">HashMap</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box action">Array of Buckets</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box hash">hashCode(key)</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box bucket">Bucket Index Calculation</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box" style="color:var(--text-bright);border-color:var(--dim);">Bucket Empty?</div>
+            <div class="flow-arrow">↙&nbsp;&nbsp;&nbsp;↘</div>
+            <div class="flow-branch">
+              <div class="flow-branch-item">
+                <div class="flow-branch-label">Yes</div>
+                <div class="flow-box store">Store Entry</div>
+              </div>
+              <div class="flow-branch-item">
+                <div class="flow-branch-label">No</div>
+                <div class="flow-box coll">Collision</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box ll">Linked List</div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-box" style="color:var(--text-bright);border-color:var(--dim);">Nodes &gt; 8?</div>
+                <div class="flow-arrow">↙&nbsp;↘</div>
+                <div class="flow-branch">
+                  <div class="flow-branch-item">
+                    <div class="flow-branch-label">Yes</div>
+                    <div class="flow-box tree">Red-Black Tree</div>
+                  </div>
+                  <div class="flow-branch-item">
+                    <div class="flow-branch-label">No</div>
+                    <div class="flow-box ll">Linked List</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- GET flow -->
+        <div>
+          <div class="flow-col-title">get(key)</div>
+          <div class="flow-step">
+            <div class="flow-box action">get(key)</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box hash">hashCode(key)</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box bucket">Find Bucket</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box eq">equals(key)</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box ret">Return Value</div>
+          </div>
+          <!-- hashCode / equals rule -->
+          <div class="rule-box">
+            <div class="rule-row">
+              <span class="rule-kw">hashCode()</span>
+              <span class="rule-arr">→</span>
+              <span class="rule-desc">Finds Bucket</span>
+            </div>
+            <div class="rule-row">
+              <span class="rule-kw">equals()&nbsp;&nbsp;</span>
+              <span class="rule-arr">→</span>
+              <span class="rule-desc">Finds Exact Object</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Comparable / Comparator -->
+    <div class="cmp-panel">
+      <div class="tree-title">Comparable vs Comparator</div>
+      <div class="cmp-card comparable">
+        <div class="cmp-header">
+          <span class="cmp-name bl">Comparable</span>
+        </div>
+        <div class="cmp-rows">
+          <div class="cmp-row">
+            <span class="cmp-key">Purpose</span>
+            <span class="cmp-val">Natural Sorting Order</span>
+          </div>
+          <div class="cmp-row">
+            <span class="cmp-key">Implements</span>
+            <span class="cmp-val code">compareTo()</span>
+          </div>
+          <div class="cmp-row">
+            <span class="cmp-key">Logics</span>
+            <span class="cmp-val green">Single Sorting Logic</span>
+          </div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header">
+          <span class="cmp-name pu">Comparator</span>
+        </div>
+        <div class="cmp-rows">
+          <div class="cmp-row">
+            <span class="cmp-key">Purpose</span>
+            <span class="cmp-val">Custom Sorting Order</span>
+          </div>
+          <div class="cmp-row">
+            <span class="cmp-key">Implements</span>
+            <span class="cmp-val code">compare()</span>
+          </div>
+          <div class="cmp-row">
+            <span class="cmp-key">Logics</span>
+            <span class="cmp-val purple">Multiple Sorting Logics</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /bottom-grid -->
 </div><!-- /page -->
 </body>
 </html>
