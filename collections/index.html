@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Collections Framework — Interview Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: A4;
+    margin: 8mm;
+  }
+
+  :root {
+    --bg:         #0D1117;
+    --surface:    #161B22;
+    --border:     #21262D;
+    --dim:        #444D56;
+    --muted:      #6E7681;
+    --text:       #C9D1D9;
+    --text-bright:#E6EDF3;
+
+    --blue:       #58A6FF;
+    --blue-dim:   #1F3A5F;
+    --green:      #3FB950;
+    --green-dim:  #1A3A1A;
+    --amber:      #E3B341;
+    --amber-dim:  #3D2E0A;
+    --purple:     #BC8CFF;
+    --purple-dim: #2A1A4A;
+    --cyan:       #39D4C4;
+    --cyan-dim:   #0D2E2B;
+    --red:        #F85149;
+    --red-dim:    #3A0D0D;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 9.5px;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    width: 210mm;
+    margin: 0 auto;
+  }
+
+  .page {
+    padding: 0;
+  }
+
+  /* ── HEADER ──────────────────────────────────────────── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 7px;
+    margin-bottom: 10px;
+  }
+  .header-top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .prompt {
+    color: var(--green);
+    font-weight: 600;
+    font-size: 10px;
+  }
+  .title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.3px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 9px;
+    margin-top: 2px;
+    padding-left: 18px;
+  }
+
+  /* ── QUICK REF CARDS ─────────────────────────────────── */
+  .section-label {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 5px;
+    padding-left: 2px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 7px;
+    border-left-width: 3px;
+  }
+  .card-name {
+    font-weight: 700;
+    font-size: 9.5px;
+    margin-bottom: 2px;
+  }
+  .card-desc {
+    font-size: 8px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .card-list   { border-left-color: var(--blue);   }
+  .card-list   .card-name { color: var(--blue);   }
+  .card-set    { border-left-color: var(--green);  }
+  .card-set    .card-name { color: var(--green);  }
+  .card-queue  { border-left-color: var(--amber);  }
+  .card-queue  .card-name { color: var(--amber);  }
+  .card-map    { border-left-color: var(--purple); }
+  .card-map    .card-name { color: var(--purple); }
+  .card-sync   { border-left-color: var(--cyan);   }
+  .card-sync   .card-name { color: var(--cyan);   }
+  .card-legacy { border-left-color: var(--red);    }
+  .card-legacy .card-name { color: var(--red);    }
+
+  /* ── LEGEND ──────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+  }
+  .legend-label {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-right: 4px;
+  }
+  .legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 8.5px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-list   { background: var(--blue);   }
+  .dot-set    { background: var(--green);  }
+  .dot-queue  { background: var(--amber);  }
+  .dot-map    { background: var(--purple); }
+  .dot-sync   { background: var(--cyan);   }
+  .dot-legacy { background: var(--red);    }
+
+  /* ── NAMING PATTERN ──────────────────────────────────── */
+  .naming-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .naming-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .naming-prefix {
+    font-weight: 700;
+    font-size: 10px;
+    color: var(--text-bright);
+    background: var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+  .naming-arrow {
+    color: var(--dim);
+    font-size: 9px;
+  }
+  .naming-meaning {
+    font-size: 8.5px;
+    color: var(--muted);
+  }
+
+  /* ── HIERARCHY TREES ─────────────────────────────────── */
+  .tree-section {
+    margin-bottom: 0;
+  }
+
+  .tree-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+  .tree-title {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tree-body {
+    white-space: pre;
+    font-size: 8.5px;
+    line-height: 1.65;
+    overflow: hidden;
+  }
+
+  /* node coloring via spans */
+  .c  { color: var(--dim); }           /* connector chars */
+  .i  { color: var(--text-bright); font-weight: 500; }  /* interface */
+  .n  { color: var(--text); }          /* class (base) */
+  .bl { color: var(--blue);   }
+  .gr { color: var(--green);  }
+  .am { color: var(--amber);  }
+  .pu { color: var(--purple); }
+  .cy { color: var(--cyan);   }
+  .re { color: var(--red);    }
+
+  @media print {
+    html, body { width: 210mm; }
+    .page { page-break-inside: avoid; }
+    .tree-panel { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Java Collections Framework</span>
+    </div>
+    <div class="subtitle">// Interview Prep — Quick Reference</div>
+  </div>
+
+  <!-- QUICK REF CARDS -->
+  <div class="section-label">Quick Reference</div>
+  <div class="cards-grid">
+    <div class="card card-list">
+      <div class="card-name">List</div>
+      <div class="card-desc">Duplicate + Ordered + Index Based</div>
+    </div>
+    <div class="card card-set">
+      <div class="card-name">Set</div>
+      <div class="card-desc">Unique Elements</div>
+    </div>
+    <div class="card card-queue">
+      <div class="card-name">Queue</div>
+      <div class="card-desc">First In First Out (FIFO)</div>
+    </div>
+    <div class="card card-map">
+      <div class="card-name">Map</div>
+      <div class="card-desc">Key-Value Pair</div>
+    </div>
+    <div class="card card-sync">
+      <div class="card-name">Synchronized</div>
+      <div class="card-desc">Thread Safe classes</div>
+    </div>
+    <div class="card card-legacy">
+      <div class="card-name">Legacy</div>
+      <div class="card-desc">Older thread-safe classes, largely superseded</div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><span class="dot dot-list"></span>List</div>
+      <div class="legend-item"><span class="dot dot-set"></span>Set</div>
+      <div class="legend-item"><span class="dot dot-queue"></span>Queue</div>
+      <div class="legend-item"><span class="dot dot-map"></span>Map</div>
+      <div class="legend-item"><span class="dot dot-sync"></span>Synchronized / Thread Safe</div>
+      <div class="legend-item"><span class="dot dot-legacy"></span>Legacy</div>
+    </div>
+  </div>
+
+  <!-- NAMING PATTERN -->
+  <div class="section-label">Naming Patterns</div>
+  <div class="naming-grid">
+    <div class="naming-card">
+      <span class="naming-prefix">Hash</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">No Insertion Order Guarantee</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Linked</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Insertion Order</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Tree</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Sorted Order</span>
+    </div>
+  </div>
+
+  <!-- HIERARCHY TREES -->
+  <div class="section-label">Hierarchy Trees</div>
+  <div class="tree-section">
+
+    <!-- COLLECTION TREE -->
+    <div class="tree-panel">
+      <div class="tree-title">Collection Framework Hierarchy</div>
+      <div class="tree-body"><span class="c">│
+│</span>
+<span class="c">├──</span> <span class="i">Collection (I)</span><span class="n">: Root Interface for List, Set and Queue.</span>
+<span class="c">│   │
+│   ├──</span> <span class="i bl">List (I)</span><span class="n">: Duplicate Allowed, Insertion Order Preserved, Index Based</span>
+<span class="c">│   │   ├──</span> <span class="bl">ArrayList (C)</span><span class="n">: Dynamic Array Structure, Random Access Fast, Middle Insertion/Deletion Slow</span>
+<span class="c">│   │   ├──</span> <span class="bl">LinkedList (C)</span><span class="n">: Doubly Linked List Structure,Insertion/Deletion Fast, Random Access Slow</span>
+<span class="c">│   │   ├──</span> <span class="cy">Vector (C)</span><span class="n">: Same as ArrayList, Synchronized &amp; Thread Safe, Legacy</span>
+<span class="c">│   │   │   └──</span> <span class="cy">Stack (C)</span><span class="n">: Last In First Out (LIFO)</span>
+<span class="c">│   │
+│   ├──</span> <span class="i gr">Set (I)</span><span class="n">: Unique Elements (No Duplicates)</span>
+<span class="c">│   │   ├──</span> <span class="gr">HashSet (C)</span><span class="n">: No Insertion Order Guarantee</span>
+<span class="c">│   │   │   └──</span> <span class="gr">LinkedHashSet (C)</span><span class="n">: Insertion Order</span>
+<span class="c">│   │   │
+│   │   └──</span> <span class="i gr">SortedSet (I)</span><span class="n">: Elements are automatically stored in sorted order</span>
+<span class="c">│   │       └──</span> <span class="i gr">NavigableSet (I)</span><span class="n">: SortedSet + Navigation Methods</span>
+<span class="c">│   │           └──</span> <span class="gr">TreeSet (C)</span><span class="n">: Sorted Order, Red-Black Tree</span>
+<span class="c">│   │
+│   └──</span> <span class="i am">Queue (I)</span><span class="n">: First In First Out (FIFO)</span>
+<span class="c">│       ├──</span> <span class="am">PriorityQueue (C)</span><span class="n">: Based on Priority (Default: Ascending Order)</span>
+<span class="c">│       ├──</span> <span class="i am">Deque (I)</span><span class="n">: Double Ended Queue</span>
+<span class="c">│       │   ├──</span> <span class="am">ArrayDeque (C)</span>
+<span class="c">│       │   └──</span> <span class="am">LinkedList (C)</span>
+<span class="c">│       │
+│       └──</span> <span class="i cy">BlockingQueue (I)</span><span class="n">: Multithreading</span>
+<span class="c">│           ├──</span> <span class="cy">LinkedBlockingQueue (C)</span>
+<span class="c">│           ├──</span> <span class="cy">ArrayBlockingQueue (C)</span>
+<span class="c">│           └──</span> <span class="cy">PriorityBlockingQueue (C)</span></div>
+    </div>
+
+    <!-- MAP TREE -->
+    <div class="tree-panel">
+      <div class="tree-title">Map Hierarchy</div>
+      <div class="tree-body"><span class="c">└──</span> <span class="i pu">Map (I)</span><span class="n">: Key-Value Pair, Keys Unique, Values Duplicate</span>
+<span class="c">    │
+    ├──</span> <span class="pu">HashMap (C)</span><span class="n">: No Insertion Order Guarantee, 1 Null Key Allowed</span>
+<span class="c">    │   └──</span> <span class="pu">LinkedHashMap (C)</span><span class="n">: Insertion Order, 1 Null Key Allowed</span>
+<span class="c">    │
+    ├──</span> <span class="pu">WeakHashMap (C)</span><span class="n">: If key has no strong reference, GC can remove the corresponding entry</span>
+<span class="c">    ├──</span> <span class="pu">IdentityHashMap (C)</span><span class="n">: Uses == instead of equals() for key comparison</span>
+<span class="c">    ├──</span> <span class="re">Hashtable (C)</span><span class="n">: Synchronized &amp; Thread Safe, No Null Key/Value, Legacy, Whole Map Locked</span>
+<span class="c">    ├──</span> <span class="cy">ConcurrentHashMap (C)</span><span class="n">: Modern Thread Safe Map, No Null Key/Value, Better Performance than Hashtable, Bucket/Node Locked</span>
+<span class="c">    │
+    └──</span> <span class="i pu">SortedMap (I)</span><span class="n">: Keys are automatically stored in sorted order</span>
+<span class="c">        └──</span> <span class="i pu">NavigableMap (I)</span><span class="n">: SortedMap + Navigation Methods</span>
+<span class="c">            └──</span> <span class="pu">TreeMap (C)</span><span class="n">: Sorted by Key, No Null Key, Red-Black Tree</span></div>
+    </div>
+
+  </div><!-- /tree-section -->
+
+</div><!-- /page -->
+</body>
+</html>
