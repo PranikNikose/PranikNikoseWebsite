@@ -1,761 +1,626 @@
 <!DOCTYPE html>
+
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pranik K Nikose — Java Developer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:#0A0F1E; --bg2:#111827; --bg3:#1a2035;
-      --text:#F0EDE6; --muted:#94A3B8;
-      --accent:#6366F1; --accent2:#14B8A6;
-      --border:rgba(99,102,241,0.18); --card:rgba(26,32,53,0.8);
-    }
-    html { scroll-behavior: smooth; }
-    body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:16px; line-height:1.7; overflow-x:hidden; }
-
-    /* NAV */
-    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 5vw; background:rgba(10,15,30,0.88); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
-    .nav-logo { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.1rem; color:var(--text); text-decoration:none; letter-spacing:-0.02em; }
-    .nav-logo span { color:var(--accent); }
-    .nav-links { display:flex; gap:1.6rem; list-style:none; }
-    .nav-links a { color:var(--muted); text-decoration:none; font-size:0.88rem; font-weight:500; transition:color 0.2s; }
-    .nav-links a:hover { color:var(--text); }
-
-    /* HERO */
-    #hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:8rem 5vw 4rem; position:relative; overflow:hidden; }
-    #hero::before { content:''; position:absolute; width:650px; height:650px; background:radial-gradient(circle,rgba(99,102,241,0.13) 0%,transparent 70%); top:8%; right:-120px; pointer-events:none; }
-    #hero::after { content:''; position:absolute; width:420px; height:420px; background:radial-gradient(circle,rgba(20,184,166,0.08) 0%,transparent 70%); bottom:12%; left:-80px; pointer-events:none; }
-    .hero-eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:var(--accent2); margin-bottom:1.2rem; letter-spacing:0.04em; }
-    .hero-name { font-family:'Space Grotesk',sans-serif; font-size:clamp(3rem,8vw,6rem); font-weight:700; line-height:1.05; letter-spacing:-0.03em; margin-bottom:1rem; }
-    .hero-name .accent { color:var(--accent); }
-    .hero-terminal { font-family:'JetBrains Mono',monospace; font-size:clamp(0.95rem,2.2vw,1.3rem); color:var(--muted); margin-bottom:2rem; min-height:2.2em; }
-    .hero-terminal .prompt { color:var(--accent2); margin-right:0.6em; }
-    .hero-terminal .typed { color:var(--text); }
-    .cursor { display:inline-block; width:2px; height:1.1em; background:var(--accent); vertical-align:middle; margin-left:2px; animation:blink 1s step-start infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-    .hero-desc { max-width:580px; color:var(--muted); font-size:1.05rem; margin-bottom:2rem; line-height:1.78; }
-    .hero-desc strong { color:var(--text); }
-    .hero-meta { display:flex; gap:1.6rem; flex-wrap:wrap; margin-bottom:2.2rem; }
-    .hero-meta-item { display:flex; align-items:center; gap:0.45rem; font-size:0.85rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
-    .hero-meta-item .dot { color:var(--accent2); }
-    .hero-cta { display:flex; gap:1rem; flex-wrap:wrap; }
-    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.75rem 1.6rem; border-radius:6px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:0.95rem; text-decoration:none; transition:all 0.22s; cursor:pointer; border:none; }
-    .btn-primary { background:var(--accent); color:#fff; }
-    .btn-primary:hover { background:#4f51e0; transform:translateY(-1px); box-shadow:0 8px 24px rgba(99,102,241,0.3); }
-    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
-    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
-    .btn-demo { background:rgba(20,184,166,0.15); color:var(--accent2); border:1px solid rgba(20,184,166,0.35); padding:0.55rem 1.1rem; font-size:0.82rem; border-radius:5px; font-family:'JetBrains Mono',monospace; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; transition:all 0.2s; }
-    .btn-demo:hover { background:rgba(20,184,166,0.28); transform:translateY(-1px); }
-
-.knowledge-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:1.5rem;
-}
-
-.knowledge-card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:1.5rem;
-  transition:all 0.25s ease;
-}
-
-.knowledge-card:hover{
-  transform:translateY(-5px);
-  border-color:var(--accent);
-}
-
-.knowledge-card h3{
-  font-family:'Space Grotesk',sans-serif;
-  margin-bottom:0.75rem;
-}
-
-.knowledge-card p{
-  color:var(--muted);
-  font-size:0.9rem;
-  margin-bottom:1rem;
-}
-
-.knowledge-link{
-  display:inline-block;
-  text-decoration:none;
-  color:var(--accent2);
-  font-family:'JetBrains Mono',monospace;
-}
-
-    /* SECTIONS */
-    section { padding:6rem 5vw; }
-    .section-label { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--accent); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem; }
-    .section-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.8rem,4vw,2.5rem); font-weight:700; letter-spacing:-0.02em; margin-bottom:3rem; color:var(--text); }
-
-    /* ABOUT */
-    #about { background:var(--bg2); }
-    .about-grid { display:grid; grid-template-columns:1.2fr 0.8fr; gap:4rem; align-items:start; }
-    .about-text p { color:var(--muted); margin-bottom:1.2rem; }
-    .about-text p strong { color:var(--text); }
-    .award-section-label { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--accent2); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1rem; }
-    .award-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1.3rem 1.5rem; margin-bottom:1rem; display:flex; gap:1rem; align-items:flex-start; backdrop-filter:blur(8px); transition:border-color 0.2s; }
-    .award-card:hover { border-color:rgba(99,102,241,0.4); }
-    .award-icon { font-size:1.5rem; flex-shrink:0; margin-top:0.1rem; }
-    .award-title { font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:0.92rem; color:var(--text); margin-bottom:0.3rem; }
-    .award-desc { font-size:0.82rem; color:var(--muted); }
-
-    /* EXPERIENCE */
-    #experience { background:var(--bg); }
-    .exp-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2rem 2.2rem; backdrop-filter:blur(8px); position:relative; overflow:hidden; }
-    .exp-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,var(--accent),var(--accent2)); border-radius:3px 0 0 3px; }
-    .exp-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.8rem; margin-bottom:0.5rem; }
-    .exp-role { font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:700; color:var(--text); }
-    .exp-company { color:var(--accent); font-weight:600; }
-    .exp-period { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--muted); background:rgba(99,102,241,0.1); border:1px solid var(--border); border-radius:20px; padding:0.3rem 0.85rem; white-space:nowrap; }
-    .exp-bullets { list-style:none; margin-top:1.4rem; display:flex; flex-direction:column; gap:0.75rem; }
-    .exp-bullets li { color:var(--muted); font-size:0.92rem; padding-left:1.4rem; position:relative; line-height:1.65; }
-    .exp-bullets li::before { content:'▸'; position:absolute; left:0; color:var(--accent2); font-size:0.75rem; top:0.22em; }
-
-    /* SKILLS */
-    #skills { background:var(--bg2); }
-    .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:1.4rem; }
-    .skill-group { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; backdrop-filter:blur(8px); transition:border-color 0.2s; }
-    .skill-group:hover { border-color:rgba(99,102,241,0.4); }
-    .skill-group-title { font-family:'Space Grotesk',sans-serif; font-size:0.82rem; font-weight:600; color:var(--accent2); margin-bottom:1rem; letter-spacing:0.06em; text-transform:uppercase; }
-    .skill-tags { display:flex; flex-wrap:wrap; gap:0.45rem; }
-    .skill-tag { font-family:'JetBrains Mono',monospace; font-size:0.74rem; padding:0.28rem 0.65rem; border-radius:4px; background:rgba(99,102,241,0.1); color:var(--text); border:1px solid rgba(99,102,241,0.2); }
-
-    /* PROJECTS */
-    #projects { background:var(--bg); }
-    .projects-section-label { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1rem; margin-top:2.5rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); }
-    .projects-section-label:first-of-type { margin-top:0; }
-    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.6rem; margin-bottom:1rem; }
-    .project-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:2rem; display:flex; flex-direction:column; gap:0.9rem; transition:transform 0.22s,border-color 0.22s,box-shadow 0.22s; backdrop-filter:blur(8px); }
-    .project-card:hover { transform:translateY(-4px); border-color:rgba(99,102,241,0.4); box-shadow:0 20px 40px rgba(0,0,0,0.3); }
-    /* Featured/spotlight project card */
-    .project-card.featured { border-color:rgba(99,102,241,0.35); background:rgba(30,35,60,0.9); grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
-    .project-card.featured:hover { border-color:rgba(99,102,241,0.6); box-shadow:0 24px 48px rgba(99,102,241,0.15); }
-    .project-card.featured .project-left { display:flex; flex-direction:column; gap:0.9rem; }
-    .project-card.featured .project-right { display:flex; flex-direction:column; gap:0.8rem; }
-    .project-icon { width:44px; height:44px; border-radius:10px; background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.25); display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
-    .project-icon.roulette { background:rgba(20,184,166,0.12); border-color:rgba(20,184,166,0.28); }
-    .project-title { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:600; color:var(--text); }
-    .project-card.featured .project-title { font-size:1.3rem; }
-    .project-badge { display:inline-flex; align-items:center; gap:0.35rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--accent2); background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.25); border-radius:20px; padding:0.2rem 0.65rem; width:fit-content; }
-    .project-badge::before { content:'●'; font-size:0.5rem; animation:pulse 2s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .project-desc { font-size:0.9rem; color:var(--muted); line-height:1.65; flex:1; }
-    .project-tech { display:flex; flex-wrap:wrap; gap:0.4rem; }
-    .tech-badge { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.22rem 0.55rem; border-radius:3px; background:rgba(20,184,166,0.1); color:var(--accent2); border:1px solid rgba(20,184,166,0.2); }
-    .project-actions { display:flex; gap:0.7rem; align-items:center; flex-wrap:wrap; margin-top:0.2rem; }
-    .arch-list { list-style:none; display:flex; flex-direction:column; gap:0.6rem; }
-    .arch-list li { font-size:0.85rem; color:var(--muted); padding-left:1.3rem; position:relative; line-height:1.6; }
-    .arch-list li::before { content:'→'; position:absolute; left:0; color:var(--accent); font-size:0.75rem; top:0.12em; }
-    .arch-list li strong { color:var(--text); font-weight:500; }
-    .arch-label { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--accent2); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:0.5rem; }
-
-    /* DEVOPS */
-    #devops { background:var(--bg3); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
-    .pipeline { display:flex; align-items:center; overflow-x:auto; padding-bottom:0.5rem; scrollbar-width:none; }
-    .pipeline::-webkit-scrollbar { display:none; }
-    .pipeline-step { flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:0.5rem; min-width:88px; }
-    .pipeline-icon { width:52px; height:52px; border-radius:50%; background:rgba(99,102,241,0.1); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.3rem; transition:border-color 0.2s,background 0.2s; }
-    .pipeline-step:hover .pipeline-icon { border-color:var(--accent); background:rgba(99,102,241,0.22); }
-    .pipeline-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); text-align:center; }
-    .pipeline-arrow { flex:0 0 auto; width:28px; height:2px; background:linear-gradient(90deg,var(--accent),rgba(99,102,241,0.3)); position:relative; }
-    .pipeline-arrow::after { content:''; position:absolute; right:-1px; top:-3px; border:4px solid transparent; border-left-color:rgba(99,102,241,0.5); }
-    .pipeline-details { margin-top:2.5rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(195px,1fr)); gap:1rem; }
-    .pipeline-detail { padding:1rem 1.1rem; border-radius:8px; background:rgba(10,15,30,0.6); border:1px solid var(--border); }
-    .pipeline-detail-title { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--accent); margin-bottom:0.35rem; }
-    .pipeline-detail p { font-size:0.82rem; color:var(--muted); }
-
-    /* CERTS */
-    #certs { background:var(--bg2); }
-    .certs-grid { display:flex; flex-wrap:wrap; gap:1.1rem; }
-    .cert-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1.1rem 1.4rem; display:flex; align-items:center; gap:0.8rem; transition:border-color 0.2s; backdrop-filter:blur(8px); }
-    .cert-card:hover { border-color:rgba(99,102,241,0.4); }
-    .cert-icon { font-size:1.2rem; }
-    .cert-name { font-family:'Space Grotesk',sans-serif; font-size:0.9rem; font-weight:600; color:var(--text); }
-
-    /* CONTACT */
-    #contact { background:var(--bg); }
-    .contact-wrap { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start; }
-    .contact-info p { color:var(--muted); margin-bottom:2rem; }
-    .contact-links { display:flex; flex-direction:column; gap:0.9rem; }
-    .contact-link { display:flex; align-items:center; gap:1rem; padding:1rem 1.2rem; border-radius:8px; background:var(--card); border:1px solid var(--border); text-decoration:none; transition:border-color 0.2s,transform 0.2s; }
-    .contact-link:hover { border-color:var(--accent); transform:translateX(4px); }
-    .contact-link-icon { width:36px; height:36px; border-radius:8px; background:rgba(99,102,241,0.15); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
-    .contact-link-text .label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
-    .contact-link-text .value { font-size:0.9rem; color:var(--text); font-weight:500; }
-    .contact-form-area { display:flex; flex-direction:column; gap:1rem; }
-    .form-group { display:flex; flex-direction:column; gap:0.4rem; }
-    .form-group label { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); letter-spacing:0.06em; }
-    .form-group input, .form-group textarea { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:0.75rem 1rem; color:var(--text); font-family:'Inter',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.2s; resize:vertical; }
-    .form-group input:focus, .form-group textarea:focus { border-color:var(--accent); }
-    .form-status { font-family:'JetBrains Mono',monospace; font-size:0.78rem; padding:0.6rem 1rem; border-radius:5px; display:none; }
-    .form-status.success { display:block; background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.3); color:var(--accent2); }
-    .form-status.error { display:block; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#f87171; }
-
-    /* SCROLL TO TOP */
-    #scroll-top { position:fixed; bottom:2rem; right:2rem; width:44px; height:44px; border-radius:50%; background:rgba(99,102,241,0.85); border:1px solid rgba(99,102,241,0.5); color:#fff; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.3s,transform 0.2s; z-index:99; backdrop-filter:blur(8px); }
-    #scroll-top.visible { opacity:1; pointer-events:all; }
-    #scroll-top:hover { transform:translateY(-2px); background:var(--accent); }
-
-    /* FOOTER */
-    footer { background:var(--bg2); border-top:1px solid var(--border); padding:2rem 5vw; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
-    footer p { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); }
-    footer .accent { color:var(--accent); }
-
-    /* RESPONSIVE */
-    @media (max-width:900px) {
-      .project-card.featured { grid-template-columns:1fr; }
-    }
-    @media (max-width:768px) {
-      nav { padding:1rem 4vw; }
-      .nav-links { gap:1rem; }
-      .nav-links li:nth-child(n+5) { display:none; }
-      .about-grid, .contact-wrap { grid-template-columns:1fr; gap:2.5rem; }
-      section { padding:4rem 4vw; }
-      #scroll-top { bottom:1.2rem; right:1.2rem; }
-    }
-
-    /* FADE IN */
-    .fade-in { opacity:0; transform:translateY(22px); transition:opacity 0.6s ease,transform 0.6s ease; }
-    .fade-in.visible { opacity:1; transform:none; }
-    @media (prefers-reduced-motion:reduce) { .fade-in { opacity:1; transform:none; } .cursor { animation:none; } }
-  </style>
-</head>
-<body>
-
-  <nav>
-    <a class="nav-logo" href="#hero">pranik<span>.</span></a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#skills">Skills</a></li>
-	  <li><a href="#knowledge">Knowledge Hub</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#devops">DevOps</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
-
-  <!-- HERO -->
-  <section id="hero">
-    <p class="hero-eyebrow">// hello, world</p>
-    <h1 class="hero-name">Pranik K<br><span class="accent">Nikose</span></h1>
-    <div class="hero-terminal">
-      <span class="prompt">$</span>
-      <span class="typed" id="typed-text"></span><span class="cursor"></span>
-    </div>
-    <p class="hero-desc">
-      <strong>Java Developer</strong> with 5 years of experience building and supporting enterprise-scale
-      applications. Specialising in Spring Boot, J2EE, REST APIs, and CI/CD automation —
-      with hands-on AWS, Docker, and Jenkins. I write code that scales, and systems that last.
-    </p>
-    <div class="hero-meta">
-      <span class="hero-meta-item"><span class="dot">◆</span> Amravati, Maharashtra</span>
-      <span class="hero-meta-item"><span class="dot">◆</span> +91-7058187989</span>
-      <span class="hero-meta-item"><span class="dot">◆</span> praniknikose@gmail.com</span>
-      <span class="hero-meta-item"><span class="dot">◆</span> 5 Years Experience</span>
-    </div>
-    <div class="hero-cta">
-      <a href="#projects" class="btn btn-primary">View My Work →</a>
-      <a href="#contact" class="btn btn-ghost">Get in Touch</a>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about">
-    <div class="fade-in">
-      <p class="section-label">// who I am</p>
-      <h2 class="section-title">Builder by nature,<br>architect by habit.</h2>
-    </div>
-    <div class="about-grid">
-      <div class="about-text fade-in">
-        <p>I'm a <strong>Java Developer at Dexit Global Limited</strong>, where I've spent over 5 years developing and maintaining enterprise-scale web applications across the full SDLC — from requirement analysis and design through to production support and Agile releases.</p>
-        <p>My work spans both legacy stacks (Java, J2EE, Struts, JSP, Apache Tiles) and modern architectures (Spring Boot microservices, RESTful APIs, containerised deployments on AWS). I care about <strong>performance, maintainability, and code quality</strong> — bringing that rigour whether I'm building something new or modernising something old.</p>
-        <p>Outside of work, I build side projects that satisfy genuine curiosity. My latest project is deployed on AWS using Docker, Nginx, GitHub Actions, and automated CI/CD pipelines. I enjoy treating personal projects like production systems, with a strong focus on automation, reliability, and maintainability.</p>
-        <p>I hold a <strong>B.E. in Electrical Engineering</strong> from Prof. Ram Meghe College of Engineering & Management, Amravati (Sant Gadge Baba Amravati University, 2021) — which taught me to think systematically long before I wrote a line of Java.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pranik K Nikose — Java Developer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="css/main.css">
+   </head>
+  <body>
+    <nav>
+      <a class="nav-logo" href="#hero">pranik <span>.</span>
+      </a>
+      <ul class="nav-links">
+        <li>
+          <a href="#about">About</a>
+        </li>
+        <li>
+          <a href="#experience">Experience</a>
+        </li>
+        <li>
+          <a href="#skills">Skills</a>
+        </li>
+        <li>
+          <a href="#knowledge">Knowledge Hub</a>
+        </li>
+        <li>
+          <a href="#projects">Projects</a>
+        </li>
+        <li>
+          <a href="#devops">DevOps</a>
+        </li>
+        <li>
+          <a href="#contact">Contact</a>
+        </li>
+      </ul>
+    </nav>
+    <!-- HERO -->
+    <section id="hero">
+      <p class="hero-eyebrow">// hello, world</p>
+      <h1 class="hero-name">Pranik K <br>
+        <span class="accent">Nikose</span>
+      </h1>
+      <div class="hero-terminal">
+        <span class="prompt">$</span>
+        <span class="typed" id="typed-text"></span>
+        <span class="cursor"></span>
+      </div>
+      <p class="hero-desc">
+        <strong>Java Developer</strong> with 5 years of experience building and supporting enterprise-scale applications. Specialising in Spring Boot, J2EE, REST APIs, and CI/CD automation — with hands-on AWS, Docker, and Jenkins. I write code that scales, and systems that last.
+      </p>
+      <div class="hero-meta">
+        <span class="hero-meta-item">
+          <span class="dot">◆</span> Amravati, Maharashtra </span>
+        <span class="hero-meta-item">
+          <span class="dot">◆</span> +91-7058187989 </span>
+        <span class="hero-meta-item">
+          <span class="dot">◆</span> praniknikose@gmail.com </span>
+        <span class="hero-meta-item">
+          <span class="dot">◆</span> 5 Years Experience </span>
+      </div>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View My Work →</a>
+        <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+      </div>
+    </section>
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="fade-in">
+        <p class="section-label">// who I am</p>
+        <h2 class="section-title">Builder by nature, <br>architect by habit. </h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-text fade-in">
+          <p>I'm a <strong>Java Developer at Dexit Global Limited</strong>, where I've spent over 5 years developing and maintaining enterprise-scale web applications across the full SDLC — from requirement analysis and design through to production support and Agile releases. </p>
+          <p>My work spans both legacy stacks (Java, J2EE, Struts, JSP, Apache Tiles) and modern architectures (Spring Boot microservices, RESTful APIs, containerised deployments on AWS). I care about <strong>performance, maintainability, and code quality</strong> — bringing that rigour whether I'm building something new or modernising something old. </p>
+          <p>Outside of work, I build side projects that satisfy genuine curiosity. My latest project is deployed on AWS using Docker, Nginx, GitHub Actions, and automated CI/CD pipelines. I enjoy treating personal projects like production systems, with a strong focus on automation, reliability, and maintainability.</p>
+          <p>I hold a <strong>B.E. in Electrical Engineering</strong> from Prof. Ram Meghe College of Engineering & Management, Amravati (Sant Gadge Baba Amravati University, 2021) — which taught me to think systematically long before I wrote a line of Java. </p>
+        </div>
+        <div class="fade-in">
+          <div class="award-section-label">Awards & Recognition</div>
+          <div class="award-card">
+            <div class="award-icon">⚡</div>
+            <div>
+              <div class="award-title">Supernova of the Month</div>
+              <div class="award-desc">Awarded for outstanding project contribution, ownership, and delivery excellence.</div>
+            </div>
+          </div>
+          <div class="award-card">
+            <div class="award-icon">🌟</div>
+            <div>
+              <div class="award-title">Special Recognition Award</div>
+              <div class="award-desc">Received for innovation, commitment, and successful delivery of critical business requirements.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- EXPERIENCE -->
+    <section id="experience">
+      <div class="fade-in">
+        <p class="section-label">// where I've worked</p>
+        <h2 class="section-title">Experience</h2>
+      </div>
+      <div class="exp-card fade-in">
+        <div class="exp-header">
+          <div>
+            <div class="exp-role">Java Developer</div>
+            <div class="exp-company">Dexit Global Limited</div>
+          </div>
+          <div class="exp-period">Dec 2021 – Present</div>
+        </div>
+        <ul class="exp-bullets">
+          <li>Developed, enhanced, and maintained enterprise-scale web applications using Java, J2EE, Spring Framework, Struts, JSP, Servlets, JDBC, and Apache Tiles.</li>
+          <li>Developed and integrated RESTful APIs and microservices using Spring Boot to support enterprise application integrations and business workflows.</li>
+          <li>Optimized SQL queries, database interactions, and backend processing in Oracle and PostgreSQL environments to improve application performance.</li>
+          <li>Collaborated in requirement gathering, functional discussions, impact analysis, and effort estimation for change requests and application enhancements.</li>
+          <li>Conducted code reviews, debugging, root cause analysis, unit testing, and defect resolution to ensure application stability and quality.</li>
+          <li>Applied object-oriented design principles and modular architecture practices, contributing to scalable technical solutions aligned with business requirements.</li>
+          <li>Developed and maintained Jasper Reports while contributing to CI/CD and deployment automation using Jenkins, Docker, and AWS.</li>
+          <li>Participated in complete SDLC activities including requirement analysis, design, development, testing, deployment, production support, and Agile release management.</li>
+        </ul>
+      </div>
+    </section>
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="fade-in">
+        <p class="section-label">// what I work with</p>
+        <h2 class="section-title">Tech Stack</h2>
+      </div>
+      <div class="skills-grid fade-in">
+        <div class="skill-group">
+          <div class="skill-group-title">Primary Skills</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Java</span>
+            <span class="skill-tag">Spring Boot</span>
+            <span class="skill-tag">J2EE</span>
+            <span class="skill-tag">Struts</span>
+            <span class="skill-tag">REST APIs</span>
+            <span class="skill-tag">Oracle</span>
+            <span class="skill-tag">PostgreSQL</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Java Technologies</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Core Java</span>
+            <span class="skill-tag">Advanced Java</span>
+            <span class="skill-tag">JSP</span>
+            <span class="skill-tag">Servlets</span>
+            <span class="skill-tag">JDBC</span>
+            <span class="skill-tag">Reflection API</span>
+            <span class="skill-tag">Jasper Reports</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Frameworks</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Spring Core</span>
+            <span class="skill-tag">Spring MVC</span>
+            <span class="skill-tag">Spring Boot</span>
+            <span class="skill-tag">Struts</span>
+            <span class="skill-tag">Apache Tiles</span>
+            <span class="skill-tag">Microservices</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Web & Frontend</div>
+          <div class="skill-tags">
+            <span class="skill-tag">React</span>
+            <span class="skill-tag">HTML</span>
+            <span class="skill-tag">CSS</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">AJAX</span>
+            <span class="skill-tag">jQuery</span>
+            <span class="skill-tag">JSON</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Cloud & DevOps</div>
+          <div class="skill-tags">
+            <span class="skill-tag">AWS EC2</span>
+            <span class="skill-tag">AWS S3</span>
+            <span class="skill-tag">AWS RDS</span>
+            <span class="skill-tag">CloudWatch</span>
+            <span class="skill-tag">IAM</span>
+            <span class="skill-tag">VPC</span>
+            <span class="skill-tag">Docker</span>
+            <span class="skill-tag">Jenkins</span>
+            <span class="skill-tag">GitHub Actions</span>
+            <span class="skill-tag">Linux</span>
+            <span class="skill-tag">Shell Scripting</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Databases & Tools</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Oracle</span>
+            <span class="skill-tag">PostgreSQL</span>
+            <span class="skill-tag">MySQL</span>
+            <span class="skill-tag">MS SQL Server</span>
+            <span class="skill-tag">Maven</span>
+            <span class="skill-tag">Apache Tomcat</span>
+            <span class="skill-tag">Postman</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Version Control</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Git</span>
+            <span class="skill-tag">GitHub</span>
+            <span class="skill-tag">GitLab</span>
+            <span class="skill-tag">SVN</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- KNOWLEDGE -->
+    <section id="knowledge">
+      <div class="fade-in">
+        <p class="section-label">// interview preparation</p>
+        <h2 class="section-title">Java Knowledge Hub</h2>
+      </div>
+      <div class="knowledge-grid fade-in">
+        <div class="knowledge-card">
+          <h3>☕ Java Stream API</h3>
+          <p> Interview questions, coding examples, collectors, map vs flatMap, grouping, sorting, and advanced stream operations. </p>
+          <a class="knowledge-link" href="/java/streamapi/"> Open Notes → </a>
+        </div>
+        <div class="knowledge-card">
+          <h3>🧩 OOPs Concepts</h3>
+          <p> Encapsulation, Inheritance, Polymorphism, Abstraction, SOLID principles and interview notes. </p>
+          <a class="knowledge-link" href="/java/oops/"> Open Notes → </a>
+        </div>
+        <div class="knowledge-card">
+          <h3>📦 Collections Framework</h3>
+          <p> List, Set, Map, Concurrent Collections, internal working and interview questions. </p>
+          <a class="knowledge-link" href="/java/collections/"> Open Notes → </a>
+        </div>
+      </div>
+    </section>
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="fade-in">
+        <p class="section-label">// what I've built</p>
+        <h2 class="section-title">Projects</h2>
+      </div>
+      <!-- PERSONAL PROJECTS -->
+      <div class="projects-section-label fade-in">⚗️ Personal Projects</div>
+      <div class="projects-grid fade-in">
+        <!-- BUTTON ROULETTE — FEATURED -->
+        <div class="project-card featured">
+          <div class="project-left">
+            <div class="project-icon roulette">🎰</div>
+            <div>
+              <div class="project-badge">Live · roulette.praniknikose.top</div>
+            </div>
+            <div class="project-title">Button Roulette</div>
+            <div class="project-desc"> A full-stack application built to demonstrate end-to-end software delivery, combining modern Java development with practical DevOps implementation. The application generates random outcomes through a Spring Boot backend while a React frontend provides an interactive user experience. </div>
+            <div class="project-desc" style="margin-top:-0.4rem;"> The project showcases complete ownership of the software lifecycle—from development and containerization to infrastructure provisioning, CI/CD automation, Docker image management, AWS deployment, domain integration, and automated application delivery using Infrastructure as Code principles. </div>
+            <div class="project-actions">
+              <a href="http://roulette.praniknikose.top" target="_blank" rel="noopener" class="btn btn-demo"> ▶ Live Demo </a>
+              <a href="https://github.com/PranikNikose/button-roulette" target="_blank" rel="noopener" class="btn-ghost btn" style="padding:0.55rem 1.1rem;font-size:0.82rem;"> GitHub → </a>
+            </div>
+            <div class="project-tech">
+              <span class="tech-badge">React</span>
+              <span class="tech-badge">Spring Boot</span>
+              <span class="tech-badge">Java</span>
+              <span class="tech-badge">Java Reflection API</span>
+              <span class="tech-badge">Docker</span>
+              <span class="tech-badge">Docker Compose</span>
+              <span class="tech-badge">GitHub Actions</span>
+              <span class="tech-badge">Docker Hub</span>
+              <span class="tech-badge">Terraform</span>
+              <span class="tech-badge">AWS EC2</span>
+              <span class="tech-badge">AWS S3</span>
+              <span class="tech-badge">AWS DynamoDB</span>
+              <span class="tech-badge">Elastic IP</span>
+              <span class="tech-badge">Nginx</span>
+              <span class="tech-badge">CI/CD</span>
+            </div>
+          </div>
+          <div class="project-right">
+            <div class="arch-label">Architecture Highlights</div>
+            <ul class="arch-list">
+              <li>
+                <strong>React Frontend</strong> — Single Page Application providing an interactive user interface and consuming backend REST APIs.
+              </li>
+              <li>
+                <strong>Spring Boot Backend</strong> — REST API responsible for request processing, roulette execution logic, and application endpoints.
+              </li>
+              <li>
+                <strong>Java Reflection API</strong> — Dynamically discovers and invokes spell implementations at runtime without hardcoded execution paths.
+              </li>
+              <li>
+                <strong>Dockerized Architecture</strong> — Frontend, Backend, and Nginx services are containerized and orchestrated using Docker Compose.
+              </li>
+              <li>
+                <strong>GitHub Actions CI/CD</strong> — Automated workflows build applications, create Docker images, publish images to Docker Hub, and deploy updates to AWS EC2.
+              </li>
+              <li>
+                <strong>Docker Hub Registry</strong> — Stores application images used by the automated deployment pipeline.
+              </li>
+              <li>
+                <strong>Terraform Infrastructure as Code</strong> — AWS infrastructure is provisioned and managed using Terraform with remote state storage in S3 and state locking through DynamoDB.
+              </li>
+              <li>
+                <strong>AWS Deployment</strong> — Application hosted on EC2 with Elastic IP configuration providing stable public accessibility.
+              </li>
+              <li>
+                <strong>Nginx Reverse Proxy</strong> — Routes incoming requests between frontend and backend services and exposes applications through a unified entry point.
+              </li>
+              <li>
+                <strong>Custom Domain Integration</strong> — DNS configured to expose the application publicly through <code style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent2)"> roulette.praniknikose.top </code>.
+              </li>
+            </ul>
+            <div style="margin-top:1rem;padding:1rem;background:rgba(10,15,30,0.6);border-radius:8px;border:1px solid var(--border);">
+              <div class="arch-label" style="margin-bottom:0.6rem;"> Key Achievements </div>
+              <p style="font-size:0.84rem;color:var(--muted);line-height:1.65;"> Designed, built, and deployed a complete production-style application covering full-stack development, Docker containerization, Infrastructure as Code, AWS provisioning, CI/CD automation, image lifecycle management, reverse proxy configuration, automated deployment, and domain integration. Demonstrates practical experience across Java development, DevOps engineering, Terraform, AWS, Docker, GitHub Actions, and modern software delivery practices. </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- PROFESSIONAL PROJECTS -->
+      <div class="projects-section-label fade-in">🏢 Professional Work (Dexit Global Limited)</div>
+      <div class="projects-grid">
+        <div class="project-card fade-in">
+          <div class="project-icon">🏢</div>
+          <div class="project-title">Enterprise Legacy Application Development & Support</div>
+          <div class="project-desc">Developed and maintained enterprise web applications using Java, J2EE, Struts, JSP, Servlets, JDBC, and Apache Tiles. Drove requirement analysis, impact assessment, database optimization, and production support to ensure application stability and performance.</div>
+          <div class="project-tech">
+            <span class="tech-badge">Java</span>
+            <span class="tech-badge">J2EE</span>
+            <span class="tech-badge">Struts</span>
+            <span class="tech-badge">JSP</span>
+            <span class="tech-badge">JDBC</span>
+            <span class="tech-badge">Apache Tiles</span>
+            <span class="tech-badge">Oracle</span>
+            <span class="tech-badge">PostgreSQL</span>
+          </div>
+        </div>
+        <div class="project-card fade-in">
+          <div class="project-icon">⚙️</div>
+          <div class="project-title">Spring Boot Microservice Development</div>
+          <div class="project-desc">Developed Spring Boot-based microservices and RESTful APIs to support enterprise application integrations and business workflows. Contributed across requirement analysis, development, testing, deployment, and performance optimization.</div>
+          <div class="project-tech">
+            <span class="tech-badge">Spring Boot</span>
+            <span class="tech-badge">REST APIs</span>
+            <span class="tech-badge">Microservices</span>
+            <span class="tech-badge">Java</span>
+            <span class="tech-badge">PostgreSQL</span>
+            <span class="tech-badge">Maven</span>
+          </div>
+        </div>
+        <div class="project-card fade-in">
+          <div class="project-icon">🚀</div>
+          <div class="project-title">CI/CD Automation & Cloud Deployment Platform</div>
+          <div class="project-desc">Implemented CI/CD pipelines using Jenkins, Maven, and Docker to automate application build, testing, deployment, and release management. Deployed containerised Spring Boot applications on AWS infrastructure including EC2 and RDS.</div>
+          <div class="project-tech">
+            <span class="tech-badge">Spring Boot</span>
+            <span class="tech-badge">Jenkins</span>
+            <span class="tech-badge">Docker</span>
+            <span class="tech-badge">AWS</span>
+            <span class="tech-badge">Maven</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- DEVOPS -->
+    <section id="devops">
+      <div class="fade-in">
+        <p class="section-label">// how I ship</p>
+        <h2 class="section-title">DevOps & SDLC</h2>
       </div>
       <div class="fade-in">
-        <div class="award-section-label">Awards & Recognition</div>
-        <div class="award-card">
-          <div class="award-icon">⚡</div>
-          <div>
-            <div class="award-title">Supernova of the Month</div>
-            <div class="award-desc">Awarded for outstanding project contribution, ownership, and delivery excellence.</div>
+        <div class="pipeline">
+          <div class="pipeline-step">
+            <div class="pipeline-icon">📋</div>
+            <div class="pipeline-label">Plan</div>
+          </div>
+          <div class="pipeline-arrow"></div>
+          <div class="pipeline-step">
+            <div class="pipeline-icon">💻</div>
+            <div class="pipeline-label">Code</div>
+          </div>
+          <div class="pipeline-arrow"></div>
+          <div class="pipeline-step">
+            <div class="pipeline-icon">🔨</div>
+            <div class="pipeline-label">Build</div>
+          </div>
+          <div class="pipeline-arrow"></div>
+          <div class="pipeline-step">
+            <div class="pipeline-icon">🧪</div>
+            <div class="pipeline-label">Test</div>
+          </div>
+          <div class="pipeline-arrow"></div>
+          <div class="pipeline-step">
+            <div class="pipeline-icon">🔒</div>
+            <div class="pipeline-label">Security</div>
+          </div>
+          <div class="pipeline-arrow"></div>
+          <div class="pipeline-step">
+            <div class="pipeline-icon">📦</div>
+            <div class="pipeline-label">Release</div>
+          </div>
+          <div class="pipeline-arrow"></div>
+          <div class="pipeline-step">
+            <div class="pipeline-icon">☁️</div>
+            <div class="pipeline-label">Deploy</div>
+          </div>
+          <div class="pipeline-arrow"></div>
+          <div class="pipeline-step">
+            <div class="pipeline-icon">📡</div>
+            <div class="pipeline-label">Monitor</div>
           </div>
         </div>
-        <div class="award-card">
-          <div class="award-icon">🌟</div>
-          <div>
-            <div class="award-title">Special Recognition Award</div>
-            <div class="award-desc">Received for innovation, commitment, and successful delivery of critical business requirements.</div>
+        <div class="pipeline-details">
+          <div class="pipeline-detail">
+            <div class="pipeline-detail-title">Build</div>
+            <p>Maven · Apache Tomcat</p>
+          </div>
+          <div class="pipeline-detail">
+            <div class="pipeline-detail-title">CI/CD</div>
+            <p>Jenkins · GitHub Actions · automated pipelines</p>
+          </div>
+          <div class="pipeline-detail">
+            <div class="pipeline-detail-title">Containerization</div>
+            <p>Docker · Docker Compose · Spring Boot apps</p>
+          </div>
+          <div class="pipeline-detail">
+            <div class="pipeline-detail-title">Cloud (AWS)</div>
+            <p>EC2 · S3 · RDS · IAM · VPC · CloudWatch</p>
+          </div>
+          <div class="pipeline-detail">
+            <div class="pipeline-detail-title">Homelab</div>
+            <p>Ubuntu Server · Nginx · Cloudflare Tunnel</p>
+          </div>
+          <div class="pipeline-detail">
+            <div class="pipeline-detail-title">Version Control</div>
+            <p>Git · GitHub · GitLab · SVN</p>
+          </div>
+          <div class="pipeline-detail">
+            <div class="pipeline-detail-title">Agile</div>
+            <p>Sprint planning · impact analysis · production support</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- EXPERIENCE -->
-  <section id="experience">
-    <div class="fade-in">
-      <p class="section-label">// where I've worked</p>
-      <h2 class="section-title">Experience</h2>
-    </div>
-    <div class="exp-card fade-in">
-      <div class="exp-header">
-        <div>
-          <div class="exp-role">Java Developer</div>
-          <div class="exp-company">Dexit Global Limited</div>
-        </div>
-        <div class="exp-period">Dec 2021 – Present</div>
+    </section>
+    <!-- CERTIFICATIONS -->
+    <section id="certs">
+      <div class="fade-in">
+        <p class="section-label">// credentials</p>
+        <h2 class="section-title">Certifications</h2>
       </div>
-      <ul class="exp-bullets">
-        <li>Developed, enhanced, and maintained enterprise-scale web applications using Java, J2EE, Spring Framework, Struts, JSP, Servlets, JDBC, and Apache Tiles.</li>
-        <li>Developed and integrated RESTful APIs and microservices using Spring Boot to support enterprise application integrations and business workflows.</li>
-        <li>Optimized SQL queries, database interactions, and backend processing in Oracle and PostgreSQL environments to improve application performance.</li>
-        <li>Collaborated in requirement gathering, functional discussions, impact analysis, and effort estimation for change requests and application enhancements.</li>
-        <li>Conducted code reviews, debugging, root cause analysis, unit testing, and defect resolution to ensure application stability and quality.</li>
-        <li>Applied object-oriented design principles and modular architecture practices, contributing to scalable technical solutions aligned with business requirements.</li>
-        <li>Developed and maintained Jasper Reports while contributing to CI/CD and deployment automation using Jenkins, Docker, and AWS.</li>
-        <li>Participated in complete SDLC activities including requirement analysis, design, development, testing, deployment, production support, and Agile release management.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- SKILLS -->
-  <section id="skills">
-    <div class="fade-in">
-      <p class="section-label">// what I work with</p>
-      <h2 class="section-title">Tech Stack</h2>
-    </div>
-    <div class="skills-grid fade-in">
-      <div class="skill-group">
-        <div class="skill-group-title">Primary Skills</div>
-        <div class="skill-tags">
-          <span class="skill-tag">Java</span><span class="skill-tag">Spring Boot</span><span class="skill-tag">J2EE</span><span class="skill-tag">Struts</span><span class="skill-tag">REST APIs</span><span class="skill-tag">Oracle</span><span class="skill-tag">PostgreSQL</span>
+      <div class="certs-grid fade-in">
+        <div class="cert-card">
+          <div class="cert-icon">☕</div>
+          <div class="cert-name">Java for Beginners</div>
+        </div>
+        <div class="cert-card">
+          <div class="cert-icon">🌱</div>
+          <div class="cert-name">Java Spring Framework</div>
+        </div>
+        <div class="cert-card">
+          <div class="cert-icon">🚀</div>
+          <div class="cert-name">Java Spring Boot</div>
         </div>
       </div>
-      <div class="skill-group">
-        <div class="skill-group-title">Java Technologies</div>
-        <div class="skill-tags">
-          <span class="skill-tag">Core Java</span><span class="skill-tag">Advanced Java</span><span class="skill-tag">JSP</span><span class="skill-tag">Servlets</span><span class="skill-tag">JDBC</span><span class="skill-tag">Reflection API</span><span class="skill-tag">Jasper Reports</span>
+    </section>
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="fade-in">
+        <p class="section-label">// let's connect</p>
+        <h2 class="section-title">Get in Touch</h2>
+      </div>
+      <div class="contact-wrap">
+        <div class="contact-info fade-in">
+          <p>Whether it's about a project, a collaboration, or a good conversation about Spring Boot architecture — I'm always happy to connect.</p>
+          <div class="contact-links">
+            <a class="contact-link" href="tel:+917058187989">
+              <div class="contact-link-icon">📞</div>
+              <div class="contact-link-text">
+                <div class="label">PHONE</div>
+                <div class="value">+91-7058187989</div>
+              </div>
+            </a>
+            <a class="contact-link" href="mailto:praniknikose@gmail.com">
+              <div class="contact-link-icon">✉️</div>
+              <div class="contact-link-text">
+                <div class="label">EMAIL</div>
+                <div class="value">praniknikose@gmail.com</div>
+              </div>
+            </a>
+            <a class="contact-link" href="https://github.com/PranikNikose" target="_blank" rel="noopener">
+              <div class="contact-link-icon">🐙</div>
+              <div class="contact-link-text">
+                <div class="label">GITHUB</div>
+                <div class="value">github.com/PranikNikose</div>
+              </div>
+            </a>
+            <a class="contact-link" href="https://www.linkedin.com/in/pranik-nikose/" target="_blank" rel="noopener">
+              <div class="contact-link-icon">💼</div>
+              <div class="contact-link-text">
+                <div class="label">LINKEDIN</div>
+                <div class="value">linkedin.com/in/pranik-nikose</div>
+              </div>
+            </a>
+            <a class="contact-link" href="https://praniknikose.top" target="_blank" rel="noopener">
+              <div class="contact-link-icon">🌐</div>
+              <div class="contact-link-text">
+                <div class="label">WEBSITE</div>
+                <div class="value">praniknikose.top</div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="contact-form-area fade-in">
+          <div class="form-group">
+            <label>NAME</label>
+            <input type="text" id="form-name" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label>EMAIL</label>
+            <input type="email" id="form-email" placeholder="your@email.com" />
+          </div>
+          <div class="form-group">
+            <label>MESSAGE</label>
+            <textarea id="form-message" rows="5" placeholder="What's on your mind?"></textarea>
+          </div>
+          <div class="form-status" id="form-status"></div>
+          <button class="btn btn-primary" style="align-self:flex-start;" id="send-btn" onclick="handleSend(event)">Send Message →</button>
         </div>
       </div>
-      <div class="skill-group">
-        <div class="skill-group-title">Frameworks</div>
-        <div class="skill-tags">
-          <span class="skill-tag">Spring Core</span><span class="skill-tag">Spring MVC</span><span class="skill-tag">Spring Boot</span><span class="skill-tag">Struts</span><span class="skill-tag">Apache Tiles</span><span class="skill-tag">Microservices</span>
-        </div>
-      </div>
-      <div class="skill-group">
-        <div class="skill-group-title">Web & Frontend</div>
-        <div class="skill-tags">
-          <span class="skill-tag">React</span><span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span><span class="skill-tag">AJAX</span><span class="skill-tag">jQuery</span><span class="skill-tag">JSON</span>
-        </div>
-      </div>
-      <div class="skill-group">
-        <div class="skill-group-title">Cloud & DevOps</div>
-        <div class="skill-tags">
-          <span class="skill-tag">AWS EC2</span><span class="skill-tag">AWS S3</span><span class="skill-tag">AWS RDS</span><span class="skill-tag">CloudWatch</span><span class="skill-tag">IAM</span><span class="skill-tag">VPC</span><span class="skill-tag">Docker</span><span class="skill-tag">Jenkins</span><span class="skill-tag">GitHub Actions</span><span class="skill-tag">Linux</span><span class="skill-tag">Shell Scripting</span>
-        </div>
-      </div>
-      <div class="skill-group">
-        <div class="skill-group-title">Databases & Tools</div>
-        <div class="skill-tags">
-          <span class="skill-tag">Oracle</span><span class="skill-tag">PostgreSQL</span><span class="skill-tag">MySQL</span><span class="skill-tag">MS SQL Server</span><span class="skill-tag">Maven</span><span class="skill-tag">Apache Tomcat</span><span class="skill-tag">Postman</span>
-        </div>
-      </div>
-      <div class="skill-group">
-        <div class="skill-group-title">Version Control</div>
-        <div class="skill-tags">
-          <span class="skill-tag">Git</span><span class="skill-tag">GitHub</span><span class="skill-tag">GitLab</span><span class="skill-tag">SVN</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-<!-- KNOWLEDGE -->
-<section id="knowledge">
-  <div class="fade-in">
-    <p class="section-label">// interview preparation</p>
-    <h2 class="section-title">Java Knowledge Hub</h2>
-  </div>
-
-  <div class="knowledge-grid fade-in">
-
-    <div class="knowledge-card">
-      <h3>☕ Java Stream API</h3>
-      <p>
-        Interview questions, coding examples, collectors,
-        map vs flatMap, grouping, sorting, and advanced stream operations.
+    </section>
+    <footer>
+      <p>© <span id="footer-year"></span>
+        <span class="accent">Pranik K Nikose</span> · Java Developer · Amravati, Maharashtra.
       </p>
+      <p>Built with HTML, CSS & strong opinions about clean architecture.</p>
+    </footer>
+    <!-- SCROLL TO TOP -->
+    <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+    <script>
+      // Typed animation
+      const phrases = ['Java Developer · 5 Years', 'Spring Boot Architect', 'React + Spring Boot Builder', 'REST API Engineer', 'CI/CD & DevOps Practitioner', 'Enterprise Application Builder'];
+      let pi = 0,
+        ci = 0,
+        deleting = false;
+      const el = document.getElementById('typed-text');
 
-      <a class="knowledge-link"
-         href="/java/streamapi/">
-         Open Notes →
-      </a>
-    </div>
-
-    <div class="knowledge-card">
-      <h3>🧩 OOPs Concepts</h3>
-      <p>
-        Encapsulation, Inheritance, Polymorphism,
-        Abstraction, SOLID principles and interview notes.
-      </p>
-
-      <a class="knowledge-link"
-         href="/java/oops/">
-         Open Notes →
-      </a>
-    </div>
-    <div class="knowledge-card">
-      <h3>📦 Collections Framework</h3>
-      <p>
-        List, Set, Map, Concurrent Collections,
-        internal working and interview questions.
-      </p>
-      <a class="knowledge-link"
-         href="/java/collections/">
-         Open Notes →
-      </a>
-    </div>
-  </div>
-</section>
-
-  <!-- PROJECTS -->
-  <section id="projects">
-    <div class="fade-in">
-      <p class="section-label">// what I've built</p>
-      <h2 class="section-title">Projects</h2>
-    </div>
-
-<!-- PERSONAL PROJECTS -->
-<div class="projects-section-label fade-in">⚗️ Personal Projects</div>
-
-<div class="projects-grid fade-in">
-
-  <!-- BUTTON ROULETTE — FEATURED -->
-  <div class="project-card featured">
-
-    <div class="project-left">
-
-      <div class="project-icon roulette">🎰</div>
-
-      <div>
-        <div class="project-badge">Live · roulette.praniknikose.top</div>
-      </div>
-
-      <div class="project-title">Button Roulette</div>
-
-      <div class="project-desc">
-        A full-stack application built to demonstrate end-to-end software delivery, combining modern Java development with practical DevOps implementation. The application generates random outcomes through a Spring Boot backend while a React frontend provides an interactive user experience.
-      </div>
-
-      <div class="project-desc" style="margin-top:-0.4rem;">
-        The project showcases complete ownership of the software lifecycle—from development and containerization to infrastructure provisioning, CI/CD automation, Docker image management, AWS deployment, domain integration, and automated application delivery using Infrastructure as Code principles.
-      </div>
-
-      <div class="project-actions">
-        <a href="http://roulette.praniknikose.top" target="_blank" rel="noopener" class="btn btn-demo">
-          ▶ Live Demo
-        </a>
-
-        <a href="https://github.com/PranikNikose/button-roulette" target="_blank" rel="noopener" class="btn-ghost btn" style="padding:0.55rem 1.1rem;font-size:0.82rem;">
-          GitHub →
-        </a>
-      </div>
-
-      <div class="project-tech">
-        <span class="tech-badge">React</span><span class="tech-badge">Spring Boot</span><span class="tech-badge">Java</span><span class="tech-badge">Java Reflection API</span><span class="tech-badge">Docker</span><span class="tech-badge">Docker Compose</span><span class="tech-badge">GitHub Actions</span><span class="tech-badge">Docker Hub</span><span class="tech-badge">Terraform</span><span class="tech-badge">AWS EC2</span><span class="tech-badge">AWS S3</span><span class="tech-badge">AWS DynamoDB</span><span class="tech-badge">Elastic IP</span><span class="tech-badge">Nginx</span><span class="tech-badge">CI/CD</span>
-      </div>
-
-    </div>
-
-    <div class="project-right">
-
-      <div class="arch-label">Architecture Highlights</div>
-
-      <ul class="arch-list">
-
-        <li>
-          <strong>React Frontend</strong> —
-          Single Page Application providing an interactive user interface and consuming backend REST APIs.
-        </li>
-
-        <li>
-          <strong>Spring Boot Backend</strong> —
-          REST API responsible for request processing, roulette execution logic, and application endpoints.
-        </li>
-
-        <li>
-          <strong>Java Reflection API</strong> —
-          Dynamically discovers and invokes spell implementations at runtime without hardcoded execution paths.
-        </li>
-
-        <li>
-          <strong>Dockerized Architecture</strong> —
-          Frontend, Backend, and Nginx services are containerized and orchestrated using Docker Compose.
-        </li>
-
-        <li>
-          <strong>GitHub Actions CI/CD</strong> —
-          Automated workflows build applications, create Docker images, publish images to Docker Hub, and deploy updates to AWS EC2.
-        </li>
-
-        <li>
-          <strong>Docker Hub Registry</strong> —
-          Stores application images used by the automated deployment pipeline.
-        </li>
-
-        <li>
-          <strong>Terraform Infrastructure as Code</strong> —
-          AWS infrastructure is provisioned and managed using Terraform with remote state storage in S3 and state locking through DynamoDB.
-        </li>
-
-        <li>
-          <strong>AWS Deployment</strong> —
-          Application hosted on EC2 with Elastic IP configuration providing stable public accessibility.
-        </li>
-
-        <li>
-          <strong>Nginx Reverse Proxy</strong> —
-          Routes incoming requests between frontend and backend services and exposes applications through a unified entry point.
-        </li>
-
-        <li>
-          <strong>Custom Domain Integration</strong> —
-          DNS configured to expose the application publicly through
-          <code style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent2)">
-            roulette.praniknikose.top
-          </code>.
-        </li>
-      </ul>
-
-      <div style="margin-top:1rem;padding:1rem;background:rgba(10,15,30,0.6);border-radius:8px;border:1px solid var(--border);">
-
-        <div class="arch-label" style="margin-bottom:0.6rem;">
-          Key Achievements
-        </div>
-
-        <p style="font-size:0.84rem;color:var(--muted);line-height:1.65;">
-          Designed, built, and deployed a complete production-style application covering full-stack development, Docker containerization, Infrastructure as Code, AWS provisioning, CI/CD automation, image lifecycle management, reverse proxy configuration, automated deployment, and domain integration. Demonstrates practical experience across Java development, DevOps engineering, Terraform, AWS, Docker, GitHub Actions, and modern software delivery practices.
-        </p>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-    <!-- PROFESSIONAL PROJECTS -->
-    <div class="projects-section-label fade-in">🏢 Professional Work (Dexit Global Limited)</div>
-    <div class="projects-grid">
-      <div class="project-card fade-in">
-        <div class="project-icon">🏢</div>
-        <div class="project-title">Enterprise Legacy Application Development & Support</div>
-        <div class="project-desc">Developed and maintained enterprise web applications using Java, J2EE, Struts, JSP, Servlets, JDBC, and Apache Tiles. Drove requirement analysis, impact assessment, database optimization, and production support to ensure application stability and performance.</div>
-        <div class="project-tech">
-          <span class="tech-badge">Java</span><span class="tech-badge">J2EE</span><span class="tech-badge">Struts</span><span class="tech-badge">JSP</span><span class="tech-badge">JDBC</span><span class="tech-badge">Apache Tiles</span><span class="tech-badge">Oracle</span><span class="tech-badge">PostgreSQL</span>
-        </div>
-      </div>
-      <div class="project-card fade-in">
-        <div class="project-icon">⚙️</div>
-        <div class="project-title">Spring Boot Microservice Development</div>
-        <div class="project-desc">Developed Spring Boot-based microservices and RESTful APIs to support enterprise application integrations and business workflows. Contributed across requirement analysis, development, testing, deployment, and performance optimization.</div>
-        <div class="project-tech">
-          <span class="tech-badge">Spring Boot</span><span class="tech-badge">REST APIs</span><span class="tech-badge">Microservices</span><span class="tech-badge">Java</span><span class="tech-badge">PostgreSQL</span><span class="tech-badge">Maven</span>
-        </div>
-      </div>
-      <div class="project-card fade-in">
-        <div class="project-icon">🚀</div>
-        <div class="project-title">CI/CD Automation & Cloud Deployment Platform</div>
-        <div class="project-desc">Implemented CI/CD pipelines using Jenkins, Maven, and Docker to automate application build, testing, deployment, and release management. Deployed containerised Spring Boot applications on AWS infrastructure including EC2 and RDS.</div>
-        <div class="project-tech">
-          <span class="tech-badge">Spring Boot</span><span class="tech-badge">Jenkins</span><span class="tech-badge">Docker</span><span class="tech-badge">AWS</span><span class="tech-badge">Maven</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- DEVOPS -->
-  <section id="devops">
-    <div class="fade-in">
-      <p class="section-label">// how I ship</p>
-      <h2 class="section-title">DevOps & SDLC</h2>
-    </div>
-    <div class="fade-in">
-      <div class="pipeline">
-        <div class="pipeline-step"><div class="pipeline-icon">📋</div><div class="pipeline-label">Plan</div></div>
-        <div class="pipeline-arrow"></div>
-        <div class="pipeline-step"><div class="pipeline-icon">💻</div><div class="pipeline-label">Code</div></div>
-        <div class="pipeline-arrow"></div>
-        <div class="pipeline-step"><div class="pipeline-icon">🔨</div><div class="pipeline-label">Build</div></div>
-        <div class="pipeline-arrow"></div>
-        <div class="pipeline-step"><div class="pipeline-icon">🧪</div><div class="pipeline-label">Test</div></div>
-        <div class="pipeline-arrow"></div>
-        <div class="pipeline-step"><div class="pipeline-icon">🔒</div><div class="pipeline-label">Security</div></div>
-        <div class="pipeline-arrow"></div>
-        <div class="pipeline-step"><div class="pipeline-icon">📦</div><div class="pipeline-label">Release</div></div>
-        <div class="pipeline-arrow"></div>
-        <div class="pipeline-step"><div class="pipeline-icon">☁️</div><div class="pipeline-label">Deploy</div></div>
-        <div class="pipeline-arrow"></div>
-        <div class="pipeline-step"><div class="pipeline-icon">📡</div><div class="pipeline-label">Monitor</div></div>
-      </div>
-      <div class="pipeline-details">
-        <div class="pipeline-detail"><div class="pipeline-detail-title">Build</div><p>Maven · Apache Tomcat</p></div>
-        <div class="pipeline-detail"><div class="pipeline-detail-title">CI/CD</div><p>Jenkins · GitHub Actions · automated pipelines</p></div>
-        <div class="pipeline-detail"><div class="pipeline-detail-title">Containerization</div><p>Docker · Docker Compose · Spring Boot apps</p></div>
-        <div class="pipeline-detail"><div class="pipeline-detail-title">Cloud (AWS)</div><p>EC2 · S3 · RDS · IAM · VPC · CloudWatch</p></div>
-        <div class="pipeline-detail"><div class="pipeline-detail-title">Homelab</div><p>Ubuntu Server · Nginx · Cloudflare Tunnel</p></div>
-        <div class="pipeline-detail"><div class="pipeline-detail-title">Version Control</div><p>Git · GitHub · GitLab · SVN</p></div>
-        <div class="pipeline-detail"><div class="pipeline-detail-title">Agile</div><p>Sprint planning · impact analysis · production support</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CERTIFICATIONS -->
-  <section id="certs">
-    <div class="fade-in">
-      <p class="section-label">// credentials</p>
-      <h2 class="section-title">Certifications</h2>
-    </div>
-    <div class="certs-grid fade-in">
-      <div class="cert-card"><div class="cert-icon">☕</div><div class="cert-name">Java for Beginners</div></div>
-      <div class="cert-card"><div class="cert-icon">🌱</div><div class="cert-name">Java Spring Framework</div></div>
-      <div class="cert-card"><div class="cert-icon">🚀</div><div class="cert-name">Java Spring Boot</div></div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="fade-in">
-      <p class="section-label">// let's connect</p>
-      <h2 class="section-title">Get in Touch</h2>
-    </div>
-    <div class="contact-wrap">
-      <div class="contact-info fade-in">
-        <p>Whether it's about a project, a collaboration, or a good conversation about Spring Boot architecture — I'm always happy to connect.</p>
-        <div class="contact-links">
-          <a class="contact-link" href="tel:+917058187989">
-            <div class="contact-link-icon">📞</div>
-            <div class="contact-link-text"><div class="label">PHONE</div><div class="value">+91-7058187989</div></div>
-          </a>
-          <a class="contact-link" href="mailto:praniknikose@gmail.com">
-            <div class="contact-link-icon">✉️</div>
-            <div class="contact-link-text"><div class="label">EMAIL</div><div class="value">praniknikose@gmail.com</div></div>
-          </a>
-          <a class="contact-link" href="https://github.com/PranikNikose" target="_blank" rel="noopener">
-            <div class="contact-link-icon">🐙</div>
-            <div class="contact-link-text"><div class="label">GITHUB</div><div class="value">github.com/PranikNikose</div></div>
-          </a>
-          <a class="contact-link" href="https://www.linkedin.com/in/pranik-nikose/" target="_blank" rel="noopener">
-            <div class="contact-link-icon">💼</div>
-            <div class="contact-link-text"><div class="label">LINKEDIN</div><div class="value">linkedin.com/in/pranik-nikose</div></div>
-          </a>
-          <a class="contact-link" href="https://praniknikose.top" target="_blank" rel="noopener">
-            <div class="contact-link-icon">🌐</div>
-            <div class="contact-link-text"><div class="label">WEBSITE</div><div class="value">praniknikose.top</div></div>
-          </a>
-        </div>
-      </div>
-      <div class="contact-form-area fade-in">
-        <div class="form-group">
-          <label>NAME</label>
-          <input type="text" id="form-name" placeholder="Your name" />
-        </div>
-        <div class="form-group">
-          <label>EMAIL</label>
-          <input type="email" id="form-email" placeholder="your@email.com" />
-        </div>
-        <div class="form-group">
-          <label>MESSAGE</label>
-          <textarea id="form-message" rows="5" placeholder="What's on your mind?"></textarea>
-        </div>
-        <div class="form-status" id="form-status"></div>
-        <button class="btn btn-primary" style="align-self:flex-start;" id="send-btn" onclick="handleSend(event)">Send Message →</button>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <p>© <span id="footer-year"></span> <span class="accent">Pranik K Nikose</span> · Java Developer · Amravati, Maharashtra.</p>
-    <p>Built with HTML, CSS & strong opinions about clean architecture.</p>
-  </footer>
-
-  <!-- SCROLL TO TOP -->
-  <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
-
-  <script>
-    // Typed animation
-    const phrases = ['Java Developer · 5 Years','Spring Boot Architect','React + Spring Boot Builder','REST API Engineer','CI/CD & DevOps Practitioner','Enterprise Application Builder'];
-    let pi=0,ci=0,deleting=false;
-    const el=document.getElementById('typed-text');
-    function type(){
-      const phrase=phrases[pi];
-      if(!deleting){el.textContent=phrase.slice(0,++ci);if(ci===phrase.length){deleting=true;setTimeout(type,1800);return;}}
-      else{el.textContent=phrase.slice(0,--ci);if(ci===0){deleting=false;pi=(pi+1)%phrases.length;}}
-      setTimeout(type,deleting?36:66);
-    }
-    type();
-
-    // Intersection observer for fade-in
-    const observer=new IntersectionObserver(entries=>{
-      entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}});
-    },{threshold:0.08});
-    document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
-
-    // Contact form — opens mailto with pre-filled content
-    function handleSend(event){
-      const name = document.getElementById('form-name').value.trim();
-      const email = document.getElementById('form-email').value.trim();
-      const message = document.getElementById('form-message').value.trim();
-      const status = document.getElementById('form-status');
-      const btn = document.getElementById('send-btn');
-
-      if(!name || !email || !message){
-        status.textContent = '⚠ Please fill in all fields before sending.';
-        status.className = 'form-status error';
-        return;
+      function type() {
+        const phrase = phrases[pi];
+        if (!deleting) {
+          el.textContent = phrase.slice(0, ++ci);
+          if (ci === phrase.length) {
+            deleting = true;
+            setTimeout(type, 1800);
+            return;
+          }
+        } else {
+          el.textContent = phrase.slice(0, --ci);
+          if (ci === 0) {
+            deleting = false;
+            pi = (pi + 1) % phrases.length;
+          }
+        }
+        setTimeout(type, deleting ? 36 : 66);
       }
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-        status.textContent = '⚠ Please enter a valid email address.';
-        status.className = 'form-status error';
-        return;
+      type();
+      // Intersection observer for fade-in
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            observer.unobserve(e.target);
+          }
+        });
+      }, {
+        threshold: 0.08
+      });
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+      // Contact form — opens mailto with pre-filled content
+      function handleSend(event) {
+        const name = document.getElementById('form-name').value.trim();
+        const email = document.getElementById('form-email').value.trim();
+        const message = document.getElementById('form-message').value.trim();
+        const status = document.getElementById('form-status');
+        const btn = document.getElementById('send-btn');
+        if (!name || !email || !message) {
+          status.textContent = '⚠ Please fill in all fields before sending.';
+          status.className = 'form-status error';
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          status.textContent = '⚠ Please enter a valid email address.';
+          status.className = 'form-status error';
+          return;
+        }
+        const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+        window.location.href = `mailto:praniknikose@gmail.com?subject=${subject}&body=${body}`;
+        btn.textContent = 'Opening mail client ✓';
+        btn.style.background = 'var(--accent2)';
+        btn.disabled = true;
+        status.textContent = '✓ Your email client should open now. If not, email me directly at praniknikose@gmail.com';
+        status.className = 'form-status success';
+        setTimeout(() => {
+          btn.textContent = 'Send Message →';
+          btn.style.background = '';
+          btn.disabled = false;
+          status.className = 'form-status';
+        }, 5000);
       }
-
-      const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-      window.location.href = `mailto:praniknikose@gmail.com?subject=${subject}&body=${body}`;
-
-      btn.textContent = 'Opening mail client ✓';
-      btn.style.background = 'var(--accent2)';
-      btn.disabled = true;
-      status.textContent = '✓ Your email client should open now. If not, email me directly at praniknikose@gmail.com';
-      status.className = 'form-status success';
-
-      setTimeout(()=>{
-        btn.textContent = 'Send Message →';
-        btn.style.background = '';
-        btn.disabled = false;
-        status.className = 'form-status';
-      }, 5000);
-    }
-
-    // Footer year — auto-updates
-    document.getElementById('footer-year').textContent = new Date().getFullYear();
-
-    // Scroll to top button
-    const scrollBtn = document.getElementById('scroll-top');
-    window.addEventListener('scroll', () => {
-      scrollBtn.classList.toggle('visible', window.scrollY > 500);
-    });
-  </script>
-</body>
+      // Footer year — auto-updates
+      document.getElementById('footer-year').textContent = new Date().getFullYear();
+      // Scroll to top button
+      const scrollBtn = document.getElementById('scroll-top');
+      window.addEventListener('scroll', () => {
+        scrollBtn.classList.toggle('visible', window.scrollY > 500);
+      });
+    </script>
+  </body>
 </html>
