@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java OOP Concepts — Interview Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: A4;
+    margin: 8mm;
+  }
+
+  :root {
+    --bg:         #0D1117;
+    --surface:    #161B22;
+    --border:     #21262D;
+    --dim:        #444D56;
+    --muted:      #6E7681;
+    --text:       #C9D1D9;
+    --text-bright:#E6EDF3;
+
+    --blue:       #58A6FF;
+    --blue-dim:   #1F3A5F;
+    --green:      #3FB950;
+    --green-dim:  #1A3A1A;
+    --amber:      #E3B341;
+    --amber-dim:  #3D2E0A;
+    --purple:     #BC8CFF;
+    --purple-dim: #2A1A4A;
+    --cyan:       #39D4C4;
+    --cyan-dim:   #0D2E2B;
+    --red:        #F85149;
+    --red-dim:    #3A0D0D;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 9.5px;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    width: 210mm;
+    margin: 0 auto;
+  }
+
+  .page { padding: 0; }
+
+  /* ── HEADER ──────────────────────────────────────────── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 7px;
+    margin-bottom: 10px;
+  }
+  .header-top { display: flex; align-items: baseline; gap: 10px; }
+  .prompt { color: var(--green); font-weight: 600; font-size: 10px; }
+  .title { font-size: 17px; font-weight: 700; color: var(--text-bright); letter-spacing: -0.3px; }
+  .subtitle { color: var(--muted); font-size: 9px; margin-top: 2px; padding-left: 18px; }
+
+  /* ── QUICK REF CARDS ─────────────────────────────────── */
+  .section-label {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 5px;
+    padding-left: 2px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 7px;
+    border-left-width: 3px;
+  }
+  .card-name { font-weight: 700; font-size: 9.5px; margin-bottom: 2px; }
+  .card-desc { font-size: 8px; color: var(--muted); line-height: 1.4; }
+
+  .card-list   { border-left-color: var(--blue);   }
+  .card-list   .card-name { color: var(--blue);   }
+  .card-set    { border-left-color: var(--green);  }
+  .card-set    .card-name { color: var(--green);  }
+  .card-queue  { border-left-color: var(--amber);  }
+  .card-queue  .card-name { color: var(--amber);  }
+  .card-map    { border-left-color: var(--purple); }
+  .card-map    .card-name { color: var(--purple); }
+  .card-sync   { border-left-color: var(--cyan);   }
+  .card-sync   .card-name { color: var(--cyan);   }
+  .card-legacy { border-left-color: var(--red);    }
+  .card-legacy .card-name { color: var(--red);    }
+
+  /* ── LEGEND ──────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+  }
+  .legend-label { font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-right: 4px; }
+  .legend-items { display: flex; flex-wrap: wrap; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 8.5px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-list   { background: var(--blue);   }
+  .dot-set    { background: var(--green);  }
+  .dot-queue  { background: var(--amber);  }
+  .dot-map    { background: var(--purple); }
+  .dot-sync   { background: var(--cyan);   }
+  .dot-legacy { background: var(--red);    }
+
+  /* ── RELATIONSHIP / CONSTRUCTOR CARDS ───────────────── */
+  .naming-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .naming-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .naming-prefix {
+    font-weight: 700;
+    font-size: 9.5px;
+    color: var(--text-bright);
+    background: var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+  .naming-arrow { color: var(--dim); font-size: 9px; }
+  .naming-meaning { font-size: 8.5px; color: var(--muted); }
+
+  /* ── HIERARCHY TREES ─────────────────────────────────── */
+  .tree-section { margin-bottom: 0; }
+
+  .tree-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+  .tree-title {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tree-body { white-space: pre; font-size: 8.5px; line-height: 1.65; overflow: hidden; }
+
+  .c  { color: var(--dim); }
+  .i  { color: var(--text-bright); font-weight: 500; }
+  .n  { color: var(--text); }
+  .bl { color: var(--blue);   }
+  .gr { color: var(--green);  }
+  .am { color: var(--amber);  }
+  .pu { color: var(--purple); }
+  .cy { color: var(--cyan);   }
+  .re { color: var(--red);    }
+
+  /* ── BOTTOM GRID ─────────────────────────────────────── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .table-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .table-panel table { width: 100%; border-collapse: collapse; }
+  .table-panel th, .table-panel td {
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 8px;
+  }
+  .table-panel th {
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 7.5px;
+    font-weight: 600;
+  }
+  .table-panel td { color: var(--text); }
+  .table-panel tr:last-child td { border-bottom: none; }
+  .yes { color: var(--green); font-weight: 600; }
+  .no  { color: var(--red); }
+  .cell-hl { color: var(--amber); font-weight: 600; }
+
+  /* Comparable / Comparator style panel (reused for Overloading vs Overriding) */
+  .cmp-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cmp-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 8px;
+  }
+  .cmp-card.comparable  { border-left: 3px solid var(--blue);   }
+  .cmp-card.comparator  { border-left: 3px solid var(--purple); }
+  .cmp-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .cmp-name { font-weight: 700; font-size: 10px; }
+  .cmp-name.bl { color: var(--blue); }
+  .cmp-name.pu { color: var(--purple); }
+  .cmp-rows { display: flex; flex-direction: column; gap: 2px; }
+  .cmp-row { display: flex; gap: 6px; font-size: 8px; align-items: baseline; }
+  .cmp-key  { color: var(--dim); white-space: nowrap; min-width: 74px; }
+  .cmp-val  { color: var(--text); }
+  .cmp-val.code { color: var(--amber); font-weight: 600; }
+  .cmp-val.green { color: var(--green); }
+  .cmp-val.purple { color: var(--purple); }
+  .cmp-divider { height: 1px; background: var(--border); }
+
+  /* Pillar detail panel */
+  .pillar-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+  }
+  .pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .pillar-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 8px;
+    border-top-width: 3px;
+  }
+  .pillar-card.p-bl { border-top-color: var(--blue); }
+  .pillar-card.p-gr { border-top-color: var(--green); }
+  .pillar-card.p-am { border-top-color: var(--amber); }
+  .pillar-card.p-pu { border-top-color: var(--purple); }
+  .pillar-name { font-weight: 700; font-size: 9.5px; margin-bottom: 3px; }
+  .pillar-name.bl { color: var(--blue); }
+  .pillar-name.gr { color: var(--green); }
+  .pillar-name.am { color: var(--amber); }
+  .pillar-name.pu { color: var(--purple); }
+  .pillar-def { font-size: 8px; color: var(--muted); line-height: 1.4; margin-bottom: 4px; }
+  .pillar-tag {
+    display: inline-block;
+    font-size: 7.5px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-weight: 600;
+    margin-right: 3px;
+    margin-bottom: 3px;
+  }
+  .tag-bl { background: var(--blue-dim);   color: var(--blue);   }
+  .tag-gr { background: var(--green-dim);  color: var(--green);  }
+  .tag-am { background: var(--amber-dim);  color: var(--amber);  }
+  .tag-pu { background: var(--purple-dim); color: var(--purple); }
+  .pillar-example { font-size: 7.5px; color: var(--text); margin-top: 3px; border-top: 1px dashed var(--border); padding-top: 3px; }
+  .pillar-example b { color: var(--text-bright); }
+
+  @media print {
+    html, body { width: 210mm; }
+    .page { page-break-inside: avoid; }
+    .tree-panel { page-break-inside: avoid; }
+    .bottom-grid { page-break-inside: avoid; }
+    .pillar-panel { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Java OOP Concepts</span>
+    </div>
+    <div class="subtitle">// Interview Prep — Quick Reference</div>
+  </div>
+
+  <!-- QUICK REF CARDS -->
+  <div class="section-label">Quick Reference</div>
+  <div class="cards-grid">
+    <div class="card card-sync">
+      <div class="card-name">Class</div>
+      <div class="card-desc">Blueprint / Template — Variables &amp; Methods</div>
+    </div>
+    <div class="card card-legacy">
+      <div class="card-name">Object</div>
+      <div class="card-desc">Instance of a Class</div>
+    </div>
+    <div class="card card-list">
+      <div class="card-name">Encapsulation</div>
+      <div class="card-desc">Data Hiding — Bind Data + Methods</div>
+    </div>
+    <div class="card card-set">
+      <div class="card-name">Inheritance</div>
+      <div class="card-desc">Code Reuse — IS-A Relationship</div>
+    </div>
+    <div class="card card-queue">
+      <div class="card-name">Polymorphism</div>
+      <div class="card-desc">One Interface, Many Forms</div>
+    </div>
+    <div class="card card-map">
+      <div class="card-name">Abstraction</div>
+      <div class="card-desc">Hide Implementation Details</div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><span class="dot dot-list"></span>Encapsulation</div>
+      <div class="legend-item"><span class="dot dot-set"></span>Inheritance</div>
+      <div class="legend-item"><span class="dot dot-queue"></span>Polymorphism</div>
+      <div class="legend-item"><span class="dot dot-map"></span>Abstraction</div>
+      <div class="legend-item"><span class="dot dot-sync"></span>Class / Object</div>
+      <div class="legend-item"><span class="dot dot-legacy"></span>Modifiers / Relationships</div>
+    </div>
+  </div>
+
+  <!-- RELATIONSHIP TYPES -->
+  <div class="section-label">Relationship Types (HAS-A)</div>
+  <div class="naming-grid">
+    <div class="naming-card">
+      <span class="naming-prefix">Association</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">HAS-A, fully independent — Teacher ↔ Student</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Aggregation</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Weak HAS-A, parts exist independently — Department ↔ Employee</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Composition</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Strong HAS-A, parts can't exist alone — Car ↔ Engine</span>
+    </div>
+  </div>
+
+  <!-- FOUR PILLARS DETAIL -->
+  <div class="section-label">Four Pillars of OOP</div>
+  <div class="pillar-panel">
+    <div class="pillar-grid">
+      <div class="pillar-card p-bl">
+        <div class="pillar-name bl">1. Encapsulation</div>
+        <div class="pillar-def">Wrapping data and methods together into a single unit; achieved using private variables with public getters/setters.</div>
+        <span class="pillar-tag tag-bl">Data Hiding</span>
+        <span class="pillar-tag tag-bl">Security</span>
+        <span class="pillar-tag tag-bl">Maintainability</span>
+        <div class="pillar-example"><b>Ex:</b> private balance + getBalance()</div>
+      </div>
+      <div class="pillar-card p-gr">
+        <div class="pillar-name gr">2. Inheritance</div>
+        <div class="pillar-def">Child class inherits properties &amp; behavior from a parent class, promoting code reuse.</div>
+        <span class="pillar-tag tag-gr">Single</span>
+        <span class="pillar-tag tag-gr">Multilevel</span>
+        <span class="pillar-tag tag-gr">Hierarchical</span>
+        <span class="pillar-tag tag-gr">Multiple (via Interface)</span>
+        <div class="pillar-example"><b>Ex:</b> class Dog extends Animal</div>
+      </div>
+      <div class="pillar-card p-am">
+        <div class="pillar-name am">3. Polymorphism</div>
+        <div class="pillar-def">One interface, many forms — the same action behaves differently on different objects.</div>
+        <span class="pillar-tag tag-am">Compile-Time (Overload)</span>
+        <span class="pillar-tag tag-am">Runtime (Override)</span>
+        <div class="pillar-example"><b>Ex:</b> Person is Employee, Patient &amp; Father at once</div>
+      </div>
+      <div class="pillar-card p-pu">
+        <div class="pillar-name pu">4. Abstraction</div>
+        <div class="pillar-def">Showing only essential details and hiding implementation complexity from the user.</div>
+        <span class="pillar-tag tag-pu">Abstract Class</span>
+        <span class="pillar-tag tag-pu">Interface</span>
+        <div class="pillar-example"><b>Ex:</b> car.start() hides engine internals</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIERARCHY TREES -->
+  <div class="section-label">Structure &amp; Examples</div>
+  <div class="tree-section">
+
+    <div class="tree-panel">
+      <div class="tree-title">Class / Object &amp; Inheritance Example</div>
+      <div class="tree-body"><span class="c">│
+│</span>
+<span class="c">├──</span> <span class="i cy">Class (Blueprint)</span><span class="n">: Defines variables (state) + methods (behavior)</span>
+<span class="c">│   └──</span> <span class="re">Object</span><span class="n"> = Instance of Class, created via </span><span class="am">new</span><span class="n"> keyword</span>
+<span class="c">│
+├──</span> <span class="i gr">Inheritance (IS-A)</span><span class="n">: child reuses parent's members</span>
+<span class="c">│   ├──</span> <span class="gr">Single</span><span class="n">: Dog extends Animal</span>
+<span class="c">│   ├──</span> <span class="gr">Multilevel</span><span class="n">: Puppy extends Dog extends Animal</span>
+<span class="c">│   ├──</span> <span class="gr">Hierarchical</span><span class="n">: Dog, Cat both extend Animal</span>
+<span class="c">│   └──</span> <span class="gr">Multiple</span><span class="n"> (via Interface): class Duck implements Flyable, Swimmable</span>
+<span class="c">│
+└──</span> <span class="i am">Polymorphism</span><span class="n">: same call, different behavior</span>
+<span class="c">    ├──</span> <span class="am">Compile-Time — Method Overloading</span><span class="n">: add(int,int) vs add(int,int,int)</span>
+<span class="c">    └──</span> <span class="am">Runtime — Method Overriding</span><span class="n">: Animal.speak() → Dog.speak() @Override</span></div>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title">Abstraction: Interface vs Abstract Class</div>
+      <div class="tree-body"><span class="c">│
+│</span>
+<span class="c">├──</span> <span class="i pu">Interface</span><span class="n">: 100% Contract — "What to do"</span>
+<span class="c">│   ├──</span> <span class="pu">Variables</span><span class="n">: public static final (constants only)</span>
+<span class="c">│   ├──</span> <span class="pu">Methods</span><span class="n">: Abstract, Default, Static</span>
+<span class="c">│   └──</span> <span class="pu">Inheritance</span><span class="n">: A class can implement multiple interfaces</span>
+<span class="c">│
+└──</span> <span class="i bl">Abstract Class</span><span class="n">: Partial Implementation — "What + How (partial)"</span>
+<span class="c">    ├──</span> <span class="bl">Constructor</span><span class="n">: Allowed (called via super())</span>
+<span class="c">    ├──</span> <span class="bl">Methods</span><span class="n">: Abstract + Concrete methods together</span>
+<span class="c">    └──</span> <span class="bl">Inheritance</span><span class="n">: A class can extend only one abstract class</span></div>
+    </div>
+
+  </div><!-- /tree-section -->
+
+  <!-- BOTTOM SECTION -->
+  <div class="section-label" style="margin-top:8px;">Comparisons &amp; Access Control</div>
+  <div class="bottom-grid">
+
+    <!-- Abstract Class vs Interface table -->
+    <div class="table-panel">
+      <div class="tree-title">Abstract Class vs Interface</div>
+      <table>
+        <tr><th>Feature</th><th>Abstract Class</th><th>Interface</th></tr>
+        <tr><td>Constructor</td><td class="yes">Yes</td><td class="no">No</td></tr>
+        <tr><td>Variables</td><td>Any Type</td><td class="cell-hl">public static final</td></tr>
+        <tr><td>Methods</td><td>Abstract + Concrete</td><td>Abstract, Default, Static</td></tr>
+        <tr><td>Inheritance</td><td>Single</td><td>Multiple</td></tr>
+        <tr><td>State</td><td class="yes">Yes</td><td class="no">No</td></tr>
+      </table>
+    </div>
+
+    <!-- Overloading vs Overriding -->
+    <div class="cmp-panel">
+      <div class="tree-title">Overloading vs Overriding</div>
+      <div class="cmp-card comparable">
+        <div class="cmp-header">
+          <span class="cmp-name bl">Overloading</span>
+        </div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">When</span><span class="cmp-val">Compile-Time Polymorphism</span></div>
+          <div class="cmp-row"><span class="cmp-key">Rule</span><span class="cmp-val code">Same name, diff signature</span></div>
+          <div class="cmp-row"><span class="cmp-key">Varies by</span><span class="cmp-val green">Number / Type / Order of Params</span></div>
+          <div class="cmp-row"><span class="cmp-key">Class</span><span class="cmp-val">Same class</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header">
+          <span class="cmp-name pu">Overriding</span>
+        </div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">When</span><span class="cmp-val">Runtime Polymorphism</span></div>
+          <div class="cmp-row"><span class="cmp-key">Rule</span><span class="cmp-val code">Same signature, same/covariant return</span></div>
+          <div class="cmp-row"><span class="cmp-key">Varies by</span><span class="cmp-val purple">Implementation in Child Class</span></div>
+          <div class="cmp-row"><span class="cmp-key">Class</span><span class="cmp-val">Parent → Child (@Override)</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /bottom-grid -->
+
+  <div class="bottom-grid" style="margin-top:6px;">
+
+    <!-- Access Modifiers -->
+    <div class="table-panel">
+      <div class="tree-title">Access Modifiers</div>
+      <table>
+        <tr><th>Modifier</th><th>Same Class</th><th>Package</th><th>Child</th><th>Outside</th></tr>
+        <tr><td>private</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+        <tr><td>default</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
+        <tr><td>protected</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td></tr>
+        <tr><td>public</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      </table>
+    </div>
+
+    <!-- Constructors -->
+    <div class="table-panel">
+      <div class="tree-title">Constructors</div>
+      <table>
+        <tr><th>Type</th><th>Description</th></tr>
+        <tr><td class="cell-hl">Default Constructor</td><td>No-arg; auto-supplied by compiler if none defined; initializes with default values</td></tr>
+        <tr><td class="cell-hl">Parameterized Constructor</td><td>Accepts arguments to initialize object state at creation time</td></tr>
+        <tr><td class="cell-hl">Purpose</td><td>Initialize object state as soon as it's created</td></tr>
+      </table>
+    </div>
+
+  </div><!-- /bottom-grid -->
+
+</div><!-- /page -->
+</body>
+</html>
