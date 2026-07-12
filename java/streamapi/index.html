@@ -306,8 +306,6 @@
   .problem-code .kw { color: var(--purple); }
   .problem-code .mt { color: var(--blue); }
   .problem-code .cl { color: var(--amber); }
-  .problem-code .st { color: var(--green); }
-  .problem-card { page-break-inside: avoid; }
 
   /* ── 30 SEC REVISION ─────────────────────────────────── */
   .revision-panel {
@@ -540,81 +538,6 @@
       <div class="problem-code"><span class="kw">Set</span>&lt;Integer&gt; seen = <span class="kw">new</span> <span class="cl">HashSet</span>&lt;&gt;();
 list.stream()
    .<span class="mt">filter</span>(n -&gt; !seen.add(n))
-   .<span class="mt">toList</span>();</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Employees with Salary &gt; 50000</div>
-      <div class="problem-code">employees.stream()
-   .<span class="mt">filter</span>(e -&gt; e.getSalary() &gt; 50000)
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Sort Employees by Salary (Ascending)</div>
-      <div class="problem-code">employees.stream()
-   .<span class="mt">sorted</span>(<span class="cl">Comparator</span>.comparing(Employee::getSalary))
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Highest Paid Employee per Department</div>
-      <div class="problem-code">employees.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Employee::getDepartment,
-       <span class="cl">Collectors</span>.maxBy(<span class="cl">Comparator</span>.comparing(
-           Employee::getSalary))));</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Employee Names to Uppercase</div>
-      <div class="problem-code">employees.stream()
-   .<span class="mt">map</span>(e -&gt; e.getName().toUpperCase())
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Duplicate Employee Names</div>
-      <div class="problem-code">employees.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Employee::getName, <span class="cl">Collectors</span>.counting()))
-   .entrySet().stream()
-   .<span class="mt">filter</span>(en -&gt; en.getValue() &gt; 1)
-   .<span class="mt">map</span>(Map.Entry::getKey)
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toSet());</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Salary &gt; 20000 AND Gender Male</div>
-      <div class="problem-code">list.stream()
-   .<span class="mt">filter</span>(e -&gt; e.getSal() &gt; 20000.00)
-   .<span class="mt">filter</span>(e -&gt; e.getGender().equalsIgnoreCase(<span class="st">"Male"</span>))
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Sum of Salary by Department</div>
-      <div class="problem-code">list.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Emp::getDeptName,
-       <span class="cl">Collectors</span>.summingDouble(Emp::getSal)));</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">First Non-Repeating Character</div>
-      <div class="problem-code">str.chars().mapToObj(c -&gt; (<span class="kw">char</span>) c)
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       c -&gt; c, <span class="cl">LinkedHashMap</span>::new,
-       <span class="cl">Collectors</span>.counting()))
-   .entrySet().stream()
-   .<span class="mt">filter</span>(e -&gt; e.getValue() == 1)
-   .<span class="mt">map</span>(Map.Entry::getKey)
-   .<span class="mt">findFirst</span>()
-   .orElse(<span class="kw">null</span>);</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Names Starting with "C" → Uppercase</div>
-      <div class="problem-code">names.stream()
-   .<span class="mt">filter</span>(a -&gt; a.startsWith(<span class="st">"C"</span>))
-   .<span class="mt">map</span>(String::toUpperCase)
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-title">Remove Duplicates via distinct()</div>
-      <div class="problem-code"><span class="kw">List</span>&lt;Integer&gt; uniqueList = list.stream()
-   .<span class="mt">distinct</span>()
    .<span class="mt">toList</span>();</div>
     </div>
   </div>

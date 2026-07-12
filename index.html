@@ -52,6 +52,43 @@
     .btn-demo { background:rgba(20,184,166,0.15); color:var(--accent2); border:1px solid rgba(20,184,166,0.35); padding:0.55rem 1.1rem; font-size:0.82rem; border-radius:5px; font-family:'JetBrains Mono',monospace; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem; transition:all 0.2s; }
     .btn-demo:hover { background:rgba(20,184,166,0.28); transform:translateY(-1px); }
 
+.knowledge-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;
+}
+
+.knowledge-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:1.5rem;
+  transition:all 0.25s ease;
+}
+
+.knowledge-card:hover{
+  transform:translateY(-5px);
+  border-color:var(--accent);
+}
+
+.knowledge-card h3{
+  font-family:'Space Grotesk',sans-serif;
+  margin-bottom:0.75rem;
+}
+
+.knowledge-card p{
+  color:var(--muted);
+  font-size:0.9rem;
+  margin-bottom:1rem;
+}
+
+.knowledge-link{
+  display:inline-block;
+  text-decoration:none;
+  color:var(--accent2);
+  font-family:'JetBrains Mono',monospace;
+}
+
     /* SECTIONS */
     section { padding:6rem 5vw; }
     .section-label { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--accent); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.5rem; }
@@ -198,6 +235,7 @@
       <li><a href="#about">About</a></li>
       <li><a href="#experience">Experience</a></li>
       <li><a href="#skills">Skills</a></li>
+	  <li><a href="#knowledge">Knowledge Hub</a></li>
       <li><a href="#projects">Projects</a></li>
       <li><a href="#devops">DevOps</a></li>
       <li><a href="#contact">Contact</a></li>
@@ -340,6 +378,54 @@
       </div>
     </div>
   </section>
+
+<!-- KNOWLEDGE -->
+<section id="knowledge">
+  <div class="fade-in">
+    <p class="section-label">// interview preparation</p>
+    <h2 class="section-title">Java Knowledge Hub</h2>
+  </div>
+
+  <div class="knowledge-grid fade-in">
+
+    <div class="knowledge-card">
+      <h3>☕ Java Stream API</h3>
+      <p>
+        Interview questions, coding examples, collectors,
+        map vs flatMap, grouping, sorting, and advanced stream operations.
+      </p>
+
+      <a class="knowledge-link"
+         href="/java/streamapi/">
+         Open Notes →
+      </a>
+    </div>
+
+    <div class="knowledge-card">
+      <h3>🧩 OOPs Concepts</h3>
+      <p>
+        Encapsulation, Inheritance, Polymorphism,
+        Abstraction, SOLID principles and interview notes.
+      </p>
+
+      <a class="knowledge-link"
+         href="/java/oops/">
+         Open Notes →
+      </a>
+    </div>
+    <div class="knowledge-card">
+      <h3>📦 Collections Framework</h3>
+      <p>
+        List, Set, Map, Concurrent Collections,
+        internal working and interview questions.
+      </p>
+      <a class="knowledge-link"
+         href="/java/collections/">
+         Open Notes →
+      </a>
+    </div>
+  </div>
+</section>
 
   <!-- PROJECTS -->
   <section id="projects">
