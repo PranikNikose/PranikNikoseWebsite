@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Java Collections Framework — Interview Prep</title>
+<title>Java 8 Stream API — Interview Prep</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,9 +48,7 @@
     margin: 0 auto;
   }
 
-  .page {
-    padding: 0;
-  }
+  .page { padding: 0; }
 
   /* ── HEADER ──────────────────────────────────────────── */
   .header {
@@ -58,30 +56,11 @@
     padding-bottom: 7px;
     margin-bottom: 10px;
   }
-  .header-top {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
-  .prompt {
-    color: var(--green);
-    font-weight: 600;
-    font-size: 10px;
-  }
-  .title {
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text-bright);
-    letter-spacing: -0.3px;
-  }
-  .subtitle {
-    color: var(--muted);
-    font-size: 9px;
-    margin-top: 2px;
-    padding-left: 18px;
-  }
+  .header-top { display: flex; align-items: baseline; gap: 10px; }
+  .prompt { color: var(--green); font-weight: 600; font-size: 10px; }
+  .title { font-size: 17px; font-weight: 700; color: var(--text-bright); letter-spacing: -0.3px; }
+  .subtitle { color: var(--muted); font-size: 9px; margin-top: 2px; padding-left: 18px; }
 
-  /* ── QUICK REF CARDS ─────────────────────────────────── */
   .section-label {
     font-size: 8px;
     font-weight: 600;
@@ -92,13 +71,13 @@
     padding-left: 2px;
   }
 
+  /* ── QUICK REF CARDS ─────────────────────────────────── */
   .cards-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 5px;
     margin-bottom: 10px;
   }
-
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -106,29 +85,17 @@
     padding: 6px 7px;
     border-left-width: 3px;
   }
-  .card-name {
-    font-weight: 700;
-    font-size: 9.5px;
-    margin-bottom: 2px;
-  }
-  .card-desc {
-    font-size: 8px;
-    color: var(--muted);
-    line-height: 1.4;
-  }
+  .card-name { font-weight: 700; font-size: 9.5px; margin-bottom: 2px; }
+  .card-desc { font-size: 8px; color: var(--muted); line-height: 1.4; }
 
-  .card-list   { border-left-color: var(--blue);   }
-  .card-list   .card-name { color: var(--blue);   }
-  .card-set    { border-left-color: var(--green);  }
-  .card-set    .card-name { color: var(--green);  }
-  .card-queue  { border-left-color: var(--amber);  }
-  .card-queue  .card-name { color: var(--amber);  }
-  .card-map    { border-left-color: var(--purple); }
-  .card-map    .card-name { color: var(--purple); }
-  .card-sync   { border-left-color: var(--cyan);   }
-  .card-sync   .card-name { color: var(--cyan);   }
-  .card-legacy { border-left-color: var(--red);    }
-  .card-legacy .card-name { color: var(--red);    }
+  .card-source  { border-left-color: var(--cyan);   }
+  .card-source  .card-name { color: var(--cyan);   }
+  .card-inter   { border-left-color: var(--blue);   }
+  .card-inter   .card-name { color: var(--blue);   }
+  .card-term    { border-left-color: var(--amber);  }
+  .card-term    .card-name { color: var(--amber);  }
+  .card-coll    { border-left-color: var(--purple); }
+  .card-coll    .card-name { color: var(--purple); }
 
   /* ── LEGEND ──────────────────────────────────────────── */
   .legend {
@@ -150,31 +117,16 @@
     color: var(--dim);
     margin-right: 4px;
   }
-  .legend-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 8.5px;
-  }
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .dot-list   { background: var(--blue);   }
-  .dot-set    { background: var(--green);  }
-  .dot-queue  { background: var(--amber);  }
-  .dot-map    { background: var(--purple); }
-  .dot-sync   { background: var(--cyan);   }
-  .dot-legacy { background: var(--red);    }
+  .legend-items { display: flex; flex-wrap: wrap; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 8.5px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-source { background: var(--cyan); }
+  .dot-inter  { background: var(--blue); }
+  .dot-term   { background: var(--amber); }
+  .dot-coll   { background: var(--purple); }
+  .dot-lazy   { background: var(--green); }
 
-  /* ── NAMING PATTERN ──────────────────────────────────── */
+  /* ── NAMING / KEY POINTS ─────────────────────────────── */
   .naming-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -192,27 +144,17 @@
   }
   .naming-prefix {
     font-weight: 700;
-    font-size: 10px;
+    font-size: 9.5px;
     color: var(--text-bright);
     background: var(--border);
     border-radius: 3px;
     padding: 2px 6px;
     white-space: nowrap;
   }
-  .naming-arrow {
-    color: var(--dim);
-    font-size: 9px;
-  }
-  .naming-meaning {
-    font-size: 8.5px;
-    color: var(--muted);
-  }
+  .naming-arrow { color: var(--dim); font-size: 9px; }
+  .naming-meaning { font-size: 8.5px; color: var(--muted); }
 
-  /* ── HIERARCHY TREES ─────────────────────────────────── */
-  .tree-section {
-    margin-bottom: 0;
-  }
-
+  /* ── API TABLE PANELS ────────────────────────────────── */
   .tree-panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -231,125 +173,79 @@
     padding-bottom: 4px;
     border-bottom: 1px solid var(--border);
   }
-  .tree-body {
-    white-space: pre;
-    font-size: 8.5px;
-    line-height: 1.65;
-    overflow: hidden;
+
+  .api-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.3px;
+  }
+  .api-table td {
+    padding: 2.5px 4px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  .api-table tr:last-child td { border-bottom: none; }
+  .api-code {
+    font-weight: 700;
+    white-space: nowrap;
+    width: 130px;
+  }
+  .api-code.bl { color: var(--blue); }
+  .api-code.am { color: var(--amber); }
+  .api-code.pu { color: var(--purple); }
+  .api-code.cy { color: var(--cyan); }
+  .api-desc { color: var(--muted); }
+  .api-desc code {
+    color: var(--text);
+    background: var(--bg);
+    padding: 0 3px;
+    border-radius: 2px;
   }
 
-  /* node coloring via spans */
-  .c  { color: var(--dim); }           /* connector chars */
-  .i  { color: var(--text-bright); font-weight: 500; }  /* interface */
-  .n  { color: var(--text); }          /* class (base) */
-  .bl { color: var(--blue);   }
-  .gr { color: var(--green);  }
-  .am { color: var(--amber);  }
-  .pu { color: var(--purple); }
-  .cy { color: var(--cyan);   }
-  .re { color: var(--red);    }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
-  /* ── HASHMAP INTERNAL + COMPARABLE/COMPARATOR ─────────── */
-  .bottom-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-top: 6px;
-  }
-  /* Flow diagram */
+  /* ── FLOW DIAGRAM ─────────────────────────────────────── */
   .flow-panel {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 8px 10px;
   }
-  .flow-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .flow-col-title {
-    font-size: 8px;
-    font-weight: 600;
-    color: var(--purple);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    padding-bottom: 3px;
-    border-bottom: 1px solid var(--border);
-  }
-  .flow-step {
+  .flow-row {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    margin-bottom: 0;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
   }
   .flow-box {
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 3px;
-    padding: 3px 7px;
-    font-size: 8px;
+    padding: 4px 9px;
+    font-size: 8.5px;
     color: var(--text-bright);
     text-align: center;
-    width: 100%;
     font-weight: 500;
+    white-space: nowrap;
   }
-  .flow-box.root   { border-color: var(--purple); color: var(--purple); font-weight: 700; }
-  .flow-box.action { border-color: var(--blue);   color: var(--blue);   }
-  .flow-box.hash   { border-color: var(--amber);  color: var(--amber);  }
-  .flow-box.bucket { border-color: var(--cyan);   color: var(--cyan);   }
-  .flow-box.store  { border-color: var(--green);  color: var(--green);  }
-  .flow-box.coll   { border-color: var(--red);    color: var(--red);    }
-  .flow-box.tree   { border-color: var(--amber);  color: var(--amber);  }
-  .flow-box.ll     { border-color: var(--blue);   color: var(--blue);   }
-  .flow-box.eq     { border-color: var(--green);  color: var(--green);  }
-  .flow-box.ret    { border-color: var(--purple);  color: var(--purple); }
-  .flow-arrow {
-    color: var(--dim);
-    font-size: 9px;
-    line-height: 1.2;
-    text-align: center;
-    margin: 1px 0;
-  }
-  .flow-branch {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    width: 100%;
-    margin-top: 1px;
-  }
-  .flow-branch-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .flow-branch-label {
+  .flow-box.source { border-color: var(--cyan);  color: var(--cyan); font-weight: 700; }
+  .flow-box.inter  { border-color: var(--blue);  color: var(--blue); }
+  .flow-box.term   { border-color: var(--amber); color: var(--amber); font-weight: 700; }
+  .flow-arrow { color: var(--dim); font-size: 11px; }
+
+  .flow-sub-title {
     font-size: 7.5px;
     color: var(--muted);
+    text-align: center;
+    margin-top: 6px;
     margin-bottom: 2px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
-  /* hashcode/equals rule */
-  .rule-box {
-    margin-top: 8px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 5px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .rule-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 8px;
-  }
-  .rule-kw  { color: var(--amber);  font-weight: 700; white-space: nowrap; }
-  .rule-arr { color: var(--dim); }
-  .rule-desc { color: var(--muted); }
-  /* Comparable / Comparator panel */
+
+  /* map vs flatMap panel */
   .cmp-panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -365,74 +261,310 @@
     border-radius: 3px;
     padding: 6px 8px;
   }
-  .cmp-card.comparable  { border-left: 3px solid var(--blue);   }
-  .cmp-card.comparator  { border-left: 3px solid var(--purple); }
-  .cmp-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-  .cmp-name {
-    font-weight: 700;
-    font-size: 10px;
-  }
+  .cmp-card.map     { border-left: 3px solid var(--blue); }
+  .cmp-card.flatmap { border-left: 3px solid var(--purple); }
+  .cmp-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .cmp-name { font-weight: 700; font-size: 10px; }
   .cmp-name.bl { color: var(--blue); }
   .cmp-name.pu { color: var(--purple); }
-  .cmp-badge {
-    font-size: 7.5px;
-    padding: 1px 5px;
-    border-radius: 2px;
-    font-weight: 600;
-  }
-  .badge-interface { background: var(--blue-dim);   color: var(--blue);   }
-  .badge-method    { background: var(--purple-dim); color: var(--purple); }
-  .cmp-rows {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .cmp-row {
-    display: flex;
-    gap: 6px;
-    font-size: 8px;
-    align-items: baseline;
-  }
-  .cmp-key  { color: var(--dim); white-space: nowrap; min-width: 64px; }
-  .cmp-val  { color: var(--text); }
+  .cmp-rows { display: flex; flex-direction: column; gap: 2px; }
+  .cmp-row { display: flex; gap: 6px; font-size: 8px; align-items: baseline; }
+  .cmp-key { color: var(--dim); white-space: nowrap; min-width: 62px; }
+  .cmp-val { color: var(--text); }
   .cmp-val.code { color: var(--amber); font-weight: 600; }
-  .cmp-val.green { color: var(--green); }
-  .cmp-val.purple { color: var(--purple); }
-  .cmp-divider {
-    height: 1px;
-    background: var(--border);
+  .cmp-divider { height: 1px; background: var(--border); }
+
+  /* ── INTERVIEW PROBLEMS ──────────────────────────────── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
   }
-  .cmp-vs-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 8px;
+  .problem-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    border-left: 3px solid var(--green);
   }
-  .vs-pill {
-    padding: 1px 8px;
-    border-radius: 10px;
+  .problem-title {
+    font-size: 8.5px;
     font-weight: 700;
-    font-size: 7.5px;
+    color: var(--green);
+    margin-bottom: 3px;
   }
-  .vs-pill.bl { background: var(--blue-dim);   color: var(--blue);   }
-  .vs-pill.pu { background: var(--purple-dim); color: var(--purple); }
-  .vs-sep { color: var(--dim); }
-  
+  .problem-code {
+    font-size: 7.8px;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 3px;
+    padding: 4px 6px;
+    white-space: pre;
+    overflow: hidden;
+    line-height: 1.45;
+  }
+  .problem-code .kw { color: var(--purple); }
+  .problem-code .mt { color: var(--blue); }
+  .problem-code .cl { color: var(--amber); }
+
+  /* ── 30 SEC REVISION ─────────────────────────────────── */
+  .revision-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .revision-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px 14px;
+  }
+  .revision-item {
+    font-size: 8.3px;
+    color: var(--text);
+    display: flex;
+    gap: 5px;
+  }
+  .revision-item .chk { color: var(--green); font-weight: 700; }
+
   @media print {
     html, body { width: 210mm; }
     .page { page-break-inside: avoid; }
     .tree-panel { page-break-inside: avoid; }
-	.bottom-grid { page-break-inside: avoid; }
+    .flow-panel { page-break-inside: avoid; }
   }
 </style>
 </head>
 <body>
-<h1>Stream APi BY PranikN</h2>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Java 8 Stream API</span>
+    </div>
+    <div class="subtitle">// Interview Prep — Quick Reference</div>
+  </div>
+
+  <!-- QUICK REF CARDS -->
+  <div class="section-label">Quick Reference</div>
+  <div class="cards-grid">
+    <div class="card card-source">
+      <div class="card-name">Source</div>
+      <div class="card-desc">Creates a Stream from a Collection</div>
+    </div>
+    <div class="card card-inter">
+      <div class="card-name">Intermediate</div>
+      <div class="card-desc">Lazy, Returns a Stream, Chainable</div>
+    </div>
+    <div class="card card-term">
+      <div class="card-name">Terminal</div>
+      <div class="card-desc">Triggers Execution, Ends the Stream</div>
+    </div>
+    <div class="card card-coll">
+      <div class="card-name">Collectors</div>
+      <div class="card-desc">Reduces Stream into List / Set / Map</div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><span class="dot dot-source"></span>Source</div>
+      <div class="legend-item"><span class="dot dot-inter"></span>Intermediate (Lazy)</div>
+      <div class="legend-item"><span class="dot dot-term"></span>Terminal</div>
+      <div class="legend-item"><span class="dot dot-coll"></span>Collectors</div>
+    </div>
+  </div>
+
+  <!-- KEY POINTS -->
+  <div class="section-label">Core Rules</div>
+  <div class="naming-grid">
+    <div class="naming-card">
+      <span class="naming-prefix">Lazy</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Intermediate Ops Don't Run Until Terminal Op Called</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Once</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">A Stream Can Be Consumed Only Once</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Immutable</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Stream Never Modifies the Source Collection</span>
+    </div>
+  </div>
+
+  <!-- API TABLES -->
+  <div class="section-label">Stream Operations</div>
+
+  <div class="two-col">
+    <!-- SOURCE + INTERMEDIATE -->
+    <div class="tree-panel">
+      <div class="tree-title">Source</div>
+      <table class="api-table">
+        <tr><td class="api-code cy">stream()</td><td class="api-desc">Converts a <code>Collection</code> into a Stream</td></tr>
+        <tr><td class="api-code cy">parallelStream()</td><td class="api-desc">Parallel stream, uses <code>ForkJoinPool</code> internally</td></tr>
+      </table>
+
+      <div class="tree-title" style="margin-top:8px;">Intermediate Operations (Lazy)</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">filter()</td><td class="api-desc">Filters records — <code>.filter(n -&gt; n%2==0)</code></td></tr>
+        <tr><td class="api-code bl">map()</td><td class="api-desc">Transforms data (1-to-1) — <code>.map(String::toUpperCase)</code></td></tr>
+        <tr><td class="api-code bl">flatMap()</td><td class="api-desc">Flattens nested collections (1-to-many) — <code>.flatMap(List::stream)</code></td></tr>
+        <tr><td class="api-code bl">distinct()</td><td class="api-desc">Removes duplicate elements</td></tr>
+        <tr><td class="api-code bl">sorted()</td><td class="api-desc">Sorts — natural or via <code>Comparator</code></td></tr>
+        <tr><td class="api-code bl">peek()</td><td class="api-desc">Debug/log elements without consuming stream</td></tr>
+        <tr><td class="api-code bl">limit(n)</td><td class="api-desc">Returns first N elements</td></tr>
+        <tr><td class="api-code bl">skip(n)</td><td class="api-desc">Skips first N elements (pagination, top-N)</td></tr>
+      </table>
+    </div>
+
+    <!-- TERMINAL + COLLECTORS -->
+    <div class="tree-panel">
+      <div class="tree-title">Terminal Operations</div>
+      <table class="api-table">
+        <tr><td class="api-code am">collect()</td><td class="api-desc">Converts stream result into a Collection</td></tr>
+        <tr><td class="api-code am">count()</td><td class="api-desc">Returns total element count</td></tr>
+        <tr><td class="api-code am">forEach()</td><td class="api-desc">Iterates over elements</td></tr>
+        <tr><td class="api-code am">findFirst()</td><td class="api-desc">Returns first element as <code>Optional</code></td></tr>
+        <tr><td class="api-code am">findAny()</td><td class="api-desc">Returns any element, useful with parallel streams</td></tr>
+        <tr><td class="api-code am">anyMatch()</td><td class="api-desc">True if at least one element matches</td></tr>
+        <tr><td class="api-code am">allMatch()</td><td class="api-desc">True if all elements match</td></tr>
+        <tr><td class="api-code am">noneMatch()</td><td class="api-desc">True if no elements match</td></tr>
+        <tr><td class="api-code am">reduce()</td><td class="api-desc">Aggregation — <code>.reduce(0, Integer::sum)</code></td></tr>
+        <tr><td class="api-code am">min() / max()</td><td class="api-desc">Min/Max element via <code>Comparator</code></td></tr>
+      </table>
+
+      <div class="tree-title" style="margin-top:8px;">Collectors</div>
+      <table class="api-table">
+        <tr><td class="api-code pu">toList() / toSet()</td><td class="api-desc">Collect into List or Set</td></tr>
+        <tr><td class="api-code pu">toMap()</td><td class="api-desc"><code>toMap(key, value)</code> functions</td></tr>
+        <tr><td class="api-code pu">groupingBy()</td><td class="api-desc">Groups records by a classifier function</td></tr>
+        <tr><td class="api-code pu">counting()</td><td class="api-desc">Counts grouped records (used with groupingBy)</td></tr>
+        <tr><td class="api-code pu">joining()</td><td class="api-desc">Joins Strings with a delimiter</td></tr>
+        <tr><td class="api-code pu">averagingDouble()</td><td class="api-desc">Calculates average of a numeric field</td></tr>
+        <tr><td class="api-code pu">partitioningBy()</td><td class="api-desc">Splits into TRUE / FALSE groups</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- FLOW + MAP VS FLATMAP -->
+  <div class="section-label" style="margin-top:8px;">Pipeline Flow &amp; map() vs flatMap()</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Stream Execution Pipeline</div>
+      <div class="flow-row">
+        <div class="flow-box source">collection.stream()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box inter">filter()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box inter">map()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box inter">sorted()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box term">collect()</div>
+      </div>
+      <div class="flow-sub-title">Source → Intermediate Ops (Lazy) → Terminal Op (Executes)</div>
+      <div class="flow-sub-title" style="margin-top:8px;">Interview Use Cases for skip()/limit()</div>
+      <div class="flow-row" style="gap:8px;">
+        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">Pagination</div>
+        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">2nd Highest Salary</div>
+        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">Top N Records</div>
+      </div>
+    </div>
+
+    <div class="cmp-panel">
+      <div class="tree-title">map() vs flatMap()</div>
+      <div class="cmp-card map">
+        <div class="cmp-header"><span class="cmp-name bl">map()</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Relation</span><span class="cmp-val">One-to-One Transformation</span></div>
+          <div class="cmp-row"><span class="cmp-key">Example</span><span class="cmp-val code">List&lt;Employee&gt; → List&lt;String&gt;</span></div>
+          <div class="cmp-row"><span class="cmp-key">Usage</span><span class="cmp-val code">.map(Employee::getName)</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card flatmap">
+        <div class="cmp-header"><span class="cmp-name pu">flatMap()</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Relation</span><span class="cmp-val">One-to-Many + Flattening</span></div>
+          <div class="cmp-row"><span class="cmp-key">Example</span><span class="cmp-val code">List&lt;List&lt;String&gt;&gt; → List&lt;String&gt;</span></div>
+          <div class="cmp-row"><span class="cmp-key">Usage</span><span class="cmp-val code">.flatMap(emp -> emp.getSkills().stream())</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP INTERVIEW PROBLEMS -->
+  <div class="section-label" style="margin-top:8px;">Frequently Asked Interview Problems</div>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-title">Highest Salary Employee</div>
+      <div class="problem-code">employees.stream()
+   .<span class="mt">max</span>(<span class="cl">Comparator</span>.comparing(Employee::getSalary));</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Second Highest Salary</div>
+      <div class="problem-code">employees.stream()
+   .<span class="mt">sorted</span>(<span class="cl">Comparator</span>.comparing(Employee::getSalary).reversed())
+   .<span class="mt">skip</span>(1)
+   .<span class="mt">findFirst</span>();</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Group Employees by Department</div>
+      <div class="problem-code">employees.stream()
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getDepartment));</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Count Employees by Department</div>
+      <div class="problem-code">employees.stream()
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
+       Employee::getDepartment, <span class="cl">Collectors</span>.counting()));</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Average Salary by Department</div>
+      <div class="problem-code">employees.stream()
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
+       Employee::getDepartment,
+       <span class="cl">Collectors</span>.averagingDouble(Employee::getSalary)));</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Find Duplicate Elements</div>
+      <div class="problem-code"><span class="kw">Set</span>&lt;Integer&gt; seen = <span class="kw">new</span> <span class="cl">HashSet</span>&lt;&gt;();
+list.stream()
+   .<span class="mt">filter</span>(n -&gt; !seen.add(n))
+   .<span class="mt">toList</span>();</div>
+    </div>
+  </div>
+
+  <!-- 30 SECOND REVISION -->
+  <div class="section-label" style="margin-top:8px;">30-Second Interview Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Stream introduced in Java 8</div>
+      <div class="revision-item"><span class="chk">✓</span>Stream does not store data</div>
+      <div class="revision-item"><span class="chk">✓</span>Stream does not modify original collection</div>
+      <div class="revision-item"><span class="chk">✓</span>Intermediate Operations are Lazy</div>
+      <div class="revision-item"><span class="chk">✓</span>Terminal Operation triggers execution</div>
+      <div class="revision-item"><span class="chk">✓</span>Stream can be consumed only once</div>
+      <div class="revision-item"><span class="chk">✓</span>map() = Transform Data (1-to-1)</div>
+      <div class="revision-item"><span class="chk">✓</span>flatMap() = Flatten Nested Collections</div>
+      <div class="revision-item"><span class="chk">✓</span>filter() = Apply Condition</div>
+      <div class="revision-item"><span class="chk">✓</span>reduce() = Aggregation</div>
+      <div class="revision-item"><span class="chk">✓</span>collect() = Final Result</div>
+      <div class="revision-item"><span class="chk">✓</span>groupingBy() = Group Data</div>
+      <div class="revision-item"><span class="chk">✓</span>counting() = Count Grouped Data</div>
+      <div class="revision-item"><span class="chk">✓</span>averagingDouble() = Calculate Average</div>
+      <div class="revision-item"><span class="chk">✓</span>partitioningBy() = Split into TRUE/FALSE</div>
+      <div class="revision-item"><span class="chk">✓</span>parallelStream() = Parallel Processing</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
 </body>
 </html>
