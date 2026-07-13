@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Multithreading — Interview Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page {
+    size: A4;
+    margin: 8mm;
+  }
+
+  :root {
+    --bg:         #0D1117;
+    --surface:    #161B22;
+    --border:     #21262D;
+    --dim:        #444D56;
+    --muted:      #6E7681;
+    --text:       #C9D1D9;
+    --text-bright:#E6EDF3;
+
+    --blue:       #58A6FF;
+    --blue-dim:   #1F3A5F;
+    --green:      #3FB950;
+    --green-dim:  #1A3A1A;
+    --amber:      #E3B341;
+    --amber-dim:  #3D2E0A;
+    --purple:     #BC8CFF;
+    --purple-dim: #2A1A4A;
+    --cyan:       #39D4C4;
+    --cyan-dim:   #0D2E2B;
+    --red:        #F85149;
+    --red-dim:    #3A0D0D;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 9.5px;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    width: 210mm;
+    margin: 0 auto;
+  }
+
+  .page { padding: 0; }
+
+  /* ── HEADER ──────────────────────────────────────────── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 7px;
+    margin-bottom: 10px;
+  }
+  .header-top { display: flex; align-items: baseline; gap: 10px; }
+  .prompt { color: var(--green); font-weight: 600; font-size: 10px; }
+  .title { font-size: 17px; font-weight: 700; color: var(--text-bright); letter-spacing: -0.3px; }
+  .subtitle { color: var(--muted); font-size: 9px; margin-top: 2px; padding-left: 18px; }
+
+  .section-label {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 5px;
+    padding-left: 2px;
+  }
+
+  /* ── QUICK REF CARDS ─────────────────────────────────── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 7px;
+    border-left-width: 3px;
+  }
+  .card-name { font-weight: 700; font-size: 9.5px; margin-bottom: 2px; }
+  .card-desc { font-size: 8px; color: var(--muted); line-height: 1.4; }
+
+  .card-source  { border-left-color: var(--cyan);   }
+  .card-source  .card-name { color: var(--cyan);   }
+  .card-inter   { border-left-color: var(--blue);   }
+  .card-inter   .card-name { color: var(--blue);   }
+  .card-term    { border-left-color: var(--amber);  }
+  .card-term    .card-name { color: var(--amber);  }
+  .card-coll    { border-left-color: var(--purple); }
+  .card-coll    .card-name { color: var(--purple); }
+
+  /* ── LEGEND ──────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+  }
+  .legend-label {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-right: 4px;
+  }
+  .legend-items { display: flex; flex-wrap: wrap; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 8.5px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-source { background: var(--cyan); }
+  .dot-inter  { background: var(--blue); }
+  .dot-term   { background: var(--amber); }
+  .dot-coll   { background: var(--purple); }
+  .dot-lazy   { background: var(--red); }
+
+  /* ── NAMING / KEY POINTS ─────────────────────────────── */
+  .naming-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .naming-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .naming-prefix {
+    font-weight: 700;
+    font-size: 9.5px;
+    color: var(--text-bright);
+    background: var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+  .naming-arrow { color: var(--dim); font-size: 9px; }
+  .naming-meaning { font-size: 8.5px; color: var(--muted); }
+
+  /* ── API TABLE PANELS ────────────────────────────────── */
+  .tree-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+  .tree-title {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .api-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.3px;
+  }
+  .api-table td {
+    padding: 2.5px 4px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  .api-table tr:last-child td { border-bottom: none; }
+  .api-code {
+    font-weight: 700;
+    white-space: nowrap;
+    width: 130px;
+  }
+  .api-code.bl { color: var(--blue); }
+  .api-code.am { color: var(--amber); }
+  .api-code.pu { color: var(--purple); }
+  .api-code.cy { color: var(--cyan); }
+  .api-code.rd { color: var(--red); }
+  .api-desc { color: var(--muted); }
+  .api-desc code {
+    color: var(--text);
+    background: var(--bg);
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  /* ── FLOW DIAGRAM ─────────────────────────────────────── */
+  .flow-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .flow-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 4px 9px;
+    font-size: 8.5px;
+    color: var(--text-bright);
+    text-align: center;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .flow-box.source { border-color: var(--cyan);  color: var(--cyan); font-weight: 700; }
+  .flow-box.inter  { border-color: var(--blue);  color: var(--blue); }
+  .flow-box.term   { border-color: var(--amber); color: var(--amber); font-weight: 700; }
+  .flow-box.warn   { border-color: var(--red); color: var(--red); font-weight: 700; }
+  .flow-arrow { color: var(--dim); font-size: 11px; }
+
+  .flow-sub-title {
+    font-size: 7.5px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 2px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* comparison panel */
+  .cmp-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cmp-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 8px;
+  }
+  .cmp-card.map     { border-left: 3px solid var(--blue); }
+  .cmp-card.flatmap { border-left: 3px solid var(--purple); }
+  .cmp-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .cmp-name { font-weight: 700; font-size: 10px; }
+  .cmp-name.bl { color: var(--blue); }
+  .cmp-name.pu { color: var(--purple); }
+  .cmp-rows { display: flex; flex-direction: column; gap: 2px; }
+  .cmp-row { display: flex; gap: 6px; font-size: 8px; align-items: baseline; }
+  .cmp-key { color: var(--dim); white-space: nowrap; min-width: 62px; }
+  .cmp-val { color: var(--text); }
+  .cmp-val.code { color: var(--amber); font-weight: 600; }
+  .cmp-divider { height: 1px; background: var(--border); }
+
+  /* compact vs table (two-column comparison inside a panel) */
+  .vs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.2px;
+  }
+  .vs-table th {
+    text-align: left;
+    color: var(--dim);
+    font-size: 7.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .vs-table td {
+    padding: 3px 5px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .vs-table tr:last-child td { border-bottom: none; }
+  .vs-table td:first-child { color: var(--blue); font-weight: 600; }
+  .vs-table td:last-child { color: var(--purple); font-weight: 600; }
+
+  /* ── INTERVIEW PROBLEMS / CODE SNIPPETS ──────────────── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .problem-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    border-left: 3px solid var(--green);
+  }
+  .problem-title {
+    font-size: 8.5px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 3px;
+  }
+  .problem-code {
+    font-size: 7.8px;
+    color: var(--text);
+    background: var(--bg);
+    border-radius: 3px;
+    padding: 4px 6px;
+    white-space: pre;
+    overflow: hidden;
+    line-height: 1.45;
+  }
+  .problem-code .kw { color: var(--purple); }
+  .problem-code .mt { color: var(--blue); }
+  .problem-code .cl { color: var(--amber); }
+  .problem-code .st { color: var(--green); }
+  .problem-code .cm { color: var(--muted); }
+  .problem-card { page-break-inside: avoid; }
+
+  /* ── 30 SEC REVISION ─────────────────────────────────── */
+  .revision-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+  .revision-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px 14px;
+  }
+  .revision-item {
+    font-size: 8.3px;
+    color: var(--text);
+    display: flex;
+    gap: 5px;
+  }
+  .revision-item .chk { color: var(--green); font-weight: 700; }
+
+  /* thread pool sizing panel */
+  .sizing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .sizing-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 8px;
+  }
+  .sizing-card .formula {
+    color: var(--amber);
+    font-weight: 700;
+    font-size: 9px;
+    margin: 3px 0;
+  }
+  .sizing-card .label { color: var(--muted); font-size: 8px; }
+
+  @media print {
+    html, body { width: 210mm; }
+    .tree-panel { page-break-inside: avoid; }
+    .flow-panel { page-break-inside: avoid; }
+    .cmp-panel { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Java Multithreading</span>
+    </div>
+    <div class="subtitle">// Interview Prep — Quick Reference (5–7 YOE, Spring Boot &amp; Microservices)</div>
+  </div>
+
+  <!-- QUICK REF CARDS -->
+  <div class="section-label">Quick Reference</div>
+  <div class="cards-grid">
+    <div class="card card-source">
+      <div class="card-name">Basics</div>
+      <div class="card-desc">Process, Thread, Lifecycle, Creation</div>
+    </div>
+    <div class="card card-inter">
+      <div class="card-name">Safety</div>
+      <div class="card-desc">Race Condition, Sync, Volatile, Atomic, Locks</div>
+    </div>
+    <div class="card card-term">
+      <div class="card-name">Coordination</div>
+      <div class="card-desc">wait/notify, Latch, Barrier, Semaphore</div>
+    </div>
+    <div class="card card-coll">
+      <div class="card-name">Modern Java</div>
+      <div class="card-desc">Executor, CompletableFuture, ForkJoin, Concurrent Collections</div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><span class="dot dot-source"></span>Core Concept</div>
+      <div class="legend-item"><span class="dot dot-inter"></span>Sync / Safety</div>
+      <div class="legend-item"><span class="dot dot-term"></span>Executor / Async</div>
+      <div class="legend-item"><span class="dot dot-coll"></span>Collections / Utilities</div>
+      <div class="legend-item"><span class="dot dot-lazy"></span>Danger Zone (Deadlock/Starvation)</div>
+    </div>
+  </div>
+
+  <!-- CORE RULES -->
+  <div class="section-label">Core Rules (Say These First In Interview)</div>
+  <div class="naming-grid">
+    <div class="naming-card">
+      <span class="naming-prefix">Concurrency</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Multiple Tasks Make Progress in Overlapping Time (Not Necessarily Same Instant)</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Parallelism</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Multiple Tasks Run Truly Simultaneously on Multiple Cores</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Multithreading</span>
+      <span class="naming-arrow">→</span>
+      <span class="naming-meaning">Multiple Threads Run Concurrently Within One Process, Sharing Memory</span>
+    </div>
+  </div>
+
+  <!-- LIFECYCLE + CREATION -->
+  <div class="section-label">Thread Lifecycle &amp; Creation</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Thread Lifecycle</div>
+      <table class="api-table">
+        <tr><td class="api-code cy">NEW</td><td class="api-desc">Thread object created, <code>start()</code> not yet called</td></tr>
+        <tr><td class="api-code cy">RUNNABLE</td><td class="api-desc">Eligible to run — moves here after <code>start()</code></td></tr>
+        <tr><td class="api-code cy">RUNNING</td><td class="api-desc">CPU is actively executing this thread</td></tr>
+        <tr><td class="api-code cy">BLOCKED</td><td class="api-desc">Waiting to acquire a monitor lock held by another thread</td></tr>
+        <tr><td class="api-code cy">WAITING</td><td class="api-desc">Waiting indefinitely — <code>wait()</code>, <code>join()</code> w/o timeout</td></tr>
+        <tr><td class="api-code cy">TIMED_WAITING</td><td class="api-desc">Waiting for a fixed time — <code>sleep()</code>, <code>wait(ms)</code>, <code>join(ms)</code></td></tr>
+        <tr><td class="api-code cy">TERMINATED</td><td class="api-desc">Run completed (normally or via exception)</td></tr>
+      </table>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title">Thread Creation Options</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">extends Thread</td><td class="api-desc">Simplest, but no multiple inheritance — avoid in practice</td></tr>
+        <tr><td class="api-code bl">implements Runnable</td><td class="api-desc">Preferred — no return value, no checked exceptions</td></tr>
+        <tr><td class="api-code bl">Callable&lt;V&gt;</td><td class="api-desc">Returns a value, can throw checked exceptions</td></tr>
+        <tr><td class="api-code bl">Future&lt;V&gt;</td><td class="api-desc">Handle to result of async task — <code>get()</code> blocks</td></tr>
+        <tr><td class="api-code bl">CompletableFuture</td><td class="api-desc">Non-blocking, chainable, combinable async pipeline</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:8px;">Runnable vs Callable</div>
+      <table class="vs-table">
+        <tr><th>Runnable</th><th>Callable</th></tr>
+        <tr><td>No return value</td><td>Returns a value (V)</td></tr>
+        <tr><td>No checked exceptions</td><td>Can throw checked exceptions</td></tr>
+        <tr><td>run()</td><td>call()</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- SAFETY: SYNC / VOLATILE / ATOMIC -->
+  <div class="section-label" style="margin-top:8px;">Thread Safety — Sync, Visibility, Atomicity</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Race Condition &amp; Synchronization</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Race Condition</td><td class="api-desc">≥2 threads read-modify-write same shared state concurrently → lost updates</td></tr>
+        <tr><td class="api-code bl">Critical Section</td><td class="api-desc">Code block that touches shared state; must run exclusively</td></tr>
+        <tr><td class="api-code bl">synchronized method</td><td class="api-desc">Locks <code>this</code> (instance monitor) for whole method</td></tr>
+        <tr><td class="api-code bl">synchronized block</td><td class="api-desc"><code>synchronized(obj){...}</code> — locks only critical section</td></tr>
+        <tr><td class="api-code bl">static synchronized</td><td class="api-desc">Locks the Class object — one lock across all instances</td></tr>
+        <tr><td class="api-code bl">Monitor / Intrinsic Lock</td><td class="api-desc">Built-in lock every Java object has; backbone of <code>synchronized</code></td></tr>
+      </table>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title">Visibility &amp; Atomicity</div>
+      <table class="api-table">
+        <tr><td class="api-code am">volatile</td><td class="api-desc">Guarantees visibility of latest value across threads — NOT atomicity</td></tr>
+        <tr><td class="api-code am">AtomicInteger/Long</td><td class="api-desc">Lock-free, thread-safe counters via <code>incrementAndGet()</code> etc.</td></tr>
+        <tr><td class="api-code am">AtomicReference</td><td class="api-desc">Atomic updates to object references</td></tr>
+        <tr><td class="api-code am">CAS</td><td class="api-desc">Compare-And-Swap: read → compare expected → update or retry (lock-free)</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:8px;">volatile vs AtomicInteger</div>
+      <table class="vs-table">
+        <tr><th>volatile</th><th>AtomicInteger</th></tr>
+        <tr><td>Visibility only</td><td>Visibility + Atomicity</td></tr>
+        <tr><td>No CAS</td><td>Uses CAS internally</td></tr>
+        <tr><td>Unsafe for count++</td><td>Safe for count++</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- LOCKING + DEADLOCK -->
+  <div class="section-label" style="margin-top:8px;">Locking Mechanisms &amp; Deadlock</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Locking Mechanisms</div>
+      <table class="api-table">
+        <tr><td class="api-code pu">ReentrantLock</td><td class="api-desc">Explicit lock — supports <code>tryLock()</code>, fairness, interruptibility</td></tr>
+        <tr><td class="api-code pu">ReadWriteLock</td><td class="api-desc">Multiple readers OR one writer — great for read-heavy caches</td></tr>
+        <tr><td class="api-code pu">StampedLock</td><td class="api-desc">Adds optimistic read mode — faster than ReadWriteLock</td></tr>
+        <tr><td class="api-code pu">Fair Lock</td><td class="api-desc"><code>new ReentrantLock(true)</code> — grants lock in request order</td></tr>
+        <tr><td class="api-code pu">tryLock()</td><td class="api-desc">Attempts lock, returns immediately/with timeout instead of blocking</td></tr>
+      </table>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title" style="color:var(--red);">Deadlock, Starvation, Livelock</div>
+      <table class="api-table">
+        <tr><td class="api-code rd">Deadlock</td><td class="api-desc">Threads hold-and-wait on each other's locks in a cycle → all stuck forever</td></tr>
+        <tr><td class="api-code rd">Starvation</td><td class="api-desc">A thread never gets CPU/lock because others keep getting priority</td></tr>
+        <tr><td class="api-code rd">Livelock</td><td class="api-desc">Threads keep responding to each other but make no real progress</td></tr>
+        <tr><td class="api-code rd">Prevention</td><td class="api-desc">Consistent lock ordering, <code>tryLock()</code> + timeout, avoid nested locks</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- DEADLOCK EXAMPLE + WAIT/NOTIFY -->
+  <div class="two-col" style="margin-top:6px;">
+    <div class="tree-panel">
+      <div class="tree-title">Classic Deadlock Example</div>
+      <div class="problem-code"><span class="cm">// Thread-1</span>
+<span class="mt">lock</span>(A); <span class="mt">lock</span>(B);
+
+<span class="cm">// Thread-2 (reverse order = deadlock)</span>
+<span class="mt">lock</span>(B); <span class="mt">lock</span>(A);</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">wait() / notify() / notifyAll()</div>
+      <table class="api-table">
+        <tr><td class="api-code am">wait()</td><td class="api-desc">Releases lock, waits until notified — must be inside synchronized block</td></tr>
+        <tr><td class="api-code am">notify()</td><td class="api-desc">Wakes ONE waiting thread (unspecified which)</td></tr>
+        <tr><td class="api-code am">notifyAll()</td><td class="api-desc">Wakes ALL waiting threads</td></tr>
+        <tr><td class="api-code am">sleep()</td><td class="api-desc">Pauses thread but KEEPS the lock (Thread class, not Object)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- EXECUTOR + THREAD POOLS -->
+  <div class="section-label" style="margin-top:8px;">Executor Framework &amp; Thread Pools</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Executor Framework</div>
+      <table class="api-table">
+        <tr><td class="api-code am">Executor</td><td class="api-desc">Base interface — just <code>execute(Runnable)</code></td></tr>
+        <tr><td class="api-code am">ExecutorService</td><td class="api-desc">Adds <code>submit()</code>, <code>shutdown()</code>, returns <code>Future</code></td></tr>
+        <tr><td class="api-code am">ScheduledExecutorService</td><td class="api-desc">Run tasks after delay / periodically</td></tr>
+        <tr><td class="api-code am">FixedThreadPool</td><td class="api-desc">Fixed N threads, unbounded queue</td></tr>
+        <tr><td class="api-code am">CachedThreadPool</td><td class="api-desc">Grows/shrinks dynamically — risky under heavy load</td></tr>
+        <tr><td class="api-code am">SingleThreadExecutor</td><td class="api-desc">One thread, tasks run sequentially in order</td></tr>
+        <tr><td class="api-code am">ScheduledThreadPool</td><td class="api-desc">Fixed pool for scheduled/repeating jobs</td></tr>
+      </table>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title">Production: ThreadPoolTaskExecutor</div>
+      <div class="problem-code"><span class="kw">@Bean</span>
+<span class="cl">Executor</span> taskExecutor() {
+  <span class="cl">ThreadPoolTaskExecutor</span> ex =
+    <span class="kw">new</span> <span class="cl">ThreadPoolTaskExecutor</span>();
+  ex.setCorePoolSize(10);
+  ex.setMaxPoolSize(20);
+  ex.setQueueCapacity(100);
+  ex.initialize();
+  <span class="kw">return</span> ex;
+}</div>
+      <div class="tree-title" style="margin-top:8px;">Why Not new Thread()?</div>
+      <table class="api-table">
+        <tr><td class="api-desc" colspan="2">No pooling/reuse, no lifecycle mgmt, no backpressure/queueing, resource exhaustion risk in prod.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- THREAD POOL SIZING -->
+  <div class="section-label" style="margin-top:8px;">Thread Pool Sizing (Frequently Asked)</div>
+  <div class="tree-panel">
+    <div class="sizing-grid">
+      <div class="sizing-card">
+        <div class="label">CPU-Bound Tasks</div>
+        <div class="formula">Threads = CPU Cores + 1</div>
+        <div class="label">e.g. heavy computation, encryption, image processing</div>
+      </div>
+      <div class="sizing-card">
+        <div class="label">I/O-Bound Tasks</div>
+        <div class="formula">Threads = Cores × (1 + Wait/Compute)</div>
+        <div class="label">e.g. DB calls, REST API calls, file I/O — usually need larger pools</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCURRENT COLLECTIONS + SYNC UTILITIES -->
+  <div class="section-label" style="margin-top:8px;">Concurrent Collections &amp; Synchronization Utilities</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Concurrent Collections</div>
+      <table class="api-table">
+        <tr><td class="api-code pu">ConcurrentHashMap</td><td class="api-desc">Segmented/bucket-level locking — thread-safe map, no full-map lock</td></tr>
+        <tr><td class="api-code pu">CopyOnWriteArrayList</td><td class="api-desc">Copies array on write — best when reads &gt;&gt; writes</td></tr>
+        <tr><td class="api-code pu">ConcurrentLinkedQueue</td><td class="api-desc">Lock-free, non-blocking FIFO queue</td></tr>
+        <tr><td class="api-code pu">BlockingQueue</td><td class="api-desc">Blocks on <code>put()</code>/<code>take()</code> when full/empty — Producer-Consumer</td></tr>
+        <tr><td class="api-code pu">ConcurrentSkipListMap</td><td class="api-desc">Thread-safe sorted map, concurrent version of TreeMap</td></tr>
+      </table>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title">Synchronization Utilities</div>
+      <table class="api-table">
+        <tr><td class="api-code pu">CountDownLatch</td><td class="api-desc">One-time — main thread awaits N workers finishing (not reusable)</td></tr>
+        <tr><td class="api-code pu">CyclicBarrier</td><td class="api-desc">Reusable — all threads wait for each other at a checkpoint</td></tr>
+        <tr><td class="api-code pu">Semaphore</td><td class="api-desc">Limits N concurrent threads — DB pool, rate limiting</td></tr>
+        <tr><td class="api-code pu">Phaser</td><td class="api-desc">Advanced reusable barrier with dynamic party registration</td></tr>
+        <tr><td class="api-code pu">Exchanger</td><td class="api-desc">Two threads swap data at a synchronization point</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- FORKJOIN + PARALLEL STREAM FLOW -->
+  <div class="section-label" style="margin-top:8px;">Fork-Join, Parallel Streams &amp; CompletableFuture</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">CompletableFuture Chain (Aggregator Pattern)</div>
+      <div class="flow-row">
+        <div class="flow-box source">supplyAsync()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box inter">thenApply()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box inter">thenCombine()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box term">exceptionally()</div>
+      </div>
+      <div class="flow-sub-title">Async Task → Transform → Combine Results → Handle Errors</div>
+      <div class="tree-title" style="margin-top:8px;">Parallel API Calls</div>
+      <div class="problem-code"><span class="cl">CompletableFuture</span>&lt;User&gt; u =
+  <span class="cl">CompletableFuture</span>.supplyAsync(
+    () -&gt; userService.getUser());
+<span class="cl">CompletableFuture</span>&lt;Order&gt; o =
+  <span class="cl">CompletableFuture</span>.supplyAsync(
+    () -&gt; orderService.getOrders());
+<span class="cl">CompletableFuture</span>.allOf(u, o).join();</div>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title">ForkJoinPool &amp; Parallel Stream</div>
+      <table class="api-table">
+        <tr><td class="api-code cy">ForkJoinPool</td><td class="api-desc">Divide-and-conquer pool with work-stealing between idle threads</td></tr>
+        <tr><td class="api-code cy">RecursiveTask&lt;V&gt;</td><td class="api-desc">Fork-join task that returns a result</td></tr>
+        <tr><td class="api-code cy">RecursiveAction</td><td class="api-desc">Fork-join task with no return value</td></tr>
+        <tr><td class="api-code cy">Work Stealing</td><td class="api-desc">Idle worker threads "steal" tasks from busy threads' queues</td></tr>
+        <tr><td class="api-code cy">parallelStream()</td><td class="api-desc">Uses common ForkJoinPool internally — good for CPU-bound work only</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:8px;">Avoid parallelStream() For</div>
+      <div class="flow-row" style="gap:8px;">
+        <div class="flow-box warn">DB Calls</div>
+        <div class="flow-box warn">External APIs</div>
+        <div class="flow-box warn">Small Collections</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THREADLOCAL + SPRING ASYNC -->
+  <div class="section-label" style="margin-top:8px;">ThreadLocal &amp; Spring Boot Async</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">ThreadLocal</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">ThreadLocal&lt;T&gt;</td><td class="api-desc">Per-thread isolated copy of a variable — no sharing across threads</td></tr>
+        <tr><td class="api-code bl">InheritableThreadLocal</td><td class="api-desc">Child threads inherit parent's ThreadLocal value</td></tr>
+        <tr><td class="api-code bl">MDC (Logging)</td><td class="api-desc">Uses ThreadLocal to carry correlation/request-ID through logs</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:8px;">Use Cases</div>
+      <div class="flow-row" style="gap:8px;">
+        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">User Context</div>
+        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">Correlation ID</div>
+        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">Request Tracking</div>
+      </div>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title">Spring Boot @Async</div>
+      <div class="problem-code"><span class="kw">@EnableAsync</span>
+
+<span class="kw">@Async</span>
+<span class="kw">public</span> <span class="cl">CompletableFuture</span>&lt;String&gt; process() {
+  <span class="kw">return</span> <span class="cl">CompletableFuture</span>
+    .completedFuture(<span class="st">"Done"</span>);
+}</div>
+      <div class="tree-title" style="margin-top:8px; color:var(--red);">⚠ Will @Async Work In Same-Class Call?</div>
+      <table class="api-table">
+        <tr><td class="api-desc" colspan="2"><b style="color:var(--red);">NO</b> — Spring AOP proxy is bypassed on self-invocation; the method must be called through the Spring-managed bean.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- KAFKA CONCURRENCY -->
+  <div class="section-label" style="margin-top:8px;">Kafka Consumer Concurrency</div>
+  <div class="flow-panel">
+    <div class="tree-title">Partition → Consumer Assignment (Rule: Partitions ≥ Consumers)</div>
+    <div class="problem-code"><span class="kw">@KafkaListener</span>(topics = <span class="st">"orders"</span>, concurrency = <span class="st">"3"</span>)
+
+<span class="cm">// 6 Partitions, 3 Consumers</span>
+Consumer-1 → P0, P1
+Consumer-2 → P2, P3
+Consumer-3 → P4, P5</div>
+    <div class="flow-sub-title">One Partition Is Consumed By Exactly One Consumer Within a Group — Extra Consumers Beyond Partition Count Sit Idle</div>
+  </div>
+
+  <!-- COMPARISON PANEL -->
+  <div class="section-label" style="margin-top:8px;">Interview Comparisons</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <table class="vs-table">
+        <tr><th>synchronized</th><th>ReentrantLock</th></tr>
+        <tr><td>JVM managed, auto-release</td><td>Manual lock/unlock (try/finally)</td></tr>
+        <tr><td>No tryLock()</td><td>tryLock() with timeout</td></tr>
+        <tr><td>Less flexible</td><td>Fair locking, interruptible</td></tr>
+      </table>
+      <table class="vs-table" style="margin-top:6px;">
+        <tr><th>wait()</th><th>sleep()</th></tr>
+        <tr><td>Releases the lock</td><td>Keeps the lock</td></tr>
+        <tr><td>Object class</td><td>Thread class</td></tr>
+        <tr><td>Needs synchronized</td><td>No synchronized needed</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <table class="vs-table">
+        <tr><th>HashMap</th><th>ConcurrentHashMap</th></tr>
+        <tr><td>Not thread-safe</td><td>Thread-safe, bucket-level locks</td></tr>
+        <tr><td>Race conditions possible</td><td>Safe concurrent access</td></tr>
+      </table>
+      <table class="vs-table" style="margin-top:6px;">
+        <tr><th>CountDownLatch</th><th>CyclicBarrier</th></tr>
+        <tr><td>One-time use</td><td>Reusable</td></tr>
+        <tr><td>Main thread waits for workers</td><td>All threads wait for each other</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- CODE SNIPPET GRID -->
+  <div class="section-label" style="margin-top:8px;">Must-Know Code Snippets</div>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-title">Runnable Task</div>
+      <div class="problem-code"><span class="kw">class</span> <span class="cl">MyTask</span> <span class="kw">implements</span> <span class="cl">Runnable</span> {
+  <span class="kw">public void</span> run() {
+    System.out.println(<span class="st">"Running"</span>);
+  }
+}</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Callable + Future</div>
+      <div class="problem-code"><span class="cl">Callable</span>&lt;String&gt; task = () -&gt; <span class="st">"Success"</span>;
+<span class="cl">Future</span>&lt;String&gt; f = executor.submit(task);
+<span class="kw">String</span> result = f.get(); <span class="cm">// blocks</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Synchronized Method</div>
+      <div class="problem-code"><span class="kw">public synchronized void</span> increment() {
+  count++;
+}</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Synchronized Block</div>
+      <div class="problem-code"><span class="kw">synchronized</span>(<span class="kw">this</span>) {
+  count++;
+}</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Volatile Flag (Safe Stop)</div>
+      <div class="problem-code"><span class="kw">private volatile boolean</span> running = <span class="kw">true</span>;
+<span class="cm">// running = false; from another thread</span>
+<span class="cm">// visible immediately to the loop thread</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">AtomicInteger Counter</div>
+      <div class="problem-code"><span class="cl">AtomicInteger</span> count = <span class="kw">new</span> <span class="cl">AtomicInteger</span>(0);
+count.incrementAndGet();
+count.getAndIncrement();</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">ReentrantLock with tryLock</div>
+      <div class="problem-code"><span class="cl">Lock</span> lock = <span class="kw">new</span> <span class="cl">ReentrantLock</span>();
+<span class="kw">if</span> (lock.tryLock(5, TimeUnit.SECONDS)) {
+  <span class="kw">try</span> { <span class="cm">/* work */</span> }
+  <span class="kw">finally</span> { lock.unlock(); }
+}</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">wait() / notifyAll()</div>
+      <div class="problem-code"><span class="kw">synchronized</span>(lock) {
+  <span class="kw">while</span> (!ready) lock.wait();
+  <span class="cm">// proceed after notifyAll()</span>
+}</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">ExecutorService Basics</div>
+      <div class="problem-code"><span class="cl">ExecutorService</span> ex =
+  Executors.newFixedThreadPool(10);
+ex.submit(task);
+ex.shutdown();</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Producer-Consumer (BlockingQueue)</div>
+      <div class="problem-code"><span class="cl">BlockingQueue</span>&lt;Integer&gt; q =
+  <span class="kw">new</span> <span class="cl">ArrayBlockingQueue</span>&lt;&gt;(10);
+q.put(1);   <span class="cm">// producer, blocks if full</span>
+q.take();   <span class="cm">// consumer, blocks if empty</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">CountDownLatch</div>
+      <div class="problem-code"><span class="cl">CountDownLatch</span> latch =
+  <span class="kw">new</span> <span class="cl">CountDownLatch</span>(3);
+latch.countDown(); <span class="cm">// per worker</span>
+latch.await();     <span class="cm">// main thread</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Semaphore (Rate Limiting)</div>
+      <div class="problem-code"><span class="cl">Semaphore</span> sem = <span class="kw">new</span> <span class="cl">Semaphore</span>(5);
+sem.acquire();
+<span class="kw">try</span> { <span class="cm">/* limited resource */</span> }
+<span class="kw">finally</span> { sem.release(); }</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">ThreadLocal Context</div>
+      <div class="problem-code"><span class="cl">ThreadLocal</span>&lt;String&gt; user =
+  <span class="kw">new</span> <span class="cl">ThreadLocal</span>&lt;&gt;();
+user.set(<span class="st">"Pranik"</span>);
+user.get();
+user.remove(); <span class="cm">// avoid leaks in pools</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">CompletableFuture Chain</div>
+      <div class="problem-code"><span class="cl">CompletableFuture</span>.supplyAsync(this::callService)
+  .thenApply(this::process)
+  .exceptionally(ex -&gt; <span class="st">"Fallback"</span>);</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">ConcurrentHashMap</div>
+      <div class="problem-code"><span class="cl">ConcurrentHashMap</span>&lt;String,String&gt; map =
+  <span class="kw">new</span> <span class="cl">ConcurrentHashMap</span>&lt;&gt;();
+map.computeIfAbsent(<span class="st">"k"</span>, k -&gt; <span class="st">"v"</span>);</div>
+    </div>
+  </div>
+
+  <!-- 30 SECOND REVISION -->
+  <div class="section-label" style="margin-top:8px;">30-Second Interview Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Concurrency ≠ Parallelism (overlap vs simultaneous)</div>
+      <div class="revision-item"><span class="chk">✓</span>Thread: NEW→RUNNABLE→RUNNING→(BLOCKED/WAITING/TIMED_WAITING)→TERMINATED</div>
+      <div class="revision-item"><span class="chk">✓</span>Prefer Runnable/Callable over extending Thread</div>
+      <div class="revision-item"><span class="chk">✓</span>Race Condition = unsynchronized shared-state read-modify-write</div>
+      <div class="revision-item"><span class="chk">✓</span>volatile = visibility only, NOT atomicity</div>
+      <div class="revision-item"><span class="chk">✓</span>Atomic classes use CAS — lock-free thread safety</div>
+      <div class="revision-item"><span class="chk">✓</span>ReentrantLock > synchronized: tryLock(), fairness</div>
+      <div class="revision-item"><span class="chk">✓</span>Deadlock = circular wait on locks → prevent via lock ordering</div>
+      <div class="revision-item"><span class="chk">✓</span>wait() releases lock; sleep() keeps lock</div>
+      <div class="revision-item"><span class="chk">✓</span>Avoid new Thread() in enterprise code — use ExecutorService</div>
+      <div class="revision-item"><span class="chk">✓</span>CPU-bound pool size = cores + 1</div>
+      <div class="revision-item"><span class="chk">✓</span>I/O-bound pool size = cores × (1 + wait/compute)</div>
+      <div class="revision-item"><span class="chk">✓</span>parallelStream() uses common ForkJoinPool — avoid for I/O</div>
+      <div class="revision-item"><span class="chk">✓</span>CompletableFuture > Future: non-blocking, chainable</div>
+      <div class="revision-item"><span class="chk">✓</span>ConcurrentHashMap: bucket-level locks, no full-map lock</div>
+      <div class="revision-item"><span class="chk">✓</span>CopyOnWriteArrayList: best when reads &gt;&gt; writes</div>
+      <div class="revision-item"><span class="chk">✓</span>CountDownLatch = one-time; CyclicBarrier = reusable</div>
+      <div class="revision-item"><span class="chk">✓</span>Semaphore = limit N concurrent threads (DB pool, rate limit)</div>
+      <div class="revision-item"><span class="chk">✓</span>ThreadLocal = per-thread isolated data (context, correlation ID)</div>
+      <div class="revision-item"><span class="chk">✓</span>@Async fails on self-invocation — AOP proxy bypassed</div>
+      <div class="revision-item"><span class="chk">✓</span>Kafka: partitions ≥ consumers; extra consumers idle</div>
+      <div class="revision-item"><span class="chk">✓</span>Troubleshooting: thread dump for deadlock/blocking, heap dump for memory</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

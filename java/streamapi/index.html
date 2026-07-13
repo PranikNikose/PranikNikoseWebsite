@@ -451,6 +451,8 @@
         <tr><td class="api-code pu">joining()</td><td class="api-desc">Joins Strings with a delimiter</td></tr>
         <tr><td class="api-code pu">averagingDouble()</td><td class="api-desc">Calculates average of a numeric field</td></tr>
         <tr><td class="api-code pu">partitioningBy()</td><td class="api-desc">Splits into TRUE / FALSE groups</td></tr>
+		<tr><td class="api-code pu">summingDouble()</td><td class="api-desc">???</td></tr>
+		<tr><td class="api-code pu">maxBy()</td><td class="api-desc">???</td></tr>
       </table>
     </div>
   </div>
@@ -569,7 +571,7 @@ list.stream()
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
     </div>
     <div class="problem-card">
-      <div class="problem-title">Duplicate Employee Names</div>
+      <div class="problem-title">Duplicate Employee Names &#11088; &#11088;</div>
       <div class="problem-code">employees.stream()
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
        Employee::getName, <span class="cl">Collectors</span>.counting()))
@@ -581,7 +583,7 @@ list.stream()
     <div class="problem-card">
       <div class="problem-title">Salary &gt; 20000 AND Gender Male</div>
       <div class="problem-code">list.stream()
-   .<span class="mt">filter</span>(e -&gt; e.getSal() &gt; 20000.00)
+   .<span class="mt">filter</span>(e -&gt; e.getSalary() &gt; 20000.00)
    .<span class="mt">filter</span>(e -&gt; e.getGender().equalsIgnoreCase(<span class="st">"Male"</span>))
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
     </div>
@@ -593,7 +595,7 @@ list.stream()
        <span class="cl">Collectors</span>.summingDouble(Emp::getSal)));</div>
     </div>
     <div class="problem-card">
-      <div class="problem-title">First Non-Repeating Character</div>
+      <div class="problem-title">First Non-Repeating Character | String str = "swiss</div>
       <div class="problem-code">str.chars().mapToObj(c -&gt; (<span class="kw">char</span>) c)
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
        c -&gt; c, <span class="cl">LinkedHashMap</span>::new,
@@ -601,8 +603,7 @@ list.stream()
    .entrySet().stream()
    .<span class="mt">filter</span>(e -&gt; e.getValue() == 1)
    .<span class="mt">map</span>(Map.Entry::getKey)
-   .<span class="mt">findFirst</span>()
-   .orElse(<span class="kw">null</span>);</div>
+   .<span class="mt">findFirst</span>();</div>
     </div>
     <div class="problem-card">
       <div class="problem-title">Names Starting with "C" → Uppercase</div>
