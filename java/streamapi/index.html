@@ -5,337 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Java 8 Stream API — Interview Prep</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  @page {
-    size: A4;
-    margin: 8mm;
-  }
-
-  :root {
-    --bg:         #0D1117;
-    --surface:    #161B22;
-    --border:     #21262D;
-    --dim:        #444D56;
-    --muted:      #6E7681;
-    --text:       #C9D1D9;
-    --text-bright:#E6EDF3;
-
-    --blue:       #58A6FF;
-    --blue-dim:   #1F3A5F;
-    --green:      #3FB950;
-    --green-dim:  #1A3A1A;
-    --amber:      #E3B341;
-    --amber-dim:  #3D2E0A;
-    --purple:     #BC8CFF;
-    --purple-dim: #2A1A4A;
-    --cyan:       #39D4C4;
-    --cyan-dim:   #0D2E2B;
-    --red:        #F85149;
-    --red-dim:    #3A0D0D;
-  }
-
-  html, body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'JetBrains Mono', 'Courier New', monospace;
-    font-size: 9.5px;
-    line-height: 1.5;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    width: 210mm;
-    margin: 0 auto;
-  }
-
-  .page { padding: 0; }
-
-  /* ── HEADER ──────────────────────────────────────────── */
-  .header {
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 7px;
-    margin-bottom: 10px;
-  }
-  .header-top { display: flex; align-items: baseline; gap: 10px; }
-  .prompt { color: var(--green); font-weight: 600; font-size: 10px; }
-  .title { font-size: 17px; font-weight: 700; color: var(--text-bright); letter-spacing: -0.3px; }
-  .subtitle { color: var(--muted); font-size: 9px; margin-top: 2px; padding-left: 18px; }
-
-  .section-label {
-    font-size: 8px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--dim);
-    margin-bottom: 5px;
-    padding-left: 2px;
-  }
-
-  /* ── QUICK REF CARDS ─────────────────────────────────── */
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
-    margin-bottom: 10px;
-  }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 6px 7px;
-    border-left-width: 3px;
-  }
-  .card-name { font-weight: 700; font-size: 9.5px; margin-bottom: 2px; }
-  .card-desc { font-size: 8px; color: var(--muted); line-height: 1.4; }
-
-  .card-source  { border-left-color: var(--cyan);   }
-  .card-source  .card-name { color: var(--cyan);   }
-  .card-inter   { border-left-color: var(--blue);   }
-  .card-inter   .card-name { color: var(--blue);   }
-  .card-term    { border-left-color: var(--amber);  }
-  .card-term    .card-name { color: var(--amber);  }
-  .card-coll    { border-left-color: var(--purple); }
-  .card-coll    .card-name { color: var(--purple); }
-
-  /* ── LEGEND ──────────────────────────────────────────── */
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 5px 10px;
-    margin-bottom: 10px;
-  }
-  .legend-label {
-    font-size: 8px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--dim);
-    margin-right: 4px;
-  }
-  .legend-items { display: flex; flex-wrap: wrap; gap: 10px; }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 8.5px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .dot-source { background: var(--cyan); }
-  .dot-inter  { background: var(--blue); }
-  .dot-term   { background: var(--amber); }
-  .dot-coll   { background: var(--purple); }
-  .dot-lazy   { background: var(--green); }
-
-  /* ── NAMING / KEY POINTS ─────────────────────────────── */
-  .naming-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    margin-bottom: 10px;
-  }
-  .naming-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 6px 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .naming-prefix {
-    font-weight: 700;
-    font-size: 9.5px;
-    color: var(--text-bright);
-    background: var(--border);
-    border-radius: 3px;
-    padding: 2px 6px;
-    white-space: nowrap;
-  }
-  .naming-arrow { color: var(--dim); font-size: 9px; }
-  .naming-meaning { font-size: 8.5px; color: var(--muted); }
-
-  /* ── API TABLE PANELS ────────────────────────────────── */
-  .tree-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px 10px;
-    margin-bottom: 6px;
-    overflow: hidden;
-  }
-  .tree-title {
-    font-size: 8px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--dim);
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .api-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 8.3px;
-  }
-  .api-table td {
-    padding: 2.5px 4px;
-    vertical-align: top;
-    border-bottom: 1px solid var(--border);
-  }
-  .api-table tr:last-child td { border-bottom: none; }
-  .api-code {
-    font-weight: 700;
-    white-space: nowrap;
-    width: 130px;
-  }
-  .api-code.bl { color: var(--blue); }
-  .api-code.am { color: var(--amber); }
-  .api-code.pu { color: var(--purple); }
-  .api-code.cy { color: var(--cyan); }
-  .api-desc { color: var(--muted); }
-  .api-desc code {
-    color: var(--text);
-    background: var(--bg);
-    padding: 0 3px;
-    border-radius: 2px;
-  }
-
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-
-  /* ── FLOW DIAGRAM ─────────────────────────────────────── */
-  .flow-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px 10px;
-  }
-  .flow-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-top: 4px;
-  }
-  .flow-box {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 4px 9px;
-    font-size: 8.5px;
-    color: var(--text-bright);
-    text-align: center;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  .flow-box.source { border-color: var(--cyan);  color: var(--cyan); font-weight: 700; }
-  .flow-box.inter  { border-color: var(--blue);  color: var(--blue); }
-  .flow-box.term   { border-color: var(--amber); color: var(--amber); font-weight: 700; }
-  .flow-arrow { color: var(--dim); font-size: 11px; }
-
-  .flow-sub-title {
-    font-size: 7.5px;
-    color: var(--muted);
-    text-align: center;
-    margin-top: 6px;
-    margin-bottom: 2px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  /* map vs flatMap panel */
-  .cmp-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .cmp-card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 6px 8px;
-  }
-  .cmp-card.map     { border-left: 3px solid var(--blue); }
-  .cmp-card.flatmap { border-left: 3px solid var(--purple); }
-  .cmp-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-  .cmp-name { font-weight: 700; font-size: 10px; }
-  .cmp-name.bl { color: var(--blue); }
-  .cmp-name.pu { color: var(--purple); }
-  .cmp-rows { display: flex; flex-direction: column; gap: 2px; }
-  .cmp-row { display: flex; gap: 6px; font-size: 8px; align-items: baseline; }
-  .cmp-key { color: var(--dim); white-space: nowrap; min-width: 62px; }
-  .cmp-val { color: var(--text); }
-  .cmp-val.code { color: var(--amber); font-weight: 600; }
-  .cmp-divider { height: 1px; background: var(--border); }
-
-  /* ── INTERVIEW PROBLEMS ──────────────────────────────── */
-  .problem-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-  .problem-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 6px 8px;
-    border-left: 3px solid var(--green);
-  }
-  .problem-title {
-    font-size: 8.5px;
-    font-weight: 700;
-    color: var(--green);
-    margin-bottom: 3px;
-  }
-  .problem-code {
-    font-size: 7.8px;
-    color: var(--text);
-    background: var(--bg);
-    border-radius: 3px;
-    padding: 4px 6px;
-    white-space: pre;
-    overflow: hidden;
-    line-height: 1.45;
-  }
-  .problem-code .kw { color: var(--purple); }
-  .problem-code .mt { color: var(--blue); }
-  .problem-code .cl { color: var(--amber); }
-  .problem-code .st { color: var(--green); }
-  .problem-card { page-break-inside: avoid; }
-
-  /* ── 30 SEC REVISION ─────────────────────────────────── */
-  .revision-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px 10px;
-  }
-  .revision-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3px 14px;
-  }
-  .revision-item {
-    font-size: 8.3px;
-    color: var(--text);
-    display: flex;
-    gap: 5px;
-  }
-  .revision-item .chk { color: var(--green); font-weight: 700; }
-
-  @media print {
-    html, body { width: 210mm; }
-    .page { page-break-inside: avoid; }
-    .tree-panel { page-break-inside: avoid; }
-    .flow-panel { page-break-inside: avoid; }
-  }
-</style>
+<link rel="stylesheet" href="../../css/styles.css">
 </head>
 <body>
 <div class="page">
@@ -351,7 +21,7 @@
 
   <!-- QUICK REF CARDS -->
   <div class="section-label">Quick Reference</div>
-  <div class="cards-grid">
+  <div class="cards-grid cols-4">
     <div class="card card-source">
       <div class="card-name">Source</div>
       <div class="card-desc">Creates a Stream from a Collection</div>
@@ -463,22 +133,22 @@
     <div class="flow-panel">
       <div class="tree-title">Stream Execution Pipeline</div>
       <div class="flow-row">
-        <div class="flow-box source">collection.stream()</div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-box inter">filter()</div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-box inter">map()</div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-box inter">sorted()</div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-box term">collect()</div>
+        <div class="pipe-box source">collection.stream()</div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">filter()</div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">map()</div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">sorted()</div>
+        <span class="pipe-arrow">→</span>
+        <div class="pipe-box term">collect()</div>
       </div>
       <div class="flow-sub-title">Source → Intermediate Ops (Lazy) → Terminal Op (Executes)</div>
       <div class="flow-sub-title" style="margin-top:8px;">Interview Use Cases for skip()/limit()</div>
       <div class="flow-row" style="gap:8px;">
-        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">Pagination</div>
-        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">2nd Highest Salary</div>
-        <div class="flow-box inter" style="border-color:var(--dim);color:var(--text);">Top N Records</div>
+        <div class="pipe-box inter" style="border-color:var(--dim);color:var(--text);">Pagination</div>
+        <div class="pipe-box inter" style="border-color:var(--dim);color:var(--text);">2nd Highest Salary</div>
+        <div class="pipe-box inter" style="border-color:var(--dim);color:var(--text);">Top N Records</div>
       </div>
     </div>
 
