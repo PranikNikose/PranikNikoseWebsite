@@ -203,8 +203,7 @@
     <div class="problem-card">
       <div class="problem-title">Average Salary by Department</div>
       <div class="problem-code">employees.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Employee::getDepartment,
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getDepartment,
        <span class="cl">Collectors</span>.averagingDouble(Employee::getSalary)));</div>
     </div>
     <div class="problem-card">
