@@ -228,10 +228,8 @@ list.stream()
     <div class="problem-card">
       <div class="problem-title">Highest Paid Employee per Department</div>
       <div class="problem-code">employees.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Employee::getDepartment,
-       <span class="cl">Collectors</span>.maxBy(<span class="cl">Comparator</span>.comparing(
-           Employee::getSalary))));</div>
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getDepartment,
+       <span class="cl">Collectors</span>.maxBy(<span class="cl">Comparator</span>.comparing(Employee::getSalary))));</div>
     </div>
     <div class="problem-card">
       <div class="problem-title">Employee Names to Uppercase</div>
