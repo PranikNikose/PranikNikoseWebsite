@@ -119,10 +119,10 @@
         <tr><td class="api-code pu">groupingBy()</td><td class="api-desc">Groups records by a classifier function</td></tr>
         <tr><td class="api-code pu">counting()</td><td class="api-desc">Counts grouped records (used with groupingBy)</td></tr>
         <tr><td class="api-code pu">joining()</td><td class="api-desc">Joins Strings with a delimiter</td></tr>
-        <tr><td class="api-code pu">averagingDouble()</td><td class="api-desc">Calculates average of a numeric field</td></tr>
         <tr><td class="api-code pu">partitioningBy()</td><td class="api-desc">Splits into TRUE / FALSE groups</td></tr>
-		<tr><td class="api-code pu">summingDouble()</td><td class="api-desc">???</td></tr>
-		<tr><td class="api-code pu">maxBy()</td><td class="api-desc">???</td></tr>
+		<tr><td class="api-code pu">averagingDouble()</td><td class="api-desc">Calculates average of a numeric field</td></tr>
+		<tr><td class="api-code pu">summingDouble()</td><td class="api-desc">Sum all double values</td></tr>
+		<tr><td class="api-code pu">maxBy()</td><td class="api-desc">Find maximum element</td></tr>
       </table>
     </div>
   </div>
@@ -243,8 +243,7 @@ list.stream()
     <div class="problem-card">
       <div class="problem-title">Duplicate Employee Names &#11088; &#11088;</div>
       <div class="problem-code">employees.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Employee::getName, <span class="cl">Collectors</span>.counting()))
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getName, <span class="cl">Collectors</span>.counting()))
    .entrySet().stream()
    .<span class="mt">filter</span>(en -&gt; en.getValue() &gt; 1)
    .<span class="mt">map</span>(Map.Entry::getKey)
@@ -261,15 +260,13 @@ list.stream()
       <div class="problem-title">Sum of Salary by Department</div>
       <div class="problem-code">list.stream()
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Emp::getDeptName,
-       <span class="cl">Collectors</span>.summingDouble(Emp::getSal)));</div>
+       Employee::getDepartment,
+       <span class="cl">Collectors</span>.summingDouble(Employee::getSalary)));</div>
     </div>
     <div class="problem-card">
-      <div class="problem-title">First Non-Repeating Character | String str = "swiss</div>
+      <div class="problem-title">First Non-Repeating Character | String str = "swiss &#11088; &#11088; </div>
       <div class="problem-code">str.chars().mapToObj(c -&gt; (<span class="kw">char</span>) c)
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       c -&gt; c, <span class="cl">LinkedHashMap</span>::new,
-       <span class="cl">Collectors</span>.counting()))
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy( c -&gt; c, <span class="cl">LinkedHashMap</span>::new,<span class="cl">Collectors</span>.counting()))
    .entrySet().stream()
    .<span class="mt">filter</span>(e -&gt; e.getValue() == 1)
    .<span class="mt">map</span>(Map.Entry::getKey)
