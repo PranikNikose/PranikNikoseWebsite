@@ -212,7 +212,7 @@
       <div class="problem-code"><span class="kw">Set</span>&lt;Integer&gt; seen = <span class="kw">new</span> <span class="cl">HashSet</span>&lt;&gt;();
 list.stream()
    .<span class="mt">filter</span>(n -&gt; !seen.add(n))
-   .<span class="mt">toList</span>();</div>
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
     </div>
     <div class="problem-card">
       <div class="problem-title">Employees with Salary &gt; 50000</div>
@@ -283,7 +283,7 @@ list.stream()
       <div class="problem-title">Remove Duplicates via distinct()</div>
       <div class="problem-code"><span class="kw">List</span>&lt;Integer&gt; uniqueList = list.stream()
    .<span class="mt">distinct</span>()
-   .<span class="mt">toList</span>();</div>
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
     </div>
   </div>
 
