@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Java — Complete Interview Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14; --panel:#12161f; --panel2:#151a24; --border:#232a38; --border-soft:#1b212d;
+  --text:#c9d1d9; --dim:#6e7681; --dim2:#8892a0;
+  --cy:#39c5cf; --bl:#58a6ff; --gr:#3fb950; --am:#e3b341; --pu:#a371f7; --re:#f778ba; --or:#ff9a5a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'JetBrains Mono', monospace; font-size:14px; line-height:1.55;
+  padding:28px 16px 80px;
+}
+.page{max-width:1180px; margin:0 auto;}
+
+/* HEADER */
+.header{border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:22px;}
+.header-top{display:flex; align-items:baseline; gap:10px;}
+.prompt{color:var(--gr); font-weight:700; font-size:20px;}
+.title{font-size:22px; font-weight:700; color:#fff; letter-spacing:.3px;}
+.subtitle{color:var(--dim); margin-top:6px; font-size:13px;}
+.toc{margin-top:14px; display:flex; flex-wrap:wrap; gap:6px 10px;}
+.toc a{color:var(--cy); text-decoration:none; font-size:12px; border:1px solid var(--border-soft); padding:3px 9px; border-radius:20px;}
+.toc a:hover{border-color:var(--cy);}
+
+/* SECTION LABEL */
+.section-label{
+  font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:var(--dim2);
+  margin:34px 0 10px; padding-bottom:6px; border-bottom:1px dashed var(--border);
+  display:flex; align-items:center; gap:8px;
+}
+.section-label::before{content:"//"; color:var(--gr);}
+.section-label.big{font-size:14px; color:#fff; margin-top:46px; padding:10px 0; border-bottom:1px solid var(--border);}
+.section-label.big::before{content:"§";}
+
+/* CARDS GRID */
+.cards-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cards-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.cards-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.card{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:12px 14px; border-left:3px solid var(--dim);}
+.card-name{font-weight:700; color:#fff; font-size:13px; margin-bottom:4px;}
+.card-desc{color:var(--dim2); font-size:12px;}
+.card-cy{border-left-color:var(--cy);} .card-cy .card-name{color:var(--cy);}
+.card-bl{border-left-color:var(--bl);} .card-bl .card-name{color:var(--bl);}
+.card-gr{border-left-color:var(--gr);} .card-gr .card-name{color:var(--gr);}
+.card-am{border-left-color:var(--am);} .card-am .card-name{color:var(--am);}
+.card-pu{border-left-color:var(--pu);} .card-pu .card-name{color:var(--pu);}
+.card-re{border-left-color:var(--re);} .card-re .card-name{color:var(--re);}
+.card-or{border-left-color:var(--or);} .card-or .card-name{color:var(--or);}
+
+/* LEGEND */
+.legend{display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--panel2); border:1px solid var(--border-soft); border-radius:6px; padding:8px 14px; margin-top:10px;}
+.legend-label{color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:1px;}
+.legend-items{display:flex; gap:14px; flex-wrap:wrap;}
+.legend-item{font-size:12px; color:var(--dim2); display:flex; align-items:center; gap:6px;}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+.dot-cy{background:var(--cy);} .dot-bl{background:var(--bl);} .dot-gr{background:var(--gr);}
+.dot-am{background:var(--am);} .dot-pu{background:var(--pu);} .dot-re{background:var(--re);} .dot-or{background:var(--or);}
+
+/* NAMING / KEY POINT GRID */
+.naming-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+.naming-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.naming-card{background:var(--panel); border:1px solid var(--border-soft); border-radius:6px; padding:10px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+.naming-prefix{color:#fff; font-weight:700; font-size:12.5px; white-space:nowrap;}
+.naming-arrow{color:var(--dim);}
+.naming-meaning{color:var(--dim2); font-size:12.5px;}
+
+/* TWO / THREE COL LAYOUT */
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+
+/* TREE PANEL */
+.tree-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.tree-title{font-size:12.5px; font-weight:700; color:#fff; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;}
+.tree-body{font-size:12.5px; white-space:pre-wrap; line-height:1.75;}
+.tree-body .c{color:var(--dim); }
+.tree-body .n{color:var(--dim2);}
+.tree-body .i{font-weight:700;}
+.tree-body .cy{color:var(--cy);} .tree-body .bl{color:var(--bl);} .tree-body .gr{color:var(--gr);}
+.tree-body .am{color:var(--am);} .tree-body .pu{color:var(--pu);} .tree-body .re{color:var(--re);}
+
+/* API TABLE */
+table.api-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+table.api-table td{padding:5px 6px; border-bottom:1px solid var(--border-soft); vertical-align:top;}
+.api-code{font-weight:700; white-space:nowrap; width:1%;}
+.api-code.cy{color:var(--cy);} .api-code.bl{color:var(--bl);} .api-code.gr{color:var(--gr);}
+.api-code.am{color:var(--am);} .api-code.pu{color:var(--pu);} .api-code.re{color:var(--re);}
+.api-desc{color:var(--dim2);}
+.api-desc code{color:var(--am); background:rgba(255,255,255,.04); padding:1px 5px; border-radius:4px;}
+
+/* PILLAR PANEL (OOP) */
+.pillar-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.pillar-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.pillar-card{border:1px solid var(--border-soft); border-radius:6px; padding:12px 14px; background:var(--panel2);}
+.pillar-name{font-weight:700; font-size:13.5px; margin-bottom:6px;}
+.pillar-name.bl{color:var(--bl);} .pillar-name.gr{color:var(--gr);} .pillar-name.am{color:var(--am);} .pillar-name.pu{color:var(--pu);}
+.pillar-def{color:var(--dim2); font-size:12.5px; margin-bottom:8px;}
+.pillar-tag{display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin:0 5px 5px 0; border:1px solid var(--border);}
+.tag-bl{color:var(--bl); border-color:rgba(88,166,255,.35);}
+.tag-gr{color:var(--gr); border-color:rgba(63,185,80,.35);}
+.tag-am{color:var(--am); border-color:rgba(227,179,65,.35);}
+.tag-pu{color:var(--pu); border-color:rgba(163,113,247,.35);}
+.pillar-example{margin-top:8px; font-size:12px; color:var(--dim2); border-top:1px dashed var(--border-soft); padding-top:6px;}
+.pillar-example b{color:#fff;}
+
+/* TABLE PANEL (real tables) */
+.table-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.table-panel table, .bottom-grid table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px;}
+.table-panel th, .bottom-grid th{text-align:left; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border);}
+.table-panel td, .bottom-grid td{padding:6px 8px; border-bottom:1px solid var(--border-soft); color:var(--dim2);}
+.yes{color:var(--gr); font-weight:700;}
+.no{color:var(--re); font-weight:700;}
+.cell-hl{color:var(--am); font-weight:700;}
+.bottom-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+/* CMP PANEL (comparisons) */
+.cmp-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:2px;}
+.cmp-card{padding:10px 4px;}
+.cmp-header{margin-bottom:6px;}
+.cmp-name{font-weight:700; font-size:13.5px;}
+.cmp-name.bl{color:var(--bl);} .cmp-name.pu{color:var(--pu);} .cmp-name.gr{color:var(--gr);} .cmp-name.am{color:var(--am);}
+.cmp-rows{display:flex; flex-direction:column; gap:3px;}
+.cmp-row{display:flex; gap:10px; font-size:12.5px;}
+.cmp-key{color:var(--dim); width:78px; flex-shrink:0;}
+.cmp-val{color:var(--dim2);}
+.cmp-val.code{color:var(--am); font-size:12px;}
+.cmp-val.green{color:var(--gr);}
+.cmp-val.purple{color:var(--pu);}
+.cmp-divider{height:1px; background:var(--border-soft); margin:4px 0;}
+
+/* FLOW / PIPELINE */
+.flow-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.flow-row{display:flex; align-items:center; flex-wrap:wrap; gap:8px;}
+.pipe-box{border:1px solid var(--border); border-radius:6px; padding:7px 12px; font-size:12px; font-weight:700; background:var(--panel2);}
+.pipe-box.source{color:var(--cy); border-color:rgba(57,197,207,.4);}
+.pipe-box.inter{color:var(--bl); border-color:rgba(88,166,255,.4);}
+.pipe-box.term{color:var(--am); border-color:rgba(227,179,65,.4);}
+.pipe-box.gc{color:var(--gr); border-color:rgba(63,185,80,.4);}
+.pipe-arrow{color:var(--dim);}
+.flow-vert{display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
+.flow-vert .pipe-arrow{align-self:center; margin-left:60px;}
+
+/* PROBLEM / CODE CARDS */
+.problem-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+.problem-card{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px;}
+.problem-title{font-weight:700; color:#fff; font-size:12.5px; margin-bottom:6px;}
+.problem-code{font-size:12px; color:var(--dim2); white-space:pre-wrap; line-height:1.6;}
+.problem-code .kw{color:var(--pu);}
+.problem-code .cl{color:var(--cy);}
+.problem-code .mt{color:var(--am);}
+.problem-code .st{color:var(--gr);}
+.problem-code .cm{color:var(--dim); font-style:italic;}
+
+/* REVISION CHECKLIST */
+.revision-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.revision-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px 20px;}
+.revision-grid.cols-1{grid-template-columns:1fr;}
+.revision-item{font-size:12.5px; color:var(--dim2); display:flex; gap:8px;}
+.chk{color:var(--gr); font-weight:700;}
+
+/* Q&A */
+.qa{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px;}
+.qa .q{color:#fff; font-weight:700; font-size:13px; margin-bottom:6px;}
+.qa .q::before{content:"Q: "; color:var(--am);}
+.qa .a{color:var(--dim2); font-size:12.5px;}
+
+/* MISC */
+code{font-family:'JetBrains Mono', monospace;}
+.note{font-size:12px; color:var(--dim); margin-top:8px;}
+.badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.badge{font-size:11px; padding:3px 9px; border:1px solid var(--border); border-radius:20px; color:var(--dim2);}
+
+@media(max-width:820px){
+  .cards-grid, .cards-grid.cols-3, .cards-grid.cols-5{grid-template-columns:repeat(2,1fr);}
+  .two-col, .three-col, .bottom-grid, .pillar-grid, .problem-grid, .naming-grid, .naming-grid.cols-3, .revision-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Core Java — Complete Interview Revision</span>
+    </div>
+    <div class="subtitle">// 6-7 Yrs Experience — Full Core Java + OOP Revision Before Interview</div>
+    <div class="toc">
+      <a href="#platform">Platform</a>
+      <a href="#datatypes">Data Types</a>
+      <a href="#string">String</a>
+      <a href="#control">Control Flow</a>
+      <a href="#oop">OOP Pillars</a>
+      <a href="#relations">Relationships</a>
+      <a href="#construct">Constructors</a>
+      <a href="#staticfinal">static/final</a>
+      <a href="#solid">SOLID</a>
+      <a href="#innerclass">Inner Class/Enum/Record</a>
+      <a href="#equality">equals/hashCode</a>
+      <a href="#serial">Serialization/Reflection</a>
+      <a href="#gc">GC & Memory</a>
+      <a href="#bestpractice">Best Practices</a>
+      <a href="#revision">One-Liners</a>
+      <a href="#flow">Revision Flow</a>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="platform">1. Java Platform & Execution</div>
+
+  <div class="section-label">Quick Reference</div>
+  <div class="cards-grid">
+    <div class="card card-cy"><div class="card-name">JDK</div><div class="card-desc">Development Kit = JRE + Compiler + Debugger + Tools</div></div>
+    <div class="card card-bl"><div class="card-name">JRE</div><div class="card-desc">Runtime Environment = JVM + Core Libraries</div></div>
+    <div class="card card-gr"><div class="card-name">JVM</div><div class="card-desc">Loads classes, executes bytecode, manages memory & GC</div></div>
+    <div class="card card-am"><div class="card-name">javac</div><div class="card-desc">Compiles .java → .class (bytecode)</div></div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-label">Remember</span>
+    <div class="legend-items">
+      <div class="legend-item"><span class="dot dot-cy"></span>JDK = JRE + Development Tools</div>
+      <div class="legend-item"><span class="dot dot-bl"></span>JRE = JVM + Libraries</div>
+      <div class="legend-item"><span class="dot dot-gr"></span>JVM = Executes Java Bytecode</div>
+    </div>
+  </div>
+
+  <div class="section-label">Execution Flow & Features</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">.java → Output</div>
+      <div class="flow-row">
+        <div class="pipe-box source">.java File</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">javac Compiler</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">.class Bytecode</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">JVM</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box gc">Machine Code / Output</div>
+      </div>
+      <div class="note">JVM makes Java <b style="color:#fff">platform independent</b> — bytecode runs on any OS with a JVM ("write once, run anywhere").</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Java Features</div>
+      <div class="tree-body"><span class="i gr">✓ Platform Independent</span>   <span class="i bl">✓ Object Oriented</span>   <span class="i am">✓ Secure</span>
+<span class="i pu">✓ Robust</span>   <span class="i cy">✓ Portable</span>   <span class="i gr">✓ Multithreaded</span>
+<span class="i bl">✓ High Performance (JIT)</span>   <span class="i am">✓ Auto Garbage Collection</span>
+<span class="i pu">✓ Distributed</span>   <span class="i cy">✓ Dynamic</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="datatypes">2. Data Types, Wrappers & Casting</div>
+
+  <div class="section-label">Primitive Data Types (8)</div>
+  <div class="cards-grid cols-5">
+    <div class="card card-cy"><div class="card-name">byte</div><div class="card-desc">1 byte</div></div>
+    <div class="card card-cy"><div class="card-name">short</div><div class="card-desc">2 bytes</div></div>
+    <div class="card card-cy"><div class="card-name">int</div><div class="card-desc">4 bytes</div></div>
+    <div class="card card-cy"><div class="card-name">long</div><div class="card-desc">8 bytes</div></div>
+    <div class="card card-bl"><div class="card-name">float</div><div class="card-desc">4 bytes</div></div>
+    <div class="card card-bl"><div class="card-name">double</div><div class="card-desc">8 bytes</div></div>
+    <div class="card card-am"><div class="card-name">char</div><div class="card-desc">2 bytes</div></div>
+    <div class="card card-am"><div class="card-name">boolean</div><div class="card-desc">JVM Dependent</div></div>
+  </div>
+
+  <div class="section-label">Primitive vs Object · Wrapper Classes · Autoboxing</div>
+  <div class="two-col">
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">Primitive</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Storage</span><span class="cmp-val">Stored Directly (Stack)</span></div>
+          <div class="cmp-row"><span class="cmp-key">Speed</span><span class="cmp-val">Fast</span></div>
+          <div class="cmp-row"><span class="cmp-key">Null</span><span class="cmp-val">Cannot Be Null</span></div>
+          <div class="cmp-row"><span class="cmp-key">Methods</span><span class="cmp-val">No Methods</span></div>
+          <div class="cmp-row"><span class="cmp-key">Example</span><span class="cmp-val code">int age = 25;</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">Object (Wrapper)</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Storage</span><span class="cmp-val">Reference Type, Stored In Heap</span></div>
+          <div class="cmp-row"><span class="cmp-key">Speed</span><span class="cmp-val">Slower (boxing overhead)</span></div>
+          <div class="cmp-row"><span class="cmp-key">Null</span><span class="cmp-val">Can Be Null</span></div>
+          <div class="cmp-row"><span class="cmp-key">Methods</span><span class="cmp-val">Has Methods</span></div>
+          <div class="cmp-row"><span class="cmp-key">Example</span><span class="cmp-val code">Integer age = 25;</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tree-panel">
+      <div class="tree-title">Wrapper Mapping + Why Needed</div>
+      <table class="api-table">
+        <tr><td class="api-code cy">byte→Byte</td><td class="api-desc">short→Short, int→Integer, long→Long</td></tr>
+        <tr><td class="api-code bl">float→Float</td><td class="api-desc">double→Double</td></tr>
+        <tr><td class="api-code am">char→Character</td><td class="api-desc">boolean→Boolean</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:10px;">Why Wrapper Classes?</div>
+      <div class="tree-body"><span class="n">Collections store Objects → Generics require Objects → Utility methods → Can store null</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Autoboxing / Unboxing & Integer Caching</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Autoboxing vs Unboxing</div>
+      <div class="flow-row">
+        <div class="pipe-box source">int</div><span class="pipe-arrow">→ autobox →</span>
+        <div class="pipe-box term">Integer</div>
+      </div>
+      <div class="flow-row" style="margin-top:8px;">
+        <div class="pipe-box term">Integer</div><span class="pipe-arrow">→ unbox →</span>
+        <div class="pipe-box source">int</div>
+      </div>
+      <div class="note">Example: <code>Integer x = 10; int y = x;</code></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Integer Cache (-128 to 127)</div>
+      <div class="tree-body"><span class="n">Integer a = 100; Integer b = 100;  → </span><span class="i gr">a == b → true</span> <span class="n">(cached)</span>
+<span class="n">Integer a = 200; Integer b = 200;  → </span><span class="i re">a == b → false</span> <span class="n">(new objects)</span></div>
+      <div class="note">⚠ Always use <code>.equals()</code> to compare wrapper values, never <code>==</code>.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="string">3. Object Class & String</div>
+
+  <div class="section-label">Object Class — Root of Every Class</div>
+  <div class="tree-panel">
+    <div class="tree-title">Methods on java.lang.Object</div>
+    <div class="tree-body"><span class="i cy">toString()</span>  <span class="i bl">equals()</span>  <span class="i am">hashCode()</span>  <span class="i pu">clone()</span>  <span class="i gr">getClass()</span>
+<span class="i cy">wait()</span>  <span class="i bl">notify()</span>  <span class="i bl">notifyAll()</span>  <span class="i re">finalize()</span> <span class="n">(deprecated)</span></div>
+    <div class="note">Default <code>toString()</code> → <code>ClassName@HashCode</code>. Always override for readable output, e.g. <code>Employee{id=101,name=John}</code>.</div>
+  </div>
+
+  <div class="section-label">String Immutability, Pool & Comparison</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">String Memory Model</div>
+      <div class="tree-body"><span class="c">│</span>
+<span class="c">├──</span> <span class="i cy">String s1 = "Java";</span> <span class="n">→ goes to String Constant Pool (reused if exists)</span>
+<span class="c">└──</span> <span class="i am">String s2 = new String("Java");</span> <span class="n">→ new Heap Object + separate Pool entry</span></div>
+      <div class="note">Pool purpose: reuse objects, save memory, improve performance. <code>String a="Java"; String b="Java";</code> → same object.</div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">==</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-key">Compares</span><span class="cmp-val">Reference / Memory Address</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">equals()</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-key">Compares</span><span class="cmp-val">Actual Value / Content</span></div></div>
+      </div>
+      <div class="note">✓ Why String is immutable: Security, Caching, Thread Safety, Performance, enables String Pool.</div>
+    </div>
+  </div>
+
+  <div class="section-label">String vs StringBuilder vs StringBuffer</div>
+  <div class="three-col">
+    <div class="pillar-card p-bl">
+      <div class="pillar-name bl">String</div>
+      <div class="pillar-def">Immutable — every modification creates a new object.</div>
+      <span class="pillar-tag tag-bl">Thread Safe</span><span class="pillar-tag tag-bl">Slow on Modification</span>
+    </div>
+    <div class="pillar-card p-gr">
+      <div class="pillar-name gr">StringBuilder ⭐</div>
+      <div class="pillar-def">Mutable, modifies same object, no synchronization.</div>
+      <span class="pillar-tag tag-gr">Not Thread Safe</span><span class="pillar-tag tag-gr">Fastest</span><span class="pillar-tag tag-gr">Single Thread</span>
+    </div>
+    <div class="pillar-card p-am">
+      <div class="pillar-name am">StringBuffer</div>
+      <div class="pillar-def">Mutable, synchronized methods — safe across threads.</div>
+      <span class="pillar-tag tag-am">Thread Safe</span><span class="pillar-tag tag-am">Slower</span><span class="pillar-tag tag-am">Multi Thread</span>
+    </div>
+  </div>
+
+  <div class="section-label">Common String Methods</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">length()</span><span class="naming-meaning">size of string</span></div>
+    <div class="naming-card"><span class="naming-prefix">charAt()</span><span class="naming-meaning">char at index</span></div>
+    <div class="naming-card"><span class="naming-prefix">substring()</span><span class="naming-meaning">extract portion</span></div>
+    <div class="naming-card"><span class="naming-prefix">contains()</span><span class="naming-meaning">check substring</span></div>
+    <div class="naming-card"><span class="naming-prefix">equalsIgnoreCase()</span><span class="naming-meaning">case-insensitive compare</span></div>
+    <div class="naming-card"><span class="naming-prefix">startsWith()/endsWith()</span><span class="naming-meaning">prefix/suffix check</span></div>
+    <div class="naming-card"><span class="naming-prefix">replace() / trim()</span><span class="naming-meaning">modify content</span></div>
+    <div class="naming-card"><span class="naming-prefix">split()</span><span class="naming-meaning">tokenize by delimiter</span></div>
+    <div class="naming-card"><span class="naming-prefix">indexOf()</span><span class="naming-meaning">position of substring</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="control">4. Variables, Casting, Operators & Arrays</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Variable Types</div>
+      <table class="api-table">
+        <tr><td class="api-code cy">Local</td><td class="api-desc">Inside a method, must be initialized before use</td></tr>
+        <tr><td class="api-code bl">Instance</td><td class="api-desc">Inside class, per-object, gets default value</td></tr>
+        <tr><td class="api-code am">Static</td><td class="api-desc">Belongs to class, shared across all objects</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:10px;">Type Casting</div>
+      <div class="tree-body"><span class="i gr">Implicit</span> <span class="n">int → long (widening, automatic)</span>
+<span class="i am">Explicit</span> <span class="n">double → int (narrowing, needs cast)</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Operators</div>
+      <div class="tree-body"><span class="i cy">Arithmetic</span> <span class="n">+ − * / %</span>
+<span class="i bl">Relational</span> <span class="n">== != &gt; &lt; &gt;= &lt;=</span>
+<span class="i gr">Logical</span> <span class="n">&amp;&amp; || !</span>
+<span class="i am">Bitwise</span> <span class="n">&amp; | ^ ~</span>
+<span class="i pu">Shift</span> <span class="n">&lt;&lt; &gt;&gt; &gt;&gt;&gt;</span></div>
+      <div class="tree-title" style="margin-top:10px;">Control Statements</div>
+      <div class="tree-body"><span class="n">if · if-else · switch · for · while · do-while · break · continue · return</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Array vs ArrayList</div>
+  <div class="cmp-panel">
+    <div class="cmp-card comparable">
+      <div class="cmp-header"><span class="cmp-name bl">Array</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Size</span><span class="cmp-val">Fixed</span></div>
+        <div class="cmp-row"><span class="cmp-key">Stores</span><span class="cmp-val">Primitives + Objects</span></div>
+        <div class="cmp-row"><span class="cmp-key">Perf</span><span class="cmp-val">Fast, continuous memory, index starts at 0</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card comparator">
+      <div class="cmp-header"><span class="cmp-name pu">ArrayList</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Size</span><span class="cmp-val">Dynamic / Resizable</span></div>
+        <div class="cmp-row"><span class="cmp-key">Stores</span><span class="cmp-val">Objects only</span></div>
+        <div class="cmp-row"><span class="cmp-key">Perf</span><span class="cmp-val">Slight overhead vs array, more flexible</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="oop">5. OOP — Four Pillars</div>
+
+  <div class="section-label">Quick Reference</div>
+  <div class="cards-grid">
+    <div class="card card-cy"><div class="card-name">Class</div><div class="card-desc">Blueprint / Template — Variables &amp; Methods</div></div>
+    <div class="card card-re"><div class="card-name">Object</div><div class="card-desc">Instance of a Class</div></div>
+    <div class="card card-bl"><div class="card-name">Encapsulation</div><div class="card-desc">Data Hiding — Wraps Data + Methods</div></div>
+    <div class="card card-gr"><div class="card-name">Inheritance</div><div class="card-desc">Code Reusability — IS-A Relationship</div></div>
+    <div class="card card-am"><div class="card-name">Polymorphism</div><div class="card-desc">One Interface, Many Forms</div></div>
+    <div class="card card-pu"><div class="card-name">Abstraction</div><div class="card-desc">Hide Implementation Details</div></div>
+  </div>
+
+  <div class="section-label">Four Pillars Detail</div>
+  <div class="pillar-panel">
+    <div class="pillar-grid">
+      <div class="pillar-card p-bl">
+        <div class="pillar-name bl">1. Encapsulation</div>
+        <div class="pillar-def">Wrapping data and methods into a single unit; achieved using private variables with public getters/setters.</div>
+        <span class="pillar-tag tag-bl">Data Hiding</span><span class="pillar-tag tag-bl">Security</span><span class="pillar-tag tag-bl">Maintainability</span>
+        <div class="pillar-example"><b>Ex:</b> private balance + getBalance()</div>
+      </div>
+      <div class="pillar-card p-gr">
+        <div class="pillar-name gr">2. Inheritance</div>
+        <div class="pillar-def">Child class inherits properties & behavior from a parent class — promotes code reusability, IS-A relationship.</div>
+        <span class="pillar-tag tag-gr">Single</span><span class="pillar-tag tag-gr">Multilevel</span><span class="pillar-tag tag-gr">Hierarchical</span><span class="pillar-tag tag-gr">Multiple (via Interface)</span>
+        <div class="pillar-example"><b>Ex:</b> class Dog extends Animal</div>
+      </div>
+      <div class="pillar-card p-am">
+        <div class="pillar-name am">3. Polymorphism</div>
+        <div class="pillar-def">One interface, many forms — the same action behaves differently on different objects.</div>
+        <span class="pillar-tag tag-am">Compile-Time (Overload)</span><span class="pillar-tag tag-am">Runtime (Override)</span>
+        <div class="pillar-example"><b>Ex:</b> A Person can be Employee, Patient & Father at once</div>
+      </div>
+      <div class="pillar-card p-pu">
+        <div class="pillar-name pu">4. Abstraction</div>
+        <div class="pillar-def">Showing only essential details and hiding implementation complexity from the user.</div>
+        <span class="pillar-tag tag-pu">Abstract Class</span><span class="pillar-tag tag-pu">Interface</span>
+        <div class="pillar-example"><b>Ex:</b> car.start() hides engine internals</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Inheritance Types & Polymorphism</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="c">│
+├──</span> <span class="i gr">Inheritance (IS-A)</span><span class="n">: child reuses parent's members</span>
+<span class="c">│   ├──</span> <span class="gr">Single</span><span class="n">: Dog extends Animal</span>
+<span class="c">│   ├──</span> <span class="gr">Multilevel</span><span class="n">: Puppy extends Dog extends Animal</span>
+<span class="c">│   ├──</span> <span class="gr">Hierarchical</span><span class="n">: Dog, Cat both extend Animal</span>
+<span class="c">│   └──</span> <span class="gr">Multiple</span><span class="n"> (via Interface): class Duck implements Flyable, Swimmable — Java doesn't allow multiple class inheritance (diamond problem)</span>
+<span class="c">│
+└──</span> <span class="i am">Polymorphism</span><span class="n">: same call, different behavior</span>
+<span class="c">    ├──</span> <span class="am">Compile-Time — Overloading</span><span class="n">: add(int,int) vs add(int,int,int)</span>
+<span class="c">    └──</span> <span class="am">Runtime — Overriding</span><span class="n">: Animal.speak() → Dog.speak() @Override</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="relations">6. Relationships & Abstract Class vs Interface</div>
+
+  <div class="section-label">HAS-A Relationship Types</div>
+  <div class="naming-grid">
+    <div class="naming-card"><span class="naming-prefix">Association</span><span class="naming-arrow">→</span><span class="naming-meaning">HAS-A, fully independent — Teacher ↔ Student</span></div>
+    <div class="naming-card"><span class="naming-prefix">Aggregation</span><span class="naming-arrow">→</span><span class="naming-meaning">Weak HAS-A, parts exist independently — Department ↔ Employee</span></div>
+    <div class="naming-card"><span class="naming-prefix">Composition</span><span class="naming-arrow">→</span><span class="naming-meaning">Strong HAS-A, parts can't exist alone — Car ↔ Engine</span></div>
+  </div>
+
+  <div class="section-label">Abstract Class vs Interface</div>
+  <div class="bottom-grid">
+    <div class="table-panel">
+      <div class="tree-title">Feature Comparison</div>
+      <table>
+        <tr><th>Feature</th><th>Abstract Class</th><th>Interface</th></tr>
+        <tr><td>Constructor</td><td class="yes">Yes</td><td class="no">No</td></tr>
+        <tr><td>Variables</td><td>Any Type</td><td class="cell-hl">public static final</td></tr>
+        <tr><td>Methods</td><td>Abstract + Concrete</td><td>Abstract, Default, Static</td></tr>
+        <tr><td>Inheritance</td><td>Single</td><td>Multiple</td></tr>
+        <tr><td>State</td><td class="yes">Yes</td><td class="no">No</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Interface vs Abstract Class</div>
+      <div class="tree-body"><span class="c">│
+├──</span> <span class="i pu">Interface</span><span class="n">: 100% Contract — "What to do"</span>
+<span class="c">│   └──</span> <span class="pu">A class can implement multiple interfaces</span>
+<span class="c">│
+└──</span> <span class="i bl">Abstract Class</span><span class="n">: Partial Implementation — "What + How (partial)"</span>
+<span class="c">    └──</span> <span class="bl">A class can extend only one abstract class</span></div>
+      <div class="note">Interface → Contract. Abstract Class → Partial Implementation.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="construct">7. Constructors, this/super, Overload vs Override</div>
+
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Object / Constructor Flow</div>
+      <div class="flow-row">
+        <div class="pipe-box source">new Employee()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">Memory Allocated</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">Constructor Executed</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">Object Initialized</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box gc">Reference Returned</div>
+      </div>
+      <div class="note">Types: Default Constructor (no args), Parameterized Constructor, Copy Constructor (user-defined pattern).</div>
+      <div class="note">Constructor Chaining: <code>this()</code> = same class, <code>super()</code> = parent class. Must be the <b style="color:#fff">first statement</b>.</div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">this</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Refers to</span><span class="cmp-val">Current Object</span></div>
+          <div class="cmp-row"><span class="cmp-key">Used for</span><span class="cmp-val">Current variable, method, constructor chaining</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">super</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Refers to</span><span class="cmp-val">Parent Class</span></div>
+          <div class="cmp-row"><span class="cmp-key">Used for</span><span class="cmp-val">Parent variable, method, parent constructor call</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Overloading vs Overriding</div>
+  <div class="cmp-panel">
+    <div class="cmp-card comparable">
+      <div class="cmp-header"><span class="cmp-name bl">Overloading</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">When</span><span class="cmp-val">Compile-Time Polymorphism</span></div>
+        <div class="cmp-row"><span class="cmp-key">Rule</span><span class="cmp-val code">Same name, different signature</span></div>
+        <div class="cmp-row"><span class="cmp-key">Varies by</span><span class="cmp-val green">Number / Type / Order of Params</span></div>
+        <div class="cmp-row"><span class="cmp-key">Class</span><span class="cmp-val">Same class</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card comparator">
+      <div class="cmp-header"><span class="cmp-name pu">Overriding</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">When</span><span class="cmp-val">Runtime Polymorphism</span></div>
+        <div class="cmp-row"><span class="cmp-key">Rule</span><span class="cmp-val code">Same signature, same/covariant return</span></div>
+        <div class="cmp-row"><span class="cmp-key">Varies by</span><span class="cmp-val purple">Implementation in Child Class</span></div>
+        <div class="cmp-row"><span class="cmp-key">Class</span><span class="cmp-val">Parent → Child (@Override)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="staticfinal">8. static / final, Access Modifiers, Packages</div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">static Members</div>
+      <div class="tree-body"><span class="i cy">Static Variable</span> <span class="n">→ one copy, shared by all objects (constants, counters, config)</span>
+<span class="i bl">Static Method</span> <span class="n">→ can access only static members, cannot use this/super</span>
+<span class="i am">Static Block</span> <span class="n">→ runs once when class loads, for static init</span>
+<span class="i pu">Static Nested Class</span> <span class="n">→ no outer object needed</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">final Keyword</div>
+      <div class="tree-body"><span class="i cy">final Variable</span> <span class="n">→ cannot change (constant)</span>
+<span class="i bl">final Method</span> <span class="n">→ cannot override</span>
+<span class="i am">final Class</span> <span class="n">→ cannot extend</span></div>
+      <div class="note"><code>static final</code> together → compile-time constant, e.g. <code>final int MAX = 100;</code></div>
+    </div>
+  </div>
+
+  <div class="section-label">Access Modifiers</div>
+  <div class="bottom-grid">
+    <div class="table-panel">
+      <table>
+        <tr><th>Modifier</th><th>Same Class</th><th>Package</th><th>Child</th><th>Outside</th></tr>
+        <tr><td>private</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+        <tr><td>default</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
+        <tr><td>protected</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td></tr>
+        <tr><td>public</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Packages & Class Loading</div>
+      <div class="tree-body"><span class="n">Packages organize classes, avoid name conflicts, provide access control.</span>
+<span class="n"><code>import</code> class · <code>import static</code> static members · <code>package.*</code> wildcard (no sub-packages)</span></div>
+      <div class="tree-title" style="margin-top:10px;">Class Loading Order</div>
+      <div class="flow-row">
+        <div class="pipe-box source">Class Loaded</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">Static Block</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">main()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">Object + Constructor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="solid">9. SOLID Principles</div>
+  <div class="cards-grid cols-5">
+    <div class="card card-cy"><div class="card-name">S — SRP</div><div class="card-desc">Single Responsibility — one class, one reason to change</div></div>
+    <div class="card card-bl"><div class="card-name">O — OCP</div><div class="card-desc">Open for Extension, Closed for Modification</div></div>
+    <div class="card card-gr"><div class="card-name">L — LSP</div><div class="card-desc">Child must replace Parent without breaking behavior</div></div>
+    <div class="card card-am"><div class="card-name">I — ISP</div><div class="card-desc">Many small interfaces &gt; one large interface</div></div>
+    <div class="card card-pu"><div class="card-name">D — DIP</div><div class="card-desc">Depend on Abstraction, not Concrete class</div></div>
+  </div>
+  <div class="tree-panel" style="margin-top:10px;">
+    <div class="tree-title">Quick Example — ISP + DIP</div>
+    <div class="tree-body"><span class="re">Bad:</span> <span class="n">NotificationService → handles Email + SMS + WhatsApp inside same class</span>
+<span class="gr">Good:</span> <span class="n">Notification Interface → EmailService, SMSService, WhatsAppService (separate implementations)</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="innerclass">10. Inner Classes, Enum, Record, Annotations</div>
+
+  <div class="section-label">Types of Inner Classes</div>
+  <div class="naming-grid">
+    <div class="naming-card"><span class="naming-prefix">Member Inner</span><span class="naming-arrow">→</span><span class="naming-meaning">Non-static, needs outer object, accesses all outer members</span></div>
+    <div class="naming-card"><span class="naming-prefix">Static Nested</span><span class="naming-arrow">→</span><span class="naming-meaning">Static, no outer object needed, accesses only static members</span></div>
+    <div class="naming-card"><span class="naming-prefix">Local Inner</span><span class="naming-arrow">→</span><span class="naming-meaning">Declared inside a method, scope limited to that method</span></div>
+    <div class="naming-card"><span class="naming-prefix">Anonymous Inner</span><span class="naming-arrow">→</span><span class="naming-meaning">No class name, one-time use, now mostly replaced by Lambdas</span></div>
+  </div>
+
+  <div class="section-label">Enum · Record · Annotations</div>
+  <div class="three-col">
+    <div class="pillar-card p-bl">
+      <div class="pillar-name bl">Enum</div>
+      <div class="pillar-def">Special class representing a fixed set of constants. Can have fields, constructors, methods, interfaces, switch support.</div>
+      <span class="pillar-tag tag-bl">Type Safety</span><span class="pillar-tag tag-bl">Compile-Time Check</span>
+    </div>
+    <div class="pillar-card p-gr">
+      <div class="pillar-name gr">Record (Java 16+)</div>
+      <div class="pillar-def">Immutable data carrier. Auto-generates constructor, getters, equals(), hashCode(), toString().</div>
+      <span class="pillar-tag tag-gr">Less Boilerplate</span><span class="pillar-tag tag-gr">Ex: record Employee(int id, String name)</span>
+    </div>
+    <div class="pillar-card p-am">
+      <div class="pillar-name am">Annotations</div>
+      <div class="pillar-def">Metadata for compiler, framework, or runtime — @Override, @Deprecated, @FunctionalInterface, @Component, @Autowired.</div>
+      <span class="pillar-tag tag-am">Retention: SOURCE/CLASS/RUNTIME</span>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="equality">11. Cloning, Immutability, equals/hashCode, Comparable vs Comparator</div>
+
+  <div class="section-label">Shallow vs Deep Copy</div>
+  <div class="cmp-panel">
+    <div class="cmp-card comparable">
+      <div class="cmp-header"><span class="cmp-name bl">Shallow Copy</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Primitives</span><span class="cmp-val">Copied</span></div>
+        <div class="cmp-row"><span class="cmp-key">References</span><span class="cmp-val">Shared — nested object changes reflect in both</span></div>
+        <div class="cmp-row"><span class="cmp-key">Trade-off</span><span class="cmp-val">Fast, less memory</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card comparator">
+      <div class="cmp-header"><span class="cmp-name pu">Deep Copy</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Primitives</span><span class="cmp-val">Copied</span></div>
+        <div class="cmp-row"><span class="cmp-key">References</span><span class="cmp-val">Nested objects also copied → fully independent</span></div>
+        <div class="cmp-row"><span class="cmp-key">Trade-off</span><span class="cmp-val">Safe, more memory</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note" style="margin-top:6px;"><code>Cloneable</code> is a marker interface required for <code>clone()</code>, otherwise <code>CloneNotSupportedException</code>.</div>
+
+  <div class="section-label">Immutable Class — How to Build</div>
+  <div class="flow-panel">
+    <div class="flow-row">
+      <div class="pipe-box source">final class</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">private final fields</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">No Setters</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box term">Init via Constructor</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box gc">Defensive Copies for mutable fields</div>
+    </div>
+    <div class="note">Benefits: Thread Safe, Simple, Secure, Cache Friendly, Reliable. Examples: String, Wrapper Classes, Record.</div>
+  </div>
+
+  <div class="section-label">== vs equals() vs hashCode()</div>
+  <div class="bottom-grid">
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">==</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-key">Compares</span><span class="cmp-val">Reference / Memory Address</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">equals()</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-key">Compares</span><span class="cmp-val">Content / Business Value</span></div></div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Why Override Both equals() &amp; hashCode()?</div>
+      <div class="flow-row">
+        <div class="pipe-box source">Key</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">hashCode()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">Find Bucket</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">equals()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box gc">Correct Entry</div>
+      </div>
+      <div class="note">Rule: Equal objects must have the same hashCode(). Overriding only equals() breaks HashMap/HashSet.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Comparable vs Comparator</div>
+  <div class="cmp-panel">
+    <div class="cmp-card comparable">
+      <div class="cmp-header"><span class="cmp-name bl">Comparable</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Sorting</span><span class="cmp-val">Single / Natural Ordering</span></div>
+        <div class="cmp-row"><span class="cmp-key">Location</span><span class="cmp-val">Inside the class</span></div>
+        <div class="cmp-row"><span class="cmp-key">Method</span><span class="cmp-val code">compareTo()</span></div>
+        <div class="cmp-row"><span class="cmp-key">Use When</span><span class="cmp-val">Employee ID, Student Roll No, Product ID</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card comparator">
+      <div class="cmp-header"><span class="cmp-name pu">Comparator</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Sorting</span><span class="cmp-val">Multiple / Custom Ordering</span></div>
+        <div class="cmp-row"><span class="cmp-key">Location</span><span class="cmp-val">Outside the class</span></div>
+        <div class="cmp-row"><span class="cmp-key">Method</span><span class="cmp-val code">compare()</span></div>
+        <div class="cmp-row"><span class="cmp-key">Use When</span><span class="cmp-val">Sort by Salary, Age, Department, Name</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="serial">12. Serialization & Reflection</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Serialization Flow</div>
+      <div class="flow-row">
+        <div class="pipe-box source">Java Object</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">ObjectOutputStream</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">Byte Stream</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">File / Network</div>
+      </div>
+      <div class="flow-row" style="margin-top:8px;">
+        <div class="pipe-box term">ObjectInputStream</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box gc">Java Object (restored)</div>
+      </div>
+      <div class="note">Requires <code>Serializable</code> (marker interface). <code>serialVersionUID</code> ensures class compatibility on deserialization. <code>transient</code> fields (passwords, OTP) are skipped; <code>static</code> fields are never serialized.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Reflection</div>
+      <div class="tree-body"><span class="n">Inspect / modify / invoke classes, methods, fields — at runtime.</span>
+<span class="i cy">Get Class Object:</span> <span class="n">obj.getClass() · Employee.class · Class.forName()</span>
+<span class="i gr">Used By:</span> <span class="n">Spring, Hibernate, JUnit, Dependency Injection, ORM</span>
+<span class="i re">Disadvantages:</span> <span class="n">Slow, breaks encapsulation, security risk — avoid in business logic</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="gc">13. Garbage Collection & Memory Model</div>
+
+  <div class="section-label">GC Flow & Eligibility</div>
+  <div class="flow-panel">
+    <div class="flow-row">
+      <div class="pipe-box source">Object Created</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">Used</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">Reference Lost</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box term">Eligible for GC</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box gc">Memory Reclaimed</div>
+    </div>
+    <div class="note">Eligible when: reference = null · object out of scope · anonymous object · reassigned reference · island of isolation. <code>System.gc()</code> only requests GC, not guaranteed. <code>finalize()</code> is deprecated — avoid.</div>
+  </div>
+
+  <div class="section-label">Heap vs Stack & JVM Memory Areas</div>
+  <div class="two-col">
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">Heap</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Stores</span><span class="cmp-val">Objects</span></div>
+          <div class="cmp-row"><span class="cmp-key">Scope</span><span class="cmp-val">Shared, managed by GC, large memory</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">Stack</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Stores</span><span class="cmp-val">Method calls, local variables</span></div>
+          <div class="cmp-row"><span class="cmp-key">Scope</span><span class="cmp-val">Thread-specific, auto-cleared</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">JVM Memory Areas</div>
+      <div class="tree-body"><span class="n">JVM Memory → </span><span class="i cy">Heap</span> <span class="i bl">Stack</span> <span class="i am">Metaspace</span> <span class="i pu">PC Register</span> <span class="i gr">Native Stack</span></div>
+      <div class="tree-title" style="margin-top:10px;">Memory Errors</div>
+      <div class="tree-body"><span class="i re">OutOfMemoryError</span> <span class="n">→ heap full (large objects, memory leak, infinite collection growth)</span>
+<span class="i re">StackOverflowError</span> <span class="n">→ deep / infinite recursion</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Memory Leaks & Reference Types</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Memory Leak — Causes & Prevention</div>
+      <div class="tree-body"><span class="n">Cause: Static Collections · Unclosed Resources · Listeners · Caches · ThreadLocal · Large Maps</span>
+<span class="n">Prevent: Close resources · Remove listeners · Limit cache size · Avoid static collections · Use weak references · Monitor heap</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Weak / Soft / Phantom Reference</div>
+      <div class="tree-body"><span class="i cy">WeakReference</span> <span class="n">→ collected even if reference exists — used in caching</span>
+<span class="i bl">SoftReference</span> <span class="n">→ collected only when memory is low — memory-sensitive cache</span>
+<span class="i pu">PhantomReference</span> <span class="n">→ advanced cleanup — rare interview topic</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="bestpractice">14. Best Practices & Common Differences</div>
+
+  <div class="section-label">Real Project Best Practices</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Prefer Composition Over Inheritance</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Constructor Injection over Setter Injection</div>
+      <div class="revision-item"><span class="chk">✓</span>Mark constants as static final</div>
+      <div class="revision-item"><span class="chk">✓</span>Keep fields private, program to interfaces</div>
+      <div class="revision-item"><span class="chk">✓</span>Follow SOLID Principles</div>
+      <div class="revision-item"><span class="chk">✓</span>Avoid deep inheritance hierarchies</div>
+      <div class="revision-item"><span class="chk">✓</span>Always override toString()</div>
+      <div class="revision-item"><span class="chk">✓</span>Override equals() and hashCode() together</div>
+      <div class="revision-item"><span class="chk">✓</span>Never use == for String comparison</div>
+      <div class="revision-item"><span class="chk">✓</span>Use StringBuilder inside loops</div>
+      <div class="revision-item"><span class="chk">✓</span>Prefer Record for DTOs (Java 17+)</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Enum instead of String constants</div>
+      <div class="revision-item"><span class="chk">✓</span>Avoid clone() in modern Java — use copy constructor/Builder</div>
+      <div class="revision-item"><span class="chk">✓</span>Make domain objects immutable where possible</div>
+      <div class="revision-item"><span class="chk">✓</span>Close resources via try-with-resources</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Optional as return type, not as field/param</div>
+      <div class="revision-item"><span class="chk">✓</span>Follow DRY, KISS, YAGNI</div>
+      <div class="revision-item"><span class="chk">✓</span>Keep methods small, one responsibility per class</div>
+    </div>
+  </div>
+
+  <div class="section-label">Top Interview Differences</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">Heap</span><span class="naming-arrow">vs</span><span class="naming-meaning">Stack</span></div>
+    <div class="naming-card"><span class="naming-prefix">Serializable</span><span class="naming-arrow">vs</span><span class="naming-meaning">Externalizable</span></div>
+    <div class="naming-card"><span class="naming-prefix">Shallow Copy</span><span class="naming-arrow">vs</span><span class="naming-meaning">Deep Copy</span></div>
+    <div class="naming-card"><span class="naming-prefix">==</span><span class="naming-arrow">vs</span><span class="naming-meaning">equals()</span></div>
+    <div class="naming-card"><span class="naming-prefix">equals()</span><span class="naming-arrow">vs</span><span class="naming-meaning">hashCode()</span></div>
+    <div class="naming-card"><span class="naming-prefix">Comparable</span><span class="naming-arrow">vs</span><span class="naming-meaning">Comparator</span></div>
+    <div class="naming-card"><span class="naming-prefix">Abstract Class</span><span class="naming-arrow">vs</span><span class="naming-meaning">Interface</span></div>
+    <div class="naming-card"><span class="naming-prefix">String</span><span class="naming-arrow">vs</span><span class="naming-meaning">StringBuilder</span></div>
+    <div class="naming-card"><span class="naming-prefix">Array</span><span class="naming-arrow">vs</span><span class="naming-meaning">ArrayList</span></div>
+    <div class="naming-card"><span class="naming-prefix">Composition</span><span class="naming-arrow">vs</span><span class="naming-meaning">Inheritance</span></div>
+    <div class="naming-card"><span class="naming-prefix">Checked</span><span class="naming-arrow">vs</span><span class="naming-meaning">Unchecked Exception</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashMap</span><span class="naming-arrow">vs</span><span class="naming-meaning">ConcurrentHashMap</span></div>
+    <div class="naming-card"><span class="naming-prefix">List</span><span class="naming-arrow">vs</span><span class="naming-meaning">Set</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashSet</span><span class="naming-arrow">vs</span><span class="naming-meaning">TreeSet</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashMap</span><span class="naming-arrow">vs</span><span class="naming-meaning">Hashtable</span></div>
+  </div>
+
+  <div class="section-label">Interview Tips — Frequently Asked "Why"</div>
+  <div class="qa">
+    <div class="q">Why override hashCode() with equals()?</div>
+    <div class="a">HashMap first uses hashCode() to locate the bucket, then equals() to identify the correct object. Overriding only equals() breaks hash-based collections.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Why is String immutable?</div>
+    <div class="a">Security, Thread Safety, Caching, String Pool reuse, and reliability as a HashMap key.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Comparable or Comparator?</div>
+    <div class="a">Comparable for one natural ordering (defined inside the class). Comparator when multiple sorting strategies are needed (defined outside the class).</div>
+  </div>
+  <div class="qa">
+    <div class="q">Why prefer Enum over String constants?</div>
+    <div class="a">Type safety, compile-time checking, better readability, and switch support.</div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="revision">15. 50 One-Liner Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">›</span><b>JDK</b> → Development Kit</div>
+      <div class="revision-item"><span class="chk">›</span><b>JRE</b> → Runtime Environment</div>
+      <div class="revision-item"><span class="chk">›</span><b>JVM</b> → Executes Bytecode</div>
+      <div class="revision-item"><span class="chk">›</span><b>Object</b> → Parent Class of All</div>
+      <div class="revision-item"><span class="chk">›</span><b>String</b> → Immutable</div>
+      <div class="revision-item"><span class="chk">›</span><b>String Pool</b> → Reuses String Objects</div>
+      <div class="revision-item"><span class="chk">›</span><b>Wrapper</b> → Object Representation of Primitive</div>
+      <div class="revision-item"><span class="chk">›</span><b>Autoboxing</b> → Primitive to Wrapper</div>
+      <div class="revision-item"><span class="chk">›</span><b>Unboxing</b> → Wrapper to Primitive</div>
+      <div class="revision-item"><span class="chk">›</span><b>Encapsulation</b> → Data Hiding</div>
+      <div class="revision-item"><span class="chk">›</span><b>Abstraction</b> → Hide Implementation</div>
+      <div class="revision-item"><span class="chk">›</span><b>Inheritance</b> → Code Reuse</div>
+      <div class="revision-item"><span class="chk">›</span><b>Polymorphism</b> → One Interface, Many Forms</div>
+      <div class="revision-item"><span class="chk">›</span><b>Constructor</b> → Object Initialization</div>
+      <div class="revision-item"><span class="chk">›</span><b>this</b> → Current Object</div>
+      <div class="revision-item"><span class="chk">›</span><b>super</b> → Parent Object</div>
+      <div class="revision-item"><span class="chk">›</span><b>Overloading</b> → Compile Time</div>
+      <div class="revision-item"><span class="chk">›</span><b>Overriding</b> → Runtime</div>
+      <div class="revision-item"><span class="chk">›</span><b>static</b> → Belongs to Class</div>
+      <div class="revision-item"><span class="chk">›</span><b>final</b> → Cannot Change</div>
+      <div class="revision-item"><span class="chk">›</span><b>private</b> → Same Class Only</div>
+      <div class="revision-item"><span class="chk">›</span><b>protected</b> → Package + Child</div>
+      <div class="revision-item"><span class="chk">›</span><b>public</b> → Everywhere</div>
+      <div class="revision-item"><span class="chk">›</span><b>Package</b> → Organize Classes</div>
+      <div class="revision-item"><span class="chk">›</span><b>SOLID</b> → Maintainable Code</div>
+      <div class="revision-item"><span class="chk">›</span><b>Enum</b> → Type Safe Constant</div>
+      <div class="revision-item"><span class="chk">›</span><b>Record</b> → Immutable Data Carrier</div>
+      <div class="revision-item"><span class="chk">›</span><b>Annotation</b> → Metadata</div>
+      <div class="revision-item"><span class="chk">›</span><b>Clone</b> → Copy Object</div>
+      <div class="revision-item"><span class="chk">›</span><b>Shallow Copy</b> → Shared Reference</div>
+      <div class="revision-item"><span class="chk">›</span><b>Deep Copy</b> → Independent Copy</div>
+      <div class="revision-item"><span class="chk">›</span><b>Immutable</b> → Cannot Change After Creation</div>
+      <div class="revision-item"><span class="chk">›</span><b>==</b> → Compare Reference</div>
+      <div class="revision-item"><span class="chk">›</span><b>equals()</b> → Compare Content</div>
+      <div class="revision-item"><span class="chk">›</span><b>hashCode()</b> → Hash Bucket</div>
+      <div class="revision-item"><span class="chk">›</span><b>Comparable</b> → Natural Sorting</div>
+      <div class="revision-item"><span class="chk">›</span><b>Comparator</b> → Custom Sorting</div>
+      <div class="revision-item"><span class="chk">›</span><b>Serializable</b> → Convert Object to Bytes</div>
+      <div class="revision-item"><span class="chk">›</span><b>transient</b> → Skip Field in Serialization</div>
+      <div class="revision-item"><span class="chk">›</span><b>Reflection</b> → Runtime Inspection</div>
+      <div class="revision-item"><span class="chk">›</span><b>Heap</b> → Object Memory</div>
+      <div class="revision-item"><span class="chk">›</span><b>Stack</b> → Method Memory</div>
+      <div class="revision-item"><span class="chk">›</span><b>GC</b> → Cleans Unused Objects</div>
+      <div class="revision-item"><span class="chk">›</span><b>Memory Leak</b> → Unused but Referenced Object</div>
+      <div class="revision-item"><span class="chk">›</span><b>try-with-resources</b> → Auto Close</div>
+      <div class="revision-item"><span class="chk">›</span><b>DRY</b> → Don't Repeat Yourself</div>
+      <div class="revision-item"><span class="chk">›</span><b>KISS</b> → Keep It Simple</div>
+      <div class="revision-item"><span class="chk">›</span><b>YAGNI</b> → Build Only What's Needed</div>
+      <div class="revision-item"><span class="chk">›</span><b>Array</b> → Fixed Size</div>
+      <div class="revision-item"><span class="chk">›</span><b>ArrayList</b> → Dynamic Size</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="flow">16. 6-7 Yrs Interview Expectations & Revision Flow</div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Interviewers Expect You To Explain</div>
+      <div class="tree-body"><span class="i gr">✓ Internal Working</span>  <span class="i bl">✓ JVM Basics</span>  <span class="i am">✓ Memory Management</span>
+<span class="i pu">✓ OOP Design</span>  <span class="i cy">✓ SOLID Principles</span>  <span class="i gr">✓ Object Lifecycle</span>
+<span class="i bl">✓ Collection Selection</span>  <span class="i am">✓ Performance Considerations</span>
+<span class="i pu">✓ Multi-threading Basics</span>  <span class="i cy">✓ Real Project Examples</span>
+<span class="i re">✓ Why One Approach Is Better Than Another</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Core Java Revision Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Java Platform (JDK→JRE→JVM)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Data Types → Wrapper Classes → String</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">OOP (4 Pillars) → SOLID</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Constructors → static/final → Object Class</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">equals/hashCode → Comparable</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Serialization → Reflection</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Garbage Collection → Best Practices</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
