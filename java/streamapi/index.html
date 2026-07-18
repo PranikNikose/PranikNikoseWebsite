@@ -243,7 +243,7 @@ list.stream()
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getName, <span class="cl">Collectors</span>.counting()))
    .entrySet().stream()
    .<span class="mt">filter</span>(en -&gt; en.getValue() &gt; 1)
-   .<span class="mt">map</span>(Map.Entry::getKey)
+   .<span class="mt">map</span>(Map.Entry::getKey)     //.map(entry -> entry.getKey())
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toSet());</div>
     </div>
     <div class="problem-card">
