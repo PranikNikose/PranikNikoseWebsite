@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Collections Framework — Complete Interview Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14; --panel:#12161f; --panel2:#151a24; --border:#232a38; --border-soft:#1b212d;
+  --text:#c9d1d9; --dim:#6e7681; --dim2:#8892a0;
+  --cy:#39c5cf; --bl:#58a6ff; --gr:#3fb950; --am:#e3b341; --pu:#a371f7; --re:#f778ba; --or:#ff9a5a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'JetBrains Mono', monospace; font-size:14px; line-height:1.55;
+  padding:28px 16px 80px;
+}
+.page{max-width:1180px; margin:0 auto;}
+
+/* HEADER */
+.header{border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:22px;}
+.header-top{display:flex; align-items:baseline; gap:10px;}
+.prompt{color:var(--gr); font-weight:700; font-size:20px;}
+.title{font-size:22px; font-weight:700; color:#fff; letter-spacing:.3px;}
+.subtitle{color:var(--dim); margin-top:6px; font-size:13px;}
+.toc{margin-top:14px; display:flex; flex-wrap:wrap; gap:6px 10px;}
+.toc a{color:var(--cy); text-decoration:none; font-size:12px; border:1px solid var(--border-soft); padding:3px 9px; border-radius:20px;}
+.toc a:hover{border-color:var(--cy);}
+
+/* SECTION LABEL */
+.section-label{
+  font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:var(--dim2);
+  margin:34px 0 10px; padding-bottom:6px; border-bottom:1px dashed var(--border);
+  display:flex; align-items:center; gap:8px;
+}
+.section-label::before{content:"//"; color:var(--gr);}
+.section-label.big{font-size:14px; color:#fff; margin-top:46px; padding:10px 0; border-bottom:1px solid var(--border);}
+.section-label.big::before{content:"§";}
+
+/* CARDS GRID */
+.cards-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cards-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.cards-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.cards-grid.cols-6{grid-template-columns:repeat(6,1fr);}
+.card{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:12px 14px; border-left:3px solid var(--dim);}
+.card-name{font-weight:700; color:#fff; font-size:13px; margin-bottom:4px;}
+.card-desc{color:var(--dim2); font-size:12px;}
+.card-cy{border-left-color:var(--cy);} .card-cy .card-name{color:var(--cy);}
+.card-bl{border-left-color:var(--bl);} .card-bl .card-name{color:var(--bl);}
+.card-gr{border-left-color:var(--gr);} .card-gr .card-name{color:var(--gr);}
+.card-am{border-left-color:var(--am);} .card-am .card-name{color:var(--am);}
+.card-pu{border-left-color:var(--pu);} .card-pu .card-name{color:var(--pu);}
+.card-re{border-left-color:var(--re);} .card-re .card-name{color:var(--re);}
+.card-or{border-left-color:var(--or);} .card-or .card-name{color:var(--or);}
+
+/* LEGEND */
+.legend{display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--panel2); border:1px solid var(--border-soft); border-radius:6px; padding:8px 14px; margin-top:10px;}
+.legend-label{color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:1px;}
+.legend-items{display:flex; gap:14px; flex-wrap:wrap;}
+.legend-item{font-size:12px; color:var(--dim2); display:flex; align-items:center; gap:6px;}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+.dot-cy{background:var(--cy);} .dot-bl{background:var(--bl);} .dot-gr{background:var(--gr);}
+.dot-am{background:var(--am);} .dot-pu{background:var(--pu);} .dot-re{background:var(--re);} .dot-or{background:var(--or);}
+
+/* NAMING / KEY POINT GRID */
+.naming-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+.naming-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.naming-card{background:var(--panel); border:1px solid var(--border-soft); border-radius:6px; padding:10px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+.naming-prefix{color:#fff; font-weight:700; font-size:12.5px; white-space:nowrap;}
+.naming-arrow{color:var(--dim);}
+.naming-meaning{color:var(--dim2); font-size:12.5px;}
+
+/* TWO / THREE COL LAYOUT */
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+
+/* TREE PANEL */
+.tree-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.tree-title{font-size:12.5px; font-weight:700; color:#fff; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;}
+.tree-body{font-size:12.5px; white-space:pre-wrap; line-height:1.75;}
+.tree-body .c{color:var(--dim); }
+.tree-body .n{color:var(--dim2);}
+.tree-body .i{font-weight:700;}
+.tree-body .cy{color:var(--cy);} .tree-body .bl{color:var(--bl);} .tree-body .gr{color:var(--gr);}
+.tree-body .am{color:var(--am);} .tree-body .pu{color:var(--pu);} .tree-body .re{color:var(--re);}
+
+/* API TABLE */
+table.api-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+table.api-table td{padding:5px 6px; border-bottom:1px solid var(--border-soft); vertical-align:top;}
+.api-code{font-weight:700; white-space:nowrap; width:1%;}
+.api-code.cy{color:var(--cy);} .api-code.bl{color:var(--bl);} .api-code.gr{color:var(--gr);}
+.api-code.am{color:var(--am);} .api-code.pu{color:var(--pu);} .api-code.re{color:var(--re);}
+.api-desc{color:var(--dim2);}
+.api-desc code{color:var(--am); background:rgba(255,255,255,.04); padding:1px 5px; border-radius:4px;}
+
+/* PILLAR PANEL */
+.pillar-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.pillar-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.pillar-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.pillar-card{border:1px solid var(--border-soft); border-radius:6px; padding:12px 14px; background:var(--panel2);}
+.pillar-name{font-weight:700; font-size:13.5px; margin-bottom:6px;}
+.pillar-name.bl{color:var(--bl);} .pillar-name.gr{color:var(--gr);} .pillar-name.am{color:var(--am);} .pillar-name.pu{color:var(--pu);} .pillar-name.cy{color:var(--cy);} .pillar-name.re{color:var(--re);}
+.pillar-def{color:var(--dim2); font-size:12.5px; margin-bottom:8px;}
+.pillar-tag{display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin:0 5px 5px 0; border:1px solid var(--border);}
+.tag-bl{color:var(--bl); border-color:rgba(88,166,255,.35);}
+.tag-gr{color:var(--gr); border-color:rgba(63,185,80,.35);}
+.tag-am{color:var(--am); border-color:rgba(227,179,65,.35);}
+.tag-pu{color:var(--pu); border-color:rgba(163,113,247,.35);}
+.tag-cy{color:var(--cy); border-color:rgba(57,197,207,.35);}
+.tag-re{color:var(--re); border-color:rgba(247,120,186,.35);}
+.pillar-example{margin-top:8px; font-size:12px; color:var(--dim2); border-top:1px dashed var(--border-soft); padding-top:6px;}
+.pillar-example b{color:#fff;}
+
+/* TABLE PANEL (real tables) */
+.table-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.table-panel table, .bottom-grid table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px;}
+.table-panel th, .bottom-grid th{text-align:left; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border);}
+.table-panel td, .bottom-grid td{padding:6px 8px; border-bottom:1px solid var(--border-soft); color:var(--dim2);}
+.yes{color:var(--gr); font-weight:700;}
+.no{color:var(--re); font-weight:700;}
+.cell-hl{color:var(--am); font-weight:700;}
+.bottom-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+/* CMP PANEL (comparisons) */
+.cmp-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:2px;}
+.cmp-card{padding:10px 4px;}
+.cmp-header{margin-bottom:6px;}
+.cmp-name{font-weight:700; font-size:13.5px;}
+.cmp-name.bl{color:var(--bl);} .cmp-name.pu{color:var(--pu);} .cmp-name.gr{color:var(--gr);} .cmp-name.am{color:var(--am);} .cmp-name.cy{color:var(--cy);} .cmp-name.re{color:var(--re);}
+.cmp-rows{display:flex; flex-direction:column; gap:3px;}
+.cmp-row{display:flex; gap:10px; font-size:12.5px;}
+.cmp-key{color:var(--dim); width:88px; flex-shrink:0;}
+.cmp-val{color:var(--dim2);}
+.cmp-val.code{color:var(--am); font-size:12px;}
+.cmp-val.green{color:var(--gr);}
+.cmp-val.purple{color:var(--pu);}
+.cmp-divider{height:1px; background:var(--border-soft); margin:4px 0;}
+
+/* FLOW / PIPELINE */
+.flow-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.flow-row{display:flex; align-items:center; flex-wrap:wrap; gap:8px;}
+.pipe-box{border:1px solid var(--border); border-radius:6px; padding:7px 12px; font-size:12px; font-weight:700; background:var(--panel2);}
+.pipe-box.source{color:var(--cy); border-color:rgba(57,197,207,.4);}
+.pipe-box.inter{color:var(--bl); border-color:rgba(88,166,255,.4);}
+.pipe-box.term{color:var(--am); border-color:rgba(227,179,65,.4);}
+.pipe-box.gc{color:var(--gr); border-color:rgba(63,185,80,.4);}
+.pipe-box.warn{color:var(--re); border-color:rgba(247,120,186,.4);}
+.pipe-arrow{color:var(--dim);}
+.flow-vert{display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
+.flow-vert .pipe-arrow{align-self:center; margin-left:60px;}
+
+/* PERFORMANCE TABLE PANEL EXTRA */
+.perf-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+.perf-table th{text-align:left; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border);}
+.perf-table td{padding:6px 8px; border-bottom:1px solid var(--border-soft); color:var(--dim2);}
+.perf-table td.mono{color:var(--am); font-weight:700;}
+
+/* REVISION CHECKLIST */
+.revision-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.revision-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px 20px;}
+.revision-grid.cols-1{grid-template-columns:1fr;}
+.revision-item{font-size:12.5px; color:var(--dim2); display:flex; gap:8px;}
+.chk{color:var(--gr); font-weight:700;}
+
+/* Q&A */
+.qa{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px;}
+.qa .q{color:#fff; font-weight:700; font-size:13px; margin-bottom:6px;}
+.qa .q::before{content:"Q: "; color:var(--am);}
+.qa .a{color:var(--dim2); font-size:12.5px;}
+
+/* MISC */
+code{font-family:'JetBrains Mono', monospace;}
+.note{font-size:12px; color:var(--dim); margin-top:8px;}
+.badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.badge{font-size:11px; padding:3px 9px; border:1px solid var(--border); border-radius:20px; color:var(--dim2);}
+
+@media(max-width:820px){
+  .cards-grid, .cards-grid.cols-3, .cards-grid.cols-5, .cards-grid.cols-6{grid-template-columns:repeat(2,1fr);}
+  .two-col, .three-col, .bottom-grid, .pillar-grid, .pillar-grid.cols-3, .naming-grid, .naming-grid.cols-3, .revision-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Java Collections Framework — Complete Interview Revision</span>
+    </div>
+    <div class="subtitle">// 6-7 Yrs Experience — Full Collections Revision Before Interview</div>
+    <div class="toc">
+      <a href="#overview">Overview</a>
+      <a href="#hierarchy">Hierarchy Trees</a>
+      <a href="#list">List</a>
+      <a href="#set">Set</a>
+      <a href="#queue">Queue / Deque</a>
+      <a href="#map">Map</a>
+      <a href="#hashing">Hashing & HashMap Internals</a>
+      <a href="#iterator">Iterator & Fail-Fast/Safe</a>
+      <a href="#sorting">Comparable/Comparator & Sorting</a>
+      <a href="#utility">Collections & Arrays Utility</a>
+      <a href="#performance">Performance Summary</a>
+      <a href="#choose">Which Collection?</a>
+      <a href="#bestpractice">Best Practices</a>
+      <a href="#revision">One-Liners</a>
+      <a href="#flow">Revision Flow</a>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="overview">1. Collection Framework — Overview</div>
+
+  <div class="section-label">Quick Reference</div>
+  <div class="cards-grid cols-6">
+    <div class="card card-bl"><div class="card-name">List</div><div class="card-desc">Duplicate + Ordered + Index Based</div></div>
+    <div class="card card-gr"><div class="card-name">Set</div><div class="card-desc">Unique Elements</div></div>
+    <div class="card card-am"><div class="card-name">Queue</div><div class="card-desc">First In First Out (FIFO)</div></div>
+    <div class="card card-pu"><div class="card-name">Map</div><div class="card-desc">Key-Value Pair</div></div>
+    <div class="card card-cy"><div class="card-name">Synchronized</div><div class="card-desc">Thread Safe classes</div></div>
+    <div class="card card-re"><div class="card-name">Legacy</div><div class="card-desc">Older thread-safe classes, mostly superseded</div></div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><span class="dot dot-bl"></span>List</div>
+      <div class="legend-item"><span class="dot dot-gr"></span>Set</div>
+      <div class="legend-item"><span class="dot dot-am"></span>Queue</div>
+      <div class="legend-item"><span class="dot dot-pu"></span>Map</div>
+      <div class="legend-item"><span class="dot dot-cy"></span>Synchronized / Thread Safe</div>
+      <div class="legend-item"><span class="dot dot-re"></span>Legacy</div>
+    </div>
+  </div>
+
+  <div class="section-label">Naming Patterns</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">Hash</span><span class="naming-arrow">→</span><span class="naming-meaning">No Insertion Order Guarantee</span></div>
+    <div class="naming-card"><span class="naming-prefix">Linked</span><span class="naming-arrow">→</span><span class="naming-meaning">Insertion Order</span></div>
+    <div class="naming-card"><span class="naming-prefix">Tree</span><span class="naming-arrow">→</span><span class="naming-meaning">Sorted Order</span></div>
+  </div>
+
+  <div class="section-label">Collection vs Collections vs Map vs Arrays</div>
+  <div class="two-col">
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">Collection</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Type</span><span class="cmp-val">Interface</span></div>
+          <div class="cmp-row"><span class="cmp-key">Represents</span><span class="cmp-val">Group of Objects — List, Set, Queue</span></div>
+          <div class="cmp-row"><span class="cmp-key">Stores</span><span class="cmp-val">Single value elements</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">Collections</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Type</span><span class="cmp-val">Utility Class (java.util)</span></div>
+          <div class="cmp-row"><span class="cmp-key">Provides</span><span class="cmp-val code">sort() reverse() shuffle() binarySearch() min() max()</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name gr">Map</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Stores</span><span class="cmp-val">Key + Value pair (separate hierarchy from Collection)</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name am">Arrays</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Type</span><span class="cmp-val">Utility Class for raw Java arrays (not Collections)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="hierarchy">2. Hierarchy Trees</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Collection Framework Hierarchy</div>
+      <div class="tree-body"><span class="c">│</span>
+<span class="c">├──</span> <span class="i">Collection (I)</span><span class="n">: Root Interface for List, Set and Queue</span>
+<span class="c">│   ├──</span> <span class="i bl">List (I)</span><span class="n">: Duplicate Allowed, Insertion Order, Index Based</span>
+<span class="c">│   │   ├──</span> <span class="bl">ArrayList (C)</span><span class="n">: Dynamic Array, Fast Random Access</span>
+<span class="c">│   │   ├──</span> <span class="bl">LinkedList (C)</span><span class="n">: Doubly Linked List, Fast Insert/Delete</span>
+<span class="c">│   │   ├──</span> <span class="cy">Vector (C)</span><span class="n">: Synchronized, Legacy</span>
+<span class="c">│   │   │   └──</span> <span class="cy">Stack (C)</span><span class="n">: LIFO</span>
+<span class="c">│   ├──</span> <span class="i gr">Set (I)</span><span class="n">: Unique Elements</span>
+<span class="c">│   │   ├──</span> <span class="gr">HashSet (C)</span><span class="n">: No Order Guarantee</span>
+<span class="c">│   │   │   └──</span> <span class="gr">LinkedHashSet (C)</span><span class="n">: Insertion Order</span>
+<span class="c">│   │   └──</span> <span class="i gr">SortedSet (I)</span> <span class="c">→</span> <span class="i gr">NavigableSet (I)</span>
+<span class="c">│   │       └──</span> <span class="gr">TreeSet (C)</span><span class="n">: Sorted, Red-Black Tree</span>
+<span class="c">│   └──</span> <span class="i am">Queue (I)</span><span class="n">: FIFO</span>
+<span class="c">│       ├──</span> <span class="am">PriorityQueue (C)</span><span class="n">: Priority Order</span>
+<span class="c">│       ├──</span> <span class="i am">Deque (I)</span><span class="n">: Double Ended Queue</span>
+<span class="c">│       │   ├──</span> <span class="am">ArrayDeque (C)</span>
+<span class="c">│       │   └──</span> <span class="am">LinkedList (C)</span>
+<span class="c">│       └──</span> <span class="i cy">BlockingQueue (I)</span><span class="n">: Multithreading</span>
+<span class="c">│           ├──</span> <span class="cy">LinkedBlockingQueue</span> <span class="cy">ArrayBlockingQueue</span> <span class="cy">PriorityBlockingQueue</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Map Hierarchy (Separate From Collection)</div>
+      <div class="tree-body"><span class="c">└──</span> <span class="i pu">Map (I)</span><span class="n">: Key-Value Pair, Keys Unique, Values Can Duplicate</span>
+<span class="c">    ├──</span> <span class="pu">HashMap (C)</span><span class="n">: No Order, 1 Null Key Allowed, Not Thread Safe</span>
+<span class="c">    │   └──</span> <span class="pu">LinkedHashMap (C)</span><span class="n">: Insertion Order, 1 Null Key</span>
+<span class="c">    ├──</span> <span class="pu">WeakHashMap (C)</span><span class="n">: GC removes entry if key has no strong ref</span>
+<span class="c">    ├──</span> <span class="pu">IdentityHashMap (C)</span><span class="n">: Uses == instead of equals()</span>
+<span class="c">    ├──</span> <span class="re">Hashtable (C)</span><span class="n">: Synchronized, No Null Key/Value, Legacy, Whole Map Locked</span>
+<span class="c">    ├──</span> <span class="cy">ConcurrentHashMap (C)</span><span class="n">: Thread Safe, No Null Key/Value, Bucket/Node Locked</span>
+<span class="c">    └──</span> <span class="i pu">SortedMap (I)</span> <span class="c">→</span> <span class="i pu">NavigableMap (I)</span>
+<span class="c">        └──</span> <span class="pu">TreeMap (C)</span><span class="n">: Sorted by Key, No Null Key, Red-Black Tree</span></div>
+      <div class="note">Collection Framework = interfaces + classes to store &amp; manipulate groups of objects. Benefits: dynamic size, generics, high-performance algorithms, sorting/searching utilities, thread-safe variants.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="list">3. List — ArrayList, LinkedList, Vector, Stack</div>
+
+  <div class="section-label">Internal Structures</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">ArrayList — Dynamic Array</div>
+      <div class="tree-body"><span class="n">ArrayList[ </span><span class="bl">E0</span><span class="n"> | </span><span class="bl">E1</span><span class="n"> | </span><span class="bl">E2</span><span class="n"> | ... | </span><span class="bl">En</span><span class="n"> ]</span>
+<span class="n">Contiguous memory → random access is O(1)</span></div>
+      <div class="tree-title" style="margin-top:10px;">Growth Formula</div>
+      <div class="flow-row">
+        <div class="pipe-box source">10</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">15</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">22</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">33</div>
+      </div>
+      <div class="note">Default capacity = 10. When full → New Capacity = Old + (Old / 2).</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">LinkedList — Doubly Linked List</div>
+      <div class="tree-body"><span class="n">NULL ← [Prev|</span><span class="bl">A</span><span class="n">|Next] ⇄ [Prev|</span><span class="bl">B</span><span class="n">|Next] ⇄ [Prev|</span><span class="bl">C</span><span class="n">|Next] → NULL</span></div>
+      <div class="note">Each node = Data + Next Pointer + Previous Pointer. Fast insert/delete at ends, slow random access.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Time Complexity</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">ArrayList</div>
+      <table>
+        <tr><th>Operation</th><th>Complexity</th></tr>
+        <tr><td>get(index)</td><td class="cell-hl">O(1)</td></tr>
+        <tr><td>add(end)</td><td class="cell-hl">O(1)</td></tr>
+        <tr><td>add(middle)</td><td>O(n)</td></tr>
+        <tr><td>remove(middle)</td><td>O(n)</td></tr>
+        <tr><td>contains() / search</td><td>O(n)</td></tr>
+      </table>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">LinkedList</div>
+      <table>
+        <tr><th>Operation</th><th>Complexity</th></tr>
+        <tr><td>get(index)</td><td>O(n)</td></tr>
+        <tr><td>add(first) / add(last)</td><td class="cell-hl">O(1)</td></tr>
+        <tr><td>remove(first) / remove(last)</td><td class="cell-hl">O(1)</td></tr>
+        <tr><td>search</td><td>O(n)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label">ArrayList vs LinkedList vs Vector</div>
+  <div class="pillar-panel">
+    <div class="pillar-grid cols-3">
+      <div class="pillar-card">
+        <div class="pillar-name bl">ArrayList</div>
+        <div class="pillar-def">Dynamic array, fast read, slow middle insert/delete, less memory.</div>
+        <span class="pillar-tag tag-bl">Most Common Choice</span>
+        <div class="pillar-example"><b>Use:</b> Employee List, Product List, Config Data</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name gr">LinkedList</div>
+        <div class="pillar-def">Doubly linked list, slow read, fast insert/delete, more memory.</div>
+        <span class="pillar-tag tag-gr">Frequent Insert/Delete</span>
+        <div class="pillar-example"><b>Use:</b> Undo/Redo, Browser History, Playlist</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name am">Vector / Stack</div>
+        <div class="pillar-def">Legacy, synchronized, thread safe, slower than ArrayList. Stack = LIFO built on Vector.</div>
+        <span class="pillar-tag tag-am">Avoid in New Code</span>
+        <div class="pillar-example"><b>Prefer instead:</b> ArrayDeque</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Stack Flow (LIFO) & Performance Summary</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">push() / pop()</div>
+      <div class="flow-row">
+        <div class="pipe-box source">push(A)</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">push(B)</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">pop() returns B</div>
+      </div>
+      <div class="note">Operations: push(), pop(), peek(). Real use: Undo, Browser Back, Books Stack. ArrayDeque is modern &amp; faster than legacy Stack.</div>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">List Performance Summary</div>
+      <table>
+        <tr><th>Implementation</th><th>Read</th><th>Insert</th><th>Delete</th></tr>
+        <tr><td>ArrayList</td><td class="cell-hl">Fast</td><td>Slow</td><td>Slow</td></tr>
+        <tr><td>LinkedList</td><td>Slow</td><td class="cell-hl">Fast</td><td class="cell-hl">Fast</td></tr>
+        <tr><td>Vector</td><td>Medium</td><td>Slow</td><td>Slow</td></tr>
+        <tr><td>Stack</td><td>Medium</td><td>Medium</td><td>Medium</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="set">4. Set — HashSet, LinkedHashSet, TreeSet</div>
+
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">HashSet Internal Working</div>
+      <div class="flow-row">
+        <div class="pipe-box source">add("Java")</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">hashCode()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">Bucket</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">equals()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box gc">No Duplicate → Insert</div>
+      </div>
+      <div class="note">HashSet is backed by a HashMap internally — elements are stored as keys, with a dummy constant object as the value.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">TreeSet — Auto Sorted (Red-Black Tree)</div>
+      <div class="tree-body"><span class="n">Insert: 40, 20, 60, 30</span>
+<span class="c">↓</span>
+<span class="i gr">Sorted Automatically: 20, 30, 40, 60</span></div>
+      <div class="note">Supports natural ordering or a custom Comparator; range queries and navigation methods (first(), last(), ceiling(), floor()).</div>
+    </div>
+  </div>
+
+  <div class="section-label">Set Implementations Compared</div>
+  <div class="pillar-panel">
+    <div class="pillar-grid cols-3">
+      <div class="pillar-card">
+        <div class="pillar-name gr">HashSet</div>
+        <div class="pillar-def">No order guarantee, one null allowed, fastest lookup.</div>
+        <span class="pillar-tag tag-gr">add/remove/contains O(1)</span>
+        <div class="pillar-example"><b>Use:</b> Unique Emails, User IDs, Product Codes</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name bl">LinkedHashSet</div>
+        <div class="pillar-def">Backed by LinkedHashMap, maintains insertion order, slightly slower + more memory.</div>
+        <span class="pillar-tag tag-bl">O(1)</span>
+        <div class="pillar-example"><b>Use:</b> Ordered unique data</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name am">TreeSet</div>
+        <div class="pillar-def">Sorted order, no null, natural ordering or Comparator.</div>
+        <span class="pillar-tag tag-am">O(log n)</span>
+        <div class="pillar-example"><b>Use:</b> Leaderboard, Rankings, Alphabetical Order</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="queue">5. Queue & Deque — PriorityQueue, ArrayDeque, BlockingQueue</div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Queue Hierarchy</div>
+      <div class="tree-body"><span class="n">Collection → </span><span class="i am">Queue (I)</span><span class="n"> — FIFO</span>
+<span class="c">    ├──</span> <span class="am">PriorityQueue (C)</span><span class="n">: Binary Heap, priority order (not FIFO)</span>
+<span class="c">    └──</span> <span class="i am">Deque (I)</span><span class="n">: Double Ended Queue</span>
+<span class="c">        ├──</span> <span class="am">ArrayDeque (C)</span><span class="n">: resizable circular array, fastest</span>
+<span class="c">        └──</span> <span class="am">LinkedList (C)</span><span class="n">: legacy queue/deque choice</span></div>
+      <div class="note">Deque operations: addFirst(), addLast(), removeFirst(), removeLast() — all O(1) on ArrayDeque.</div>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">Queue Implementations</div>
+      <table>
+        <tr><th>Impl</th><th>Order</th><th>Insert/Remove</th></tr>
+        <tr><td>PriorityQueue</td><td>Priority (heap)</td><td>O(log n)</td></tr>
+        <tr><td>ArrayDeque</td><td>FIFO / Double Ended</td><td class="cell-hl">O(1)</td></tr>
+        <tr><td>LinkedList (as Queue)</td><td>FIFO — Legacy Choice</td><td class="cell-hl">O(1)</td></tr>
+      </table>
+      <div class="note">BlockingQueue (multithreading): LinkedBlockingQueue, ArrayBlockingQueue, PriorityBlockingQueue.</div>
+    </div>
+  </div>
+
+  <div class="section-label">When To Use — Real Examples</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">PriorityQueue</span><span class="naming-arrow">→</span><span class="naming-meaning">Task Scheduler, CPU Scheduling, Dijkstra, Top-N</span></div>
+    <div class="naming-card"><span class="naming-prefix">ArrayDeque</span><span class="naming-arrow">→</span><span class="naming-meaning">Better than Stack &amp; better than LinkedList as Queue</span></div>
+    <div class="naming-card"><span class="naming-prefix">BlockingQueue</span><span class="naming-arrow">→</span><span class="naming-meaning">Producer-consumer, thread pool task queues</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="map">6. Map — HashMap, LinkedHashMap, TreeMap, Hashtable, ConcurrentHashMap</div>
+
+  <div class="pillar-panel">
+    <div class="pillar-grid">
+      <div class="pillar-card">
+        <div class="pillar-name pu">HashMap</div>
+        <div class="pillar-def">Array → Bucket → Linked List → Red-Black Tree (Java 8+). Fast, unordered.</div>
+        <span class="pillar-tag tag-pu">1 Null Key, Multiple Null Values</span><span class="pillar-tag tag-pu">Not Thread Safe</span>
+        <div class="pillar-example"><b>put/get/remove:</b> O(1) avg</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name bl">LinkedHashMap</div>
+        <div class="pillar-def">HashMap + Doubly Linked List — maintains insertion order, supports LRU Cache.</div>
+        <span class="pillar-tag tag-bl">O(1)</span>
+        <div class="pillar-example"><b>Use:</b> LRU Cache, Recent Searches</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name am">TreeMap</div>
+        <div class="pillar-def">Red-Black Tree, sorted keys, no null key, Comparator supported.</div>
+        <span class="pillar-tag tag-am">O(log n)</span>
+        <div class="pillar-example"><b>Use:</b> Sorted key iteration, range queries</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name re">Hashtable</div>
+        <div class="pillar-def">Legacy, synchronized, whole map locked, no null key/value — slower.</div>
+        <span class="pillar-tag tag-re">Avoid in New Code</span>
+        <div class="pillar-example"><b>Use instead:</b> ConcurrentHashMap</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name cy">ConcurrentHashMap</div>
+        <div class="pillar-def">Modern thread-safe map, bucket/node-level locking, high concurrency, no null key/value.</div>
+        <span class="pillar-tag tag-cy">Preferred For Multithreading</span>
+        <div class="pillar-example"><b>Use:</b> Session Store, In-Memory Cache</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name gr">WeakHashMap / IdentityHashMap</div>
+        <div class="pillar-def">WeakHashMap: GC removes entry if key has no strong reference. IdentityHashMap: uses == instead of equals().</div>
+        <span class="pillar-tag tag-gr">Rare / Special Purpose</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Map Comparisons</div>
+  <div class="two-col">
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">HashMap</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Thread Safety</span><span class="cmp-val">Not Thread Safe</span></div>
+          <div class="cmp-row"><span class="cmp-key">Null</span><span class="cmp-val">Allows null key/value</span></div>
+          <div class="cmp-row"><span class="cmp-key">Speed</span><span class="cmp-val">Fast, Preferred</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">Hashtable</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Thread Safety</span><span class="cmp-val">Thread Safe (whole map locked)</span></div>
+          <div class="cmp-row"><span class="cmp-key">Null</span><span class="cmp-val">No null key/value</span></div>
+          <div class="cmp-row"><span class="cmp-key">Speed</span><span class="cmp-val">Slow, Legacy</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">HashMap</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Threading</span><span class="cmp-val">Single Thread, No Synchronization</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">ConcurrentHashMap</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Threading</span><span class="cmp-val">Multi Thread, Fine-Grained Locking, High Performance</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="hashing">7. Hashing & HashMap Internal Working</div>
+
+  <div class="section-label">General Hashing Flow</div>
+  <div class="flow-panel">
+    <div class="flow-row">
+      <div class="pipe-box source">Key</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">hashCode()</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">Hash Function</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box term">Bucket Index</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box gc">Store / Retrieve Value</div>
+    </div>
+    <div class="note"><code>hashCode()</code> finds the bucket, <code>equals()</code> finds the exact object. Rule: equal objects must return the same hashCode(); different objects may share a hashCode (collision).</div>
+  </div>
+
+  <div class="section-label">put() and get() Flow</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">put(key, value)</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">hashCode(key) → Bucket Index</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Bucket Empty? → Yes → Insert</div>
+        <span class="pipe-arrow">↓ No (Collision)</span>
+        <div class="pipe-box term">equals() checks Linked List nodes</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Duplicate Key → Update Value / Else → Add Node</div>
+      </div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">get(key)</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">hashCode(key) → Find Bucket</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Traverse Bucket, run equals()</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Key Found → Return Value</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box warn">Not Found → return null</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Default Values, Collision Handling, Treeification & Load Factor</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Default Config</div>
+      <div class="tree-body"><span class="i cy">Initial Capacity</span> <span class="n">→ 16</span>
+<span class="i bl">Load Factor</span> <span class="n">→ 0.75</span>
+<span class="i am">Threshold</span> <span class="n">→ Capacity × Load Factor = 16 × 0.75 = 12</span>
+<span class="n">On inserting the 13th element → Resize (Rehashing) happens</span></div>
+      <div class="note">Why 0.75? Best balance of memory use, performance, and low collision rate. Why capacity 16? Power of 2 → fast bucket index calculation.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Collision Handling</div>
+      <div class="tree-body"><span class="i cy">Java 7</span> <span class="n">→ Linked List only</span>
+<span class="i gr">Java 8+</span> <span class="n">→ Linked List, converts to Red-Black Tree if bucket nodes &gt; 8 AND table capacity ≥ 64 (Treeification)</span>
+<span class="i am">Untreeification</span> <span class="n">→ Tree reverts to Linked List if bucket size falls below 6</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Rehashing & Time Complexity</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Rehashing on Threshold Crossed</div>
+      <div class="flow-row">
+        <div class="pipe-box source">16</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">32</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">64</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">128</div>
+      </div>
+      <div class="note">All existing nodes are rehashed and reassigned to new buckets on capacity growth.</div>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">HashMap Time Complexity</div>
+      <table>
+        <tr><th>Operation</th><th>Average</th><th>Worst</th></tr>
+        <tr><td>put()</td><td class="cell-hl">O(1)</td><td>O(log n)</td></tr>
+        <tr><td>get()</td><td class="cell-hl">O(1)</td><td>O(log n)</td></tr>
+        <tr><td>remove()</td><td class="cell-hl">O(1)</td><td>O(log n)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="iterator">8. Iterator, ListIterator & Fail-Fast vs Fail-Safe</div>
+
+  <div class="two-col">
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">Iterator</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Direction</span><span class="cmp-val">Forward Only</span></div>
+          <div class="cmp-row"><span class="cmp-key">Works On</span><span class="cmp-val">All Collections</span></div>
+          <div class="cmp-row"><span class="cmp-key">Methods</span><span class="cmp-val code">hasNext() next() remove()</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">ListIterator</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Direction</span><span class="cmp-val">Forward + Backward</span></div>
+          <div class="cmp-row"><span class="cmp-key">Works On</span><span class="cmp-val">List only</span></div>
+          <div class="cmp-row"><span class="cmp-key">Methods</span><span class="cmp-val code">previous() hasPrevious() set() add()</span></div>
+        </div>
+      </div>
+      <div class="note">For-each: simple, read only, cannot remove. Iterator: can safely remove during traversal via iterator.remove().</div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">Fail-Fast</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Works On</span><span class="cmp-val">Original Collection</span></div>
+          <div class="cmp-row"><span class="cmp-key">Behavior</span><span class="cmp-val">Throws ConcurrentModificationException if modified during iteration</span></div>
+          <div class="cmp-row"><span class="cmp-key">Examples</span><span class="cmp-val">ArrayList, HashMap, HashSet, TreeMap</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">Fail-Safe</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Works On</span><span class="cmp-val">A Copy of the Collection</span></div>
+          <div class="cmp-row"><span class="cmp-key">Behavior</span><span class="cmp-val">No exception, but more memory</span></div>
+          <div class="cmp-row"><span class="cmp-key">Examples</span><span class="cmp-val">ConcurrentHashMap, CopyOnWriteArrayList</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="sorting">9. Comparable vs Comparator & Sorting</div>
+
+  <div class="cmp-panel">
+    <div class="cmp-card comparable">
+      <div class="cmp-header"><span class="cmp-name bl">Comparable</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Purpose</span><span class="cmp-val">Natural Sorting Order</span></div>
+        <div class="cmp-row"><span class="cmp-key">Implemented</span><span class="cmp-val">Inside the class</span></div>
+        <div class="cmp-row"><span class="cmp-key">Method</span><span class="cmp-val code">compareTo()</span></div>
+        <div class="cmp-row"><span class="cmp-key">Logic</span><span class="cmp-val green">Single Sorting Logic</span></div>
+        <div class="cmp-row"><span class="cmp-key">Use When</span><span class="cmp-val">Employee ID, Roll No, Product Code</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card comparator">
+      <div class="cmp-header"><span class="cmp-name pu">Comparator</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Purpose</span><span class="cmp-val">Custom Sorting Order</span></div>
+        <div class="cmp-row"><span class="cmp-key">Implemented</span><span class="cmp-val">Outside the class</span></div>
+        <div class="cmp-row"><span class="cmp-key">Method</span><span class="cmp-val code">compare()</span></div>
+        <div class="cmp-row"><span class="cmp-key">Logic</span><span class="cmp-val purple">Multiple Sorting Logics</span></div>
+        <div class="cmp-row"><span class="cmp-key">Use When</span><span class="cmp-val">Salary, Name, Age, Department</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">compareTo() Return Values</div>
+      <div class="tree-body"><span class="i re">Negative</span> <span class="n">→ current object is smaller</span>
+<span class="i am">Zero</span> <span class="n">→ equal</span>
+<span class="i gr">Positive</span> <span class="n">→ current object is greater</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Sorting APIs</div>
+      <div class="tree-body"><span class="i cy">Collections.sort(list)</span> <span class="n">→ natural order (Comparable)</span>
+<span class="i bl">Collections.sort(list, comparator)</span> <span class="n">→ custom order</span>
+<span class="i gr">list.sort(comparator)</span> <span class="n">→ Java 8+, preferred</span>
+<span class="i am">Multi-level:</span> <span class="n">Comparator.comparing().thenComparing().thenComparing()</span>
+<span class="i pu">Reverse:</span> <span class="n">Collections.reverseOrder() / comparator.reversed()</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="utility">10. Collections & Arrays Utility Classes</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Collections Class — Common Methods</div>
+      <div class="tree-body"><span class="n">sort() reverse() shuffle() swap() fill() copy() binarySearch()
+min() max() frequency() disjoint() rotate() replaceAll()</span></div>
+      <div class="note">binarySearch() requires a sorted list. frequency() counts occurrences. min()/max() find smallest/largest element.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Arrays Class — Common Methods</div>
+      <div class="tree-body"><span class="n">sort() binarySearch() equals() fill() copyOf() copyOfRange() deepEquals() toString() stream()</span></div>
+      <div class="note">Collections works with Collection objects (List, Set). Arrays works with raw Java arrays.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="performance">11. Performance Summary — All Collections</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">Set & Map — Search / Order</div>
+      <table>
+        <tr><th>Implementation</th><th>Search</th><th>Order</th></tr>
+        <tr><td>HashSet</td><td class="cell-hl">O(1)</td><td>No</td></tr>
+        <tr><td>LinkedHashSet</td><td class="cell-hl">O(1)</td><td>Insertion</td></tr>
+        <tr><td>TreeSet</td><td>O(log n)</td><td>Sorted</td></tr>
+        <tr><td>HashMap</td><td class="cell-hl">O(1)</td><td>No</td></tr>
+        <tr><td>LinkedHashMap</td><td class="cell-hl">O(1)</td><td>Insertion</td></tr>
+        <tr><td>TreeMap</td><td>O(log n)</td><td>Sorted</td></tr>
+        <tr><td>Hashtable</td><td class="cell-hl">O(1)</td><td>No</td></tr>
+        <tr><td>ConcurrentHashMap</td><td class="cell-hl">O(1)</td><td>No</td></tr>
+      </table>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">List & Queue — Insert / Remove</div>
+      <table>
+        <tr><th>Implementation</th><th>Read</th><th>Insert</th><th>Search</th></tr>
+        <tr><td>ArrayList</td><td class="cell-hl">O(1)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>LinkedList</td><td>O(n)</td><td class="cell-hl">O(1)*</td><td>O(n)</td></tr>
+        <tr><td>Vector</td><td class="cell-hl">O(1)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>PriorityQueue</td><td>—</td><td>O(log n)</td><td>—</td></tr>
+        <tr><td>ArrayDeque</td><td>—</td><td class="cell-hl">O(1)</td><td>—</td></tr>
+      </table>
+      <div class="note">* O(1) only at head/tail of LinkedList.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="choose">12. Which Collection Should I Use?</div>
+  <div class="naming-grid">
+    <div class="naming-card"><span class="naming-prefix">Random Access</span><span class="naming-arrow">→</span><span class="naming-meaning">ArrayList</span></div>
+    <div class="naming-card"><span class="naming-prefix">Frequent Insert/Delete</span><span class="naming-arrow">→</span><span class="naming-meaning">LinkedList</span></div>
+    <div class="naming-card"><span class="naming-prefix">Unique Elements</span><span class="naming-arrow">→</span><span class="naming-meaning">HashSet</span></div>
+    <div class="naming-card"><span class="naming-prefix">Ordered Unique Elements</span><span class="naming-arrow">→</span><span class="naming-meaning">LinkedHashSet</span></div>
+    <div class="naming-card"><span class="naming-prefix">Sorted Unique Elements</span><span class="naming-arrow">→</span><span class="naming-meaning">TreeSet</span></div>
+    <div class="naming-card"><span class="naming-prefix">Key-Value Storage</span><span class="naming-arrow">→</span><span class="naming-meaning">HashMap</span></div>
+    <div class="naming-card"><span class="naming-prefix">Ordered Map</span><span class="naming-arrow">→</span><span class="naming-meaning">LinkedHashMap</span></div>
+    <div class="naming-card"><span class="naming-prefix">Sorted Keys</span><span class="naming-arrow">→</span><span class="naming-meaning">TreeMap</span></div>
+    <div class="naming-card"><span class="naming-prefix">Thread Safe Map</span><span class="naming-arrow">→</span><span class="naming-meaning">ConcurrentHashMap</span></div>
+    <div class="naming-card"><span class="naming-prefix">Queue</span><span class="naming-arrow">→</span><span class="naming-meaning">ArrayDeque</span></div>
+    <div class="naming-card"><span class="naming-prefix">Priority Processing</span><span class="naming-arrow">→</span><span class="naming-meaning">PriorityQueue</span></div>
+  </div>
+
+  <div class="section-label">Real Project Use Cases</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">ArrayList</span><span class="naming-arrow">→</span><span class="naming-meaning">Employee/Customer/Order List</span></div>
+    <div class="naming-card"><span class="naming-prefix">LinkedList</span><span class="naming-arrow">→</span><span class="naming-meaning">Undo/Redo, Browser History, Playlist</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashSet</span><span class="naming-arrow">→</span><span class="naming-meaning">Unique Emails, Roles, Tags</span></div>
+    <div class="naming-card"><span class="naming-prefix">TreeSet</span><span class="naming-arrow">→</span><span class="naming-meaning">Leaderboard, Ranking, Scoreboard</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashMap</span><span class="naming-arrow">→</span><span class="naming-meaning">Caching, Config, Session Data, API Mapping</span></div>
+    <div class="naming-card"><span class="naming-prefix">LinkedHashMap</span><span class="naming-arrow">→</span><span class="naming-meaning">LRU Cache, Recent Searches</span></div>
+    <div class="naming-card"><span class="naming-prefix">ConcurrentHashMap</span><span class="naming-arrow">→</span><span class="naming-meaning">Session Store, In-Memory Cache</span></div>
+    <div class="naming-card"><span class="naming-prefix">PriorityQueue</span><span class="naming-arrow">→</span><span class="naming-meaning">Task Scheduler, Job Queue, CPU Scheduling</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="bestpractice">13. Best Practices, Common Programs & Differences</div>
+
+  <div class="section-label">Real Project Best Practices</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Code to interfaces — List&lt;Employee&gt; list = new ArrayList&lt;&gt;();</div>
+      <div class="revision-item"><span class="chk">✓</span>Prefer ArrayList by default</div>
+      <div class="revision-item"><span class="chk">✓</span>Use LinkedList only for frequent insert/delete</div>
+      <div class="revision-item"><span class="chk">✓</span>Avoid Vector / Hashtable in new projects</div>
+      <div class="revision-item"><span class="chk">✓</span>Prefer ArrayDeque instead of Stack</div>
+      <div class="revision-item"><span class="chk">✓</span>Use HashMap for general key-value storage</div>
+      <div class="revision-item"><span class="chk">✓</span>Use LinkedHashMap if iteration order matters</div>
+      <div class="revision-item"><span class="chk">✓</span>Use TreeMap only when sorted keys are required</div>
+      <div class="revision-item"><span class="chk">✓</span>Prefer ConcurrentHashMap for multi-threaded access</div>
+      <div class="revision-item"><span class="chk">✓</span>Always override equals() and hashCode() together</div>
+      <div class="revision-item"><span class="chk">✓</span>Use immutable keys in HashMap, never modify after insert</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Iterator.remove(), not direct removal during iteration</div>
+      <div class="revision-item"><span class="chk">✓</span>Choose initial capacity when expected size is known</div>
+      <div class="revision-item"><span class="chk">✓</span>Don't depend on HashMap iteration order</div>
+      <div class="revision-item"><span class="chk">✓</span>Don't expose mutable collections directly</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Collections.unmodifiableList() or List.of() for read-only data</div>
+      <div class="revision-item"><span class="chk">✓</span>Prefer Stream API for readable transformations</div>
+    </div>
+  </div>
+
+  <div class="section-label">Common Interview Programs</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-meaning">Remove Duplicates · Count Frequency · Merge Two Lists</span></div>
+    <div class="naming-card"><span class="naming-meaning">Sort Employee by Salary/Name · Find Highest/2nd Highest Salary</span></div>
+    <div class="naming-card"><span class="naming-meaning">Find Duplicate Elements · Common Elements · Group Objects</span></div>
+    <div class="naming-card"><span class="naming-meaning">Convert List↔Set · Sort Map by Key/Value</span></div>
+    <div class="naming-card"><span class="naming-meaning">Reverse/Shuffle List · Top N Elements</span></div>
+    <div class="naming-card"><span class="naming-meaning">Word Frequency · Character Frequency</span></div>
+  </div>
+
+  <div class="section-label">Top Interview Differences</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">Collection</span><span class="naming-arrow">vs</span><span class="naming-meaning">Collections</span></div>
+    <div class="naming-card"><span class="naming-prefix">Collections</span><span class="naming-arrow">vs</span><span class="naming-meaning">Arrays</span></div>
+    <div class="naming-card"><span class="naming-prefix">List</span><span class="naming-arrow">vs</span><span class="naming-meaning">Set</span></div>
+    <div class="naming-card"><span class="naming-prefix">Set</span><span class="naming-arrow">vs</span><span class="naming-meaning">Map</span></div>
+    <div class="naming-card"><span class="naming-prefix">ArrayList</span><span class="naming-arrow">vs</span><span class="naming-meaning">LinkedList</span></div>
+    <div class="naming-card"><span class="naming-prefix">ArrayList</span><span class="naming-arrow">vs</span><span class="naming-meaning">Vector</span></div>
+    <div class="naming-card"><span class="naming-prefix">Vector</span><span class="naming-arrow">vs</span><span class="naming-meaning">Stack</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashSet</span><span class="naming-arrow">vs</span><span class="naming-meaning">TreeSet</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashSet</span><span class="naming-arrow">vs</span><span class="naming-meaning">LinkedHashSet</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashMap</span><span class="naming-arrow">vs</span><span class="naming-meaning">Hashtable</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashMap</span><span class="naming-arrow">vs</span><span class="naming-meaning">ConcurrentHashMap</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashMap</span><span class="naming-arrow">vs</span><span class="naming-meaning">LinkedHashMap</span></div>
+    <div class="naming-card"><span class="naming-prefix">HashMap</span><span class="naming-arrow">vs</span><span class="naming-meaning">TreeMap</span></div>
+    <div class="naming-card"><span class="naming-prefix">Iterator</span><span class="naming-arrow">vs</span><span class="naming-meaning">ListIterator</span></div>
+    <div class="naming-card"><span class="naming-prefix">Comparable</span><span class="naming-arrow">vs</span><span class="naming-meaning">Comparator</span></div>
+    <div class="naming-card"><span class="naming-prefix">Fail Fast</span><span class="naming-arrow">vs</span><span class="naming-meaning">Fail Safe</span></div>
+  </div>
+
+  <div class="section-label">Common Interview "Why" Questions</div>
+  <div class="qa">
+    <div class="q">Why is ArrayList faster for reads than LinkedList?</div>
+    <div class="a">ArrayList is array-based → O(1) random access via index. LinkedList must traverse nodes → O(n).</div>
+  </div>
+  <div class="qa">
+    <div class="q">Why does HashSet use HashMap internally?</div>
+    <div class="a">HashSet stores elements as HashMap keys, using a shared dummy constant object as the value — reusing HashMap's hashing logic for O(1) uniqueness checks.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Why was the Red-Black Tree introduced in Java 8 HashMap?</div>
+    <div class="a">To improve the worst-case lookup time in a heavily collided bucket from O(n) to O(log n), when a bucket has more than 8 nodes and table capacity ≥ 64.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Why is ConcurrentHashMap better than Hashtable?</div>
+    <div class="a">Hashtable locks the entire map for every operation. ConcurrentHashMap uses fine-grained (bucket/node) locking, allowing much higher concurrency.</div>
+  </div>
+  <div class="qa">
+    <div class="q">Why must you override hashCode() and equals() together?</div>
+    <div class="a">HashMap/HashSet first use hashCode() to locate the bucket, then equals() to confirm the exact key. Overriding only one breaks lookups — equal objects must produce the same hashCode().</div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="revision">14. 50 One-Liner Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">›</span><b>Collection</b> → Group of Objects</div>
+      <div class="revision-item"><span class="chk">›</span><b>Collections</b> → Utility Class</div>
+      <div class="revision-item"><span class="chk">›</span><b>List</b> → Ordered Collection</div>
+      <div class="revision-item"><span class="chk">›</span><b>Set</b> → Unique Elements</div>
+      <div class="revision-item"><span class="chk">›</span><b>Queue</b> → FIFO</div>
+      <div class="revision-item"><span class="chk">›</span><b>Deque</b> → Double Ended Queue</div>
+      <div class="revision-item"><span class="chk">›</span><b>Map</b> → Key Value Pair</div>
+      <div class="revision-item"><span class="chk">›</span><b>ArrayList</b> → Dynamic Array</div>
+      <div class="revision-item"><span class="chk">›</span><b>LinkedList</b> → Doubly Linked List</div>
+      <div class="revision-item"><span class="chk">›</span><b>Vector</b> → Thread Safe List (Legacy)</div>
+      <div class="revision-item"><span class="chk">›</span><b>Stack</b> → LIFO</div>
+      <div class="revision-item"><span class="chk">›</span><b>HashSet</b> → Fastest Set</div>
+      <div class="revision-item"><span class="chk">›</span><b>LinkedHashSet</b> → Ordered Set</div>
+      <div class="revision-item"><span class="chk">›</span><b>TreeSet</b> → Sorted Set</div>
+      <div class="revision-item"><span class="chk">›</span><b>PriorityQueue</b> → Heap Based Queue</div>
+      <div class="revision-item"><span class="chk">›</span><b>ArrayDeque</b> → Best Queue/Stack</div>
+      <div class="revision-item"><span class="chk">›</span><b>HashMap</b> → Fast Key Lookup</div>
+      <div class="revision-item"><span class="chk">›</span><b>LinkedHashMap</b> → Ordered Map</div>
+      <div class="revision-item"><span class="chk">›</span><b>TreeMap</b> → Sorted Map</div>
+      <div class="revision-item"><span class="chk">›</span><b>Hashtable</b> → Legacy Thread Safe Map</div>
+      <div class="revision-item"><span class="chk">›</span><b>ConcurrentHashMap</b> → Concurrent Map</div>
+      <div class="revision-item"><span class="chk">›</span><b>Hashing</b> → Fast Lookup Technique</div>
+      <div class="revision-item"><span class="chk">›</span><b>hashCode()</b> → Bucket Calculation</div>
+      <div class="revision-item"><span class="chk">›</span><b>equals()</b> → Logical Equality</div>
+      <div class="revision-item"><span class="chk">›</span><b>Collision</b> → Same Bucket</div>
+      <div class="revision-item"><span class="chk">›</span><b>Load Factor</b> → Resize Threshold (0.75)</div>
+      <div class="revision-item"><span class="chk">›</span><b>Capacity</b> → Bucket Count (default 16)</div>
+      <div class="revision-item"><span class="chk">›</span><b>Rehashing</b> → Resize HashMap</div>
+      <div class="revision-item"><span class="chk">›</span><b>Treeification</b> → List To Tree (&gt;8 nodes)</div>
+      <div class="revision-item"><span class="chk">›</span><b>Untreeification</b> → Tree To List (&lt;6 nodes)</div>
+      <div class="revision-item"><span class="chk">›</span><b>Iterator</b> → Forward Traversal</div>
+      <div class="revision-item"><span class="chk">›</span><b>ListIterator</b> → Bidirectional Traversal</div>
+      <div class="revision-item"><span class="chk">›</span><b>Fail Fast</b> → Throws ConcurrentModificationException</div>
+      <div class="revision-item"><span class="chk">›</span><b>Fail Safe</b> → Iterates Over Copy</div>
+      <div class="revision-item"><span class="chk">›</span><b>Comparable</b> → Natural Sorting</div>
+      <div class="revision-item"><span class="chk">›</span><b>Comparator</b> → Custom Sorting</div>
+      <div class="revision-item"><span class="chk">›</span><b>Collections.sort()</b> → Sort Collection</div>
+      <div class="revision-item"><span class="chk">›</span><b>binarySearch()</b> → Fast Search (sorted list)</div>
+      <div class="revision-item"><span class="chk">›</span><b>shuffle()</b> → Random Order</div>
+      <div class="revision-item"><span class="chk">›</span><b>reverse()</b> → Reverse List</div>
+      <div class="revision-item"><span class="chk">›</span><b>frequency()</b> → Count Occurrence</div>
+      <div class="revision-item"><span class="chk">›</span><b>min() / max()</b> → Smallest / Largest Element</div>
+      <div class="revision-item"><span class="chk">›</span><b>WeakHashMap</b> → GC-Friendly Keys</div>
+      <div class="revision-item"><span class="chk">›</span><b>IdentityHashMap</b> → Uses == not equals()</div>
+      <div class="revision-item"><span class="chk">›</span><b>BlockingQueue</b> → Multithreaded Queue</div>
+      <div class="revision-item"><span class="chk">›</span><b>LRU Cache</b> → LinkedHashMap use case</div>
+      <div class="revision-item"><span class="chk">›</span><b>Red-Black Tree</b> → Balances TreeMap/TreeSet/Bucket</div>
+      <div class="revision-item"><span class="chk">›</span><b>Arrays</b> → Utility Class for raw Arrays</div>
+      <div class="revision-item"><span class="chk">›</span><b>List.of()</b> → Immutable List (Java 9+)</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="flow">15. 6-7 Yrs Interview Expectations & Revision Flow</div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Interviewers Expect You To Explain</div>
+      <div class="tree-body"><span class="i gr">✓ Collection Hierarchy</span>  <span class="i bl">✓ Internal Working of HashMap</span>
+<span class="i am">✓ Hashing &amp; Collision Handling</span>  <span class="i pu">✓ Treeification (Java 8+)</span>
+<span class="i cy">✓ Performance Trade-offs</span>  <span class="i gr">✓ Choosing the Right Collection</span>
+<span class="i bl">✓ Comparable vs Comparator</span>  <span class="i am">✓ Fail Fast vs Fail Safe</span>
+<span class="i pu">✓ Thread-Safe Collections</span>  <span class="i re">✓ Real Project Collection Selection</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">15-Minute Collections Revision Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Collection Framework → Collection vs Map</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">List (ArrayList / LinkedList)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Set (HashSet / TreeSet)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Queue (ArrayDeque / PriorityQueue)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Map (HashMap / TreeMap / ConcurrentHashMap)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Hashing → HashMap Internals</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Iterator → Comparable/Comparator → Best Practices</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
