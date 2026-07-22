@@ -282,43 +282,58 @@ code{font-family:'JetBrains Mono', monospace;}
 
   <!-- =========================================================== -->
   <div class="section-label big" id="hierarchy">2. Hierarchy Trees</div>
-  <div class="two-col">
+  <div class="tree-section">
+    <!-- COLLECTION TREE -->
     <div class="tree-panel">
       <div class="tree-title">Collection Framework Hierarchy</div>
-      <div class="tree-body"><span class="c">│</span>
-<span class="c">├──</span> <span class="i">Collection (I)</span><span class="n">: Root Interface for List, Set and Queue</span>
-<span class="c">│   ├──</span> <span class="i bl">List (I)</span><span class="n">: Duplicate Allowed, Insertion Order, Index Based</span>
-<span class="c">│   │   ├──</span> <span class="bl">ArrayList (C)</span><span class="n">: Dynamic Array, Fast Random Access</span>
-<span class="c">│   │   ├──</span> <span class="bl">LinkedList (C)</span><span class="n">: Doubly Linked List, Fast Insert/Delete</span>
-<span class="c">│   │   ├──</span> <span class="cy">Vector (C)</span><span class="n">: Synchronized, Legacy</span>
-<span class="c">│   │   │   └──</span> <span class="cy">Stack (C)</span><span class="n">: LIFO</span>
-<span class="c">│   ├──</span> <span class="i gr">Set (I)</span><span class="n">: Unique Elements</span>
-<span class="c">│   │   ├──</span> <span class="gr">HashSet (C)</span><span class="n">: No Order Guarantee</span>
+      <div class="tree-body"><span class="c">│
+│</span>
+<span class="c">├──</span> <span class="i">Collection (I)</span><span class="n">: Root Interface for List, Set and Queue.</span>
+<span class="c">│   │
+│   ├──</span> <span class="i bl">List (I)</span><span class="n">: Duplicate Allowed, Insertion Order Preserved, Index Based</span>
+<span class="c">│   │   ├──</span> <span class="bl">ArrayList (C)</span><span class="n">: Dynamic Array Structure, Random Access Fast, Middle Insertion/Deletion Slow</span>
+<span class="c">│   │   ├──</span> <span class="bl">LinkedList (C)</span><span class="n">: Doubly Linked List Structure,Insertion/Deletion Fast, Random Access Slow</span>
+<span class="c">│   │   ├──</span> <span class="cy">Vector (C)</span><span class="n">: Same as ArrayList, Synchronized &amp; Thread Safe, Legacy</span>
+<span class="c">│   │   │   └──</span> <span class="cy">Stack (C)</span><span class="n">: Last In First Out (LIFO)</span>
+<span class="c">│   │
+│   ├──</span> <span class="i gr">Set (I)</span><span class="n">: Unique Elements (No Duplicates)</span>
+<span class="c">│   │   ├──</span> <span class="gr">HashSet (C)</span><span class="n">: No Insertion Order Guarantee</span>
 <span class="c">│   │   │   └──</span> <span class="gr">LinkedHashSet (C)</span><span class="n">: Insertion Order</span>
-<span class="c">│   │   └──</span> <span class="i gr">SortedSet (I)</span> <span class="c">→</span> <span class="i gr">NavigableSet (I)</span>
-<span class="c">│   │       └──</span> <span class="gr">TreeSet (C)</span><span class="n">: Sorted, Red-Black Tree</span>
-<span class="c">│   └──</span> <span class="i am">Queue (I)</span><span class="n">: FIFO</span>
-<span class="c">│       ├──</span> <span class="am">PriorityQueue (C)</span><span class="n">: Priority Order</span>
+<span class="c">│   │   │
+│   │   └──</span> <span class="i gr">SortedSet (I)</span><span class="n">: Elements are automatically stored in sorted order</span>
+<span class="c">│   │       └──</span> <span class="i gr">NavigableSet (I)</span><span class="n">: SortedSet + Navigation Methods</span>
+<span class="c">│   │           └──</span> <span class="gr">TreeSet (C)</span><span class="n">: Sorted Order, Red-Black Tree</span>
+<span class="c">│   │
+│   └──</span> <span class="i am">Queue (I)</span><span class="n">: First In First Out (FIFO)</span>
+<span class="c">│       ├──</span> <span class="am">PriorityQueue (C)</span><span class="n">: Based on Priority (Default: Ascending Order)</span>
 <span class="c">│       ├──</span> <span class="i am">Deque (I)</span><span class="n">: Double Ended Queue</span>
 <span class="c">│       │   ├──</span> <span class="am">ArrayDeque (C)</span>
 <span class="c">│       │   └──</span> <span class="am">LinkedList (C)</span>
-<span class="c">│       └──</span> <span class="i cy">BlockingQueue (I)</span><span class="n">: Multithreading</span>
-<span class="c">│           ├──</span> <span class="cy">LinkedBlockingQueue</span> <span class="cy">ArrayBlockingQueue</span> <span class="cy">PriorityBlockingQueue</span></div>
+<span class="c">│       │
+│       └──</span> <span class="i cy">BlockingQueue (I)</span><span class="n">: Multithreading</span>
+<span class="c">│           ├──</span> <span class="cy">LinkedBlockingQueue (C)</span>
+<span class="c">│           ├──</span> <span class="cy">ArrayBlockingQueue (C)</span>
+<span class="c">│           └──</span> <span class="cy">PriorityBlockingQueue (C)</span></div>
     </div>
+</br>	
+    <!-- MAP TREE -->
     <div class="tree-panel">
-      <div class="tree-title">Map Hierarchy (Separate From Collection)</div>
-      <div class="tree-body"><span class="c">└──</span> <span class="i pu">Map (I)</span><span class="n">: Key-Value Pair, Keys Unique, Values Can Duplicate</span>
-<span class="c">    ├──</span> <span class="pu">HashMap (C)</span><span class="n">: No Order, 1 Null Key Allowed, Not Thread Safe</span>
-<span class="c">    │   └──</span> <span class="pu">LinkedHashMap (C)</span><span class="n">: Insertion Order, 1 Null Key</span>
-<span class="c">    ├──</span> <span class="pu">WeakHashMap (C)</span><span class="n">: GC removes entry if key has no strong ref</span>
-<span class="c">    ├──</span> <span class="pu">IdentityHashMap (C)</span><span class="n">: Uses == instead of equals()</span>
-<span class="c">    ├──</span> <span class="re">Hashtable (C)</span><span class="n">: Synchronized, No Null Key/Value, Legacy, Whole Map Locked</span>
-<span class="c">    ├──</span> <span class="cy">ConcurrentHashMap (C)</span><span class="n">: Thread Safe, No Null Key/Value, Bucket/Node Locked</span>
-<span class="c">    └──</span> <span class="i pu">SortedMap (I)</span> <span class="c">→</span> <span class="i pu">NavigableMap (I)</span>
-<span class="c">        └──</span> <span class="pu">TreeMap (C)</span><span class="n">: Sorted by Key, No Null Key, Red-Black Tree</span></div>
-      <div class="note">Collection Framework = interfaces + classes to store &amp; manipulate groups of objects. Benefits: dynamic size, generics, high-performance algorithms, sorting/searching utilities, thread-safe variants.</div>
+      <div class="tree-title">Map Hierarchy</div>
+      <div class="tree-body"><span class="c">└──</span> <span class="i pu">Map (I)</span><span class="n">: Key-Value Pair, Keys Unique, Values Duplicate</span>
+<span class="c">    │
+    ├──</span> <span class="pu">HashMap (C)</span><span class="n">: No Insertion Order Guarantee, 1 Null Key Allowed</span>
+<span class="c">    │   └──</span> <span class="pu">LinkedHashMap (C)</span><span class="n">: Insertion Order, 1 Null Key Allowed</span>
+<span class="c">    │
+    ├──</span> <span class="pu">WeakHashMap (C)</span><span class="n">: If key has no strong reference, GC can remove the corresponding entry</span>
+<span class="c">    ├──</span> <span class="pu">IdentityHashMap (C)</span><span class="n">: Uses == instead of equals() for key comparison</span>
+<span class="c">    ├──</span> <span class="re">Hashtable (C)</span><span class="n">: Synchronized &amp; Thread Safe, No Null Key/Value, Legacy, Whole Map Locked</span>
+<span class="c">    ├──</span> <span class="cy">ConcurrentHashMap (C)</span><span class="n">: Modern Thread Safe Map, No Null Key/Value, Better Performance than Hashtable, Bucket/Node Locked</span>
+<span class="c">    │
+    └──</span> <span class="i pu">SortedMap (I)</span><span class="n">: Keys are automatically stored in sorted order</span>
+<span class="c">        └──</span> <span class="i pu">NavigableMap (I)</span><span class="n">: SortedMap + Navigation Methods</span>
+<span class="c">            └──</span> <span class="pu">TreeMap (C)</span><span class="n">: Sorted by Key, No Null Key, Red-Black Tree</span></div>
     </div>
-  </div>
+  </div><!-- /tree-section -->
 
   <!-- =========================================================== -->
   <div class="section-label big" id="list">3. List — ArrayList, LinkedList, Vector, Stack</div>
