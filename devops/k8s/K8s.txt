@@ -1,0 +1,8494 @@
+========================================================================
+WHAT IS KUBERNETES
+========================================================================
+
+Definition
+
+Open Source Container Orchestration Platform
+
+Originally Developed By Google
+
+Now Maintained By CNCF
+
+Purpose
+
+✓ Deploy Containers
+
+✓ Scale Applications
+
+✓ Self Healing
+
+✓ Load Balancing
+
+✓ Auto Scaling
+
+✓ Zero Downtime Deployment
+
+✓ High Availability
+
+Problems Kubernetes Solves
+
+✗ Manual Deployment
+
+✗ Downtime
+
+✗ Manual Scaling
+
+✗ Server Failure
+
+✗ Manual Recovery
+
+Interview Question
+
+Q. What Is Kubernetes?
+
+Container Orchestration Platform.
+
+Enterprise Scenario
+
+100 Spring Boot Microservices
+
+Running Across Multiple Nodes
+
+Managed Automatically By Kubernetes.
+
+Interview One-Liner
+
+Kubernetes
+
+→ Container Orchestration Platform.
+
+========================================================================
+WHY KUBERNETES?
+========================================================================
+
+Without Kubernetes
+
+Developer
+
+↓
+
+Docker Container
+
+↓
+
+Manual Deployment
+
+↓
+
+Server Crash
+
+↓
+
+Application Down
+
+-----------------------------------
+
+With Kubernetes
+
+Developer
+
+↓
+
+Deployment
+
+↓
+
+Pod
+
+↓
+
+Node Crash
+
+↓
+
+New Pod Created
+
+↓
+
+Application Running
+
+Benefits
+
+✓ Self Healing
+
+✓ Auto Scaling
+
+✓ Load Balancing
+
+✓ Rolling Update
+
+✓ High Availability
+
+Interview One-Liner
+
+Kubernetes
+
+→ Automates Deployment, Scaling & Recovery.
+
+========================================================================
+CONTAINER vs VIRTUAL MACHINE
+========================================================================
+
+Container
+
+✓ Lightweight
+
+✓ Shared Host OS
+
+✓ Fast Startup
+
+✓ Less Memory
+
+✓ High Density
+
+-----------------------------------
+
+Virtual Machine
+
+✓ Own Guest OS
+
+✓ Heavy
+
+✓ Slow Startup
+
+✓ More Memory
+
+✓ Low Density
+
+Interview Question
+
+Which Starts Faster?
+
+Container.
+
+========================================================================
+DOCKER vs KUBERNETES
+========================================================================
+
+Docker
+
+→ Builds & Runs Containers
+
+-----------------------------------
+
+Kubernetes
+
+→ Manages & Orchestrates Containers
+
+-----------------------------------
+
+Docker
+
+Single Host
+
+-----------------------------------
+
+Kubernetes
+
+Multiple Nodes
+
+-----------------------------------
+
+Docker
+
+Manual Scaling
+
+-----------------------------------
+
+Kubernetes
+
+Auto Scaling
+
+Interview One-Liner
+
+Docker
+
+→ Container Runtime
+
+Kubernetes
+
+→ Container Orchestrator
+
+========================================================================
+DECLARATIVE vs IMPERATIVE
+========================================================================
+
+Imperative
+
+Tell Kubernetes
+
+How To Do
+
+Example
+
+kubectl run nginx
+
+-----------------------------------
+
+Declarative
+
+Tell Kubernetes
+
+What To Do
+
+Example
+
+kubectl apply -f deployment.yaml
+
+Preferred
+
+✓ GitOps
+
+✓ Version Control
+
+✓ Production Standard
+
+========================================================================
+KUBERNETES ARCHITECTURE
+========================================================================
+
+                Kubernetes Cluster
+
+                      │
+
+      ┌────────────────────────────┐
+
+            Control Plane
+
+ API Server
+
+ Scheduler
+
+ Controller Manager
+
+ etcd
+
+      └────────────────────────────┘
+
+              │
+
+──────────────────────────────────────────
+
+              │
+
+     Worker Node 1
+
+     Worker Node 2
+
+     Worker Node N
+
+              │
+
+          Kubelet
+
+              │
+
+        Container Runtime
+
+              │
+
+             Pods
+
+Interview One-Liner
+
+Control Plane
+
+→ Brain Of Kubernetes.
+
+========================================================================
+API SERVER
+========================================================================
+
+Definition
+
+Entry Point Of Kubernetes.
+
+Responsibilities
+
+✓ Accept Requests
+
+✓ Authenticate
+
+✓ Authorize
+
+✓ Validate
+
+✓ Update etcd
+
+✓ Return Response
+
+Flow
+
+kubectl
+
+↓
+
+API Server
+
+↓
+
+etcd
+
+↓
+
+Scheduler
+
+↓
+
+Node
+
+Interview One-Liner
+
+API Server
+
+→ Entry Point Of Kubernetes.
+
+========================================================================
+etcd
+========================================================================
+
+Definition
+
+Distributed Key Value Store
+
+Stores
+
+✓ Pods
+
+✓ Deployments
+
+✓ Services
+
+✓ ConfigMaps
+
+✓ Secrets
+
+✓ Nodes
+
+Interview One-Liner
+
+etcd
+
+→ Kubernetes Database.
+
+========================================================================
+SCHEDULER
+========================================================================
+
+Purpose
+
+Select Best Worker Node.
+
+Checks
+
+✓ CPU
+
+✓ Memory
+
+✓ Taints
+
+✓ Affinity
+
+✓ Policies
+
+Interview One-Liner
+
+Scheduler
+
+→ Chooses Best Node.
+
+========================================================================
+CONTROLLER MANAGER
+========================================================================
+
+Purpose
+
+Maintains Desired State.
+
+Example
+
+Desired Pods = 5
+
+Running Pods = 4
+
+Creates
+
+1 New Pod
+
+Interview One-Liner
+
+Controller Manager
+
+→ Self Healing.
+
+========================================================================
+KUBELET
+========================================================================
+
+Definition
+
+Node Agent.
+
+Responsibilities
+
+✓ Create Pods
+
+✓ Monitor Pods
+
+✓ Report Status
+
+Interview One-Liner
+
+Kubelet
+
+→ Creates & Monitors Pods.
+
+========================================================================
+KUBE PROXY
+========================================================================
+
+Purpose
+
+Handles Networking.
+
+Responsibilities
+
+✓ Service Discovery
+
+✓ Load Balancing
+
+✓ Pod Communication
+
+Interview One-Liner
+
+Kube Proxy
+
+→ Networking Component.
+
+========================================================================
+CONTAINER RUNTIME
+========================================================================
+
+Examples
+
+✓ containerd
+
+✓ CRI-O
+
+✓ Docker
+
+Responsibilities
+
+✓ Pull Image
+
+✓ Run Container
+
+✓ Stop Container
+
+Interview One-Liner
+
+Container Runtime
+
+→ Executes Containers.
+
+========================================================================
+POD CREATION FLOW
+========================================================================
+
+kubectl apply
+
+↓
+
+API Server
+
+↓
+
+Authentication
+
+↓
+
+Authorization
+
+↓
+
+etcd
+
+↓
+
+Scheduler
+
+↓
+
+Worker Node
+
+↓
+
+Kubelet
+
+↓
+
+Container Runtime
+
+↓
+
+Pod Running
+
+========================================================================
+INTERVIEW RAPID REVISION
+========================================================================
+
+Kubernetes
+→ Container Orchestrator
+
+Docker
+→ Runs Containers
+
+Control Plane
+→ Brain
+
+API Server
+→ Entry Point
+
+etcd
+→ Database
+
+Scheduler
+→ Selects Node
+
+Controller Manager
+→ Desired State
+
+Kubelet
+→ Creates Pods
+
+Kube Proxy
+→ Networking
+
+Container Runtime
+→ Runs Containers
+
+Declarative
+→ kubectl apply
+
+Imperative
+→ kubectl run
+
+========================================================================
+PODS
+========================================================================
+
+Definition
+
+Smallest Deployable Unit In Kubernetes
+
+Contains
+
+✓ One Or More Containers
+
+✓ Shared Network
+
+✓ Shared Storage
+
+✓ Shared Lifecycle
+
+Purpose
+
+✓ Run Application
+
+✓ Encapsulate Containers
+
+✓ Easy Scaling
+
+✓ Isolation
+
+Pod Flow
+
+Deployment
+
+↓
+
+ReplicaSet
+
+↓
+
+Pod
+
+↓
+
+Container
+
+Key Points
+
+✓ Gets Own IP Address
+
+✓ Can Have Multiple Containers
+
+✓ Ephemeral (Replaceable)
+
+✓ Usually One Application Per Pod
+
+✓ Managed By Deployment
+
+Commands
+
+kubectl get pods
+
+kubectl describe pod <pod-name>
+
+kubectl logs <pod-name>
+
+kubectl exec -it <pod-name> -- sh
+
+kubectl delete pod <pod-name>
+
+Interview Questions
+
+Q. What Is A Pod?
+
+Smallest Deployable Unit.
+
+------------------------------------------------
+
+Q. Can A Pod Have Multiple Containers?
+
+Yes.
+
+------------------------------------------------
+
+Q. Does Every Pod Have Its Own IP?
+
+Yes.
+
+------------------------------------------------
+
+Q. Can We Create Pods Directly In Production?
+
+No.
+
+Use Deployment.
+
+Enterprise Scenario
+
+Each Spring Boot Microservice Runs Inside One Pod.
+
+Interview One-Liner
+
+Pod
+
+→ Smallest Deployable Unit.
+
+Best Practices
+
+✓ One Main Application Per Pod
+
+✓ Keep Pods Stateless
+
+✓ Never Create Pods Directly
+
+========================================================================
+POD LIFECYCLE
+========================================================================
+
+Pending
+
+↓
+
+ContainerCreating
+
+↓
+
+Running
+
+↓
+
+Succeeded
+
+OR
+
+Failed
+
+↓
+
+Terminating
+
+Interview Question
+
+What Happens If Node Dies?
+
+Pod Is Recreated On Another Healthy Node.
+
+Interview One-Liner
+
+Pending
+
+→ Running
+
+→ Succeeded / Failed
+
+========================================================================
+POD PHASES
+========================================================================
+
+Pending
+
+Pod Accepted
+
+Resources Not Ready
+
+----------------------------------------
+
+Running
+
+Application Running
+
+----------------------------------------
+
+Succeeded
+
+Completed Successfully
+
+----------------------------------------
+
+Failed
+
+Application Failed
+
+----------------------------------------
+
+Unknown
+
+Node Communication Lost
+
+Interview One-Liner
+
+Pending
+
+Running
+
+Succeeded
+
+Failed
+
+Unknown
+
+========================================================================
+RESTART POLICY
+========================================================================
+
+Always
+
+Default
+
+Used By Deployment
+
+----------------------------------------
+
+OnFailure
+
+Restart Only If Failed
+
+----------------------------------------
+
+Never
+
+Run Once
+
+Used In Jobs
+
+Interview Question
+
+Default Restart Policy?
+
+Always
+
+========================================================================
+MULTI-CONTAINER POD
+========================================================================
+
+Definition
+
+One Pod
+
+Multiple Containers
+
+Sharing
+
+✓ Network
+
+✓ Storage
+
+✓ Lifecycle
+
+Example
+
+Spring Boot
+
++
+
+Fluentd
+
+OR
+
+Nginx
+
++
+
+PHP
+
+Benefits
+
+✓ Tight Communication
+
+✓ Same Lifecycle
+
+Interview One-Liner
+
+Multiple Containers
+
+One Pod
+
+Shared Network
+
+========================================================================
+INIT CONTAINER
+========================================================================
+
+Definition
+
+Runs Before Main Container
+
+Purpose
+
+✓ Download Config
+
+✓ Database Migration
+
+✓ Wait For Dependency
+
+Flow
+
+Init Container
+
+↓
+
+Completed
+
+↓
+
+Application Starts
+
+Interview Question
+
+Can Main Container Start Before Init Container?
+
+No.
+
+Interview One-Liner
+
+Init Container
+
+→ Runs First
+
+========================================================================
+SIDECAR CONTAINER
+========================================================================
+
+Definition
+
+Helper Container
+
+Runs Alongside Main Container
+
+Examples
+
+✓ Log Collection
+
+✓ Monitoring
+
+✓ Proxy
+
+✓ Metrics
+
+Enterprise Scenario
+
+Spring Boot
+
++
+
+Fluent Bit
+
++
+
+Prometheus Exporter
+
+Interview One-Liner
+
+Sidecar
+
+→ Supports Main Container
+
+========================================================================
+AMBASSADOR CONTAINER
+========================================================================
+
+Purpose
+
+Acts As Proxy
+
+Between Application
+
+And External Service
+
+Example
+
+Application
+
+↓
+
+Ambassador
+
+↓
+
+Database
+
+Interview One-Liner
+
+Ambassador
+
+→ Proxy Pattern
+
+========================================================================
+ADAPTER CONTAINER
+========================================================================
+
+Purpose
+
+Transforms Data
+
+Example
+
+Application Logs
+
+↓
+
+Adapter
+
+↓
+
+Monitoring Tool
+
+Interview One-Liner
+
+Adapter
+
+→ Data Transformation
+
+========================================================================
+EPHEMERAL CONTAINER
+========================================================================
+
+Definition
+
+Temporary Debug Container
+
+Purpose
+
+✓ Troubleshooting
+
+✓ Debug Running Pod
+
+✓ Production Investigation
+
+Interview Question
+
+Used For?
+
+Debugging
+
+Interview One-Liner
+
+Ephemeral
+
+→ Debug Container
+
+========================================================================
+STATIC POD
+========================================================================
+
+Definition
+
+Managed Directly By Kubelet
+
+Not API Server
+
+Location
+
+/etc/kubernetes/manifests
+
+Usage
+
+Control Plane Components
+
+Interview One-Liner
+
+Static Pod
+
+→ Managed By Kubelet
+
+========================================================================
+MIRROR POD
+========================================================================
+
+Definition
+
+Static Pod Representation
+
+Visible In API Server
+
+Purpose
+
+Monitoring Only
+
+Cannot Modify
+
+Interview One-Liner
+
+Mirror Pod
+
+→ Read Only View Of Static Pod
+
+========================================================================
+POD QoS (QUALITY OF SERVICE)
+========================================================================
+
+Guaranteed
+
+Requests = Limits
+
+Highest Priority
+
+----------------------------------------
+
+Burstable
+
+Requests < Limits
+
+Medium Priority
+
+----------------------------------------
+
+BestEffort
+
+No Requests
+
+No Limits
+
+Lowest Priority
+
+Interview Question
+
+Which QoS Is Best?
+
+Guaranteed
+
+========================================================================
+LABELS
+========================================================================
+
+Definition
+
+Key Value Pair
+
+Attached To Objects
+
+Purpose
+
+✓ Group Resources
+
+✓ Select Pods
+
+✓ Organize Applications
+
+Example
+
+app=certifyhub
+
+env=prod
+
+version=v2
+
+Interview Question
+
+Can Two Pods Have Same Label?
+
+Yes.
+
+Interview One-Liner
+
+Labels
+
+→ Resource Identification
+
+========================================================================
+SELECTORS
+========================================================================
+
+Definition
+
+Find Objects Using Labels
+
+Types
+
+✓ Equality Based
+
+✓ Set Based
+
+Example
+
+app=certifyhub
+
+Interview One-Liner
+
+Selector
+
+→ Finds Resources
+
+========================================================================
+MATCHLABELS
+========================================================================
+
+Purpose
+
+Exact Match
+
+Example
+
+app=certifyhub
+
+Interview One-Liner
+
+MatchLabels
+
+→ Exact Match
+
+========================================================================
+MATCHEXPRESSIONS
+========================================================================
+
+Operators
+
+In
+
+NotIn
+
+Exists
+
+DoesNotExist
+
+Example
+
+env In
+
+(dev,test,prod)
+
+Interview One-Liner
+
+MatchExpressions
+
+→ Advanced Filtering
+
+========================================================================
+ANNOTATIONS
+========================================================================
+
+Definition
+
+Metadata
+
+Not Used For Selection
+
+Used For
+
+✓ Documentation
+
+✓ Build Information
+
+✓ Owner
+
+✓ Release Details
+
+Difference
+
+Labels
+
+→ Selection
+
+Annotations
+
+→ Information
+
+Interview One-Liner
+
+Annotations
+
+→ Extra Metadata
+
+========================================================================
+REPLICASET
+========================================================================
+
+Definition
+
+Maintains Desired Number Of Pods
+
+Purpose
+
+✓ High Availability
+
+✓ Self Healing
+
+✓ Scaling
+
+Flow
+
+ReplicaSet
+
+↓
+
+Pod Deleted
+
+↓
+
+New Pod Created
+
+Interview Question
+
+If One Pod Dies?
+
+ReplicaSet Creates New Pod.
+
+Enterprise Scenario
+
+Desired Pods
+
+=
+
+5
+
+Running
+
+=
+
+4
+
+ReplicaSet Creates
+
+1 New Pod
+
+Interview One-Liner
+
+ReplicaSet
+
+→ Maintains Pod Count
+
+========================================================================
+DEPLOYMENT
+========================================================================
+
+Definition
+
+Manages ReplicaSets
+
+Purpose
+
+✓ Deploy Pods
+
+✓ Rolling Update
+
+✓ Rollback
+
+✓ Scaling
+
+Flow
+
+Deployment
+
+↓
+
+ReplicaSet
+
+↓
+
+Pods
+
+Commands
+
+kubectl get deployments
+
+kubectl describe deployment <name>
+
+kubectl rollout status deployment <name>
+
+kubectl rollout history deployment <name>
+
+kubectl rollout undo deployment <name>
+
+kubectl scale deployment <name> --replicas=5
+
+Interview Questions
+
+Q. Difference Between Deployment And ReplicaSet?
+
+Deployment
+
+Manages ReplicaSet
+
+ReplicaSet
+
+Manages Pods
+
+------------------------------------------------
+
+Q. Can Deployment Rollback?
+
+Yes.
+
+------------------------------------------------
+
+Q. Can Deployment Perform Rolling Update?
+
+Yes.
+
+Enterprise Scenario
+
+Spring Boot v1
+
+↓
+
+Deploy v2
+
+↓
+
+Users Continue Using Application
+
+↓
+
+Zero Downtime
+
+Interview One-Liner
+
+Deployment
+
+→ Manages ReplicaSets
+
+========================================================================
+DEPLOYMENT STRATEGIES
+========================================================================
+
+Rolling Update
+
+Default
+
+Zero Downtime
+
+----------------------------------------
+
+Recreate
+
+Delete Old
+
+Create New
+
+Downtime Exists
+
+Interview Question
+
+Default Strategy?
+
+Rolling Update
+
+========================================================================
+ROLLING UPDATE
+========================================================================
+
+Old Pods
+
+↓
+
+New Pods Created
+
+↓
+
+Traffic Shifted
+
+↓
+
+Old Pods Removed
+
+Benefits
+
+✓ Zero Downtime
+
+✓ Safe Deployment
+
+✓ Easy Rollback
+
+Interview One-Liner
+
+Rolling Update
+
+→ Gradual Deployment
+
+========================================================================
+ROLLBACK
+========================================================================
+
+Purpose
+
+Restore Previous Version
+
+Command
+
+kubectl rollout undo deployment <name>
+
+Interview One-Liner
+
+Rollback
+
+→ Previous Stable Version
+
+========================================================================
+PAUSE & RESUME
+========================================================================
+
+Pause
+
+Stop Deployment Changes
+
+Command
+
+kubectl rollout pause deployment <name>
+
+----------------------------------------
+
+Resume
+
+Continue Deployment
+
+Command
+
+kubectl rollout resume deployment <name>
+
+========================================================================
+REVISION HISTORY
+========================================================================
+
+Every Deployment
+
+Creates Revision
+
+Benefits
+
+✓ Track Changes
+
+✓ Rollback
+
+✓ Audit
+
+Command
+
+kubectl rollout history deployment <name>
+
+========================================================================
+COMMON INTERVIEW QUESTIONS
+========================================================================
+
+Smallest Deployable Unit?
+
+→ Pod
+
+------------------------------------------------
+
+Who Maintains Pod Count?
+
+→ ReplicaSet
+
+------------------------------------------------
+
+Who Manages ReplicaSet?
+
+→ Deployment
+
+------------------------------------------------
+
+Default Deployment Strategy?
+
+→ Rolling Update
+
+------------------------------------------------
+
+Rollback Command?
+
+→ kubectl rollout undo
+
+------------------------------------------------
+
+Difference
+
+Labels vs Annotations?
+
+Labels
+
+→ Selection
+
+Annotations
+
+→ Metadata
+
+------------------------------------------------
+
+Difference
+
+ReplicaSet vs Deployment?
+
+ReplicaSet
+
+→ Pod Count
+
+Deployment
+
+→ Full Lifecycle
+
+------------------------------------------------
+
+Sidecar Purpose?
+
+→ Supporting Container
+
+------------------------------------------------
+
+Init Container Purpose?
+
+→ Runs Before Main Container
+
+========================================================================
+15-MINUTE REVISION
+========================================================================
+
+Pod
+↓
+
+Pod Lifecycle
+↓
+
+Restart Policy
+↓
+
+Multi Container Pod
+↓
+
+Init Container
+↓
+
+Sidecar
+↓
+
+Ephemeral Container
+↓
+
+Labels
+↓
+
+Selectors
+↓
+
+Annotations
+↓
+
+ReplicaSet
+↓
+
+Deployment
+↓
+
+Rolling Update
+↓
+
+Rollback
+↓
+
+Revision History
+
+========================================================================
+END OF PART 2
+========================================================================
+
+========================================================================
+SERVICES
+========================================================================
+
+Definition
+
+Stable Network Endpoint
+
+Used To Access Pods
+
+Problem Solved
+
+Pods Are Temporary
+
+Pod IP Changes
+
+Service Provides Stable IP
+
+Flow
+
+Client
+
+↓
+
+Service
+
+↓
+
+Pod 1
+
+Pod 2
+
+Pod 3
+
+Benefits
+
+✓ Stable IP
+
+✓ Load Balancing
+
+✓ Service Discovery
+
+✓ Loose Coupling
+
+Commands
+
+kubectl get svc
+
+kubectl describe svc <service-name>
+
+kubectl expose deployment nginx --port=80
+
+Interview Questions
+
+Q. Why Do We Need Service?
+
+Pods Are Ephemeral.
+
+Service Provides Stable Access.
+
+------------------------------------------------
+
+Q. Does Service Create Pods?
+
+No.
+
+Deployment Creates Pods.
+
+------------------------------------------------
+
+Q. Does Service Have Its Own IP?
+
+Yes.
+
+Called Cluster IP.
+
+Enterprise Scenario
+
+Spring Boot Pods Scale From
+
+3
+
+↓
+
+10
+
+Frontend Still Uses Same Service URL.
+
+Interview One-Liner
+
+Service
+
+→ Stable Endpoint For Pods.
+
+========================================================================
+SERVICE TYPES
+========================================================================
+
+ClusterIP
+
+↓
+
+NodePort
+
+↓
+
+LoadBalancer
+
+↓
+
+ExternalName
+
+↓
+
+Headless Service
+
+========================================================================
+CLUSTERIP
+========================================================================
+
+Definition
+
+Default Service Type
+
+Accessible Only Inside Cluster
+
+Flow
+
+Pod
+
+↓
+
+ClusterIP Service
+
+↓
+
+Another Pod
+
+Use Cases
+
+✓ Microservices Communication
+
+✓ Backend APIs
+
+✓ Internal Database
+
+Interview Question
+
+Default Service Type?
+
+ClusterIP
+
+Interview One-Liner
+
+ClusterIP
+
+→ Internal Communication.
+
+========================================================================
+NODEPORT
+========================================================================
+
+Definition
+
+Exposes Application On Every Node
+
+Port Range
+
+30000
+
+↓
+
+32767
+
+Flow
+
+Browser
+
+↓
+
+NodeIP:NodePort
+
+↓
+
+Service
+
+↓
+
+Pods
+
+Use Cases
+
+✓ Development
+
+✓ Testing
+
+✓ Small Clusters
+
+Interview Question
+
+Can We Access NodePort Outside Cluster?
+
+Yes.
+
+Interview One-Liner
+
+NodePort
+
+→ External Access Through Node.
+
+========================================================================
+LOADBALANCER
+========================================================================
+
+Definition
+
+Creates Cloud Load Balancer
+
+Supported By
+
+AWS
+
+Azure
+
+GCP
+
+Flow
+
+Internet
+
+↓
+
+Cloud Load Balancer
+
+↓
+
+Service
+
+↓
+
+Pods
+
+Benefits
+
+✓ Public Access
+
+✓ High Availability
+
+✓ Automatic Distribution
+
+Enterprise Scenario
+
+Spring Boot API
+
+↓
+
+AWS Load Balancer
+
+↓
+
+Kubernetes Service
+
+↓
+
+Pods
+
+Interview Question
+
+Where Is LoadBalancer Mostly Used?
+
+Cloud Platforms.
+
+Interview One-Liner
+
+LoadBalancer
+
+→ Internet Facing Service.
+
+========================================================================
+EXTERNALNAME
+========================================================================
+
+Definition
+
+Maps Kubernetes Service
+
+To External DNS
+
+Example
+
+database.company.com
+
+Purpose
+
+Access External Services
+
+Without Hardcoding
+
+Interview One-Liner
+
+ExternalName
+
+→ External DNS Mapping.
+
+========================================================================
+HEADLESS SERVICE
+========================================================================
+
+Definition
+
+Service Without Cluster IP
+
+clusterIP=None
+
+Purpose
+
+Returns Pod IPs Directly
+
+Used By
+
+✓ StatefulSet
+
+✓ Databases
+
+✓ Kafka
+
+✓ Cassandra
+
+Flow
+
+Client
+
+↓
+
+DNS
+
+↓
+
+Pod IP
+
+Interview Question
+
+Why Headless Service?
+
+Direct Pod Communication.
+
+Interview One-Liner
+
+Headless Service
+
+→ No Cluster IP.
+
+========================================================================
+ENDPOINT
+========================================================================
+
+Definition
+
+Stores Pod IP Addresses
+
+Service Uses Endpoint
+
+To Route Traffic
+
+Flow
+
+Service
+
+↓
+
+Endpoint
+
+↓
+
+Pods
+
+Interview One-Liner
+
+Endpoint
+
+→ Pod Address List.
+
+========================================================================
+ENDPOINTSLICE
+========================================================================
+
+Definition
+
+Scalable Version Of Endpoint
+
+Benefits
+
+✓ Better Performance
+
+✓ Large Clusters
+
+✓ Efficient Updates
+
+Interview One-Liner
+
+EndpointSlice
+
+→ Optimized Endpoint.
+
+========================================================================
+SERVICE DISCOVERY
+========================================================================
+
+Definition
+
+Automatically Finds Services
+
+Methods
+
+✓ DNS
+
+✓ Environment Variables
+
+Example
+
+user-service.default.svc.cluster.local
+
+Interview Question
+
+How Do Pods Find Other Services?
+
+Using DNS.
+
+Interview One-Liner
+
+Service Discovery
+
+→ Automatic Service Lookup.
+
+========================================================================
+KUBERNETES DNS
+========================================================================
+
+Definition
+
+Internal DNS Server
+
+Usually CoreDNS
+
+Purpose
+
+Resolve Service Names
+
+Flow
+
+Application
+
+↓
+
+DNS
+
+↓
+
+Service
+
+↓
+
+Pods
+
+Interview Question
+
+Default DNS Component?
+
+CoreDNS
+
+Interview One-Liner
+
+CoreDNS
+
+→ Internal DNS.
+
+========================================================================
+INGRESS
+========================================================================
+
+Definition
+
+HTTP/HTTPS Entry Point
+
+For Multiple Services
+
+Without Ingress
+
+Internet
+
+↓
+
+LoadBalancer
+
+↓
+
+Service A
+
+Internet
+
+↓
+
+LoadBalancer
+
+↓
+
+Service B
+
+With Ingress
+
+Internet
+
+↓
+
+Ingress
+
+↓
+
+Service A
+
+↓
+
+Service B
+
+↓
+
+Service C
+
+Benefits
+
+✓ Single Entry Point
+
+✓ SSL
+
+✓ Host Routing
+
+✓ Path Routing
+
+✓ Cost Saving
+
+Interview Question
+
+Why Use Ingress?
+
+Single Load Balancer
+
+For Multiple Services.
+
+Enterprise Scenario
+
+api.company.com
+
+↓
+
+Spring Boot API
+
+admin.company.com
+
+↓
+
+Admin Service
+
+Interview One-Liner
+
+Ingress
+
+→ HTTP Gateway.
+
+========================================================================
+INGRESS CONTROLLER
+========================================================================
+
+Definition
+
+Implements Ingress Rules
+
+Popular Controllers
+
+✓ NGINX
+
+✓ Traefik
+
+✓ HAProxy
+
+✓ AWS ALB Controller
+
+Interview Question
+
+Can Ingress Work Without Controller?
+
+No.
+
+Interview One-Liner
+
+Ingress Controller
+
+→ Executes Ingress Rules.
+
+========================================================================
+HOST BASED ROUTING
+========================================================================
+
+Example
+
+api.company.com
+
+↓
+
+API Service
+
+----------------------------
+
+admin.company.com
+
+↓
+
+Admin Service
+
+Interview One-Liner
+
+Host Routing
+
+→ Route By Domain Name.
+
+========================================================================
+PATH BASED ROUTING
+========================================================================
+
+Example
+
+/api
+
+↓
+
+API Service
+
+----------------------------
+
+/users
+
+↓
+
+User Service
+
+----------------------------
+
+/orders
+
+↓
+
+Order Service
+
+Interview One-Liner
+
+Path Routing
+
+→ Route By URL Path.
+
+========================================================================
+TLS / SSL
+========================================================================
+
+Purpose
+
+Secure Communication
+
+HTTPS
+
+Certificate Stored As Secret
+
+Flow
+
+Browser
+
+↓
+
+HTTPS
+
+↓
+
+Ingress
+
+↓
+
+Service
+
+↓
+
+Pods
+
+Interview Question
+
+Where Is SSL Terminated?
+
+Ingress Controller.
+
+Interview One-Liner
+
+TLS
+
+→ Secure Traffic.
+
+========================================================================
+NAMESPACE
+========================================================================
+
+Definition
+
+Logical Partition
+
+Inside Cluster
+
+Purpose
+
+✓ Isolation
+
+✓ Resource Organization
+
+✓ Security
+
+Default Namespaces
+
+default
+
+kube-system
+
+kube-public
+
+kube-node-lease
+
+Commands
+
+kubectl get namespaces
+
+kubectl create namespace dev
+
+kubectl config set-context --current --namespace=dev
+
+Enterprise Scenario
+
+dev
+
+↓
+
+QA
+
+↓
+
+UAT
+
+↓
+
+Production
+
+Each Has Separate Namespace.
+
+Interview Question
+
+Can Two Namespaces Have Same Pod Name?
+
+Yes.
+
+Interview One-Liner
+
+Namespace
+
+→ Logical Isolation.
+
+========================================================================
+RESOURCE QUOTA
+========================================================================
+
+Definition
+
+Limits Resource Usage
+
+Per Namespace
+
+Controls
+
+✓ CPU
+
+✓ Memory
+
+✓ Pods
+
+✓ Services
+
+✓ PVC
+
+Benefits
+
+✓ Prevent Resource Abuse
+
+✓ Fair Sharing
+
+Interview One-Liner
+
+ResourceQuota
+
+→ Namespace Limits.
+
+========================================================================
+LIMIT RANGE
+========================================================================
+
+Definition
+
+Sets Default
+
+CPU & Memory
+
+For Containers
+
+Purpose
+
+Prevent Containers
+
+Without Limits
+
+Interview Question
+
+Difference
+
+ResourceQuota
+
+vs
+
+LimitRange?
+
+ResourceQuota
+
+Namespace Total Limit
+
+LimitRange
+
+Container Default Limit
+
+Interview One-Liner
+
+LimitRange
+
+→ Default Resource Limits.
+
+========================================================================
+COMMON INTERVIEW QUESTIONS
+========================================================================
+
+Default Service Type?
+
+→ ClusterIP
+
+------------------------------------------------
+
+Internet Facing Service?
+
+→ LoadBalancer
+
+------------------------------------------------
+
+Service Without Cluster IP?
+
+→ Headless Service
+
+------------------------------------------------
+
+Who Resolves Service Names?
+
+→ CoreDNS
+
+------------------------------------------------
+
+Purpose Of Ingress?
+
+→ HTTP/HTTPS Routing
+
+------------------------------------------------
+
+Can Ingress Work Without Controller?
+
+→ No
+
+------------------------------------------------
+
+Namespace Purpose?
+
+→ Isolation
+
+------------------------------------------------
+
+Difference
+
+ClusterIP vs NodePort?
+
+ClusterIP
+
+Internal Only
+
+NodePort
+
+External Via Node
+
+------------------------------------------------
+
+Difference
+
+NodePort vs LoadBalancer?
+
+NodePort
+
+Uses Node Port
+
+LoadBalancer
+
+Uses Cloud Load Balancer
+
+------------------------------------------------
+
+Difference
+
+ResourceQuota vs LimitRange?
+
+ResourceQuota
+
+Namespace Resource Limit
+
+LimitRange
+
+Container Resource Default
+
+========================================================================
+15-MINUTE REVISION
+========================================================================
+
+Service
+
+↓
+
+ClusterIP
+
+↓
+
+NodePort
+
+↓
+
+LoadBalancer
+
+↓
+
+ExternalName
+
+↓
+
+Headless Service
+
+↓
+
+Endpoint
+
+↓
+
+EndpointSlice
+
+↓
+
+Service Discovery
+
+↓
+
+CoreDNS
+
+↓
+
+Ingress
+
+↓
+
+Ingress Controller
+
+↓
+
+Host Routing
+
+↓
+
+Path Routing
+
+↓
+
+TLS
+
+↓
+
+Namespace
+
+↓
+
+ResourceQuota
+
+↓
+
+LimitRange
+
+========================================================================
+END OF PART 3
+========================================================================
+========================================================================
+CONFIGMAP
+========================================================================
+
+Definition
+
+Stores Non-Sensitive Configuration Data
+
+Purpose
+
+Separate Configuration
+
+From Application Code
+
+Stores
+
+✓ application.properties
+
+✓ application.yml
+
+✓ URLs
+
+✓ Feature Flags
+
+✓ Environment Variables
+
+Flow
+
+ConfigMap
+
+↓
+
+Pod
+
+↓
+
+Application Reads Configuration
+
+Benefits
+
+✓ No Code Changes
+
+✓ Easy Configuration Updates
+
+✓ Environment Specific Values
+
+✓ Reusable
+
+Commands
+
+kubectl get configmap
+
+kubectl describe configmap <name>
+
+kubectl create configmap app-config --from-file=application.properties
+
+kubectl edit configmap <name>
+
+Interview Questions
+
+Q. Why Use ConfigMap?
+
+Store Configuration Outside Application.
+
+------------------------------------------------
+
+Q. Does ConfigMap Require Application Rebuild?
+
+No.
+
+Interview One-Liner
+
+ConfigMap
+
+→ Non-Sensitive Configuration.
+
+========================================================================
+SECRET
+========================================================================
+
+Definition
+
+Stores Sensitive Information
+
+Stores
+
+✓ Database Password
+
+✓ API Keys
+
+✓ JWT Secret
+
+✓ SSL Certificates
+
+✓ OAuth Credentials
+
+Flow
+
+Secret
+
+↓
+
+Pod
+
+↓
+
+Application
+
+Benefits
+
+✓ Base64 Encoded
+
+✓ Centralized
+
+✓ Secure Access
+
+✓ RBAC Protected
+
+Commands
+
+kubectl get secrets
+
+kubectl describe secret <name>
+
+kubectl create secret generic db-secret \
+--from-literal=username=admin \
+--from-literal=password=pass123
+
+Interview Questions
+
+Q. Difference Between ConfigMap And Secret?
+
+ConfigMap
+
+Non-Sensitive Data
+
+Secret
+
+Sensitive Data
+
+------------------------------------------------
+
+Q. Is Secret Encrypted?
+
+By Default
+
+Base64 Encoded
+
+Can Be Encrypted At Rest.
+
+Enterprise Scenario
+
+Spring Boot
+
+Reads
+
+Database Username
+
+Database Password
+
+JWT Secret
+
+From Kubernetes Secret.
+
+Interview One-Liner
+
+Secret
+
+→ Sensitive Configuration.
+
+========================================================================
+SECRET TYPES
+========================================================================
+
+Opaque
+
+Generic Secret
+
+(Default)
+
+----------------------------------------
+
+kubernetes.io/tls
+
+TLS Certificates
+
+----------------------------------------
+
+kubernetes.io/dockerconfigjson
+
+Docker Registry Credentials
+
+----------------------------------------
+
+kubernetes.io/service-account-token
+
+Service Account Token
+
+Interview One-Liner
+
+Opaque
+
+→ Most Common Secret Type.
+
+========================================================================
+USING CONFIGMAP AS ENVIRONMENT VARIABLES
+========================================================================
+
+Flow
+
+ConfigMap
+
+↓
+
+Environment Variables
+
+↓
+
+Spring Boot Application
+
+Example
+
+DB_HOST
+
+DB_PORT
+
+APP_NAME
+
+Interview One-Liner
+
+ConfigMap
+
+→ Environment Variables.
+
+========================================================================
+USING SECRET AS ENVIRONMENT VARIABLES
+========================================================================
+
+Flow
+
+Secret
+
+↓
+
+Environment Variables
+
+↓
+
+Application
+
+Examples
+
+DB_USERNAME
+
+DB_PASSWORD
+
+JWT_SECRET
+
+Interview One-Liner
+
+Secret
+
+→ Secure Environment Variables.
+
+========================================================================
+CONFIGMAP AS VOLUME
+========================================================================
+
+Definition
+
+Mount Configuration
+
+As Files
+
+Flow
+
+ConfigMap
+
+↓
+
+Volume
+
+↓
+
+Container
+
+Use Cases
+
+✓ application.properties
+
+✓ nginx.conf
+
+✓ logback.xml
+
+Interview One-Liner
+
+ConfigMap Volume
+
+→ Configuration Files.
+
+========================================================================
+SECRET AS VOLUME
+========================================================================
+
+Definition
+
+Mount Secret
+
+As Files
+
+Use Cases
+
+✓ SSL Certificates
+
+✓ Private Keys
+
+✓ API Tokens
+
+Flow
+
+Secret
+
+↓
+
+Volume
+
+↓
+
+Application
+
+Interview One-Liner
+
+Secret Volume
+
+→ Secure Files.
+
+========================================================================
+DOWNWARD API
+========================================================================
+
+Definition
+
+Expose Pod Information
+
+To Application
+
+Provides
+
+✓ Pod Name
+
+✓ Namespace
+
+✓ Labels
+
+✓ Node Name
+
+✓ Pod IP
+
+Purpose
+
+Application Knows
+
+Its Own Metadata
+
+Interview Question
+
+Can Application Know Pod Name?
+
+Yes.
+
+Using Downward API.
+
+Interview One-Liner
+
+Downward API
+
+→ Pod Metadata.
+
+========================================================================
+VOLUMES
+========================================================================
+
+Definition
+
+Storage Attached
+
+To Pods
+
+Purpose
+
+Persist Data
+
+Beyond Container Restart
+
+Types
+
+✓ emptyDir
+
+✓ hostPath
+
+✓ Persistent Volume
+
+✓ Persistent Volume Claim
+
+✓ ConfigMap
+
+✓ Secret
+
+Interview One-Liner
+
+Volume
+
+→ Pod Storage.
+
+========================================================================
+EMPTYDIR
+========================================================================
+
+Definition
+
+Temporary Storage
+
+Created When Pod Starts
+
+Deleted When Pod Ends
+
+Use Cases
+
+✓ Cache
+
+✓ Temporary Files
+
+✓ Shared Data
+
+Interview Question
+
+Does Data Survive Pod Deletion?
+
+No.
+
+Interview One-Liner
+
+emptyDir
+
+→ Temporary Storage.
+
+========================================================================
+HOSTPATH
+========================================================================
+
+Definition
+
+Mount Node Filesystem
+
+Into Pod
+
+Flow
+
+Node Disk
+
+↓
+
+Pod
+
+Use Cases
+
+✓ Development
+
+✓ Testing
+
+✓ Logs
+
+Disadvantages
+
+✗ Node Dependency
+
+✗ Not Portable
+
+Interview One-Liner
+
+hostPath
+
+→ Node Storage.
+
+========================================================================
+PERSISTENT VOLUME (PV)
+========================================================================
+
+Definition
+
+Cluster Storage Resource
+
+Created By Administrator
+
+Examples
+
+✓ AWS EBS
+
+✓ Azure Disk
+
+✓ GCP Persistent Disk
+
+✓ NFS
+
+✓ SAN
+
+Benefits
+
+✓ Independent Of Pods
+
+✓ Persistent Data
+
+✓ Reusable
+
+Interview Question
+
+Who Creates PV?
+
+Administrator
+
+Or Dynamic Provisioner.
+
+Interview One-Liner
+
+PV
+
+→ Actual Storage.
+
+========================================================================
+PERSISTENT VOLUME CLAIM (PVC)
+========================================================================
+
+Definition
+
+Request For Storage
+
+Made By Pod
+
+Flow
+
+Application
+
+↓
+
+PVC
+
+↓
+
+PV
+
+↓
+
+Storage
+
+Benefits
+
+✓ No Need To Know Storage Details
+
+✓ Decouples Application
+
+Interview Question
+
+Who Uses PVC?
+
+Pods.
+
+Interview One-Liner
+
+PVC
+
+→ Storage Request.
+
+========================================================================
+PV vs PVC
+========================================================================
+
+Persistent Volume
+
+Actual Storage
+
+----------------------------------------
+
+Persistent Volume Claim
+
+Request For Storage
+
+----------------------------------------
+
+PV
+
+Created By Administrator
+
+----------------------------------------
+
+PVC
+
+Created By Developer
+
+Interview One-Liner
+
+PV
+
+→ Storage
+
+PVC
+
+→ Storage Request
+
+========================================================================
+STORAGE CLASS
+========================================================================
+
+Definition
+
+Blueprint
+
+For Dynamic Storage
+
+Purpose
+
+Automatically Creates PV
+
+Flow
+
+PVC
+
+↓
+
+StorageClass
+
+↓
+
+PV Created
+
+↓
+
+Pod Uses Storage
+
+Benefits
+
+✓ Dynamic Provisioning
+
+✓ Cloud Native
+
+✓ Automation
+
+Interview Question
+
+Why StorageClass?
+
+Automatic Volume Creation.
+
+Interview One-Liner
+
+StorageClass
+
+→ Automatic Storage.
+
+========================================================================
+DYNAMIC PROVISIONING
+========================================================================
+
+Without StorageClass
+
+Admin Creates PV
+
+↓
+
+Developer Creates PVC
+
+↓
+
+Bind
+
+----------------------------------------
+
+With StorageClass
+
+Developer Creates PVC
+
+↓
+
+StorageClass
+
+↓
+
+PV Created Automatically
+
+↓
+
+Application Starts
+
+Interview One-Liner
+
+Dynamic Provisioning
+
+→ Automatic PV Creation.
+
+========================================================================
+CSI (CONTAINER STORAGE INTERFACE)
+========================================================================
+
+Definition
+
+Standard Interface
+
+For Storage Providers
+
+Supports
+
+✓ AWS EBS CSI
+
+✓ Azure Disk CSI
+
+✓ GCP PD CSI
+
+✓ Ceph CSI
+
+✓ NFS CSI
+
+Benefits
+
+✓ Vendor Independent
+
+✓ Extensible
+
+✓ Standard API
+
+Interview Question
+
+What Is CSI?
+
+Standard Storage Plugin Interface.
+
+Interview One-Liner
+
+CSI
+
+→ Standard Storage Interface.
+
+========================================================================
+ACCESS MODES
+========================================================================
+
+ReadWriteOnce (RWO)
+
+One Node
+
+Read Write
+
+----------------------------------------
+
+ReadOnlyMany (ROX)
+
+Multiple Nodes
+
+Read Only
+
+----------------------------------------
+
+ReadWriteMany (RWX)
+
+Multiple Nodes
+
+Read Write
+
+----------------------------------------
+
+ReadWriteOncePod (RWOP)
+
+Single Pod Only
+
+Interview Question
+
+Which Access Mode Is Most Common?
+
+ReadWriteOnce
+
+========================================================================
+VOLUME MODES
+========================================================================
+
+Filesystem
+
+Default
+
+Mounted As Directory
+
+----------------------------------------
+
+Block
+
+Raw Block Device
+
+Interview One-Liner
+
+Filesystem
+
+→ Default Volume Mode.
+
+========================================================================
+ENTERPRISE SCENARIO
+========================================================================
+
+Spring Boot Application
+
+↓
+
+ConfigMap
+
+application.properties
+
+↓
+
+Secret
+
+DB Password
+
+↓
+
+PVC
+
+Upload Folder
+
+↓
+
+StorageClass
+
+AWS EBS
+
+↓
+
+Persistent Data
+
+Result
+
+✓ External Configuration
+
+✓ Secure Credentials
+
+✓ Persistent Uploads
+
+✓ Easy Deployment
+
+========================================================================
+COMMON INTERVIEW QUESTIONS
+========================================================================
+
+Difference
+
+ConfigMap vs Secret?
+
+ConfigMap
+
+Non-Sensitive
+
+Secret
+
+Sensitive
+
+------------------------------------------------
+
+Purpose Of PVC?
+
+Request Storage.
+
+------------------------------------------------
+
+Difference
+
+PV vs PVC?
+
+PV
+
+Actual Storage
+
+PVC
+
+Storage Request.
+
+------------------------------------------------
+
+Purpose Of StorageClass?
+
+Automatic PV Creation.
+
+------------------------------------------------
+
+Which Storage Is Temporary?
+
+emptyDir
+
+------------------------------------------------
+
+Which Storage Depends On Node?
+
+hostPath
+
+------------------------------------------------
+
+Can Data Survive Pod Restart?
+
+Yes
+
+Using PVC.
+
+------------------------------------------------
+
+What Is CSI?
+
+Container Storage Interface.
+
+------------------------------------------------
+
+Most Common Access Mode?
+
+ReadWriteOnce.
+
+========================================================================
+15-MINUTE REVISION
+========================================================================
+
+ConfigMap
+
+↓
+
+Secret
+
+↓
+
+Secret Types
+
+↓
+
+Environment Variables
+
+↓
+
+ConfigMap Volume
+
+↓
+
+Secret Volume
+
+↓
+
+Downward API
+
+↓
+
+Volumes
+
+↓
+
+emptyDir
+
+↓
+
+hostPath
+
+↓
+
+Persistent Volume
+
+↓
+
+Persistent Volume Claim
+
+↓
+
+StorageClass
+
+↓
+
+Dynamic Provisioning
+
+↓
+
+CSI
+
+↓
+
+Access Modes
+
+↓
+
+Volume Modes
+
+========================================================================
+END OF PART 4
+========================================================================
+
+========================================================================
+SCHEDULER
+========================================================================
+
+Definition
+
+Scheduler Decides
+
+Which Worker Node
+
+Should Run A Pod
+
+Responsibilities
+
+✓ Select Best Node
+
+✓ Check Available Resources
+
+✓ Apply Scheduling Rules
+
+✓ Improve Resource Utilization
+
+Scheduler Checks
+
+✓ CPU
+
+✓ Memory
+
+✓ Node Status
+
+✓ Taints
+
+✓ Tolerations
+
+✓ Affinity Rules
+
+✓ Resource Requests
+
+Flow
+
+Pod Created
+
+↓
+
+Scheduler
+
+↓
+
+Best Node Selected
+
+↓
+
+Kubelet
+
+↓
+
+Pod Running
+
+Interview Questions
+
+Q. Does Scheduler Create Pods?
+
+No.
+
+Scheduler Only Selects Node.
+
+------------------------------------------------
+
+Q. Who Starts Container?
+
+Kubelet.
+
+Interview One-Liner
+
+Scheduler
+
+→ Chooses Best Worker Node.
+
+========================================================================
+NODE SELECTOR
+========================================================================
+
+Definition
+
+Simplest Way
+
+To Schedule Pod
+
+On Specific Node
+
+Example Label
+
+disk=ssd
+
+region=india
+
+Flow
+
+Pod
+
+↓
+
+NodeSelector
+
+↓
+
+Matching Node
+
+Use Cases
+
+✓ GPU Nodes
+
+✓ SSD Nodes
+
+✓ High Memory Nodes
+
+Interview Question
+
+What Is NodeSelector?
+
+Simple Node Scheduling.
+
+Interview One-Liner
+
+NodeSelector
+
+→ Basic Node Selection.
+
+========================================================================
+NODE AFFINITY
+========================================================================
+
+Definition
+
+Advanced Version
+
+Of NodeSelector
+
+Types
+
+✓ Required
+
+✓ Preferred
+
+Required
+
+Pod Must Run
+
+On Matching Node
+
+Preferred
+
+Try Matching
+
+Otherwise Continue
+
+Benefits
+
+✓ Flexible Scheduling
+
+✓ Better Placement
+
+Interview Question
+
+Difference
+
+NodeSelector
+
+vs
+
+NodeAffinity?
+
+NodeAffinity
+
+Supports Advanced Rules.
+
+Interview One-Liner
+
+Node Affinity
+
+→ Advanced Node Selection.
+
+========================================================================
+POD AFFINITY
+========================================================================
+
+Definition
+
+Place Pods Together
+
+Example
+
+API Pod
+
+↓
+
+Cache Pod
+
+↓
+
+Same Node
+
+Benefits
+
+✓ Faster Communication
+
+✓ Lower Latency
+
+Enterprise Scenario
+
+Spring Boot API
+
+And Redis
+
+Placed Together
+
+Interview One-Liner
+
+Pod Affinity
+
+→ Keep Related Pods Together.
+
+========================================================================
+POD ANTI-AFFINITY
+========================================================================
+
+Definition
+
+Separate Similar Pods
+
+Across Nodes
+
+Example
+
+Replica 1
+
+↓
+
+Node A
+
+Replica 2
+
+↓
+
+Node B
+
+Benefits
+
+✓ High Availability
+
+✓ Fault Tolerance
+
+Interview Question
+
+Why Anti-Affinity?
+
+Avoid Single Node Failure.
+
+Interview One-Liner
+
+Pod Anti-Affinity
+
+→ Spread Pods.
+
+========================================================================
+TAINTS
+========================================================================
+
+Definition
+
+Prevent Pods
+
+From Running
+
+On Node
+
+Concept
+
+Node Says
+
+Don't Schedule Here.
+
+Command
+
+kubectl taint nodes node1 gpu=true:NoSchedule
+
+Effects
+
+NoSchedule
+
+PreferNoSchedule
+
+NoExecute
+
+Interview Question
+
+Purpose Of Taints?
+
+Restrict Pod Placement.
+
+Interview One-Liner
+
+Taints
+
+→ Block Pods.
+
+========================================================================
+TOLERATIONS
+========================================================================
+
+Definition
+
+Allows Pod
+
+To Ignore Taints
+
+Flow
+
+Node
+
+↓
+
+Taint
+
+↓
+
+Pod Has Toleration
+
+↓
+
+Pod Scheduled
+
+Interview Question
+
+Difference
+
+Taint
+
+vs
+
+Toleration?
+
+Taint
+
+Blocks
+
+Toleration
+
+Allows
+
+Interview One-Liner
+
+Toleration
+
+→ Permission To Run.
+
+========================================================================
+PRIORITY CLASS
+========================================================================
+
+Definition
+
+Assign Priority
+
+To Pods
+
+Higher Priority
+
+Scheduled First
+
+Benefits
+
+✓ Critical Applications
+
+✓ Better Scheduling
+
+Example
+
+Monitoring
+
+Database
+
+API Gateway
+
+Interview One-Liner
+
+PriorityClass
+
+→ Pod Priority.
+
+========================================================================
+TOPOLOGY SPREAD CONSTRAINTS
+========================================================================
+
+Definition
+
+Distribute Pods
+
+Across Zones
+
+Or Nodes
+
+Benefits
+
+✓ High Availability
+
+✓ Better Load Distribution
+
+Enterprise Scenario
+
+3 Pods
+
+↓
+
+3 Different Nodes
+
+Interview One-Liner
+
+Topology Spread
+
+→ Balanced Distribution.
+
+========================================================================
+WORKLOADS
+========================================================================
+
+Deployment
+
+↓
+
+ReplicaSet
+
+↓
+
+Pod
+
+------------------------------
+
+StatefulSet
+
+↓
+
+Stateful Pods
+
+------------------------------
+
+DaemonSet
+
+↓
+
+One Pod Per Node
+
+------------------------------
+
+Job
+
+↓
+
+Run Once
+
+------------------------------
+
+CronJob
+
+↓
+
+Scheduled Job
+
+========================================================================
+STATEFULSET
+========================================================================
+
+Definition
+
+Manages Stateful Applications
+
+Examples
+
+✓ MySQL
+
+✓ PostgreSQL
+
+✓ MongoDB
+
+✓ Kafka
+
+✓ Elasticsearch
+
+Features
+
+✓ Stable Pod Name
+
+✓ Stable Storage
+
+✓ Ordered Deployment
+
+✓ Ordered Deletion
+
+Example
+
+mysql-0
+
+mysql-1
+
+mysql-2
+
+Interview Question
+
+Difference
+
+Deployment
+
+vs
+
+StatefulSet?
+
+Deployment
+
+Stateless
+
+StatefulSet
+
+Stateful
+
+Interview One-Liner
+
+StatefulSet
+
+→ Stateful Applications.
+
+========================================================================
+DAEMONSET
+========================================================================
+
+Definition
+
+Runs One Pod
+
+On Every Node
+
+Examples
+
+✓ Fluentd
+
+✓ Prometheus Node Exporter
+
+✓ Security Agent
+
+✓ Monitoring Agent
+
+Flow
+
+Node Added
+
+↓
+
+DaemonSet
+
+↓
+
+Pod Created
+
+Interview Question
+
+Why DaemonSet?
+
+One Pod Per Node.
+
+Interview One-Liner
+
+DaemonSet
+
+→ One Pod On Every Node.
+
+========================================================================
+JOB
+========================================================================
+
+Definition
+
+Runs Task
+
+Only Once
+
+Examples
+
+✓ Database Migration
+
+✓ Backup
+
+✓ Report Generation
+
+✓ Batch Processing
+
+Flow
+
+Job
+
+↓
+
+Pod
+
+↓
+
+Completed
+
+Interview One-Liner
+
+Job
+
+→ One-Time Execution.
+
+========================================================================
+CRONJOB
+========================================================================
+
+Definition
+
+Runs Jobs
+
+On Schedule
+
+Examples
+
+✓ Nightly Backup
+
+✓ Cleanup
+
+✓ Monthly Report
+
+✓ Data Sync
+
+Schedule
+
+Every Midnight
+
+↓
+
+CronJob
+
+↓
+
+Job
+
+↓
+
+Completed
+
+Interview Question
+
+Difference
+
+Job
+
+vs
+
+CronJob?
+
+Job
+
+Runs Once
+
+CronJob
+
+Runs Repeatedly
+
+Interview One-Liner
+
+CronJob
+
+→ Scheduled Job.
+
+========================================================================
+DEPLOYMENT vs STATEFULSET
+========================================================================
+
+Deployment
+
+Stateless
+
+-----------------------------------
+
+Random Pod Name
+
+-----------------------------------
+
+Shared Storage
+
+-----------------------------------
+
+Parallel Deployment
+
+-----------------------------------
+
+Examples
+
+Spring Boot
+
+REST API
+
+-----------------------------------
+
+StatefulSet
+
+Stateful
+
+-----------------------------------
+
+Fixed Pod Name
+
+-----------------------------------
+
+Dedicated Storage
+
+-----------------------------------
+
+Ordered Deployment
+
+-----------------------------------
+
+Examples
+
+MongoDB
+
+Kafka
+
+MySQL
+
+Interview One-Liner
+
+Deployment
+
+→ Stateless
+
+StatefulSet
+
+→ Stateful
+
+========================================================================
+SCALING
+========================================================================
+
+Manual Scaling
+
+Command
+
+kubectl scale deployment app --replicas=5
+
+-----------------------------------
+
+Automatic Scaling
+
+Horizontal Pod Autoscaler
+
+Interview One-Liner
+
+Scaling
+
+→ Increase Or Decrease Pods.
+
+========================================================================
+HORIZONTAL POD AUTOSCALER (HPA)
+========================================================================
+
+Definition
+
+Automatically Scale Pods
+
+Based On Metrics
+
+Metrics
+
+✓ CPU
+
+✓ Memory
+
+✓ Custom Metrics
+
+Flow
+
+High CPU
+
+↓
+
+HPA
+
+↓
+
+More Pods
+
+↓
+
+Load Balanced
+
+Benefits
+
+✓ Better Performance
+
+✓ Lower Cost
+
+✓ Automatic Scaling
+
+Command
+
+kubectl autoscale deployment app --cpu-percent=70 --min=2 --max=10
+
+Interview Question
+
+Does HPA Add Nodes?
+
+No.
+
+It Adds Pods.
+
+Interview One-Liner
+
+HPA
+
+→ Auto Scale Pods.
+
+========================================================================
+VERTICAL POD AUTOSCALER (VPA)
+========================================================================
+
+Definition
+
+Adjusts
+
+CPU
+
+Memory
+
+For Existing Pods
+
+Flow
+
+Application Needs More Memory
+
+↓
+
+VPA
+
+↓
+
+Increase Resources
+
+Interview Question
+
+Difference
+
+HPA
+
+vs
+
+VPA?
+
+HPA
+
+Changes Pod Count
+
+VPA
+
+Changes Pod Resources
+
+Interview One-Liner
+
+VPA
+
+→ Auto Resize Pods.
+
+========================================================================
+CLUSTER AUTOSCALER
+========================================================================
+
+Definition
+
+Automatically Adds
+
+Or Removes Nodes
+
+Flow
+
+Pods Pending
+
+↓
+
+No Resources
+
+↓
+
+Cluster Autoscaler
+
+↓
+
+New Node Added
+
+Interview Question
+
+Difference
+
+HPA
+
+vs
+
+Cluster Autoscaler?
+
+HPA
+
+Adds Pods
+
+Cluster Autoscaler
+
+Adds Nodes
+
+Interview One-Liner
+
+Cluster Autoscaler
+
+→ Auto Scale Nodes.
+
+========================================================================
+METRICS SERVER
+========================================================================
+
+Definition
+
+Collects Resource Metrics
+
+Provides
+
+✓ CPU Usage
+
+✓ Memory Usage
+
+Used By
+
+✓ HPA
+
+✓ kubectl top
+
+Commands
+
+kubectl top nodes
+
+kubectl top pods
+
+Interview One-Liner
+
+Metrics Server
+
+→ Resource Metrics.
+
+========================================================================
+ENTERPRISE SCENARIO
+========================================================================
+
+Spring Boot API
+
+↓
+
+Deployment
+
+↓
+
+6 Pods
+
+↓
+
+CPU Reaches 80%
+
+↓
+
+HPA
+
+↓
+
+12 Pods
+
+↓
+
+Traffic Distributed
+
+↓
+
+Cluster Full
+
+↓
+
+Cluster Autoscaler
+
+↓
+
+New Worker Node Added
+
+↓
+
+Application Continues Smoothly
+
+========================================================================
+COMMON INTERVIEW QUESTIONS
+========================================================================
+
+Who Selects Node?
+
+→ Scheduler
+
+------------------------------------------------
+
+Difference
+
+NodeSelector
+
+vs
+
+NodeAffinity?
+
+NodeAffinity
+
+Supports Advanced Rules.
+
+------------------------------------------------
+
+Purpose Of Pod Affinity?
+
+→ Keep Pods Together.
+
+------------------------------------------------
+
+Purpose Of Pod Anti-Affinity?
+
+→ Spread Pods Across Nodes.
+
+------------------------------------------------
+
+Difference
+
+Taints
+
+vs
+
+Tolerations?
+
+Taint
+
+Blocks Pods
+
+Toleration
+
+Allows Pods.
+
+------------------------------------------------
+
+One Pod Per Node?
+
+→ DaemonSet
+
+------------------------------------------------
+
+Runs Once?
+
+→ Job
+
+------------------------------------------------
+
+Runs On Schedule?
+
+→ CronJob
+
+------------------------------------------------
+
+Difference
+
+Deployment
+
+vs
+
+StatefulSet?
+
+Deployment
+
+Stateless
+
+StatefulSet
+
+Stateful
+
+------------------------------------------------
+
+Difference
+
+HPA
+
+vs
+
+VPA?
+
+HPA
+
+Changes Pod Count
+
+VPA
+
+Changes CPU & Memory
+
+------------------------------------------------
+
+Difference
+
+HPA
+
+vs
+
+Cluster Autoscaler?
+
+HPA
+
+Adds Pods
+
+Cluster Autoscaler
+
+Adds Nodes
+
+------------------------------------------------
+
+Which Component Provides CPU Metrics?
+
+→ Metrics Server
+
+========================================================================
+15-MINUTE REVISION
+========================================================================
+
+Scheduler
+
+↓
+
+NodeSelector
+
+↓
+
+Node Affinity
+
+↓
+
+Pod Affinity
+
+↓
+
+Pod Anti-Affinity
+
+↓
+
+Taints
+
+↓
+
+Tolerations
+
+↓
+
+PriorityClass
+
+↓
+
+Topology Spread
+
+↓
+
+StatefulSet
+
+↓
+
+DaemonSet
+
+↓
+
+Job
+
+↓
+
+CronJob
+
+↓
+
+Deployment vs StatefulSet
+
+↓
+
+Scaling
+
+↓
+
+HPA
+
+↓
+
+VPA
+
+↓
+
+Cluster Autoscaler
+
+↓
+
+Metrics Server
+
+========================================================================
+END OF PART 5
+========================================================================
+
+========================================================================
+CONTAINER NETWORK INTERFACE (CNI)
+========================================================================
+
+Definition
+
+Plugin Responsible
+
+For Kubernetes Networking
+
+Purpose
+
+✓ Connect Pods
+
+✓ Assign Pod IP
+
+✓ Enable Pod Communication
+
+✓ Network Isolation
+
+Popular CNI Plugins
+
+✓ Calico
+
+✓ Flannel
+
+✓ Cilium
+
+✓ Weave Net
+
+✓ Canal
+
+Flow
+
+Pod Created
+
+↓
+
+CNI Assigns IP
+
+↓
+
+Pod Communicates
+
+Interview Questions
+
+Q. What Is CNI?
+
+Container Network Interface.
+
+------------------------------------------------
+
+Q. Can Pods Communicate Without CNI?
+
+No.
+
+Interview One-Liner
+
+CNI
+
+→ Provides Pod Networking.
+
+========================================================================
+OVERLAY NETWORK
+========================================================================
+
+Definition
+
+Virtual Network
+
+Connecting Pods
+
+Across Different Nodes
+
+Flow
+
+Pod A
+
+(Node 1)
+
+↓
+
+Overlay Network
+
+↓
+
+Pod B
+
+(Node 2)
+
+Benefits
+
+✓ Cross Node Communication
+
+✓ Transparent Networking
+
+✓ No Manual Routing
+
+Interview One-Liner
+
+Overlay Network
+
+→ Connects Pods Across Nodes.
+
+========================================================================
+NETWORK POLICY
+========================================================================
+
+Definition
+
+Firewall For Pods
+
+Purpose
+
+Control Pod Communication
+
+Default
+
+All Traffic Allowed
+
+Can Restrict
+
+✓ Ingress
+
+✓ Egress
+
+Benefits
+
+✓ Security
+
+✓ Zero Trust
+
+✓ Isolation
+
+Example
+
+Frontend
+
+↓
+
+Allowed
+
+↓
+
+Backend
+
+Database
+
+↓
+
+Blocked
+
+↓
+
+Frontend
+
+Interview Questions
+
+Q. What Is Network Policy?
+
+Controls Pod Traffic.
+
+------------------------------------------------
+
+Q. Does Network Policy Work Without CNI Support?
+
+No.
+
+Interview One-Liner
+
+Network Policy
+
+→ Pod Firewall.
+
+========================================================================
+INGRESS vs EGRESS
+========================================================================
+
+Ingress
+
+Incoming Traffic
+
+To Pod
+
+----------------------------------------
+
+Egress
+
+Outgoing Traffic
+
+From Pod
+
+Interview One-Liner
+
+Ingress
+
+→ Incoming
+
+Egress
+
+→ Outgoing
+
+========================================================================
+SERVICE MESH
+========================================================================
+
+Definition
+
+Infrastructure Layer
+
+Managing Service Communication
+
+Features
+
+✓ Traffic Management
+
+✓ Security
+
+✓ Encryption
+
+✓ Retry
+
+✓ Circuit Breaker
+
+✓ Observability
+
+Popular Service Mesh
+
+✓ Istio
+
+✓ Linkerd
+
+✓ Consul Connect
+
+Flow
+
+Service A
+
+↓
+
+Sidecar Proxy
+
+↓
+
+Sidecar Proxy
+
+↓
+
+Service B
+
+Interview Questions
+
+Q. Why Service Mesh?
+
+Manage Microservice Communication.
+
+------------------------------------------------
+
+Q. Does Application Need Code Changes?
+
+No.
+
+Interview One-Liner
+
+Service Mesh
+
+→ Smart Networking Layer.
+
+========================================================================
+SIDECAR PROXY
+========================================================================
+
+Definition
+
+Proxy Container
+
+Runs With Application
+
+Examples
+
+✓ Envoy
+
+✓ Linkerd Proxy
+
+Responsibilities
+
+✓ Traffic Routing
+
+✓ TLS
+
+✓ Metrics
+
+✓ Retry
+
+Interview One-Liner
+
+Sidecar Proxy
+
+→ Controls Network Traffic.
+
+========================================================================
+RBAC
+========================================================================
+
+Definition
+
+Role Based Access Control
+
+Purpose
+
+Control User Permissions
+
+Authentication
+
+↓
+
+Authorization
+
+↓
+
+RBAC
+
+↓
+
+Access Granted
+
+Benefits
+
+✓ Security
+
+✓ Least Privilege
+
+✓ Fine Grained Access
+
+Interview Questions
+
+Q. What Is RBAC?
+
+Role Based Access Control.
+
+------------------------------------------------
+
+Q. Why RBAC?
+
+Restrict Access.
+
+Interview One-Liner
+
+RBAC
+
+→ Authorization Mechanism.
+
+========================================================================
+ROLE
+========================================================================
+
+Definition
+
+Permissions
+
+Within Namespace
+
+Can Allow
+
+✓ Pods
+
+✓ Services
+
+✓ ConfigMaps
+
+✓ Secrets
+
+Example
+
+Developer
+
+Can Read Pods
+
+Cannot Delete Deployment
+
+Interview One-Liner
+
+Role
+
+→ Namespace Permissions.
+
+========================================================================
+CLUSTERROLE
+========================================================================
+
+Definition
+
+Permissions
+
+Across Entire Cluster
+
+Examples
+
+✓ Nodes
+
+✓ Namespaces
+
+✓ Cluster Resources
+
+Interview Question
+
+Difference
+
+Role
+
+vs
+
+ClusterRole?
+
+Role
+
+Namespace
+
+ClusterRole
+
+Entire Cluster
+
+Interview One-Liner
+
+ClusterRole
+
+→ Cluster Level Permissions.
+
+========================================================================
+ROLEBINDING
+========================================================================
+
+Definition
+
+Assigns Role
+
+To User
+
+Within Namespace
+
+Flow
+
+User
+
+↓
+
+RoleBinding
+
+↓
+
+Role
+
+↓
+
+Permission
+
+Interview One-Liner
+
+RoleBinding
+
+→ Assign Namespace Role.
+
+========================================================================
+CLUSTERROLEBINDING
+========================================================================
+
+Definition
+
+Assigns ClusterRole
+
+Across Cluster
+
+Flow
+
+User
+
+↓
+
+ClusterRoleBinding
+
+↓
+
+ClusterRole
+
+↓
+
+Cluster Access
+
+Interview One-Liner
+
+ClusterRoleBinding
+
+→ Assign Cluster Permissions.
+
+========================================================================
+SERVICE ACCOUNT
+========================================================================
+
+Definition
+
+Identity
+
+For Applications
+
+Not Humans
+
+Purpose
+
+Allow Pods
+
+To Access Kubernetes API
+
+Default
+
+Every Namespace
+
+Has Default Service Account
+
+Enterprise Scenario
+
+Spring Boot Pod
+
+↓
+
+Service Account
+
+↓
+
+Reads ConfigMap
+
+Interview Question
+
+Difference
+
+User
+
+vs
+
+Service Account?
+
+User
+
+Human
+
+Service Account
+
+Application
+
+Interview One-Liner
+
+Service Account
+
+→ Pod Identity.
+
+========================================================================
+SECURITY CONTEXT
+========================================================================
+
+Definition
+
+Security Settings
+
+For Pod
+
+Or Container
+
+Controls
+
+✓ User ID
+
+✓ Group ID
+
+✓ Privileges
+
+✓ Read Only Filesystem
+
+✓ Capabilities
+
+Best Practices
+
+✓ Run As Non Root
+
+✓ Disable Privileged Mode
+
+✓ Read Only Root Filesystem
+
+Interview One-Liner
+
+Security Context
+
+→ Container Security Rules.
+
+========================================================================
+IMAGE PULL POLICY
+========================================================================
+
+Types
+
+Always
+
+Always Pull Image
+
+----------------------------------------
+
+IfNotPresent
+
+Default
+
+Pull If Missing
+
+----------------------------------------
+
+Never
+
+Use Local Image
+
+Interview Question
+
+Default Image Pull Policy?
+
+IfNotPresent
+
+(Except ":latest" Images)
+
+Interview One-Liner
+
+ImagePullPolicy
+
+→ Controls Image Download.
+
+========================================================================
+IMAGE PULL SECRETS
+========================================================================
+
+Definition
+
+Credentials
+
+For Private Docker Registry
+
+Examples
+
+✓ Docker Hub Private Repo
+
+✓ AWS ECR
+
+✓ Azure ACR
+
+✓ GCR
+
+Flow
+
+Pod
+
+↓
+
+ImagePullSecret
+
+↓
+
+Private Registry
+
+↓
+
+Image Downloaded
+
+Interview One-Liner
+
+ImagePullSecret
+
+→ Registry Credentials.
+
+========================================================================
+ADMISSION CONTROLLERS
+========================================================================
+
+Definition
+
+Intercept Requests
+
+Before Object Creation
+
+Purpose
+
+✓ Validation
+
+✓ Mutation
+
+✓ Security
+
+Flow
+
+kubectl apply
+
+↓
+
+API Server
+
+↓
+
+Admission Controller
+
+↓
+
+Object Created
+
+Examples
+
+✓ NamespaceLifecycle
+
+✓ LimitRanger
+
+✓ ResourceQuota
+
+✓ PodSecurity
+
+Interview Question
+
+When Do Admission Controllers Run?
+
+Before Object Is Stored.
+
+Interview One-Liner
+
+Admission Controller
+
+→ Request Validation.
+
+========================================================================
+RESOURCE REQUESTS
+========================================================================
+
+Definition
+
+Minimum Resources
+
+Needed By Container
+
+Examples
+
+CPU
+
+500m
+
+Memory
+
+512Mi
+
+Purpose
+
+Scheduler Uses Requests
+
+For Placement
+
+Interview One-Liner
+
+Requests
+
+→ Minimum Resources.
+
+========================================================================
+RESOURCE LIMITS
+========================================================================
+
+Definition
+
+Maximum Resources
+
+Container Can Use
+
+Examples
+
+CPU
+
+1 Core
+
+Memory
+
+1Gi
+
+Benefits
+
+✓ Prevent Resource Abuse
+
+✓ Fair Resource Sharing
+
+Interview Question
+
+Difference
+
+Requests
+
+vs
+
+Limits?
+
+Requests
+
+Minimum
+
+Limits
+
+Maximum
+
+Interview One-Liner
+
+Limits
+
+→ Maximum Resources.
+
+========================================================================
+QUALITY OF SERVICE (QoS)
+========================================================================
+
+Guaranteed
+
+Requests = Limits
+
+Highest Priority
+
+----------------------------------------
+
+Burstable
+
+Requests < Limits
+
+----------------------------------------
+
+BestEffort
+
+No Requests
+
+No Limits
+
+Lowest Priority
+
+Interview One-Liner
+
+Guaranteed
+
+→ Best QoS.
+
+========================================================================
+OOMKilled
+========================================================================
+
+Definition
+
+Container Killed
+
+Because Memory Limit Exceeded
+
+Symptoms
+
+✓ Restart Loop
+
+✓ Exit Code 137
+
+Solution
+
+✓ Increase Memory Limit
+
+✓ Optimize Application
+
+Interview Question
+
+What Is Exit Code 137?
+
+OOMKilled.
+
+Interview One-Liner
+
+OOMKilled
+
+→ Memory Exhausted.
+
+========================================================================
+NODE EVICTION
+========================================================================
+
+Definition
+
+Pods Removed
+
+Due To Resource Pressure
+
+Reasons
+
+✓ Memory Pressure
+
+✓ Disk Pressure
+
+✓ PID Pressure
+
+Flow
+
+Node Under Pressure
+
+↓
+
+Eviction Manager
+
+↓
+
+Pod Removed
+
+Interview One-Liner
+
+Eviction
+
+→ Resource Pressure.
+
+========================================================================
+POD SECURITY STANDARDS
+========================================================================
+
+Privileged
+
+Least Secure
+
+----------------------------------------
+
+Baseline
+
+Recommended Minimum
+
+----------------------------------------
+
+Restricted
+
+Most Secure
+
+Production Standard
+
+Interview One-Liner
+
+Restricted
+
+→ Production Security.
+
+========================================================================
+ENTERPRISE SCENARIO
+========================================================================
+
+Spring Boot Microservices
+
+↓
+
+Network Policy
+
+Restricts Access
+
+↓
+
+RBAC
+
+Developers
+
+Cannot Delete Production
+
+↓
+
+Service Account
+
+Access ConfigMaps
+
+↓
+
+Security Context
+
+Run As Non Root
+
+↓
+
+ImagePullSecret
+
+Pull From Private Registry
+
+↓
+
+Resource Requests
+
+Guaranteed Scheduling
+
+↓
+
+Resource Limits
+
+Prevent Memory Abuse
+
+↓
+
+Production Secure Cluster
+
+========================================================================
+COMMON INTERVIEW QUESTIONS
+========================================================================
+
+Purpose Of CNI?
+
+→ Pod Networking
+
+------------------------------------------------
+
+Purpose Of Network Policy?
+
+→ Restrict Pod Traffic
+
+------------------------------------------------
+
+Difference
+
+Ingress
+
+vs
+
+Egress?
+
+Ingress
+
+Incoming
+
+Egress
+
+Outgoing
+
+------------------------------------------------
+
+Purpose Of Service Mesh?
+
+→ Manage Service Communication
+
+------------------------------------------------
+
+Difference
+
+Role
+
+vs
+
+ClusterRole?
+
+Role
+
+Namespace
+
+ClusterRole
+
+Entire Cluster
+
+------------------------------------------------
+
+Difference
+
+RoleBinding
+
+vs
+
+ClusterRoleBinding?
+
+RoleBinding
+
+Namespace
+
+ClusterRoleBinding
+
+Cluster
+
+------------------------------------------------
+
+Purpose Of Service Account?
+
+→ Pod Identity
+
+------------------------------------------------
+
+Purpose Of Security Context?
+
+→ Secure Containers
+
+------------------------------------------------
+
+Difference
+
+Requests
+
+vs
+
+Limits?
+
+Requests
+
+Minimum
+
+Limits
+
+Maximum
+
+------------------------------------------------
+
+What Is OOMKilled?
+
+→ Memory Limit Exceeded
+
+------------------------------------------------
+
+Exit Code Of OOMKilled?
+
+→ 137
+
+------------------------------------------------
+
+Best QoS?
+
+→ Guaranteed
+
+========================================================================
+15-MINUTE REVISION
+========================================================================
+
+CNI
+
+↓
+
+Overlay Network
+
+↓
+
+Network Policy
+
+↓
+
+Ingress
+
+↓
+
+Egress
+
+↓
+
+Service Mesh
+
+↓
+
+Sidecar Proxy
+
+↓
+
+RBAC
+
+↓
+
+Role
+
+↓
+
+ClusterRole
+
+↓
+
+RoleBinding
+
+↓
+
+ClusterRoleBinding
+
+↓
+
+Service Account
+
+↓
+
+Security Context
+
+↓
+
+ImagePullPolicy
+
+↓
+
+ImagePullSecret
+
+↓
+
+Admission Controllers
+
+↓
+
+Requests
+
+↓
+
+Limits
+
+↓
+
+QoS
+
+↓
+
+OOMKilled
+
+↓
+
+Node Eviction
+
+↓
+
+Pod Security Standards
+
+========================================================================
+END OF PART 6
+========================================================================
+
+========================================================================
+LIVENESS PROBE
+========================================================================
+
+Definition
+
+Checks Whether
+
+Application Is Alive
+
+Purpose
+
+Restart Container
+
+If Application Is Hung
+
+Probe Types
+
+✓ HTTP
+
+✓ TCP
+
+✓ Command (Exec)
+
+Flow
+
+Application
+
+↓
+
+Liveness Probe
+
+↓
+
+Success
+
+↓
+
+Continue Running
+
+OR
+
+Failure
+
+↓
+
+Container Restarted
+
+Interview Questions
+
+Q. What Happens If Liveness Probe Fails?
+
+Container Is Restarted.
+
+------------------------------------------------
+
+Q. Does Liveness Check Readiness?
+
+No.
+
+Interview One-Liner
+
+Liveness Probe
+
+→ Checks If Application Is Alive.
+
+========================================================================
+READINESS PROBE
+========================================================================
+
+Definition
+
+Checks Whether
+
+Application Is Ready
+
+To Accept Traffic
+
+Purpose
+
+Prevent Traffic
+
+Until Application Is Ready
+
+Flow
+
+Application Starting
+
+↓
+
+Readiness Probe
+
+↓
+
+Not Ready
+
+↓
+
+No Traffic
+
+↓
+
+Ready
+
+↓
+
+Traffic Starts
+
+Interview Questions
+
+Q. What Happens If Readiness Probe Fails?
+
+Pod Is Removed
+
+From Service Endpoints.
+
+Container Is NOT Restarted.
+
+Interview One-Liner
+
+Readiness Probe
+
+→ Controls Traffic.
+
+========================================================================
+STARTUP PROBE
+========================================================================
+
+Definition
+
+Checks Whether
+
+Application
+
+Has Started Successfully
+
+Purpose
+
+Useful For
+
+Slow Starting Applications
+
+Flow
+
+Application Starts
+
+↓
+
+Startup Probe
+
+↓
+
+Success
+
+↓
+
+Liveness Starts
+
+↓
+
+Readiness Starts
+
+Benefits
+
+✓ Prevents False Restarts
+
+✓ Better For Spring Boot
+
+Interview Question
+
+When Should Startup Probe Be Used?
+
+Applications
+
+Taking Long Time To Start.
+
+Enterprise Scenario
+
+Spring Boot
+
+Takes
+
+60 Seconds
+
+To Start
+
+Startup Probe
+
+Prevents
+
+Liveness Failure.
+
+Interview One-Liner
+
+Startup Probe
+
+→ Startup Validation.
+
+========================================================================
+PROBE COMPARISON
+========================================================================
+
+Liveness
+
+Application Alive?
+
+Failure
+
+↓
+
+Restart Container
+
+----------------------------------------
+
+Readiness
+
+Ready For Traffic?
+
+Failure
+
+↓
+
+Remove From Service
+
+----------------------------------------
+
+Startup
+
+Application Started?
+
+Failure
+
+↓
+
+Wait Until Startup
+
+Interview One-Liner
+
+Liveness
+
+→ Restart
+
+Readiness
+
+→ Traffic
+
+Startup
+
+→ Initial Startup
+
+========================================================================
+METRICS SERVER
+========================================================================
+
+Definition
+
+Collects CPU
+
+And Memory Metrics
+
+Provides
+
+✓ Node Metrics
+
+✓ Pod Metrics
+
+Used By
+
+✓ HPA
+
+✓ kubectl top
+
+Commands
+
+kubectl top nodes
+
+kubectl top pods
+
+Interview One-Liner
+
+Metrics Server
+
+→ CPU & Memory Metrics.
+
+========================================================================
+PROMETHEUS
+========================================================================
+
+Definition
+
+Monitoring System
+
+Purpose
+
+Collect Metrics
+
+From Kubernetes
+
+Collects
+
+✓ CPU
+
+✓ Memory
+
+✓ JVM Metrics
+
+✓ HTTP Requests
+
+✓ Database Metrics
+
+Flow
+
+Application
+
+↓
+
+/actuator/prometheus
+
+↓
+
+Prometheus
+
+↓
+
+Metrics Stored
+
+Interview Question
+
+What Is Prometheus?
+
+Metrics Collection Tool.
+
+Interview One-Liner
+
+Prometheus
+
+→ Metrics Monitoring.
+
+========================================================================
+GRAFANA
+========================================================================
+
+Definition
+
+Visualization Tool
+
+Purpose
+
+Display Dashboards
+
+Data Source
+
+✓ Prometheus
+
+✓ Loki
+
+✓ Elasticsearch
+
+Features
+
+✓ Dashboards
+
+✓ Alerts
+
+✓ Graphs
+
+✓ Reports
+
+Enterprise Scenario
+
+Spring Boot
+
+↓
+
+Prometheus
+
+↓
+
+Grafana Dashboard
+
+↓
+
+CPU
+
+Memory
+
+Requests
+
+Errors
+
+Interview One-Liner
+
+Grafana
+
+→ Visualization Dashboard.
+
+========================================================================
+PROMETHEUS + GRAFANA FLOW
+========================================================================
+
+Spring Boot
+
+↓
+
+Micrometer
+
+↓
+
+Actuator
+
+↓
+
+Prometheus
+
+↓
+
+Grafana
+
+↓
+
+Dashboard
+
+Interview One-Liner
+
+Prometheus
+
+Collects
+
+Grafana
+
+Displays.
+
+========================================================================
+LOGGING
+========================================================================
+
+Purpose
+
+Store
+
+Search
+
+Analyze Logs
+
+Popular Solutions
+
+✓ ELK Stack
+
+✓ EFK Stack
+
+✓ Loki
+
+✓ Splunk
+
+Interview One-Liner
+
+Logging
+
+→ Centralized Logs.
+
+========================================================================
+FLUENTD / FLUENT BIT
+========================================================================
+
+Definition
+
+Log Collector
+
+Purpose
+
+Collect Logs
+
+From Every Node
+
+Flow
+
+Application Logs
+
+↓
+
+Fluent Bit
+
+↓
+
+Elasticsearch
+
+↓
+
+Kibana
+
+Interview One-Liner
+
+Fluent Bit
+
+→ Collects Logs.
+
+========================================================================
+LOKI
+========================================================================
+
+Definition
+
+Log Aggregation System
+
+Developed By
+
+Grafana Labs
+
+Advantages
+
+✓ Lightweight
+
+✓ Fast
+
+✓ Easy Integration
+
+Works With
+
+Grafana
+
+Interview One-Liner
+
+Loki
+
+→ Log Storage.
+
+========================================================================
+ELK STACK
+========================================================================
+
+Elasticsearch
+
+↓
+
+Stores Logs
+
+----------------------------------------
+
+Logstash
+
+↓
+
+Processes Logs
+
+----------------------------------------
+
+Kibana
+
+↓
+
+Visualizes Logs
+
+Flow
+
+Application
+
+↓
+
+Logstash
+
+↓
+
+Elasticsearch
+
+↓
+
+Kibana
+
+Interview One-Liner
+
+ELK
+
+→ Logging Stack.
+
+========================================================================
+HELM
+========================================================================
+
+Definition
+
+Package Manager
+
+For Kubernetes
+
+Purpose
+
+Install Applications
+
+Using Charts
+
+Examples
+
+✓ Prometheus
+
+✓ Grafana
+
+✓ NGINX
+
+✓ Jenkins
+
+Commands
+
+helm repo add
+
+helm install
+
+helm upgrade
+
+helm uninstall
+
+Benefits
+
+✓ Reusable
+
+✓ Versioned
+
+✓ Easy Deployment
+
+Interview Questions
+
+Q. What Is Helm?
+
+Package Manager.
+
+------------------------------------------------
+
+Q. What Is A Chart?
+
+Application Template.
+
+Interview One-Liner
+
+Helm
+
+→ Package Manager.
+
+========================================================================
+HELM CHART
+========================================================================
+
+Definition
+
+Collection Of
+
+Kubernetes YAML Files
+
+Contains
+
+✓ Deployment
+
+✓ Service
+
+✓ ConfigMap
+
+✓ Secret
+
+✓ Ingress
+
+Directory Structure
+
+Chart.yaml
+
+values.yaml
+
+templates/
+
+charts/
+
+Interview One-Liner
+
+Chart
+
+→ Kubernetes Package.
+
+========================================================================
+VALUES.YAML
+========================================================================
+
+Definition
+
+Stores Configurable Values
+
+Examples
+
+✓ Image Name
+
+✓ Replica Count
+
+✓ CPU
+
+✓ Memory
+
+✓ Port
+
+Benefits
+
+✓ Environment Specific
+
+✓ Easy Customization
+
+Interview One-Liner
+
+values.yaml
+
+→ Configuration File.
+
+========================================================================
+HELM UPGRADE
+========================================================================
+
+Purpose
+
+Upgrade Application
+
+Without Recreating
+
+Command
+
+helm upgrade
+
+Benefits
+
+✓ Version Upgrade
+
+✓ Configuration Update
+
+Interview One-Liner
+
+Helm Upgrade
+
+→ Update Release.
+
+========================================================================
+HELM ROLLBACK
+========================================================================
+
+Purpose
+
+Restore Previous Release
+
+Command
+
+helm rollback
+
+Benefits
+
+✓ Safe Deployment
+
+✓ Quick Recovery
+
+Interview One-Liner
+
+Helm Rollback
+
+→ Previous Release.
+
+========================================================================
+GITOPS
+========================================================================
+
+Definition
+
+Git
+
+Becomes
+
+Single Source Of Truth
+
+Flow
+
+Developer
+
+↓
+
+Git Push
+
+↓
+
+Git Repository
+
+↓
+
+ArgoCD
+
+↓
+
+Kubernetes Cluster
+
+Benefits
+
+✓ Automation
+
+✓ Audit Trail
+
+✓ Version Control
+
+✓ Rollback
+
+Interview Question
+
+What Is GitOps?
+
+Deploy Infrastructure
+
+Using Git.
+
+Interview One-Liner
+
+GitOps
+
+→ Git Driven Deployment.
+
+========================================================================
+ARGO CD
+========================================================================
+
+Definition
+
+GitOps Continuous Delivery Tool
+
+Purpose
+
+Automatically Sync
+
+Git Repository
+
+With Kubernetes
+
+Features
+
+✓ Auto Sync
+
+✓ Rollback
+
+✓ Drift Detection
+
+✓ Health Status
+
+Flow
+
+Git
+
+↓
+
+ArgoCD
+
+↓
+
+Cluster
+
+↓
+
+Deployment
+
+Interview Question
+
+What Is Drift Detection?
+
+Detects Difference
+
+Between Git
+
+And Cluster.
+
+Interview One-Liner
+
+ArgoCD
+
+→ GitOps Deployment Tool.
+
+========================================================================
+FLUX CD
+========================================================================
+
+Definition
+
+Alternative
+
+To ArgoCD
+
+Purpose
+
+GitOps Automation
+
+Features
+
+✓ Auto Sync
+
+✓ Git Based Deployment
+
+✓ Continuous Reconciliation
+
+Interview One-Liner
+
+FluxCD
+
+→ GitOps Tool.
+
+========================================================================
+OBSERVABILITY
+========================================================================
+
+Three Pillars
+
+✓ Metrics
+
+✓ Logs
+
+✓ Traces
+
+Metrics
+
+↓
+
+Prometheus
+
+Logs
+
+↓
+
+Loki / ELK
+
+Traces
+
+↓
+
+Jaeger / Zipkin
+
+Interview One-Liner
+
+Observability
+
+→ Metrics + Logs + Traces.
+
+========================================================================
+SPRING BOOT PRODUCTION MONITORING
+========================================================================
+
+Spring Boot
+
+↓
+
+Actuator
+
+↓
+
+Micrometer
+
+↓
+
+Prometheus
+
+↓
+
+Grafana
+
+↓
+
+Alerts
+
+↓
+
+DevOps Team
+
+Benefits
+
+✓ Health Monitoring
+
+✓ JVM Metrics
+
+✓ API Metrics
+
+✓ Memory Monitoring
+
+✓ Error Tracking
+
+========================================================================
+ENTERPRISE SCENARIO
+========================================================================
+
+Spring Boot Microservices
+
+↓
+
+Liveness Probe
+
+Detects Hung Application
+
+↓
+
+Readiness Probe
+
+Stops Bad Traffic
+
+↓
+
+Startup Probe
+
+Handles Slow Startup
+
+↓
+
+Micrometer
+
+Exports Metrics
+
+↓
+
+Prometheus
+
+Collects Metrics
+
+↓
+
+Grafana
+
+Displays Dashboards
+
+↓
+
+Fluent Bit
+
+Collects Logs
+
+↓
+
+Loki
+
+Stores Logs
+
+↓
+
+Helm
+
+Deploys Application
+
+↓
+
+Git Push
+
+↓
+
+ArgoCD
+
+↓
+
+Production Deployment
+
+========================================================================
+COMMON INTERVIEW QUESTIONS
+========================================================================
+
+Purpose Of Liveness Probe?
+
+→ Restart Hung Application
+
+------------------------------------------------
+
+Purpose Of Readiness Probe?
+
+→ Accept Traffic
+
+------------------------------------------------
+
+Purpose Of Startup Probe?
+
+→ Handle Slow Startup
+
+------------------------------------------------
+
+Difference
+
+Liveness
+
+vs
+
+Readiness?
+
+Liveness
+
+Restarts Container
+
+Readiness
+
+Stops Traffic
+
+------------------------------------------------
+
+Difference
+
+Readiness
+
+vs
+
+Startup?
+
+Readiness
+
+Traffic Check
+
+Startup
+
+Initial Startup Check
+
+------------------------------------------------
+
+Who Collects Metrics?
+
+→ Prometheus
+
+------------------------------------------------
+
+Who Shows Dashboards?
+
+→ Grafana
+
+------------------------------------------------
+
+Who Collects Logs?
+
+→ Fluent Bit / Fluentd
+
+------------------------------------------------
+
+Purpose Of Loki?
+
+→ Store Logs
+
+------------------------------------------------
+
+Purpose Of Helm?
+
+→ Package Manager
+
+------------------------------------------------
+
+What Is Helm Chart?
+
+→ Kubernetes Package
+
+------------------------------------------------
+
+Purpose Of values.yaml?
+
+→ Store Configuration
+
+------------------------------------------------
+
+Purpose Of GitOps?
+
+→ Git Driven Deployment
+
+------------------------------------------------
+
+Popular GitOps Tool?
+
+→ ArgoCD
+
+------------------------------------------------
+
+Three Pillars Of Observability?
+
+→ Metrics
+
+→ Logs
+
+→ Traces
+
+========================================================================
+15-MINUTE REVISION
+========================================================================
+
+Liveness Probe
+
+↓
+
+Readiness Probe
+
+↓
+
+Startup Probe
+
+↓
+
+Metrics Server
+
+↓
+
+Prometheus
+
+↓
+
+Grafana
+
+↓
+
+Logging
+
+↓
+
+Fluent Bit
+
+↓
+
+Loki
+
+↓
+
+ELK Stack
+
+↓
+
+Helm
+
+↓
+
+Helm Chart
+
+↓
+
+values.yaml
+
+↓
+
+Helm Upgrade
+
+↓
+
+Helm Rollback
+
+↓
+
+GitOps
+
+↓
+
+ArgoCD
+
+↓
+
+FluxCD
+
+↓
+
+Observability
+
+↓
+
+Spring Boot Monitoring
+
+========================================================================
+END OF PART 7
+========================================================================
+
+========================================================================
+TROUBLESHOOTING METHODOLOGY
+========================================================================
+
+Step 1
+
+Check Cluster
+
+↓
+
+kubectl get nodes
+
+----------------------------------------
+
+Step 2
+
+Check Pods
+
+↓
+
+kubectl get pods -A
+
+----------------------------------------
+
+Step 3
+
+Describe Pod
+
+↓
+
+kubectl describe pod <pod>
+
+----------------------------------------
+
+Step 4
+
+Check Logs
+
+↓
+
+kubectl logs <pod>
+
+----------------------------------------
+
+Step 5
+
+Login To Container
+
+↓
+
+kubectl exec -it <pod> -- sh
+
+----------------------------------------
+
+Step 6
+
+Check Events
+
+↓
+
+kubectl get events
+
+----------------------------------------
+
+Step 7
+
+Check Service
+
+↓
+
+kubectl get svc
+
+----------------------------------------
+
+Step 8
+
+Check Deployment
+
+↓
+
+kubectl get deploy
+
+Interview One-Liner
+
+Troubleshooting
+
+→ Describe → Logs → Events
+
+========================================================================
+PENDING POD
+========================================================================
+
+Meaning
+
+Pod Not Scheduled
+
+Possible Reasons
+
+✓ No Resources
+
+✓ NodeSelector Mismatch
+
+✓ Taints
+
+✓ PVC Not Bound
+
+✓ Node Not Ready
+
+Commands
+
+kubectl describe pod <pod>
+
+kubectl get nodes
+
+Interview Question
+
+Why Is Pod Pending?
+
+Scheduler Could Not Find Suitable Node.
+
+Interview One-Liner
+
+Pending
+
+→ Scheduling Problem.
+
+========================================================================
+CRASHLOOPBACKOFF
+========================================================================
+
+Meaning
+
+Container Starts
+
+Then Crashes
+
+Continuously
+
+Reasons
+
+✓ Application Crash
+
+✓ Wrong Configuration
+
+✓ Missing Environment Variables
+
+✓ Database Connection Failure
+
+✓ Memory Issue
+
+Commands
+
+kubectl logs <pod>
+
+kubectl describe pod <pod>
+
+Interview One-Liner
+
+CrashLoopBackOff
+
+→ Continuous Container Crash.
+
+========================================================================
+IMAGEPULLBACKOFF
+========================================================================
+
+Meaning
+
+Image Cannot Be Downloaded
+
+Reasons
+
+✓ Wrong Image Name
+
+✓ Image Does Not Exist
+
+✓ Private Registry
+
+✓ Authentication Failure
+
+Solution
+
+✓ Verify Image
+
+✓ Configure ImagePullSecret
+
+Interview One-Liner
+
+ImagePullBackOff
+
+→ Image Download Failed.
+
+========================================================================
+ERRIMAGEPULL
+========================================================================
+
+Meaning
+
+Initial Image Pull Failed
+
+Reasons
+
+✓ Wrong Image Tag
+
+✓ Registry Down
+
+✓ Network Issue
+
+Interview One-Liner
+
+ErrImagePull
+
+→ First Image Pull Failed.
+
+========================================================================
+CREATECONTAINERCONFIGERROR
+========================================================================
+
+Meaning
+
+Container Configuration Error
+
+Reasons
+
+✓ Missing ConfigMap
+
+✓ Missing Secret
+
+✓ Invalid Volume
+
+✓ Wrong Environment Variable
+
+Interview One-Liner
+
+CreateContainerConfigError
+
+→ Configuration Problem.
+
+========================================================================
+FAILEDMOUNT
+========================================================================
+
+Meaning
+
+Volume Could Not Be Mounted
+
+Reasons
+
+✓ PVC Pending
+
+✓ Storage Missing
+
+✓ Wrong Volume Name
+
+✓ Permission Issue
+
+Commands
+
+kubectl describe pod
+
+kubectl get pvc
+
+Interview One-Liner
+
+FailedMount
+
+→ Storage Problem.
+
+========================================================================
+FAILEDSCHEDULING
+========================================================================
+
+Meaning
+
+Scheduler Cannot Place Pod
+
+Reasons
+
+✓ CPU Full
+
+✓ Memory Full
+
+✓ Taints
+
+✓ Node Affinity
+
+✓ Resource Requests
+
+Interview One-Liner
+
+FailedScheduling
+
+→ No Suitable Node.
+
+========================================================================
+NODE NOT READY
+========================================================================
+
+Meaning
+
+Worker Node
+
+Unavailable
+
+Reasons
+
+✓ Kubelet Down
+
+✓ Network Failure
+
+✓ Disk Pressure
+
+✓ Memory Pressure
+
+Commands
+
+kubectl get nodes
+
+kubectl describe node
+
+Interview One-Liner
+
+Node Not Ready
+
+→ Node Problem.
+
+========================================================================
+DNS ISSUES
+========================================================================
+
+Symptoms
+
+✓ Service Not Reachable
+
+✓ Unknown Host
+
+✓ Name Resolution Failure
+
+Checks
+
+kubectl get svc
+
+kubectl get pods -n kube-system
+
+Check CoreDNS
+
+Interview One-Liner
+
+DNS Issue
+
+→ Check CoreDNS.
+
+========================================================================
+EVICTED PODS
+========================================================================
+
+Meaning
+
+Pod Removed
+
+By Kubernetes
+
+Reasons
+
+✓ Memory Pressure
+
+✓ Disk Pressure
+
+✓ Node Pressure
+
+Interview One-Liner
+
+Evicted
+
+→ Resource Pressure.
+
+========================================================================
+IMPORTANT KUBECTL COMMANDS
+========================================================================
+
+Cluster
+
+kubectl cluster-info
+
+kubectl version
+
+------------------------------------------------
+
+Nodes
+
+kubectl get nodes
+
+kubectl describe node <node>
+
+------------------------------------------------
+
+Pods
+
+kubectl get pods
+
+kubectl get pods -A
+
+kubectl describe pod <pod>
+
+kubectl delete pod <pod>
+
+------------------------------------------------
+
+Logs
+
+kubectl logs <pod>
+
+kubectl logs -f <pod>
+
+------------------------------------------------
+
+Execute
+
+kubectl exec -it <pod> -- sh
+
+------------------------------------------------
+
+Deployments
+
+kubectl get deploy
+
+kubectl rollout status deployment <name>
+
+kubectl rollout history deployment <name>
+
+kubectl rollout undo deployment <name>
+
+------------------------------------------------
+
+ReplicaSets
+
+kubectl get rs
+
+------------------------------------------------
+
+Services
+
+kubectl get svc
+
+------------------------------------------------
+
+Ingress
+
+kubectl get ingress
+
+------------------------------------------------
+
+ConfigMap
+
+kubectl get cm
+
+------------------------------------------------
+
+Secrets
+
+kubectl get secret
+
+------------------------------------------------
+
+Storage
+
+kubectl get pv
+
+kubectl get pvc
+
+------------------------------------------------
+
+Events
+
+kubectl get events
+
+------------------------------------------------
+
+Metrics
+
+kubectl top nodes
+
+kubectl top pods
+
+Interview One-Liner
+
+kubectl
+
+→ Kubernetes CLI.
+
+========================================================================
+PRODUCTION BEST PRACTICES
+========================================================================
+
+✓ Always Use Deployment
+
+✓ Never Deploy Latest Tag
+
+✓ Use Resource Requests
+
+✓ Use Resource Limits
+
+✓ Configure Liveness Probe
+
+✓ Configure Readiness Probe
+
+✓ Configure Startup Probe
+
+✓ Use ConfigMap
+
+✓ Store Passwords In Secret
+
+✓ Use RBAC
+
+✓ Use Network Policy
+
+✓ Use Namespace
+
+✓ Enable Monitoring
+
+✓ Centralize Logs
+
+✓ Use Rolling Updates
+
+✓ Enable Autoscaling
+
+✓ Keep Images Small
+
+✓ Run As Non Root
+
+✓ Enable TLS
+
+✓ Use GitOps
+
+========================================================================
+SPRING BOOT DEPLOYMENT FLOW
+========================================================================
+
+Developer
+
+↓
+
+Git Push
+
+↓
+
+Jenkins / GitHub Actions
+
+↓
+
+Build JAR
+
+↓
+
+Docker Image
+
+↓
+
+Push To Registry
+
+↓
+
+Helm Upgrade
+
+↓
+
+ArgoCD Sync
+
+↓
+
+Deployment
+
+↓
+
+ReplicaSet
+
+↓
+
+Pods
+
+↓
+
+Service
+
+↓
+
+Ingress
+
+↓
+
+Users
+
+========================================================================
+SPRING BOOT + POSTGRESQL
+========================================================================
+
+Spring Boot
+
+↓
+
+Deployment
+
+↓
+
+Service
+
+↓
+
+ConfigMap
+
+↓
+
+Secret
+
+↓
+
+PostgreSQL
+
+↓
+
+Persistent Volume
+
+↓
+
+StorageClass
+
+Interview One-Liner
+
+Configuration
+
+→ ConfigMap
+
+Credentials
+
+→ Secret
+
+========================================================================
+SPRING BOOT + REDIS
+========================================================================
+
+Client
+
+↓
+
+Spring Boot
+
+↓
+
+Redis Service
+
+↓
+
+Redis Pod
+
+Purpose
+
+✓ Cache
+
+✓ Session Storage
+
+✓ Faster Response
+
+========================================================================
+SPRING BOOT + KAFKA
+========================================================================
+
+Producer API
+
+↓
+
+Kafka Service
+
+↓
+
+Kafka Broker
+
+↓
+
+Consumer
+
+↓
+
+Database
+
+Purpose
+
+✓ Asynchronous Processing
+
+✓ Event Driven Architecture
+
+========================================================================
+NGINX INGRESS
+========================================================================
+
+Internet
+
+↓
+
+NGINX Ingress
+
+↓
+
+API Service
+
+↓
+
+Auth Service
+
+↓
+
+User Service
+
+↓
+
+Order Service
+
+Benefits
+
+✓ SSL
+
+✓ Routing
+
+✓ Load Balancing
+
+========================================================================
+COMPLETE PRODUCTION ARCHITECTURE
+========================================================================
+
+Internet
+
+↓
+
+Load Balancer
+
+↓
+
+NGINX Ingress
+
+↓
+
+Spring Boot Services
+
+↓
+
+ClusterIP Services
+
+↓
+
+Pods
+
+↓
+
+PostgreSQL
+
+↓
+
+Redis
+
+↓
+
+Kafka
+
+↓
+
+Persistent Storage
+
+↓
+
+Prometheus
+
+↓
+
+Grafana
+
+↓
+
+Loki
+
+↓
+
+ArgoCD
+
+↓
+
+Helm
+
+↓
+
+Kubernetes Cluster
+
+========================================================================
+MOST ASKED INTERVIEW QUESTIONS
+========================================================================
+
+Smallest Deployable Unit?
+
+→ Pod
+
+------------------------------------------------
+
+Default Service?
+
+→ ClusterIP
+
+------------------------------------------------
+
+Default Deployment Strategy?
+
+→ Rolling Update
+
+------------------------------------------------
+
+Database Of Kubernetes?
+
+→ etcd
+
+------------------------------------------------
+
+Brain Of Kubernetes?
+
+→ Control Plane
+
+------------------------------------------------
+
+Who Starts Container?
+
+→ Kubelet
+
+------------------------------------------------
+
+Who Chooses Node?
+
+→ Scheduler
+
+------------------------------------------------
+
+Who Runs Containers?
+
+→ Container Runtime
+
+------------------------------------------------
+
+Purpose Of ReplicaSet?
+
+→ Maintain Pod Count
+
+------------------------------------------------
+
+Purpose Of Deployment?
+
+→ Manage ReplicaSets
+
+------------------------------------------------
+
+Purpose Of ConfigMap?
+
+→ Configuration
+
+------------------------------------------------
+
+Purpose Of Secret?
+
+→ Sensitive Data
+
+------------------------------------------------
+
+Purpose Of PVC?
+
+→ Request Storage
+
+------------------------------------------------
+
+Purpose Of Ingress?
+
+→ HTTP Routing
+
+------------------------------------------------
+
+Purpose Of HPA?
+
+→ Scale Pods
+
+------------------------------------------------
+
+Purpose Of Cluster Autoscaler?
+
+→ Scale Nodes
+
+------------------------------------------------
+
+Purpose Of DaemonSet?
+
+→ One Pod Per Node
+
+------------------------------------------------
+
+Purpose Of StatefulSet?
+
+→ Stateful Applications
+
+------------------------------------------------
+
+Purpose Of Helm?
+
+→ Package Manager
+
+------------------------------------------------
+
+Purpose Of ArgoCD?
+
+→ GitOps Deployment
+
+------------------------------------------------
+
+Purpose Of Prometheus?
+
+→ Metrics
+
+------------------------------------------------
+
+Purpose Of Grafana?
+
+→ Dashboards
+
+------------------------------------------------
+
+Purpose Of Loki?
+
+→ Logs
+
+------------------------------------------------
+
+Purpose Of Network Policy?
+
+→ Restrict Traffic
+
+------------------------------------------------
+
+Purpose Of RBAC?
+
+→ Authorization
+
+========================================================================
+30-MINUTE COMPLETE REVISION FLOW
+========================================================================
+
+Kubernetes
+
+↓
+
+Architecture
+
+↓
+
+Pods
+
+↓
+
+ReplicaSet
+
+↓
+
+Deployment
+
+↓
+
+Services
+
+↓
+
+Ingress
+
+↓
+
+Namespace
+
+↓
+
+ConfigMap
+
+↓
+
+Secret
+
+↓
+
+Volumes
+
+↓
+
+PV
+
+↓
+
+PVC
+
+↓
+
+StorageClass
+
+↓
+
+Scheduler
+
+↓
+
+Affinity
+
+↓
+
+Taints
+
+↓
+
+DaemonSet
+
+↓
+
+StatefulSet
+
+↓
+
+Job
+
+↓
+
+CronJob
+
+↓
+
+HPA
+
+↓
+
+Cluster Autoscaler
+
+↓
+
+Networking
+
+↓
+
+RBAC
+
+↓
+
+Security
+
+↓
+
+Probes
+
+↓
+
+Monitoring
+
+↓
+
+Logging
+
+↓
+
+Helm
+
+↓
+
+GitOps
+
+↓
+
+Troubleshooting
+
+========================================================================
+FINAL INTERVIEW TIPS
+========================================================================
+
+✓ Understand Concepts Before Commands
+
+✓ Explain Using Architecture Flow
+
+✓ Always Mention Enterprise Use Cases
+
+✓ Know Deployment Lifecycle
+
+✓ Know Pod Lifecycle
+
+✓ Know Service Types
+
+✓ Practice kubectl Commands
+
+✓ Learn Common Errors
+
+✓ Understand Monitoring Stack
+
+✓ Understand GitOps Flow
+
+✓ Focus On Troubleshooting
+
+✓ Never Memorize Without Practice
+
+========================================================================
+KUBERNETES QUICK REFERENCE
+========================================================================
+
+Pod
+
+→ Smallest Deployable Unit
+
+Deployment
+
+→ Manages Pods
+
+ReplicaSet
+
+→ Maintains Pod Count
+
+Service
+
+→ Stable Network Endpoint
+
+Ingress
+
+→ HTTP Gateway
+
+ConfigMap
+
+→ Configuration
+
+Secret
+
+→ Sensitive Data
+
+PV
+
+→ Storage
+
+PVC
+
+→ Storage Request
+
+Scheduler
+
+→ Select Node
+
+Kubelet
+
+→ Starts Pods
+
+etcd
+
+→ Database
+
+HPA
+
+→ Scale Pods
+
+Cluster Autoscaler
+
+→ Scale Nodes
+
+Helm
+
+→ Package Manager
+
+ArgoCD
+
+→ GitOps
+
+Prometheus
+
+→ Metrics
+
+Grafana
+
+→ Dashboard
+
+Loki
+
+→ Logs
+
+RBAC
+
+→ Authorization
+
+Network Policy
+
+→ Pod Firewall
+
+========================================================================
+END OF PART 8
+========================================================================
