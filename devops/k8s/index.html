@@ -216,7 +216,906 @@ body.rapid .cards{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));}
 
 <a href="#top" class="back-top" title="Back to top">↑</a>
 
-<script src="data.js"></script>
-<script src="app.js"></script>
+<script>
+// Kubernetes Interview OS — content data
+// Each group: {id, title, items:[{t,o,d,p,pn (negative points),f,qa,cmd,note,warn,err}]}
+const DATA = [
+
+{id:'fundamentals', title:'Fundamentals', items:[
+  {t:'What Is Kubernetes', o:'Container Orchestration Platform',
+    d:'Open-source container orchestration platform. Originally developed by Google, now maintained by the CNCF.',
+    p:['Deploy containers','Scale applications','Self-healing','Load balancing','Auto scaling','Zero-downtime deployment','High availability'],
+    f:'100 Spring Boot microservices → running across multiple nodes → managed automatically by Kubernetes',
+    qa:[['What is Kubernetes?','Container orchestration platform.']]},
+  {t:'Why Kubernetes', o:'Automates Deployment, Scaling & Recovery',
+    d:'Without it: manual deploy → server crash → app down. With it: Deployment → Pod → node crash → new Pod created automatically → app keeps running.',
+    p:['Self healing','Auto scaling','Load balancing','Rolling update','High availability']},
+  {t:'Container vs Virtual Machine', o:'Container starts faster',
+    d:'Containers share the host OS kernel; VMs each run a full guest OS.',
+    p:['Container: lightweight, shared host OS, fast startup, less memory, high density'],
+    pn:['VM: own guest OS, heavy, slow startup, more memory, low density'],
+    qa:[['Which starts faster?','Container.']]},
+  {t:'Docker vs Kubernetes', o:'Docker = Runtime, Kubernetes = Orchestrator',
+    d:'Docker builds & runs containers on a single host with manual scaling. Kubernetes manages/orchestrates containers across multiple nodes with auto scaling.',
+    p:['Docker: single host, manual scaling','Kubernetes: multiple nodes, auto scaling']},
+  {t:'Declarative vs Imperative', o:'Declarative = What, Imperative = How',
+    d:'Imperative tells Kubernetes how to do something (kubectl run nginx). Declarative tells it what the end state should be (kubectl apply -f deployment.yaml).',
+    p:['Declarative is preferred: GitOps, version control, production standard'],
+    cmd:['kubectl run nginx  # imperative','kubectl apply -f deployment.yaml  # declarative']}
+]},
+
+{id:'architecture', title:'Control Plane & Architecture', items:[
+  {t:'Cluster Architecture', o:'Control Plane = Brain of Kubernetes',
+    d:'Control plane (API Server, Scheduler, Controller Manager, etcd) manages the cluster; worker nodes (Kubelet, container runtime, kube-proxy) run the Pods.',
+    f:'Control Plane → Worker Node 1..N → Kubelet → Container Runtime → Pods'},
+  {t:'API Server', o:'Entry Point of Kubernetes',
+    d:'The single entry point for every request into the cluster.',
+    p:['Accepts requests','Authenticates','Authorizes','Validates','Updates etcd','Returns response'],
+    f:'kubectl → API Server → etcd → Scheduler → Node'},
+  {t:'etcd', o:'Kubernetes Database',
+    d:'Distributed key-value store that is the single source of truth for cluster state.',
+    p:['Stores Pods','Deployments','Services','ConfigMaps','Secrets','Nodes']},
+  {t:'Scheduler', o:'Chooses the Best Node',
+    d:'Selects the best worker node for a newly created Pod. It does NOT create the Pod itself.',
+    p:['Checks CPU','Memory','Taints','Affinity rules','Scheduling policies'],
+    qa:[['Does the Scheduler create Pods?','No — it only selects the node; Kubelet starts the container.']]},
+  {t:'Controller Manager', o:'Self Healing',
+    d:'Continuously watches actual state vs desired state and reconciles the difference.',
+    d2:'Example: desired replicas = 5, running = 4 → controller manager creates 1 new Pod.'},
+  {t:'Kubelet', o:'Creates & Monitors Pods',
+    d:'The node agent. Talks to the container runtime to create Pods, monitors them, and reports status back to the API Server.',
+    p:['Creates Pods','Monitors Pods','Reports status']},
+  {t:'Kube Proxy', o:'Networking Component',
+    d:'Runs on every node and handles Service networking.',
+    p:['Service discovery','Load balancing','Pod-to-Pod communication']},
+  {t:'Container Runtime', o:'Executes Containers',
+    d:'Pulls images and actually runs/stops containers on the node.',
+    p:['containerd','CRI-O','Docker (via cri-dockerd)']},
+  {t:'Pod Creation Flow', o:'kubectl apply → Pod Running',
+    d:'The full request path from a manifest to a running container.',
+    f:'kubectl apply → API Server → AuthN → AuthZ → etcd → Scheduler → Worker Node → Kubelet → Container Runtime → Pod Running'}
+]},
+
+{id:'pods', title:'Pods & Pod Patterns', items:[
+  {t:'Pods', o:'Smallest Deployable Unit',
+    d:'The smallest deployable unit in Kubernetes — encapsulates one or more containers with a shared network, storage, and lifecycle.',
+    p:['Gets its own IP address','Can have multiple containers','Ephemeral (replaceable)','Usually one main application per Pod','Managed by a Deployment, never created directly in production'],
+    f:'Deployment → ReplicaSet → Pod → Container',
+    cmd:['kubectl get pods','kubectl describe pod <pod-name>','kubectl logs <pod-name>','kubectl exec -it <pod-name> -- sh','kubectl delete pod <pod-name>'],
+    qa:[['Can a Pod have multiple containers?','Yes.'],['Does every Pod get its own IP?','Yes.'],['Can we create Pods directly in production?','No — use a Deployment.']]},
+  {t:'Pod Lifecycle', o:'Pending → Running → Succeeded/Failed',
+    d:'The state a Pod moves through from creation to termination.',
+    f:'Pending → ContainerCreating → Running → Succeeded/Failed → Terminating',
+    qa:[['What happens if the node dies?','The Pod is recreated on another healthy node (by the owning controller).']]},
+  {t:'Pod Phases', o:'Pending · Running · Succeeded · Failed · Unknown',
+    d:'Pending: accepted but resources not ready. Running: app running. Succeeded: completed successfully. Failed: app failed. Unknown: node communication lost.'},
+  {t:'Restart Policy', o:'Default is Always',
+    d:'Always (default, used by Deployments) — restarts on any exit. OnFailure — restarts only on failure, used in Jobs. Never — run once.',
+    qa:[['Default restart policy?','Always.']]},
+  {t:'Multi-Container Pod', o:'Shared Network, Storage, Lifecycle',
+    d:'One Pod running multiple containers that need tight coupling — e.g. Spring Boot + Fluentd, or Nginx + PHP.',
+    p:['Tight communication','Same lifecycle']},
+  {t:'Init Container', o:'Runs First, Before the Main Container',
+    d:'Runs and must complete before the main application container starts.',
+    p:['Download config','Run DB migration','Wait for a dependency'],
+    f:'Init Container → Completed → Application Starts',
+    qa:[['Can the main container start before the init container?','No.']]},
+  {t:'Sidecar Container', o:'Supports the Main Container',
+    d:'A helper container running alongside the main one for the Pod\'s whole lifetime.',
+    p:['Log collection','Monitoring','Proxy','Metrics'],
+    d2:'Enterprise: Spring Boot + Fluent Bit + Prometheus Exporter.'},
+  {t:'Ambassador Container', o:'Proxy Pattern',
+    d:'Acts as a proxy between the application and an external service.',
+    f:'Application → Ambassador → Database'},
+  {t:'Adapter Container', o:'Data Transformation',
+    d:'Transforms application output into a format another tool expects.',
+    f:'Application Logs → Adapter → Monitoring Tool'},
+  {t:'Ephemeral Container', o:'Temporary Debug Container',
+    d:'Injected into a running Pod temporarily for troubleshooting/production investigation — not part of the Pod spec.',
+    qa:[['Used for?','Debugging a running Pod without restarting it.']]},
+  {t:'Static Pod', o:'Managed Directly by Kubelet',
+    d:'Managed directly by the Kubelet on a node (not by the API Server). Defined in /etc/kubernetes/manifests. Used for control plane components themselves.'},
+  {t:'Mirror Pod', o:'Read-Only View of a Static Pod',
+    d:'The API Server\'s read-only representation of a Static Pod — visible via kubectl, but cannot be modified through the API.'},
+  {t:'Pod QoS (Quality of Service)', o:'Guaranteed is the Best QoS',
+    d:'Guaranteed: requests = limits, highest priority (least likely to be evicted). Burstable: requests < limits. BestEffort: no requests/limits set, lowest priority — evicted first.',
+    qa:[['Which QoS is best?','Guaranteed.']]}
+]},
+
+{id:'controllers', title:'Labels, Selectors & Workload Controllers', items:[
+  {t:'Labels', o:'Resource Identification',
+    d:'Key-value pairs attached to objects for grouping, selecting, and organizing resources.',
+    f:'app=certifyhub · env=prod · version=v2',
+    qa:[['Can two Pods share the same label?','Yes.']]},
+  {t:'Selectors', o:'Finds Resources by Label',
+    d:'Used by Services/Deployments/etc. to find matching objects via their labels.',
+    p:['Equality-based (app=certifyhub)','Set-based (env in (dev,test,prod))']},
+  {t:'MatchLabels', o:'Exact Match',
+    d:'Simple exact-match label selection, e.g. app=certifyhub.'},
+  {t:'MatchExpressions', o:'Advanced Filtering',
+    d:'Set-based selector supporting operators.',
+    p:['In','NotIn','Exists','DoesNotExist'],
+    f:'env In (dev, test, prod)'},
+  {t:'Annotations', o:'Extra Metadata (Not for Selection)',
+    d:'Metadata attached to objects that is NOT used for selecting resources — purely informational.',
+    p:['Documentation','Build information','Owner','Release details'],
+    d2:'Labels → selection. Annotations → information.'},
+  {t:'ReplicaSet', o:'Maintains Desired Pod Count',
+    d:'Ensures a specified number of identical Pods are running at all times — self-healing at the Pod-count level.',
+    f:'ReplicaSet → Pod deleted → new Pod created',
+    d2:'Example: desired = 5, running = 4 → ReplicaSet creates 1 new Pod.',
+    qa:[['If one Pod dies?','The ReplicaSet creates a new one.']]},
+  {t:'Deployment', o:'Manages ReplicaSets',
+    d:'The standard way to run stateless workloads. Manages ReplicaSets, which in turn manage Pods.',
+    p:['Deploy Pods','Rolling update','Rollback','Scaling'],
+    f:'Deployment → ReplicaSet → Pods',
+    cmd:['kubectl get deployments','kubectl describe deployment <name>','kubectl rollout status deployment <name>','kubectl rollout history deployment <name>','kubectl rollout undo deployment <name>','kubectl scale deployment <name> --replicas=5'],
+    qa:[['Deployment vs ReplicaSet?','Deployment manages ReplicaSets; ReplicaSet manages Pods.'],['Can a Deployment rollback?','Yes.'],['Can it do rolling updates?','Yes.']],
+    d3:'Enterprise: Spring Boot v1 → deploy v2 → users keep using the app → zero downtime.'},
+  {t:'Deployment Strategies', o:'Rolling Update is the Default',
+    d:'Rolling Update (default): zero downtime, gradual replacement. Recreate: deletes old Pods before creating new ones — causes downtime.'},
+  {t:'Rolling Update', o:'Gradual Deployment',
+    d:'New Pods are created, traffic is shifted to them, then old Pods are removed — zero downtime with easy rollback.',
+    f:'Old Pods → new Pods created → traffic shifted → old Pods removed'},
+  {t:'Rollback', o:'Restore Previous Stable Version',
+    d:'Reverts a Deployment to a previous revision.',
+    cmd:['kubectl rollout undo deployment <name>']},
+  {t:'Pause & Resume', o:'Batch Multiple Changes Into One Rollout',
+    d:'Pause stops a Deployment from rolling out further changes; resume continues it — useful for batching several config edits into a single rollout.',
+    cmd:['kubectl rollout pause deployment <name>','kubectl rollout resume deployment <name>']},
+  {t:'Revision History', o:'Track, Rollback, Audit',
+    d:'Every Deployment change creates a new revision, enabling tracking, rollback, and audit.',
+    cmd:['kubectl rollout history deployment <name>']}
+]},
+
+{id:'services', title:'Services & Cluster Networking Basics', items:[
+  {t:'Services', o:'Stable Endpoint for Pods',
+    d:'Pods are ephemeral — their IPs change constantly. A Service gives them a stable network identity and load-balances across the matching Pods.',
+    p:['Stable IP','Load balancing','Service discovery','Loose coupling'],
+    f:'Client → Service → Pod 1 / Pod 2 / Pod 3',
+    cmd:['kubectl get svc','kubectl describe svc <service-name>','kubectl expose deployment nginx --port=80'],
+    qa:[['Why do we need a Service?','Pods are ephemeral; the Service provides stable access.'],['Does a Service create Pods?','No — the Deployment creates Pods.'],['Does a Service have its own IP?','Yes, called the Cluster IP.']],
+    d2:'Enterprise: Spring Boot Pods scale from 3 → 10; the frontend keeps using the same Service URL.'},
+  {t:'Service Types Overview', o:'ClusterIP → NodePort → LoadBalancer → ExternalName → Headless',
+    d:'Each type builds on the previous in terms of exposure: internal-only, all the way to fully external.'},
+  {t:'ClusterIP', o:'Internal Communication',
+    d:'Default Service type. Accessible only inside the cluster.',
+    p:['Microservices communication','Backend APIs','Internal databases'],
+    qa:[['Default Service type?','ClusterIP.']]},
+  {t:'NodePort', o:'External Access Through a Node',
+    d:'Exposes the app on a static port (30000–32767) on every node.',
+    f:'Browser → NodeIP:NodePort → Service → Pods',
+    p:['Development','Testing','Small clusters'],
+    qa:[['Can NodePort be reached outside the cluster?','Yes.']]},
+  {t:'LoadBalancer', o:'Internet-Facing Service',
+    d:'Provisions a cloud load balancer (AWS/Azure/GCP) in front of the Service.',
+    f:'Internet → Cloud Load Balancer → Service → Pods',
+    p:['Public access','High availability','Automatic distribution'],
+    d2:'Enterprise: Spring Boot API → AWS Load Balancer → Kubernetes Service → Pods.'},
+  {t:'ExternalName', o:'External DNS Mapping',
+    d:'Maps a Kubernetes Service to an external DNS name (e.g. database.company.com) without hardcoding it in app code.'},
+  {t:'Headless Service', o:'No Cluster IP',
+    d:'Set clusterIP: None — DNS returns the Pod IPs directly instead of a virtual IP. Used by StatefulSets, databases, Kafka, Cassandra.',
+    f:'Client → DNS → Pod IP',
+    qa:[['Why use a headless Service?','For direct Pod-to-Pod communication/addressing.']]},
+  {t:'Endpoint', o:'Pod Address List',
+    d:'Stores the actual Pod IPs behind a Service; the Service uses this to route traffic.',
+    f:'Service → Endpoint → Pods'},
+  {t:'EndpointSlice', o:'Optimized Endpoint',
+    d:'A more scalable version of Endpoints for large clusters.',
+    p:['Better performance','Efficient updates at scale']},
+  {t:'Service Discovery', o:'Automatic Service Lookup',
+    d:'Pods find other Services automatically via DNS or environment variables.',
+    f:'user-service.default.svc.cluster.local',
+    qa:[['How do Pods find other Services?','Using DNS.']]},
+  {t:'Kubernetes DNS (CoreDNS)', o:'Internal DNS Resolver',
+    d:'Internal DNS server (usually CoreDNS) that resolves Service names to IPs.',
+    f:'Application → DNS → Service → Pods',
+    qa:[['Default DNS component?','CoreDNS.']]},
+  {t:'Ingress', o:'HTTP Gateway',
+    d:'A single HTTP/HTTPS entry point routing to multiple Services — avoids needing a separate LoadBalancer per Service.',
+    p:['Single entry point','SSL termination','Host routing','Path routing','Cost saving'],
+    f:'Internet → Ingress → Service A / B / C',
+    d2:'Enterprise: api.company.com → Spring Boot API, admin.company.com → Admin Service.',
+    qa:[['Why use Ingress?','One load balancer serving multiple Services.']]},
+  {t:'Ingress Controller', o:'Executes Ingress Rules',
+    d:'Ingress objects are just rules — an Ingress Controller (NGINX, Traefik, HAProxy, AWS ALB Controller) actually implements them.',
+    qa:[['Can Ingress work without a controller?','No.']]},
+  {t:'Host-Based Routing', o:'Route by Domain Name',
+    d:'api.company.com → API Service, admin.company.com → Admin Service.'},
+  {t:'Path-Based Routing', o:'Route by URL Path',
+    d:'/api → API Service, /users → User Service, /orders → Order Service.'},
+  {t:'TLS / SSL on Ingress', o:'Secure Traffic',
+    d:'Certificate stored as a Secret; SSL is terminated at the Ingress Controller.',
+    f:'Browser → HTTPS → Ingress → Service → Pods',
+    qa:[['Where is SSL terminated?','At the Ingress Controller.']]},
+  {t:'Namespace', o:'Logical Isolation',
+    d:'A logical partition inside a cluster for isolation, organization, and security.',
+    p:['default','kube-system','kube-public','kube-node-lease'],
+    d2:'Enterprise: dev → QA → UAT → Production, each in its own namespace.',
+    cmd:['kubectl get namespaces','kubectl create namespace dev','kubectl config set-context --current --namespace=dev'],
+    qa:[['Can two namespaces have a Pod with the same name?','Yes.']]},
+  {t:'ResourceQuota', o:'Namespace-Level Limits',
+    d:'Limits total resource usage (CPU, memory, Pods, Services, PVCs) per namespace.',
+    p:['Prevents resource abuse','Enables fair sharing']},
+  {t:'LimitRange', o:'Container-Level Default Limits',
+    d:'Sets default CPU/memory requests & limits for containers that don\'t specify their own.',
+    qa:[['ResourceQuota vs LimitRange?','ResourceQuota caps the namespace total; LimitRange sets per-container defaults.']]}
+]},
+
+{id:'networking', title:'CNI, Network Policy & Service Mesh', items:[
+  {t:'Container Network Interface (CNI)', o:'Provides Pod Networking',
+    d:'The plugin responsible for assigning Pod IPs and enabling Pod-to-Pod communication.',
+    p:['Calico','Flannel','Cilium','Weave Net','Canal'],
+    f:'Pod created → CNI assigns IP → Pod communicates',
+    qa:[['Can Pods communicate without a CNI?','No.']]},
+  {t:'Overlay Network', o:'Connects Pods Across Nodes',
+    d:'A virtual network connecting Pods running on different nodes transparently.',
+    f:'Pod A (Node 1) → Overlay Network → Pod B (Node 2)'},
+  {t:'Network Policy', o:'Firewall for Pods',
+    d:'Controls which Pods can talk to which. By default all traffic is allowed; a NetworkPolicy restricts ingress/egress. Requires CNI support (e.g. Calico/Cilium).',
+    f:'Frontend → allowed → Backend  |  Database → blocked → Frontend',
+    qa:[['Does it work without CNI support?','No — the CNI plugin must implement NetworkPolicy enforcement.']]},
+  {t:'Ingress vs Egress (traffic)', o:'Ingress = In, Egress = Out',
+    d:'Ingress: incoming traffic to a Pod. Egress: outgoing traffic from a Pod. (Not to be confused with the Ingress *resource*.)'},
+  {t:'Service Mesh', o:'Smart Networking Layer',
+    d:'An infrastructure layer (Istio, Linkerd, Consul Connect) managing service-to-service communication without app code changes.',
+    p:['Traffic management','mTLS/security','Retries','Circuit breaking','Observability'],
+    f:'Service A → Sidecar Proxy → Sidecar Proxy → Service B',
+    qa:[['Does the app need code changes?','No.']]},
+  {t:'Sidecar Proxy', o:'Controls Network Traffic',
+    d:'A proxy container (Envoy, Linkerd-proxy) injected alongside the app to handle routing, TLS, metrics, and retries — the mechanism behind a service mesh.'}
+]},
+
+{id:'config-storage', title:'Config, Secrets & Storage', items:[
+  {t:'ConfigMap', o:'Non-Sensitive Configuration',
+    d:'Stores non-sensitive config data separately from application code — no rebuild needed to change it.',
+    p:['application.properties / .yml','URLs','Feature flags','Environment variables'],
+    f:'ConfigMap → Pod → application reads configuration',
+    cmd:['kubectl get configmap','kubectl describe configmap <name>','kubectl create configmap app-config --from-file=application.properties','kubectl edit configmap <name>'],
+    qa:[['Does ConfigMap require an app rebuild?','No.']]},
+  {t:'Secret', o:'Sensitive Configuration',
+    d:'Stores sensitive data such as DB passwords, API keys, JWT secrets, SSL certs, OAuth credentials.',
+    f:'Secret → Pod → Application',
+    cmd:['kubectl get secrets','kubectl describe secret <name>','kubectl create secret generic db-secret --from-literal=username=admin --from-literal=password=pass123'],
+    qa:[['ConfigMap vs Secret?','ConfigMap = non-sensitive; Secret = sensitive.'],['Is a Secret encrypted?','By default it is only base64-encoded, not encrypted — enable encryption-at-rest for real protection.']],
+    d2:'Enterprise: Spring Boot reads DB username, DB password, and JWT secret from a Kubernetes Secret.',
+    note:'Base64 is an encoding, not encryption — treat Secrets as sensitive but not "secure at rest" unless etcd encryption is explicitly enabled.'},
+  {t:'Secret Types', o:'Opaque is the Default',
+    d:'Opaque (generic, default). kubernetes.io/tls (TLS certs). kubernetes.io/dockerconfigjson (registry credentials). kubernetes.io/service-account-token.'},
+  {t:'ConfigMap / Secret as Env Vars', o:'Injected as Environment Variables',
+    d:'Both can be projected into a container as environment variables — e.g. DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, JWT_SECRET.'},
+  {t:'ConfigMap / Secret as Volume', o:'Mounted as Files',
+    d:'Mount configuration or sensitive data as files inside the container — used for application.properties, nginx.conf, logback.xml, SSL certs, private keys, API tokens.'},
+  {t:'Downward API', o:'Exposes Pod Metadata',
+    d:'Lets an application read its own Pod metadata (name, namespace, labels, node name, Pod IP) without hardcoding it.',
+    qa:[['Can an app know its own Pod name?','Yes, via the Downward API.']]},
+  {t:'Volumes', o:'Pod Storage',
+    d:'Storage attached to a Pod so data can persist beyond a single container restart.',
+    p:['emptyDir','hostPath','Persistent Volume','Persistent Volume Claim','ConfigMap / Secret as volume']},
+  {t:'emptyDir', o:'Temporary Storage',
+    d:'Created when the Pod starts, deleted when the Pod ends. Good for cache, temp files, or sharing data between containers in the same Pod.',
+    qa:[['Does data survive Pod deletion?','No.']]},
+  {t:'hostPath', o:'Node Storage',
+    d:'Mounts a path from the node\'s own filesystem into the Pod.',
+    p:['Development, testing, log access'],
+    pn:['Node dependency','Not portable']},
+  {t:'Persistent Volume (PV)', o:'Actual Storage',
+    d:'A cluster storage resource, usually created by an administrator or dynamic provisioner (AWS EBS, Azure Disk, GCP PD, NFS, SAN).',
+    qa:[['Who creates a PV?','An administrator, or a dynamic provisioner via StorageClass.']]},
+  {t:'Persistent Volume Claim (PVC)', o:'Storage Request',
+    d:'A request for storage made by a Pod/developer — decouples the app from storage details.',
+    f:'Application → PVC → PV → Storage',
+    qa:[['Who uses a PVC?','Pods (via their spec).']]},
+  {t:'PV vs PVC', o:'PV = Storage, PVC = Storage Request',
+    d:'PV: actual storage, created by an administrator. PVC: a request for storage, created by a developer.'},
+  {t:'StorageClass', o:'Automatic Storage Provisioning',
+    d:'A blueprint for dynamically creating PVs on demand instead of an admin pre-creating them.',
+    f:'PVC → StorageClass → PV created → Pod uses storage',
+    qa:[['Why StorageClass?','Automatic volume creation — no manual PV pre-provisioning.']]},
+  {t:'Dynamic Provisioning', o:'Automatic PV Creation',
+    d:'Without StorageClass: admin creates PV → dev creates PVC → bind. With StorageClass: dev creates PVC → StorageClass → PV created automatically → app starts.'},
+  {t:'CSI (Container Storage Interface)', o:'Standard Storage Interface',
+    d:'A vendor-neutral standard interface for storage providers to plug into Kubernetes.',
+    p:['AWS EBS CSI','Azure Disk CSI','GCP PD CSI','Ceph CSI','NFS CSI']},
+  {t:'Access Modes', o:'ReadWriteOnce is Most Common',
+    d:'ReadWriteOnce (RWO): one node, read-write. ReadOnlyMany (ROX): many nodes, read-only. ReadWriteMany (RWX): many nodes, read-write. ReadWriteOncePod (RWOP): a single Pod only.'},
+  {t:'Volume Modes', o:'Filesystem is the Default',
+    d:'Filesystem (default): mounted as a directory. Block: raw block device.'}
+]},
+
+{id:'scheduling', title:'Scheduling Controls', items:[
+  {t:'Scheduler (Deep Dive)', o:'Chooses the Best Worker Node',
+    d:'Decides which node a Pod runs on. Never creates Pods itself — that\'s Kubelet\'s job.',
+    p:['Checks CPU, memory, node status','Taints & tolerations','Affinity rules','Resource requests'],
+    f:'Pod created → Scheduler → best node selected → Kubelet → Pod running',
+    qa:[['Who starts the container?','Kubelet.']]},
+  {t:'NodeSelector', o:'Basic Node Selection',
+    d:'The simplest way to pin a Pod to nodes matching a label, e.g. disk=ssd or region=india.',
+    p:['GPU nodes','SSD nodes','High-memory nodes']},
+  {t:'Node Affinity', o:'Advanced Node Selection',
+    d:'A more expressive version of NodeSelector.',
+    p:['requiredDuringScheduling — Pod must run on a matching node','preferredDuringScheduling — tries to match, otherwise still schedules']},
+  {t:'Pod Affinity', o:'Keep Related Pods Together',
+    d:'Schedules Pods onto the same node as other specified Pods for lower latency.',
+    f:'API Pod + Cache Pod → same node',
+    d2:'Enterprise: Spring Boot API and Redis placed together for faster communication.'},
+  {t:'Pod Anti-Affinity', o:'Spread Pods Across Nodes',
+    d:'Keeps similar Pods (e.g. replicas) apart for fault tolerance / high availability.',
+    f:'Replica 1 → Node A, Replica 2 → Node B',
+    qa:[['Why anti-affinity?','Avoid all replicas going down with a single node failure.']]},
+  {t:'Taints', o:'Block Pods From a Node',
+    d:'A node-side rule saying "don\'t schedule here" unless a Pod tolerates it.',
+    cmd:['kubectl taint nodes node1 gpu=true:NoSchedule'],
+    p:['Effects: NoSchedule, PreferNoSchedule, NoExecute']},
+  {t:'Tolerations', o:'Permission to Run on a Tainted Node',
+    d:'A Pod-side declaration allowing it to be scheduled onto a node with a matching taint.',
+    f:'Node has Taint → Pod has matching Toleration → Pod scheduled',
+    qa:[['Taint vs Toleration?','Taint blocks; Toleration allows.']]},
+  {t:'PriorityClass', o:'Pod Priority',
+    d:'Assigns scheduling priority so critical Pods (monitoring, database, API gateway) are scheduled — and preempt others — first.'},
+  {t:'Topology Spread Constraints', o:'Balanced Distribution',
+    d:'Spreads Pods evenly across zones/nodes for high availability and even load, e.g. 3 Pods → 3 different nodes.'}
+]},
+
+{id:'workloads', title:'Workload Types & Scaling', items:[
+  {t:'Workloads Overview', o:'Deployment / StatefulSet / DaemonSet / Job / CronJob',
+    d:'Deployment → ReplicaSet → Pod (stateless). StatefulSet → stateful Pods. DaemonSet → one Pod per node. Job → run once. CronJob → scheduled job.'},
+  {t:'StatefulSet', o:'Stateful Applications',
+    d:'Manages Pods that need stable identity and storage — MySQL, PostgreSQL, MongoDB, Kafka, Elasticsearch.',
+    p:['Stable Pod name','Stable storage','Ordered deployment & deletion'],
+    f:'mysql-0, mysql-1, mysql-2',
+    qa:[['Deployment vs StatefulSet?','Deployment = stateless; StatefulSet = stateful.']]},
+  {t:'DaemonSet', o:'One Pod on Every Node',
+    d:'Ensures a copy of a Pod runs on every (or every matching) node — e.g. Fluentd, Prometheus Node Exporter, security/monitoring agents.',
+    f:'Node added → DaemonSet → Pod created',
+    qa:[['Why DaemonSet?','You need exactly one Pod per node.']]},
+  {t:'Job', o:'One-Time Execution',
+    d:'Runs a task to completion exactly once — DB migration, backup, report generation, batch processing.',
+    f:'Job → Pod → Completed'},
+  {t:'CronJob', o:'Scheduled Job',
+    d:'Runs Jobs on a schedule — nightly backup, cleanup, monthly report, data sync.',
+    f:'Schedule (e.g. midnight) → CronJob → Job → Completed',
+    qa:[['Job vs CronJob?','Job runs once; CronJob runs repeatedly on a schedule.']]},
+  {t:'Deployment vs StatefulSet', o:'Stateless vs Stateful',
+    d:'Deployment: stateless, random Pod names, shared/no dedicated storage, parallel deployment (e.g. Spring Boot REST API). StatefulSet: stateful, fixed Pod names, dedicated storage, ordered deployment (e.g. MongoDB, Kafka, MySQL).'},
+  {t:'Scaling', o:'Increase or Decrease Pods',
+    d:'Manual scaling via kubectl, or automatic via the Horizontal Pod Autoscaler.',
+    cmd:['kubectl scale deployment app --replicas=5']},
+  {t:'Horizontal Pod Autoscaler (HPA)', o:'Auto-Scale Pods',
+    d:'Automatically changes Pod *count* based on CPU/memory/custom metrics. Does not add nodes.',
+    f:'High CPU → HPA → more Pods → load balanced',
+    cmd:['kubectl autoscale deployment app --cpu-percent=70 --min=2 --max=10'],
+    qa:[['Does HPA add nodes?','No — it adds Pods.']]},
+  {t:'Vertical Pod Autoscaler (VPA)', o:'Auto-Resize Pods',
+    d:'Adjusts CPU/memory *requests and limits* of existing Pods based on observed usage.',
+    qa:[['HPA vs VPA?','HPA changes Pod count; VPA changes Pod resource sizing.']]},
+  {t:'Cluster Autoscaler', o:'Auto-Scale Nodes',
+    d:'Adds or removes worker nodes when Pods are pending due to insufficient cluster capacity.',
+    f:'Pods pending → no resources → Cluster Autoscaler → new node added',
+    qa:[['HPA vs Cluster Autoscaler?','HPA adds Pods; Cluster Autoscaler adds nodes.']]},
+  {t:'Metrics Server', o:'CPU & Memory Metrics',
+    d:'Collects resource metrics used by HPA and kubectl top.',
+    cmd:['kubectl top nodes','kubectl top pods'],
+    d2:'Enterprise scaling chain: 6 Pods → CPU hits 80% → HPA scales to 12 Pods → cluster full → Cluster Autoscaler adds a node → app continues smoothly.'}
+]},
+
+{id:'security', title:'Security & RBAC', items:[
+  {t:'RBAC', o:'Authorization Mechanism',
+    d:'Role-Based Access Control — restricts what authenticated users/apps are allowed to do.',
+    f:'Authentication → Authorization → RBAC → access granted',
+    p:['Least privilege','Fine-grained access'],
+    qa:[['Why RBAC?','To restrict access to only what\'s needed.']]},
+  {t:'Role', o:'Namespace-Scoped Permissions',
+    d:'Grants permissions (e.g. read Pods, cannot delete Deployments) within a single namespace.'},
+  {t:'ClusterRole', o:'Cluster-Wide Permissions',
+    d:'Grants permissions across the entire cluster — nodes, namespaces, cluster-scoped resources.',
+    qa:[['Role vs ClusterRole?','Role is namespace-scoped; ClusterRole is cluster-wide.']]},
+  {t:'RoleBinding', o:'Assign a Namespace Role',
+    d:'Binds a Role to a user/group/ServiceAccount within a namespace.',
+    f:'User → RoleBinding → Role → permission'},
+  {t:'ClusterRoleBinding', o:'Assign Cluster-Wide Permissions',
+    d:'Binds a ClusterRole to a subject across the whole cluster.',
+    f:'User → ClusterRoleBinding → ClusterRole → cluster access',
+    qa:[['RoleBinding vs ClusterRoleBinding?','RoleBinding is namespace-scoped; ClusterRoleBinding is cluster-wide.']]},
+  {t:'Service Account', o:'Pod Identity (Not a Human)',
+    d:'An identity applications (Pods) use to talk to the Kubernetes API — every namespace has a default one.',
+    d2:'Enterprise: a Spring Boot Pod uses its Service Account to read a ConfigMap.',
+    qa:[['User vs Service Account?','User = human; Service Account = application.']]},
+  {t:'Security Context', o:'Container Security Rules',
+    d:'Controls user ID, group ID, privilege level, filesystem read-only mode, and Linux capabilities for a Pod/container.',
+    p:['Run as non-root','Disable privileged mode','Read-only root filesystem']},
+  {t:'Image Pull Policy', o:'Controls Image Download',
+    d:'Always: always pull. IfNotPresent (default, except for the ":latest" tag): pull only if missing locally. Never: use local image only.',
+    qa:[['Default image pull policy?','IfNotPresent — except images tagged :latest, which default to Always.']]},
+  {t:'Image Pull Secrets', o:'Private Registry Credentials',
+    d:'Credentials for pulling images from a private registry (Docker Hub private repo, AWS ECR, Azure ACR, GCR).',
+    f:'Pod → ImagePullSecret → private registry → image downloaded'},
+  {t:'Admission Controllers', o:'Request Validation',
+    d:'Intercept requests after authN/authZ but before the object is persisted — used for validation, mutation, and security policy.',
+    f:'kubectl apply → API Server → Admission Controller → object created',
+    p:['NamespaceLifecycle','LimitRanger','ResourceQuota','PodSecurity'],
+    qa:[['When do they run?','Before the object is stored in etcd.']]},
+  {t:'Resource Requests', o:'Minimum Resources',
+    d:'The minimum CPU/memory a container needs — the Scheduler uses this for placement decisions (e.g. CPU: 500m, Memory: 512Mi).'},
+  {t:'Resource Limits', o:'Maximum Resources',
+    d:'The maximum CPU/memory a container may use (e.g. CPU: 1 core, Memory: 1Gi) — prevents one container starving others.',
+    qa:[['Requests vs Limits?','Requests = minimum guaranteed; Limits = maximum allowed.']]},
+  {t:'Quality of Service (QoS) Classes', o:'Guaranteed is Best',
+    d:'Guaranteed (requests = limits, highest priority) → Burstable (requests < limits) → BestEffort (no requests/limits, lowest priority, evicted first).'},
+  {t:'OOMKilled', o:'Memory Limit Exceeded',
+    d:'The container was killed because it exceeded its memory limit.',
+    p:['Symptom: restart loop, Exit Code 137'],
+    d2:'Fix: raise the memory limit or optimize the application\'s memory footprint.',
+    qa:[['What is exit code 137?','OOMKilled.']],
+    warn:true},
+  {t:'Node Eviction', o:'Pods Removed Under Resource Pressure',
+    d:'Kubelet removes Pods when the node is under memory, disk, or PID pressure.',
+    f:'Node under pressure → Eviction Manager → Pod removed',
+    warn:true},
+  {t:'Pod Security Standards', o:'Restricted is Production Standard',
+    d:'Privileged (least secure) → Baseline (recommended minimum) → Restricted (most secure, production standard).'}
+]},
+
+{id:'probes', title:'Health Probes', items:[
+  {t:'Liveness Probe', o:'Checks If the App Is Alive',
+    d:'Restarts the container if the application has hung. Types: HTTP, TCP, Exec/Command.',
+    f:'App → Liveness Probe → success → keep running  |  failure → container restarted',
+    qa:[['What happens if it fails?','The container is restarted.'],['Does liveness check readiness too?','No — they are independent checks.']]},
+  {t:'Readiness Probe', o:'Controls Traffic',
+    d:'Checks whether the app is ready to accept traffic; prevents traffic until it is.',
+    f:'App starting → Readiness Probe → not ready → no traffic → ready → traffic starts',
+    qa:[['What happens if it fails?','The Pod is removed from Service endpoints. The container is NOT restarted.']]},
+  {t:'Startup Probe', o:'Startup Validation',
+    d:'Checks whether a slow-starting app has finished starting, before liveness/readiness kick in — prevents false restarts on slow boot.',
+    f:'App starts → Startup Probe → success → Liveness starts → Readiness starts',
+    d2:'Enterprise: Spring Boot takes 60s to start; a Startup Probe prevents a premature Liveness failure.',
+    qa:[['When should you use it?','For applications that take a long time to start.']]},
+  {t:'Probe Comparison', o:'Liveness→Restart · Readiness→Traffic · Startup→Initial Check',
+    d:'Liveness: is it alive? Failure → restart container. Readiness: ready for traffic? Failure → removed from Service. Startup: has it started? Failure → keep waiting before other probes run.'}
+]},
+
+{id:'observability', title:'Monitoring, Logging & Observability', items:[
+  {t:'Prometheus', o:'Metrics Monitoring',
+    d:'A monitoring system that scrapes and stores metrics from Kubernetes and applications — CPU, memory, JVM metrics, HTTP requests, DB metrics.',
+    f:'Application → /actuator/prometheus → Prometheus → metrics stored'},
+  {t:'Grafana', o:'Visualization Dashboard',
+    d:'Visualization tool for dashboards, alerts, and graphs — reads from Prometheus, Loki, Elasticsearch, etc.',
+    d2:'Enterprise: Spring Boot → Prometheus → Grafana dashboard showing CPU, memory, requests, errors.'},
+  {t:'Prometheus + Grafana Flow', o:'Prometheus Collects, Grafana Displays',
+    d:'The standard Spring Boot metrics pipeline.',
+    f:'Spring Boot → Micrometer → Actuator → Prometheus → Grafana → Dashboard'},
+  {t:'Logging', o:'Centralized Logs',
+    d:'Storing, searching, and analyzing logs across the cluster.',
+    p:['ELK Stack','EFK Stack','Loki','Splunk']},
+  {t:'Fluentd / Fluent Bit', o:'Collects Logs',
+    d:'A log collector that runs on every node and forwards logs onward.',
+    f:'Application logs → Fluent Bit → Elasticsearch → Kibana'},
+  {t:'Loki', o:'Log Storage',
+    d:'A lightweight, fast log aggregation system built by Grafana Labs, designed to pair with Grafana.'},
+  {t:'ELK Stack', o:'Logging Stack',
+    d:'Elasticsearch (stores logs) + Logstash (processes logs) + Kibana (visualizes logs).',
+    f:'Application → Logstash → Elasticsearch → Kibana'},
+  {t:'Observability — Three Pillars', o:'Metrics + Logs + Traces',
+    d:'Metrics → Prometheus. Logs → Loki / ELK. Traces → Jaeger / Zipkin.'},
+  {t:'Spring Boot Production Monitoring', o:'Actuator → Micrometer → Prometheus → Grafana → Alerts',
+    d:'The end-to-end monitoring chain for a Spring Boot app on Kubernetes.',
+    p:['Health monitoring','JVM metrics','API metrics','Memory monitoring','Error tracking']}
+]},
+
+{id:'helm-gitops', title:'Helm & GitOps', items:[
+  {t:'Helm', o:'Package Manager for Kubernetes',
+    d:'Installs applications using reusable, versioned Charts (Prometheus, Grafana, NGINX, Jenkins, etc).',
+    cmd:['helm repo add','helm install','helm upgrade','helm uninstall'],
+    qa:[['What is a Chart?','An application template/package.']]},
+  {t:'Helm Chart', o:'Kubernetes Package',
+    d:'A collection of Kubernetes YAML templates (Deployment, Service, ConfigMap, Secret, Ingress) bundled together.',
+    p:['Chart.yaml','values.yaml','templates/','charts/']},
+  {t:'values.yaml', o:'Configuration File',
+    d:'Stores configurable values for a chart — image name, replica count, CPU/memory, port — for easy per-environment customization.'},
+  {t:'Helm Upgrade', o:'Update a Release',
+    d:'Upgrades an installed release without recreating it from scratch.',
+    cmd:['helm upgrade']},
+  {t:'Helm Rollback', o:'Restore a Previous Release',
+    d:'Rolls a release back to a previous version for quick, safe recovery.',
+    cmd:['helm rollback']},
+  {t:'GitOps', o:'Git-Driven Deployment',
+    d:'Git becomes the single source of truth for what should be running in the cluster.',
+    f:'Developer → git push → Git repository → ArgoCD → Kubernetes cluster',
+    p:['Automation','Audit trail','Version control','Rollback']},
+  {t:'ArgoCD', o:'GitOps Deployment Tool',
+    d:'Continuously syncs the Git repo with the cluster state, detects drift, and reports health.',
+    f:'Git → ArgoCD → Cluster → Deployment',
+    qa:[['What is drift detection?','Detecting a difference between what\'s in Git and what\'s actually running in the cluster.']]},
+  {t:'FluxCD', o:'GitOps Tool (Alternative to ArgoCD)',
+    d:'Another GitOps automation tool: auto-sync, Git-based deployment, continuous reconciliation.'}
+]},
+
+{id:'springboot', title:'Spring Boot on Kubernetes — Enterprise Patterns', items:[
+  {t:'Spring Boot CI/CD Deployment Flow', o:'Git Push → Production',
+    d:'The typical enterprise pipeline from commit to live traffic.',
+    f:'Developer → Git Push → Jenkins/GitHub Actions → Build JAR → Docker Image → Push to Registry → Helm Upgrade → ArgoCD Sync → Deployment → ReplicaSet → Pods → Service → Ingress → Users'},
+  {t:'Spring Boot + PostgreSQL', o:'ConfigMap for Config, Secret for Credentials',
+    d:'A typical stateful backing service pattern.',
+    f:'Spring Boot → Deployment → Service → ConfigMap → Secret → PostgreSQL → Persistent Volume → StorageClass'},
+  {t:'Spring Boot + Redis', o:'Cache & Session Storage',
+    d:'Redis fronted by its own Service for low-latency access.',
+    f:'Client → Spring Boot → Redis Service → Redis Pod',
+    p:['Cache','Session storage','Faster response']},
+  {t:'Spring Boot + Kafka', o:'Asynchronous, Event-Driven',
+    d:'Decouples producers and consumers via a Kafka broker.',
+    f:'Producer API → Kafka Service → Kafka Broker → Consumer → Database',
+    p:['Asynchronous processing','Event-driven architecture']},
+  {t:'NGINX Ingress Fan-Out', o:'One Ingress, Many Services',
+    d:'A single NGINX Ingress routes to multiple backend Services.',
+    f:'Internet → NGINX Ingress → API Service → Auth Service → User Service → Order Service',
+    p:['SSL','Routing','Load balancing']},
+  {t:'Complete Production Architecture', o:'The Whole Stack, End to End',
+    d:'How all the pieces fit together in a real production Spring Boot cluster.',
+    f:'Internet → Load Balancer → NGINX Ingress → Spring Boot Services → ClusterIP Services → Pods → PostgreSQL / Redis / Kafka → Persistent Storage → Prometheus → Grafana → Loki → ArgoCD → Helm → Kubernetes Cluster'}
+]},
+
+{id:'troubleshooting', title:'Troubleshooting Playbook', items:[
+  {t:'Troubleshooting Methodology', o:'Describe → Logs → Events',
+    d:'The systematic order to debug any cluster issue.',
+    f:'kubectl get nodes → kubectl get pods -A → describe pod → kubectl logs → kubectl exec -it → kubectl get events → kubectl get svc → kubectl get deploy',
+    cmd:['kubectl get nodes','kubectl get pods -A','kubectl describe pod <pod>','kubectl logs <pod>','kubectl exec -it <pod> -- sh','kubectl get events','kubectl get svc','kubectl get deploy']},
+  {t:'Pending Pod', o:'Scheduling Problem',
+    d:'The Pod hasn\'t been scheduled onto any node.',
+    p:['No resources available','NodeSelector mismatch','Taints','PVC not bound','Node not ready'],
+    cmd:['kubectl describe pod <pod>','kubectl get nodes'],
+    qa:[['Why is the Pod pending?','The Scheduler could not find a suitable node.']],
+    warn:true},
+  {t:'CrashLoopBackOff', o:'Continuous Container Crash',
+    d:'The container starts, then crashes, repeatedly.',
+    p:['Application crash','Wrong configuration','Missing environment variables','DB connection failure','Memory issue'],
+    cmd:['kubectl logs <pod>','kubectl describe pod <pod>'],
+    err:true},
+  {t:'ImagePullBackOff', o:'Image Download Failed',
+    d:'Kubernetes can\'t pull the container image.',
+    p:['Wrong image name','Image does not exist','Private registry without auth'],
+    d2:'Fix: verify the image name/tag and configure an ImagePullSecret.',
+    err:true},
+  {t:'ErrImagePull', o:'First Image Pull Attempt Failed',
+    d:'The initial pull attempt failed — precedes/accompanies ImagePullBackOff.',
+    p:['Wrong image tag','Registry down','Network issue'],
+    err:true},
+  {t:'CreateContainerConfigError', o:'Configuration Problem',
+    d:'The container spec references config that doesn\'t exist or is invalid.',
+    p:['Missing ConfigMap','Missing Secret','Invalid volume','Wrong environment variable'],
+    err:true},
+  {t:'FailedMount', o:'Storage Problem',
+    d:'A volume could not be mounted into the Pod.',
+    p:['PVC pending','Storage missing','Wrong volume name','Permission issue'],
+    cmd:['kubectl describe pod','kubectl get pvc'],
+    err:true},
+  {t:'FailedScheduling', o:'No Suitable Node',
+    d:'The Scheduler can\'t place the Pod anywhere.',
+    p:['CPU full','Memory full','Taints','Node affinity mismatch','Unmet resource requests'],
+    warn:true},
+  {t:'Node Not Ready', o:'Node Problem',
+    d:'A worker node has become unavailable.',
+    p:['Kubelet down','Network failure','Disk pressure','Memory pressure'],
+    cmd:['kubectl get nodes','kubectl describe node'],
+    warn:true},
+  {t:'DNS Issues', o:'Check CoreDNS',
+    d:'Symptoms: Service unreachable, unknown host, name resolution failure.',
+    cmd:['kubectl get svc','kubectl get pods -n kube-system'],
+    warn:true},
+  {t:'Evicted Pods', o:'Resource Pressure',
+    d:'Pods removed by Kubernetes due to memory, disk, or node pressure.',
+    warn:true}
+]},
+
+{id:'kubectl-ref', title:'kubectl Command Reference & Best Practices', items:[
+  {t:'kubectl — Full Command Reference', o:'Kubernetes CLI',
+    d:'The commands used across virtually every task above, grouped by object type.',
+    cmd:[
+      'kubectl cluster-info','kubectl version',
+      'kubectl get nodes','kubectl describe node <node>',
+      'kubectl get pods','kubectl get pods -A','kubectl describe pod <pod>','kubectl delete pod <pod>',
+      'kubectl logs <pod>','kubectl logs -f <pod>','kubectl exec -it <pod> -- sh',
+      'kubectl get deploy','kubectl rollout status deployment <name>','kubectl rollout history deployment <name>','kubectl rollout undo deployment <name>',
+      'kubectl get rs','kubectl get svc','kubectl get ingress','kubectl get cm','kubectl get secret',
+      'kubectl get pv','kubectl get pvc','kubectl get events','kubectl top nodes','kubectl top pods'
+    ]},
+  {t:'Production Best Practices', o:'What "Good" Looks Like in Prod',
+    d:'The checklist experienced DevOps engineers apply to every production workload.',
+    p:['Always use Deployment (never a bare Pod)','Never deploy the "latest" tag','Set resource requests & limits','Configure liveness, readiness & startup probes','Use ConfigMap for config, Secret for passwords','Use RBAC, NetworkPolicy, and Namespaces','Enable monitoring & centralize logs','Use rolling updates and autoscaling','Keep images small, run as non-root','Enable TLS','Use GitOps for deployment']}
+]},
+
+];
+
+// ---- Rapid-fire interview Q&A bank (from "Most Asked Interview Questions" across all parts) ----
+const QBANK = [
+  ['Smallest deployable unit?','Pod'],
+  ['Default Service type?','ClusterIP'],
+  ['Default Deployment strategy?','Rolling Update'],
+  ['Database of Kubernetes?','etcd'],
+  ['Brain of Kubernetes?','Control Plane'],
+  ['Who starts the container?','Kubelet'],
+  ['Who chooses the node?','Scheduler'],
+  ['Who runs containers?','Container Runtime'],
+  ['Purpose of ReplicaSet?','Maintain Pod count'],
+  ['Purpose of Deployment?','Manage ReplicaSets'],
+  ['Purpose of ConfigMap?','Configuration'],
+  ['Purpose of Secret?','Sensitive data'],
+  ['Purpose of PVC?','Request storage'],
+  ['Purpose of Ingress?','HTTP routing'],
+  ['Purpose of HPA?','Scale Pods'],
+  ['Purpose of Cluster Autoscaler?','Scale nodes'],
+  ['Purpose of DaemonSet?','One Pod per node'],
+  ['Purpose of StatefulSet?','Stateful applications'],
+  ['Purpose of Helm?','Package manager'],
+  ['Purpose of ArgoCD?','GitOps deployment'],
+  ['Purpose of Prometheus?','Metrics'],
+  ['Purpose of Grafana?','Dashboards'],
+  ['Purpose of Loki?','Logs'],
+  ['Purpose of Network Policy?','Restrict traffic'],
+  ['Purpose of RBAC?','Authorization'],
+  ['Internet-facing Service type?','LoadBalancer'],
+  ['Service type with no Cluster IP?','Headless Service'],
+  ['Who resolves Service names?','CoreDNS'],
+  ['Can Ingress work without a controller?','No'],
+  ['Namespace purpose?','Isolation'],
+  ['ClusterIP vs NodePort?','ClusterIP = internal only; NodePort = external via node'],
+  ['NodePort vs LoadBalancer?','NodePort uses a node port; LoadBalancer provisions a cloud LB'],
+  ['ResourceQuota vs LimitRange?','ResourceQuota = namespace limit; LimitRange = container default'],
+  ['Which storage is temporary?','emptyDir'],
+  ['Which storage depends on the node?','hostPath'],
+  ['Can data survive a Pod restart?','Yes — using a PVC'],
+  ['What is CSI?','Container Storage Interface'],
+  ['Most common access mode?','ReadWriteOnce'],
+  ['Difference: NodeSelector vs NodeAffinity?','NodeAffinity supports advanced rules'],
+  ['Purpose of Pod Affinity?','Keep related Pods together'],
+  ['Purpose of Pod Anti-Affinity?','Spread Pods across nodes'],
+  ['Difference: Taints vs Tolerations?','Taint blocks Pods; Toleration allows them'],
+  ['One Pod per node — which controller?','DaemonSet'],
+  ['Runs once — which controller?','Job'],
+  ['Runs on a schedule — which controller?','CronJob'],
+  ['Difference: HPA vs VPA?','HPA changes Pod count; VPA changes CPU & memory sizing'],
+  ['Difference: HPA vs Cluster Autoscaler?','HPA adds Pods; Cluster Autoscaler adds nodes'],
+  ['Which component provides CPU metrics?','Metrics Server'],
+  ['Purpose of CNI?','Pod networking'],
+  ['Difference: Ingress vs Egress (traffic)?','Ingress = incoming; Egress = outgoing'],
+  ['Purpose of Service Mesh?','Manage service-to-service communication'],
+  ['Difference: Role vs ClusterRole?','Role = namespace; ClusterRole = entire cluster'],
+  ['Difference: RoleBinding vs ClusterRoleBinding?','RoleBinding = namespace; ClusterRoleBinding = cluster'],
+  ['Purpose of a Service Account?','Pod identity'],
+  ['Purpose of Security Context?','Secure containers'],
+  ['Difference: Requests vs Limits?','Requests = minimum; Limits = maximum'],
+  ['What is OOMKilled?','Memory limit exceeded'],
+  ['Exit code of OOMKilled?','137'],
+  ['Best QoS class?','Guaranteed'],
+  ['Purpose of a Liveness Probe?','Restart a hung application'],
+  ['Purpose of a Readiness Probe?','Control when a Pod accepts traffic'],
+  ['Purpose of a Startup Probe?','Handle slow application startup'],
+  ['Difference: Liveness vs Readiness?','Liveness restarts the container; Readiness stops traffic to it'],
+  ['Difference: Readiness vs Startup?','Readiness = ongoing traffic check; Startup = one-time initial check'],
+  ['Who collects metrics?','Prometheus'],
+  ['Who displays dashboards?','Grafana'],
+  ['Who collects logs?','Fluent Bit / Fluentd'],
+  ['Purpose of Loki (log role)?','Store logs'],
+  ['What is a Helm Chart?','A Kubernetes package (template set)'],
+  ['Purpose of values.yaml?','Store chart configuration'],
+  ['Purpose of GitOps?','Git-driven deployment'],
+  ['Most popular GitOps tool?','ArgoCD'],
+  ['Three pillars of observability?','Metrics, Logs, Traces']
+];
+
+// ---- Kubernetes Quick Reference (one-line lookup table) ----
+const REFTABLE = [
+  ['Pod','Smallest deployable unit'],
+  ['Deployment','Manages Pods (via ReplicaSets)'],
+  ['ReplicaSet','Maintains Pod count'],
+  ['Service','Stable network endpoint'],
+  ['Ingress','HTTP gateway'],
+  ['ConfigMap','Configuration'],
+  ['Secret','Sensitive data'],
+  ['PV','Storage'],
+  ['PVC','Storage request'],
+  ['Scheduler','Selects node'],
+  ['Kubelet','Starts & monitors Pods'],
+  ['etcd','Database'],
+  ['HPA','Scale Pods'],
+  ['Cluster Autoscaler','Scale nodes'],
+  ['Helm','Package manager'],
+  ['ArgoCD','GitOps'],
+  ['Prometheus','Metrics'],
+  ['Grafana','Dashboards'],
+  ['Loki','Logs'],
+  ['RBAC','Authorization'],
+  ['Network Policy','Pod firewall']
+];
+
+// ---- 30-minute complete revision flow (ordered concept chain) ----
+const REVISION_FLOW = 'Kubernetes → Architecture → Pods → ReplicaSet → Deployment → Services → Ingress → Namespace → ConfigMap → Secret → Volumes → PV → PVC → StorageClass → Scheduler → Affinity → Taints → DaemonSet → StatefulSet → Job → CronJob → HPA → Cluster Autoscaler → Networking → RBAC → Security → Probes → Monitoring → Logging → Helm → GitOps → Troubleshooting';
+
+// ---- Final interview tips ----
+const FINAL_TIPS = [
+  'Understand concepts before commands',
+  'Explain using the architecture flow',
+  'Always mention enterprise use cases',
+  'Know the Deployment lifecycle',
+  'Know the Pod lifecycle',
+  'Know the Service types',
+  'Practice kubectl commands',
+  'Learn the common error states',
+  'Understand the monitoring stack',
+  'Understand the GitOps flow',
+  'Focus on troubleshooting',
+  'Never memorize without practice'
+];
+
+</script>
+<script>
+(function(){
+  const navList = document.getElementById('nav-list');
+  const content = document.getElementById('content');
+  const searchInput = document.getElementById('search');
+  const matchCount = document.getElementById('match-count');
+  const statGroups = document.getElementById('stat-groups');
+  const statCards = document.getElementById('stat-cards');
+
+  function esc(s){
+    return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+
+  function flowHTML(f){
+    if(!f) return '';
+    const parts = f.split('→').map(s=>s.trim()).filter(Boolean);
+    return '<div class="flow detail">' + parts.map((p,i)=>
+      (i>0?'<span class="arrow">→</span>':'') + '<span class="seg">'+esc(p)+'</span>'
+    ).join('') + '</div>';
+  }
+
+  function pointsHTML(arr, neg){
+    if(!arr || !arr.length) return '';
+    return '<ul class="points detail'+(neg?' neg':'')+'">' + arr.map(p=>'<li>'+esc(p)+'</li>').join('') + '</ul>';
+  }
+
+  function qaHTML(qa){
+    if(!qa || !qa.length) return '';
+    return qa.map(([q,a])=>'<div class="qa detail"><div class="q">'+esc(q)+'</div><p class="a">'+esc(a)+'</p></div>').join('');
+  }
+
+  function cmdHTML(cmd){
+    if(!cmd || !cmd.length) return '';
+    return '<div class="cmd detail">' + cmd.map(c=>'<div>'+esc(c)+'</div>').join('') + '</div>';
+  }
+
+  function cardHTML(item){
+    const cls = ['card'];
+    if(item.warn) cls.push('warn');
+    if(item.err) cls.push('err');
+    const searchBlob = [item.t,item.o,item.d,item.d2,item.d3,(item.p||[]).join(' '),(item.pn||[]).join(' '),
+      (item.qa||[]).map(x=>x.join(' ')).join(' '),(item.cmd||[]).join(' '),item.note].join(' ').toLowerCase();
+    let html = '<article class="'+cls.join(' ')+'" data-search="'+esc(searchBlob)+'">';
+    html += '<div class="card-head"><h3>'+esc(item.t)+'</h3><span class="oneliner">'+esc(item.o)+'</span></div>';
+    if(item.d) html += '<p class="def detail">'+esc(item.d)+'</p>';
+    if(item.d2) html += '<p class="def detail">'+esc(item.d2)+'</p>';
+    if(item.d3) html += '<p class="def detail">'+esc(item.d3)+'</p>';
+    html += pointsHTML(item.p,false);
+    html += pointsHTML(item.pn,true);
+    html += flowHTML(item.f);
+    html += qaHTML(item.qa);
+    html += cmdHTML(item.cmd);
+    if(item.note) html += '<p class="note detail">'+esc(item.note)+'</p>';
+    html += '</article>';
+    return html;
+  }
+
+  function groupHTML(group, index){
+    let html = '<section class="group" id="'+group.id+'">';
+    html += '<div class="group-head"><span class="group-index">G'+(index+1)+'</span><h2>'+esc(group.title)+'</h2><span class="count">'+group.items.length+' concepts</span></div>';
+    html += '<div class="cards">' + group.items.map(cardHTML).join('') + '</div>';
+    html += '</section>';
+    return html;
+  }
+
+  function qbankSectionHTML(){
+    let html = '<section class="group" id="qbank" data-search-skip="0">';
+    html += '<div class="group-head"><span class="group-index">G'+(DATA.length+1)+'</span><h2>Rapid-Fire Interview Q&amp;A Bank</h2><span class="count">'+QBANK.length+' questions</span></div>';
+    html += '<div class="qbank">' + QBANK.map(([q,a])=>
+      '<div class="qitem" data-search="'+esc((q+' '+a).toLowerCase())+'"><p class="q">'+esc(q)+'</p><p class="a">→ '+esc(a)+'</p></div>'
+    ).join('') + '</div>';
+    html += '</section>';
+    return html;
+  }
+
+  function refTableSectionHTML(){
+    let html = '<section class="group" id="quickref">';
+    html += '<div class="group-head"><span class="group-index">G'+(DATA.length+2)+'</span><h2>Quick Reference Table</h2><span class="count">'+REFTABLE.length+' entries</span></div>';
+    html += '<div class="card" style="max-width:560px"><table class="reftable"><thead><tr><th>Concept</th><th>One-liner</th></tr></thead><tbody>';
+    html += REFTABLE.map(([k,v])=>'<tr><td class="k">'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('');
+    html += '</tbody></table></div>';
+    html += '</section>';
+    return html;
+  }
+
+  function revisionSectionHTML(){
+    let html = '<section class="group" id="revision">';
+    html += '<div class="group-head"><span class="group-index">G'+(DATA.length+3)+'</span><h2>30-Minute Revision Flow &amp; Final Tips</h2></div>';
+    html += '<div class="card" style="margin-bottom:14px;">'+flowHTML(REVISION_FLOW).replace('detail','')+'</div>';
+    html += '<div class="card"><ul class="points">'+FINAL_TIPS.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul></div>';
+    html += '</section>';
+    return html;
+  }
+
+  // ---- Render ----
+  let allGroupsMeta = DATA.map(g=>({id:g.id,title:g.title,count:g.items.length}));
+  allGroupsMeta.push({id:'qbank',title:'Rapid-Fire Q&A Bank',count:QBANK.length});
+  allGroupsMeta.push({id:'quickref',title:'Quick Reference Table',count:REFTABLE.length});
+  allGroupsMeta.push({id:'revision',title:'Revision Flow & Tips',count:null});
+
+  navList.innerHTML = allGroupsMeta.map(g=>
+    '<li><a href="#'+g.id+'" data-target="'+g.id+'">'+esc(g.title)+(g.count!==null?'<span class="n-count">'+g.count+'</span>':'')+'</a></li>'
+  ).join('');
+
+  content.innerHTML = DATA.map(groupHTML).join('') + qbankSectionHTML() + refTableSectionHTML() + revisionSectionHTML();
+
+  let totalCards = 0;
+  DATA.forEach(g=>totalCards+=g.items.length);
+  statGroups.textContent = allGroupsMeta.length;
+  statCards.textContent = totalCards + QBANK.length;
+
+  // ---- Sidebar active-link highlight on scroll ----
+  const navLinks = Array.from(navList.querySelectorAll('a'));
+  const sections = Array.from(document.querySelectorAll('.group'));
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        navLinks.forEach(l=>l.classList.remove('current'));
+        const link = navList.querySelector('a[data-target="'+e.target.id+'"]');
+        if(link) link.classList.add('current');
+      }
+    });
+  }, {rootMargin:'-10% 0px -75% 0px'});
+  sections.forEach(s=>io.observe(s));
+
+  // ---- Search filter ----
+  function runSearch(){
+    const term = searchInput.value.trim().toLowerCase();
+    let visibleCount = 0;
+    document.querySelectorAll('.card, .qitem').forEach(card=>{
+      const blob = card.getAttribute('data-search') || '';
+      const match = !term || blob.includes(term);
+      card.classList.toggle('hidden', !match);
+      if(match) visibleCount++;
+    });
+    // hide empty groups (skip quickref/revision, which don't have per-card search)
+    sections.forEach(sec=>{
+      if(sec.id==='quickref' || sec.id==='revision'){
+        sec.classList.toggle('hidden', !!term);
+        return;
+      }
+      const visibleInGroup = sec.querySelectorAll('.card:not(.hidden), .qitem:not(.hidden)').length;
+      sec.classList.toggle('hidden', term && visibleInGroup===0);
+    });
+    matchCount.textContent = term ? (visibleCount + ' match' + (visibleCount===1?'':'es')) : '';
+  }
+  searchInput.addEventListener('input', runSearch);
+
+  // ---- Rapid mode toggle ----
+  const modeFull = document.getElementById('mode-full');
+  const modeRapid = document.getElementById('mode-rapid');
+  modeFull.addEventListener('click', ()=>{
+    document.body.classList.remove('rapid');
+    modeFull.classList.add('active'); modeRapid.classList.remove('active');
+  });
+  modeRapid.addEventListener('click', ()=>{
+    document.body.classList.add('rapid');
+    modeRapid.classList.add('active'); modeFull.classList.remove('active');
+  });
+
+  // keyboard shortcut: focus search with "/"
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='/' && document.activeElement!==searchInput){
+      e.preventDefault(); searchInput.focus();
+    }
+  });
+})();
+
+</script>
 </body>
 </html>
