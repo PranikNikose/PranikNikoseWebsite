@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Multithreading & Exception Handling — Complete Interview Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14; --panel:#12161f; --panel2:#151a24; --border:#232a38; --border-soft:#1b212d;
+  --text:#c9d1d9; --dim:#6e7681; --dim2:#8892a0;
+  --cy:#39c5cf; --bl:#58a6ff; --gr:#3fb950; --am:#e3b341; --pu:#a371f7; --re:#f778ba; --or:#ff9a5a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'JetBrains Mono', monospace; font-size:14px; line-height:1.55;
+  padding:28px 16px 80px;
+}
+.page{max-width:1180px; margin:0 auto;}
+
+/* HEADER */
+.header{border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:22px;}
+.header-top{display:flex; align-items:baseline; gap:10px;}
+.prompt{color:var(--gr); font-weight:700; font-size:20px;}
+.title{font-size:22px; font-weight:700; color:#fff; letter-spacing:.3px;}
+.subtitle{color:var(--dim); margin-top:6px; font-size:13px;}
+.toc{margin-top:14px; display:flex; flex-wrap:wrap; gap:6px 10px;}
+.toc a{color:var(--cy); text-decoration:none; font-size:12px; border:1px solid var(--border-soft); padding:3px 9px; border-radius:20px;}
+.toc a:hover{border-color:var(--cy);}
+.toc-part{width:100%; font-size:11px; color:#fff; text-transform:uppercase; letter-spacing:1px; margin:8px 0 2px;}
+
+/* PART DIVIDER */
+.part-divider{margin-top:60px; padding:16px 20px; background:linear-gradient(90deg, rgba(163,113,247,.12), transparent); border-left:4px solid var(--pu); border-radius:6px;}
+.part-divider .part-label{color:var(--pu); font-size:11px; text-transform:uppercase; letter-spacing:2px; font-weight:700;}
+.part-divider .part-title{color:#fff; font-size:20px; font-weight:700; margin-top:4px;}
+
+/* SECTION LABEL */
+.section-label{
+  font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:var(--dim2);
+  margin:34px 0 10px; padding-bottom:6px; border-bottom:1px dashed var(--border);
+  display:flex; align-items:center; gap:8px;
+}
+.section-label::before{content:"//"; color:var(--gr);}
+.section-label.big{font-size:14px; color:#fff; margin-top:46px; padding:10px 0; border-bottom:1px solid var(--border);}
+.section-label.big::before{content:"§";}
+
+/* CARDS GRID */
+.cards-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cards-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.cards-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.cards-grid.cols-6{grid-template-columns:repeat(6,1fr);}
+.card{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:12px 14px; border-left:3px solid var(--dim);}
+.card-name{font-weight:700; color:#fff; font-size:13px; margin-bottom:4px;}
+.card-desc{color:var(--dim2); font-size:12px;}
+.card-cy{border-left-color:var(--cy);} .card-cy .card-name{color:var(--cy);}
+.card-bl{border-left-color:var(--bl);} .card-bl .card-name{color:var(--bl);}
+.card-gr{border-left-color:var(--gr);} .card-gr .card-name{color:var(--gr);}
+.card-am{border-left-color:var(--am);} .card-am .card-name{color:var(--am);}
+.card-pu{border-left-color:var(--pu);} .card-pu .card-name{color:var(--pu);}
+.card-re{border-left-color:var(--re);} .card-re .card-name{color:var(--re);}
+.card-or{border-left-color:var(--or);} .card-or .card-name{color:var(--or);}
+
+/* LEGEND */
+.legend{display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--panel2); border:1px solid var(--border-soft); border-radius:6px; padding:8px 14px; margin-top:10px;}
+.legend-label{color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:1px;}
+.legend-items{display:flex; gap:14px; flex-wrap:wrap;}
+.legend-item{font-size:12px; color:var(--dim2); display:flex; align-items:center; gap:6px;}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+.dot-cy{background:var(--cy);} .dot-bl{background:var(--bl);} .dot-gr{background:var(--gr);}
+.dot-am{background:var(--am);} .dot-pu{background:var(--pu);} .dot-re{background:var(--re);} .dot-or{background:var(--or);}
+
+/* NAMING / KEY POINT GRID */
+.naming-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+.naming-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.naming-card{background:var(--panel); border:1px solid var(--border-soft); border-radius:6px; padding:10px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+.naming-prefix{color:#fff; font-weight:700; font-size:12.5px; white-space:nowrap;}
+.naming-arrow{color:var(--dim);}
+.naming-meaning{color:var(--dim2); font-size:12.5px;}
+
+/* TWO / THREE COL LAYOUT */
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+
+/* TREE PANEL */
+.tree-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.tree-title{font-size:12.5px; font-weight:700; color:#fff; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;}
+.tree-body{font-size:12.5px; white-space:pre-wrap; line-height:1.75;}
+.tree-body .c{color:var(--dim); }
+.tree-body .n{color:var(--dim2);}
+.tree-body .i{font-weight:700;}
+.tree-body .cy{color:var(--cy);} .tree-body .bl{color:var(--bl);} .tree-body .gr{color:var(--gr);}
+.tree-body .am{color:var(--am);} .tree-body .pu{color:var(--pu);} .tree-body .re{color:var(--re);}
+
+/* API TABLE */
+table.api-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+table.api-table td{padding:5px 6px; border-bottom:1px solid var(--border-soft); vertical-align:top;}
+.api-code{font-weight:700; white-space:nowrap; width:1%;}
+.api-code.cy{color:var(--cy);} .api-code.bl{color:var(--bl);} .api-code.gr{color:var(--gr);}
+.api-code.am{color:var(--am);} .api-code.pu{color:var(--pu);} .api-code.re{color:var(--re);}
+.api-desc{color:var(--dim2);}
+.api-desc code{color:var(--am); background:rgba(255,255,255,.04); padding:1px 5px; border-radius:4px;}
+
+/* PILLAR PANEL */
+.pillar-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.pillar-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.pillar-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.pillar-card{border:1px solid var(--border-soft); border-radius:6px; padding:12px 14px; background:var(--panel2);}
+.pillar-name{font-weight:700; font-size:13.5px; margin-bottom:6px;}
+.pillar-name.bl{color:var(--bl);} .pillar-name.gr{color:var(--gr);} .pillar-name.am{color:var(--am);} .pillar-name.pu{color:var(--pu);} .pillar-name.cy{color:var(--cy);} .pillar-name.re{color:var(--re);}
+.pillar-def{color:var(--dim2); font-size:12.5px; margin-bottom:8px;}
+.pillar-tag{display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin:0 5px 5px 0; border:1px solid var(--border);}
+.tag-bl{color:var(--bl); border-color:rgba(88,166,255,.35);}
+.tag-gr{color:var(--gr); border-color:rgba(63,185,80,.35);}
+.tag-am{color:var(--am); border-color:rgba(227,179,65,.35);}
+.tag-pu{color:var(--pu); border-color:rgba(163,113,247,.35);}
+.tag-cy{color:var(--cy); border-color:rgba(57,197,207,.35);}
+.tag-re{color:var(--re); border-color:rgba(247,120,186,.35);}
+.pillar-example{margin-top:8px; font-size:12px; color:var(--dim2); border-top:1px dashed var(--border-soft); padding-top:6px;}
+.pillar-example b{color:#fff;}
+
+/* TABLE PANEL (real tables) */
+.table-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.table-panel table, .bottom-grid table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px;}
+.table-panel th, .bottom-grid th{text-align:left; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border);}
+.table-panel td, .bottom-grid td{padding:6px 8px; border-bottom:1px solid var(--border-soft); color:var(--dim2);}
+.yes{color:var(--gr); font-weight:700;}
+.no{color:var(--re); font-weight:700;}
+.cell-hl{color:var(--am); font-weight:700;}
+.bottom-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+/* CMP PANEL (comparisons) */
+.cmp-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:2px;}
+.cmp-card{padding:10px 4px;}
+.cmp-header{margin-bottom:6px;}
+.cmp-name{font-weight:700; font-size:13.5px;}
+.cmp-name.bl{color:var(--bl);} .cmp-name.pu{color:var(--pu);} .cmp-name.gr{color:var(--gr);} .cmp-name.am{color:var(--am);} .cmp-name.cy{color:var(--cy);} .cmp-name.re{color:var(--re);}
+.cmp-rows{display:flex; flex-direction:column; gap:3px;}
+.cmp-row{display:flex; gap:10px; font-size:12.5px;}
+.cmp-key{color:var(--dim); width:100px; flex-shrink:0;}
+.cmp-val{color:var(--dim2);}
+.cmp-val.code{color:var(--am); font-size:12px;}
+.cmp-val.green{color:var(--gr);}
+.cmp-val.purple{color:var(--pu);}
+.cmp-divider{height:1px; background:var(--border-soft); margin:4px 0;}
+
+/* FLOW / PIPELINE */
+.flow-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.flow-row{display:flex; align-items:center; flex-wrap:wrap; gap:8px;}
+.pipe-box{border:1px solid var(--border); border-radius:6px; padding:7px 12px; font-size:12px; font-weight:700; background:var(--panel2);}
+.pipe-box.source{color:var(--cy); border-color:rgba(57,197,207,.4);}
+.pipe-box.inter{color:var(--bl); border-color:rgba(88,166,255,.4);}
+.pipe-box.term{color:var(--am); border-color:rgba(227,179,65,.4);}
+.pipe-box.gc{color:var(--gr); border-color:rgba(63,185,80,.4);}
+.pipe-box.warn{color:var(--re); border-color:rgba(247,120,186,.4);}
+.pipe-arrow{color:var(--dim);}
+.flow-vert{display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
+.flow-vert .pipe-arrow{align-self:center; margin-left:60px;}
+
+/* PROBLEM / CODE CARDS */
+.problem-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+.problem-card{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px; border-left:3px solid var(--gr);}
+.problem-title{font-weight:700; color:var(--gr); font-size:12.5px; margin-bottom:6px;}
+.problem-code{font-size:12px; color:var(--dim2); background:var(--panel2); border-radius:6px; padding:8px 10px; white-space:pre-wrap; line-height:1.6;}
+.problem-code .kw{color:var(--pu);}
+.problem-code .cl{color:var(--am);}
+.problem-code .mt{color:var(--bl);}
+.problem-code .st{color:var(--gr);}
+.problem-code .cm{color:var(--dim); font-style:italic;}
+
+/* SIZING */
+.sizing-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.sizing-card{background:var(--panel2); border:1px solid var(--border-soft); border-radius:6px; padding:10px 12px;}
+.sizing-card .slabel{color:var(--dim2); font-size:12px;}
+.sizing-card .formula{color:var(--am); font-weight:700; font-size:13px; margin:4px 0;}
+
+/* REVISION CHECKLIST */
+.revision-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.revision-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px 20px;}
+.revision-grid.cols-1{grid-template-columns:1fr;}
+.revision-item{font-size:12.5px; color:var(--dim2); display:flex; gap:8px;}
+.chk{color:var(--gr); font-weight:700;}
+
+/* Q&A */
+.qa{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px;}
+.qa .q{color:#fff; font-weight:700; font-size:13px; margin-bottom:6px;}
+.qa .q::before{content:"Q: "; color:var(--am);}
+.qa .a{color:var(--dim2); font-size:12.5px;}
+
+/* MISC */
+code{font-family:'JetBrains Mono', monospace;}
+.note{font-size:12px; color:var(--dim); margin-top:8px;}
+.badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.badge{font-size:11px; padding:3px 9px; border:1px solid var(--border); border-radius:20px; color:var(--dim2);}
+
+@media(max-width:820px){
+  .cards-grid, .cards-grid.cols-3, .cards-grid.cols-5, .cards-grid.cols-6{grid-template-columns:repeat(2,1fr);}
+  .two-col, .three-col, .bottom-grid, .pillar-grid, .pillar-grid.cols-3, .naming-grid, .naming-grid.cols-3, .revision-grid, .problem-grid, .sizing-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Java Multithreading &amp; Exception Handling — Complete Interview Revision</span>
+    </div>
+    <div class="subtitle">// 6-7 Yrs Experience — Spring Boot &amp; Microservices Focus</div>
+    <div class="toc">
+      <div class="toc-part">Part I · Multithreading</div>
+      <a href="#fundamentals">Fundamentals &amp; Lifecycle</a>
+      <a href="#creation">Thread Creation</a>
+      <a href="#safety">Thread Safety</a>
+      <a href="#locking">Locking &amp; Deadlock</a>
+      <a href="#communication">wait/notify</a>
+      <a href="#executor">Executor &amp; Thread Pools</a>
+      <a href="#concurrent-coll">Concurrent Collections</a>
+      <a href="#sync-utils">Sync Utilities</a>
+      <a href="#forkjoin">Fork-Join &amp; CompletableFuture</a>
+      <a href="#threadlocal">ThreadLocal &amp; @Async</a>
+      <a href="#sizing">Pool Sizing &amp; Kafka</a>
+      <a href="#troubleshoot">Production Troubleshooting</a>
+      <a href="#mt-compare">Comparisons &amp; Snippets</a>
+      <a href="#mt-revision">Multithreading One-Liners</a>
+      <div class="toc-part">Part II · Exception Handling</div>
+      <a href="#exc-basics">Exception Basics &amp; Hierarchy</a>
+      <a href="#exc-checked">Checked vs Unchecked</a>
+      <a href="#exc-trycatch">try/catch/finally Flow</a>
+      <a href="#exc-throw">throw vs throws &amp; Propagation</a>
+      <a href="#exc-custom">Custom &amp; Business Exceptions</a>
+      <a href="#exc-twr">Try-With-Resources &amp; Chaining</a>
+      <a href="#exc-spring">Spring Boot Exception Handling</a>
+      <a href="#exc-validation">Validation &amp; HTTP Status</a>
+      <a href="#exc-practices">Best Practices &amp; Anti-Patterns</a>
+      <a href="#exc-revision">Exception One-Liners</a>
+      <a href="#flow">Final Revision Flow</a>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <div class="part-divider">
+    <div class="part-label">Part I</div>
+    <div class="part-title">Java Multithreading</div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="fundamentals">1. Fundamentals &amp; Thread Lifecycle</div>
+
+  <div class="section-label">Quick Reference</div>
+  <div class="cards-grid">
+    <div class="card card-cy"><div class="card-name">Basics</div><div class="card-desc">Process, Thread, Lifecycle, Creation</div></div>
+    <div class="card card-bl"><div class="card-name">Safety</div><div class="card-desc">Race Condition, Sync, Volatile, Atomic, Locks</div></div>
+    <div class="card card-am"><div class="card-name">Coordination</div><div class="card-desc">wait/notify, Latch, Barrier, Semaphore</div></div>
+    <div class="card card-pu"><div class="card-name">Modern Java</div><div class="card-desc">Executor, CompletableFuture, ForkJoin, Concurrent Collections</div></div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-label">Legend</span>
+    <div class="legend-items">
+      <div class="legend-item"><span class="dot dot-cy"></span>Core Concept</div>
+      <div class="legend-item"><span class="dot dot-bl"></span>Sync / Safety</div>
+      <div class="legend-item"><span class="dot dot-am"></span>Executor / Async</div>
+      <div class="legend-item"><span class="dot dot-pu"></span>Collections / Utilities</div>
+      <div class="legend-item"><span class="dot dot-re"></span>Danger Zone (Deadlock/Starvation)</div>
+    </div>
+  </div>
+
+  <div class="section-label">Core Definitions (Say These First)</div>
+  <div class="naming-grid">
+    <div class="naming-card"><span class="naming-prefix">Process</span><span class="naming-arrow">→</span><span class="naming-meaning">An independently running application with its own memory space</span></div>
+    <div class="naming-card"><span class="naming-prefix">Thread</span><span class="naming-arrow">→</span><span class="naming-meaning">Smallest unit of execution, runs inside a process, shares its memory</span></div>
+    <div class="naming-card"><span class="naming-prefix">Multithreading</span><span class="naming-arrow">→</span><span class="naming-meaning">Multiple threads run concurrently within one process, sharing memory</span></div>
+    <div class="naming-card"><span class="naming-prefix">Concurrency</span><span class="naming-arrow">→</span><span class="naming-meaning">Multiple tasks make progress in overlapping time (not necessarily the same instant)</span></div>
+    <div class="naming-card"><span class="naming-prefix">Parallelism</span><span class="naming-arrow">→</span><span class="naming-meaning">Multiple tasks run truly simultaneously on multiple CPU cores</span></div>
+  </div>
+
+  <div class="section-label">Thread Lifecycle</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">State Transitions</div>
+      <div class="flow-row">
+        <div class="pipe-box source">NEW</div><span class="pipe-arrow">→ start() →</span>
+        <div class="pipe-box inter">RUNNABLE</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">RUNNING</div>
+      </div>
+      <div class="flow-row" style="margin-top:8px;">
+        <div class="pipe-box term">RUNNING</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box warn">BLOCKED / WAITING / TIMED_WAITING</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box gc">TERMINATED</div>
+      </div>
+    </div>
+    <div class="table-panel">
+      <table>
+        <tr><th>State</th><th>Meaning</th></tr>
+        <tr><td class="cell-hl">NEW</td><td>Thread object created, start() not yet called</td></tr>
+        <tr><td class="cell-hl">RUNNABLE</td><td>Eligible to run — moves here after start()</td></tr>
+        <tr><td class="cell-hl">RUNNING</td><td>CPU is actively executing this thread</td></tr>
+        <tr><td class="cell-hl">BLOCKED</td><td>Waiting to acquire a monitor lock held by another thread</td></tr>
+        <tr><td class="cell-hl">WAITING</td><td>Waiting indefinitely — wait(), join() without timeout</td></tr>
+        <tr><td class="cell-hl">TIMED_WAITING</td><td>Waiting a fixed time — sleep(), wait(ms), join(ms)</td></tr>
+        <tr><td class="cell-hl">TERMINATED</td><td>Run completed (normally or via exception)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="creation">2. Thread Creation</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">Thread Creation Options</div>
+      <table>
+        <tr><th>Option</th><th>Notes</th></tr>
+        <tr><td>extends Thread</td><td>Simplest, but no multiple inheritance — avoid in practice</td></tr>
+        <tr><td class="cell-hl">implements Runnable</td><td>Preferred — no return value, no checked exceptions</td></tr>
+        <tr><td>Callable&lt;V&gt;</td><td>Returns a value, can throw checked exceptions</td></tr>
+        <tr><td>Future&lt;V&gt;</td><td>Handle to result of async task — get() blocks</td></tr>
+        <tr><td class="cell-hl">CompletableFuture</td><td>Non-blocking, chainable, combinable async pipeline</td></tr>
+      </table>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">Runnable</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Return</span><span class="cmp-val">No return value</span></div>
+          <div class="cmp-row"><span class="cmp-key">Exceptions</span><span class="cmp-val">No checked exceptions</span></div>
+          <div class="cmp-row"><span class="cmp-key">Method</span><span class="cmp-val code">run()</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">Callable</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Return</span><span class="cmp-val">Returns a value (V)</span></div>
+          <div class="cmp-row"><span class="cmp-key">Exceptions</span><span class="cmp-val">Can throw checked exceptions</span></div>
+          <div class="cmp-row"><span class="cmp-key">Method</span><span class="cmp-val code">call()</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="safety">3. Thread Safety — Race Condition, Sync, Visibility, Atomicity</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">Race Condition &amp; Synchronization</div>
+      <table>
+        <tr><td class="cell-hl">Race Condition</td><td>≥2 threads read-modify-write same shared state concurrently → lost updates</td></tr>
+        <tr><td>Critical Section</td><td>Code block touching shared state; must run exclusively</td></tr>
+        <tr><td>synchronized method</td><td>Locks <code>this</code> (instance monitor) for the whole method</td></tr>
+        <tr><td>synchronized block</td><td><code>synchronized(obj){...}</code> — locks only the critical section</td></tr>
+        <tr><td>static synchronized</td><td>Locks the Class object — one lock across all instances</td></tr>
+        <tr><td>Monitor / Intrinsic Lock</td><td>Built-in lock every Java object has; backbone of synchronized</td></tr>
+      </table>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">Visibility &amp; Atomicity</div>
+      <table>
+        <tr><td class="cell-hl">volatile</td><td>Guarantees visibility of latest value across threads — NOT atomicity</td></tr>
+        <tr><td>AtomicInteger / AtomicLong</td><td>Lock-free, thread-safe counters via incrementAndGet() etc.</td></tr>
+        <tr><td>AtomicReference</td><td>Atomic updates to object references</td></tr>
+        <tr><td class="cell-hl">CAS</td><td>Compare-And-Swap: read → compare expected → update or retry (lock-free)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label">Common Comparisons</div>
+  <div class="cmp-panel">
+    <div class="cmp-card comparable">
+      <div class="cmp-header"><span class="cmp-name bl">volatile</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Guarantees</span><span class="cmp-val">Visibility only</span></div>
+        <div class="cmp-row"><span class="cmp-key">CAS</span><span class="cmp-val">No CAS</span></div>
+        <div class="cmp-row"><span class="cmp-key">count++</span><span class="cmp-val">Unsafe</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card comparator">
+      <div class="cmp-header"><span class="cmp-name pu">AtomicInteger</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Guarantees</span><span class="cmp-val">Visibility + Atomicity</span></div>
+        <div class="cmp-row"><span class="cmp-key">CAS</span><span class="cmp-val">Uses CAS internally</span></div>
+        <div class="cmp-row"><span class="cmp-key">count++</span><span class="cmp-val">Safe</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="locking">4. Locking Mechanisms &amp; Deadlock Management</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">Locking Mechanisms</div>
+      <table>
+        <tr><td class="cell-hl">ReentrantLock</td><td>Explicit lock — tryLock(), fairness, interruptibility</td></tr>
+        <tr><td>ReadWriteLock</td><td>Multiple readers OR one writer — great for read-heavy caches</td></tr>
+        <tr><td>StampedLock</td><td>Adds optimistic read mode — faster than ReadWriteLock</td></tr>
+        <tr><td>Fair Lock</td><td>new ReentrantLock(true) — grants lock in request order</td></tr>
+        <tr><td>tryLock()</td><td>Attempts lock, returns immediately/with timeout instead of blocking</td></tr>
+      </table>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title" style="color:var(--re);">Deadlock, Starvation, Livelock</div>
+      <table>
+        <tr><td class="cell-hl" style="color:var(--re);">Deadlock</td><td>Threads hold-and-wait on each other's locks in a cycle → all stuck forever</td></tr>
+        <tr><td style="color:var(--re);">Starvation</td><td>A thread never gets CPU/lock because others keep getting priority</td></tr>
+        <tr><td style="color:var(--re);">Livelock</td><td>Threads keep responding to each other but make no real progress</td></tr>
+        <tr><td style="color:var(--re);">Prevention</td><td>Consistent lock ordering, tryLock()+timeout, avoid nested locks</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="problem-grid" style="grid-column:1/-1;">
+      <div class="problem-card">
+        <div class="problem-title">Classic Deadlock Example</div>
+        <div class="problem-code"><span class="cm">// Thread-1</span>
+<span class="mt">lock</span>(A); <span class="mt">lock</span>(B);
+
+<span class="cm">// Thread-2 (reverse order = deadlock)</span>
+<span class="mt">lock</span>(B); <span class="mt">lock</span>(A);</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-title">ReentrantLock with tryLock</div>
+        <div class="problem-code"><span class="cl">Lock</span> lock = <span class="kw">new</span> <span class="cl">ReentrantLock</span>();
+<span class="kw">if</span> (lock.tryLock(5, TimeUnit.SECONDS)) {
+  <span class="kw">try</span> { <span class="cm">/* work */</span> }
+  <span class="kw">finally</span> { lock.unlock(); }
+}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="communication">5. Thread Communication — wait() / notify() / notifyAll() / sleep()</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Method</th><th>Behavior</th></tr>
+      <tr><td class="cell-hl">wait()</td><td>Releases the lock and waits until notified — must be inside a synchronized block (Object class)</td></tr>
+      <tr><td class="cell-hl">notify()</td><td>Wakes ONE waiting thread (unspecified which)</td></tr>
+      <tr><td class="cell-hl">notifyAll()</td><td>Wakes ALL waiting threads</td></tr>
+      <tr><td class="cell-hl">sleep()</td><td>Pauses the thread but KEEPS the lock (Thread class, not Object)</td></tr>
+    </table>
+  </div>
+  <div class="problem-grid" style="margin-top:10px;">
+    <div class="problem-card">
+      <div class="problem-title">wait() / notifyAll()</div>
+      <div class="problem-code"><span class="kw">synchronized</span>(lock) {
+  <span class="kw">while</span> (!ready) lock.wait();
+  <span class="cm">// proceed after notifyAll()</span>
+}</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">wait() vs sleep()</div>
+      <div class="problem-code"><span class="cm">// wait(): releases lock, Object class, needs synchronized
+// sleep(): keeps lock, Thread class, no synchronized needed</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="executor">6. Executor Framework &amp; Thread Pools</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">Executor Framework</div>
+      <table>
+        <tr><td class="cell-hl">Executor</td><td>Base interface — just execute(Runnable)</td></tr>
+        <tr><td class="cell-hl">ExecutorService</td><td>Adds submit(), shutdown(), returns Future</td></tr>
+        <tr><td>ScheduledExecutorService</td><td>Run tasks after a delay / periodically</td></tr>
+        <tr><td>FixedThreadPool</td><td>Fixed N threads, unbounded queue</td></tr>
+        <tr><td>CachedThreadPool</td><td>Grows/shrinks dynamically — risky under heavy load</td></tr>
+        <tr><td>SingleThreadExecutor</td><td>One thread, tasks run sequentially in order</td></tr>
+        <tr><td>ScheduledThreadPool</td><td>Fixed pool for scheduled/repeating jobs</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Production: ThreadPoolTaskExecutor</div>
+      <div class="problem-code"><span class="kw">@Bean</span>
+<span class="cl">Executor</span> taskExecutor() {
+  <span class="cl">ThreadPoolTaskExecutor</span> ex =
+    <span class="kw">new</span> <span class="cl">ThreadPoolTaskExecutor</span>();
+  ex.setCorePoolSize(10);
+  ex.setMaxPoolSize(20);
+  ex.setQueueCapacity(100);
+  ex.initialize();
+  <span class="kw">return</span> ex;
+}</div>
+      <div class="note">Why not <code>new Thread()</code>? No pooling/reuse, no lifecycle management, no backpressure/queueing, resource exhaustion risk in production.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="concurrent-coll">7. Concurrent Collections &amp; Producer-Consumer</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">Concurrent Collections</div>
+      <table>
+        <tr><td class="cell-hl">ConcurrentHashMap</td><td>Bucket/node-level locking — thread-safe map, no full-map lock</td></tr>
+        <tr><td>CopyOnWriteArrayList</td><td>Copies array on write — best when reads &gt;&gt; writes</td></tr>
+        <tr><td>ConcurrentLinkedQueue</td><td>Lock-free, non-blocking FIFO queue</td></tr>
+        <tr><td>BlockingQueue</td><td>Blocks on put()/take() when full/empty — Producer-Consumer</td></tr>
+        <tr><td>ConcurrentSkipListMap</td><td>Thread-safe sorted map, concurrent version of TreeMap</td></tr>
+      </table>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-title">Producer-Consumer (BlockingQueue)</div>
+        <div class="problem-code"><span class="cl">BlockingQueue</span>&lt;Integer&gt; q =
+  <span class="kw">new</span> <span class="cl">ArrayBlockingQueue</span>&lt;&gt;(10);
+q.put(1);   <span class="cm">// producer, blocks if full</span>
+q.take();   <span class="cm">// consumer, blocks if empty</span></div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-title">ConcurrentHashMap</div>
+        <div class="problem-code"><span class="cl">ConcurrentHashMap</span>&lt;String,String&gt; map =
+  <span class="kw">new</span> <span class="cl">ConcurrentHashMap</span>&lt;&gt;();
+map.computeIfAbsent(<span class="st">"k"</span>, k -&gt; <span class="st">"v"</span>);</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="sync-utils">8. Synchronization Utilities</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Utility</th><th>Purpose</th></tr>
+      <tr><td class="cell-hl">CountDownLatch</td><td>One-time — main thread awaits N workers finishing (not reusable)</td></tr>
+      <tr><td class="cell-hl">CyclicBarrier</td><td>Reusable — all threads wait for each other at a checkpoint</td></tr>
+      <tr><td class="cell-hl">Semaphore</td><td>Limits N concurrent threads — DB pool, rate limiting</td></tr>
+      <tr><td>Phaser</td><td>Advanced reusable barrier with dynamic party registration</td></tr>
+      <tr><td>Exchanger</td><td>Two threads swap data at a synchronization point</td></tr>
+    </table>
+  </div>
+  <div class="problem-grid" style="margin-top:10px;">
+    <div class="problem-card">
+      <div class="problem-title">CountDownLatch</div>
+      <div class="problem-code"><span class="cl">CountDownLatch</span> latch =
+  <span class="kw">new</span> <span class="cl">CountDownLatch</span>(3);
+latch.countDown(); <span class="cm">// per worker</span>
+latch.await();     <span class="cm">// main thread</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Semaphore (Rate Limiting)</div>
+      <div class="problem-code"><span class="cl">Semaphore</span> sem = <span class="kw">new</span> <span class="cl">Semaphore</span>(5);
+sem.acquire();
+<span class="kw">try</span> { <span class="cm">/* limited resource */</span> }
+<span class="kw">finally</span> { sem.release(); }</div>
+    </div>
+  </div>
+  <div class="note">CountDownLatch vs CyclicBarrier — CountDownLatch is one-time use, parent thread waits; CyclicBarrier is reusable, all threads wait for each other.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="forkjoin">9. Fork-Join, Parallel Streams &amp; CompletableFuture</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">CompletableFuture Chain (Aggregator Pattern)</div>
+      <div class="flow-row">
+        <div class="pipe-box source">supplyAsync()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">thenApply()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">thenCombine()</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">exceptionally()</div>
+      </div>
+      <div class="note">Async Task → Transform → Combine Results → Handle Errors</div>
+      <div class="problem-code" style="margin-top:10px;"><span class="cl">CompletableFuture</span>&lt;User&gt; u =
+  <span class="cl">CompletableFuture</span>.supplyAsync(
+    () -&gt; userService.getUser());
+<span class="cl">CompletableFuture</span>&lt;Order&gt; o =
+  <span class="cl">CompletableFuture</span>.supplyAsync(
+    () -&gt; orderService.getOrders());
+<span class="cl">CompletableFuture</span>.allOf(u, o).join();</div>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">ForkJoinPool &amp; Parallel Stream</div>
+      <table>
+        <tr><td class="cell-hl">ForkJoinPool</td><td>Divide-and-conquer pool with work-stealing between idle threads</td></tr>
+        <tr><td>RecursiveTask&lt;V&gt;</td><td>Fork-join task that returns a result</td></tr>
+        <tr><td>RecursiveAction</td><td>Fork-join task with no return value</td></tr>
+        <tr><td>Work Stealing</td><td>Idle worker threads "steal" tasks from busy threads' queues</td></tr>
+        <tr><td class="cell-hl">parallelStream()</td><td>Uses common ForkJoinPool internally — good for CPU-bound work only</td></tr>
+      </table>
+      <div class="note" style="color:var(--re);">Avoid parallelStream() for: DB Calls, External APIs, Small Collections.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="threadlocal">10. ThreadLocal &amp; Spring Boot @Async</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">ThreadLocal</div>
+      <table>
+        <tr><td class="cell-hl">ThreadLocal&lt;T&gt;</td><td>Per-thread isolated copy of a variable — no sharing across threads</td></tr>
+        <tr><td>InheritableThreadLocal</td><td>Child threads inherit parent's ThreadLocal value</td></tr>
+        <tr><td>MDC (Logging)</td><td>Uses ThreadLocal to carry correlation/request-ID through logs</td></tr>
+      </table>
+      <div class="note">Use cases: User Context, Correlation ID, Request Tracking. Always call <code>.remove()</code> in thread pools to avoid leaks.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Spring Boot @Async</div>
+      <div class="problem-code"><span class="kw">@EnableAsync</span>
+
+<span class="kw">@Async</span>
+<span class="kw">public</span> <span class="cl">CompletableFuture</span>&lt;String&gt; process() {
+  <span class="kw">return</span> <span class="cl">CompletableFuture</span>
+    .completedFuture(<span class="st">"Done"</span>);
+}</div>
+      <div class="note" style="color:var(--re);">⚠ Will @Async work in a same-class self-invocation call? <b style="color:#fff;">NO</b> — Spring AOP proxy is bypassed; the method must be called through the Spring-managed bean.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="sizing">11. Thread Pool Sizing &amp; Kafka Concurrency</div>
+  <div class="tree-panel">
+    <div class="tree-title">Thread Pool Sizing (Frequently Asked)</div>
+    <div class="sizing-grid">
+      <div class="sizing-card">
+        <div class="slabel">CPU-Bound Tasks</div>
+        <div class="formula">Threads = CPU Cores + 1</div>
+        <div class="slabel">e.g. heavy computation, encryption, image processing</div>
+      </div>
+      <div class="sizing-card">
+        <div class="slabel">I/O-Bound Tasks</div>
+        <div class="formula">Threads = Cores × (1 + Wait/Compute)</div>
+        <div class="slabel">e.g. DB calls, REST API calls, file I/O — usually need larger pools</div>
+      </div>
+    </div>
+  </div>
+  <div class="flow-panel" style="margin-top:10px;">
+    <div class="tree-title">Kafka Consumer Concurrency (Partitions ≥ Consumers)</div>
+    <div class="problem-code">@KafkaListener(topics = <span class="st">"orders"</span>, concurrency = <span class="st">"3"</span>)
+
+<span class="cm">// 6 Partitions, 3 Consumers</span>
+Consumer-1 → P0, P1
+Consumer-2 → P2, P3
+Consumer-3 → P4, P5</div>
+    <div class="note">One partition is consumed by exactly one consumer within a group — extra consumers beyond partition count sit idle.</div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="troubleshoot">12. Production Troubleshooting</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">High CPU</span><span class="naming-arrow">→</span><span class="naming-meaning">Thread dump + profiler to find hot loops/threads</span></div>
+    <div class="naming-card"><span class="naming-prefix">Deadlock</span><span class="naming-arrow">→</span><span class="naming-meaning">Thread dump shows "waiting to lock" cycle</span></div>
+    <div class="naming-card"><span class="naming-prefix">Thread Dump</span><span class="naming-arrow">→</span><span class="naming-meaning">Snapshot of all thread states/stacks at a point in time</span></div>
+    <div class="naming-card"><span class="naming-prefix">Heap Dump</span><span class="naming-arrow">→</span><span class="naming-meaning">Snapshot of memory objects — for memory leak analysis</span></div>
+    <div class="naming-card"><span class="naming-prefix">Starvation</span><span class="naming-arrow">→</span><span class="naming-meaning">Thread never scheduled — check fairness / priorities</span></div>
+    <div class="naming-card"><span class="naming-prefix">Pool Exhaustion</span><span class="naming-arrow">→</span><span class="naming-meaning">All pool threads busy — queue grows, requests time out</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="mt-compare">13. Interview Comparisons &amp; Must-Know Code Snippets</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <table>
+        <tr><th>synchronized</th><th>ReentrantLock</th></tr>
+        <tr><td>JVM managed, auto-release</td><td>Manual lock/unlock (try/finally)</td></tr>
+        <tr><td>No tryLock()</td><td>tryLock() with timeout</td></tr>
+        <tr><td>Less flexible</td><td>Fair locking, interruptible</td></tr>
+      </table>
+      <table style="margin-top:10px;">
+        <tr><th>wait()</th><th>sleep()</th></tr>
+        <tr><td>Releases the lock</td><td>Keeps the lock</td></tr>
+        <tr><td>Object class</td><td>Thread class</td></tr>
+        <tr><td>Needs synchronized</td><td>No synchronized needed</td></tr>
+      </table>
+    </div>
+    <div class="table-panel">
+      <table>
+        <tr><th>HashMap</th><th>ConcurrentHashMap</th></tr>
+        <tr><td>Not thread-safe</td><td>Thread-safe, bucket-level locks</td></tr>
+        <tr><td>Race conditions possible</td><td>Safe concurrent access</td></tr>
+      </table>
+      <table style="margin-top:10px;">
+        <tr><th>CountDownLatch</th><th>CyclicBarrier</th></tr>
+        <tr><td>One-time use</td><td>Reusable</td></tr>
+        <tr><td>Main thread waits for workers</td><td>All threads wait for each other</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="problem-grid" style="margin-top:12px;">
+    <div class="problem-card">
+      <div class="problem-title">Runnable Task</div>
+      <div class="problem-code"><span class="kw">class</span> <span class="cl">MyTask</span> <span class="kw">implements</span> <span class="cl">Runnable</span> {
+  <span class="kw">public void</span> run() {
+    System.out.println(<span class="st">"Running"</span>);
+  }
+}</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Callable + Future</div>
+      <div class="problem-code"><span class="cl">Callable</span>&lt;String&gt; task = () -&gt; <span class="st">"Success"</span>;
+<span class="cl">Future</span>&lt;String&gt; f = executor.submit(task);
+<span class="kw">String</span> result = f.get(); <span class="cm">// blocks</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Synchronized Method / Block</div>
+      <div class="problem-code"><span class="kw">public synchronized void</span> increment() { count++; }
+
+<span class="kw">synchronized</span>(<span class="kw">this</span>) { count++; }</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">Volatile Flag (Safe Stop)</div>
+      <div class="problem-code"><span class="kw">private volatile boolean</span> running = <span class="kw">true</span>;
+<span class="cm">// running = false; from another thread
+// visible immediately to the loop thread</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">AtomicInteger Counter</div>
+      <div class="problem-code"><span class="cl">AtomicInteger</span> count = <span class="kw">new</span> <span class="cl">AtomicInteger</span>(0);
+count.incrementAndGet();
+count.getAndIncrement();</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">ExecutorService Basics</div>
+      <div class="problem-code"><span class="cl">ExecutorService</span> ex =
+  Executors.newFixedThreadPool(10);
+ex.submit(task);
+ex.shutdown();</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">ThreadLocal Context</div>
+      <div class="problem-code"><span class="cl">ThreadLocal</span>&lt;String&gt; user =
+  <span class="kw">new</span> <span class="cl">ThreadLocal</span>&lt;&gt;();
+user.set(<span class="st">"Pranik"</span>); user.get();
+user.remove(); <span class="cm">// avoid leaks in pools</span></div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">CompletableFuture Chain</div>
+      <div class="problem-code"><span class="cl">CompletableFuture</span>.supplyAsync(this::callService)
+  .thenApply(this::process)
+  .exceptionally(ex -&gt; <span class="st">"Fallback"</span>);</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="mt-revision">14. Multithreading — 30-Second Interview Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Concurrency ≠ Parallelism (overlap vs simultaneous)</div>
+      <div class="revision-item"><span class="chk">✓</span>Thread: NEW→RUNNABLE→RUNNING→(BLOCKED/WAITING/TIMED_WAITING)→TERMINATED</div>
+      <div class="revision-item"><span class="chk">✓</span>Prefer Runnable/Callable over extending Thread</div>
+      <div class="revision-item"><span class="chk">✓</span>Race Condition = unsynchronized shared-state read-modify-write</div>
+      <div class="revision-item"><span class="chk">✓</span>volatile = visibility only, NOT atomicity</div>
+      <div class="revision-item"><span class="chk">✓</span>Atomic classes use CAS — lock-free thread safety</div>
+      <div class="revision-item"><span class="chk">✓</span>ReentrantLock &gt; synchronized: tryLock(), fairness</div>
+      <div class="revision-item"><span class="chk">✓</span>Deadlock = circular wait on locks → prevent via lock ordering</div>
+      <div class="revision-item"><span class="chk">✓</span>wait() releases lock; sleep() keeps lock</div>
+      <div class="revision-item"><span class="chk">✓</span>Avoid new Thread() in enterprise code — use ExecutorService</div>
+      <div class="revision-item"><span class="chk">✓</span>CPU-bound pool size = cores + 1</div>
+      <div class="revision-item"><span class="chk">✓</span>I/O-bound pool size = cores × (1 + wait/compute)</div>
+      <div class="revision-item"><span class="chk">✓</span>parallelStream() uses common ForkJoinPool — avoid for I/O</div>
+      <div class="revision-item"><span class="chk">✓</span>CompletableFuture &gt; Future: non-blocking, chainable</div>
+      <div class="revision-item"><span class="chk">✓</span>ConcurrentHashMap: bucket-level locks, no full-map lock</div>
+      <div class="revision-item"><span class="chk">✓</span>CopyOnWriteArrayList: best when reads &gt;&gt; writes</div>
+      <div class="revision-item"><span class="chk">✓</span>CountDownLatch = one-time; CyclicBarrier = reusable</div>
+      <div class="revision-item"><span class="chk">✓</span>Semaphore = limit N concurrent threads (DB pool, rate limit)</div>
+      <div class="revision-item"><span class="chk">✓</span>ThreadLocal = per-thread isolated data (context, correlation ID)</div>
+      <div class="revision-item"><span class="chk">✓</span>@Async fails on self-invocation — AOP proxy bypassed</div>
+      <div class="revision-item"><span class="chk">✓</span>Kafka: partitions ≥ consumers; extra consumers idle</div>
+      <div class="revision-item"><span class="chk">✓</span>Troubleshooting: thread dump for deadlock/blocking, heap dump for memory</div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <div class="part-divider">
+    <div class="part-label">Part II</div>
+    <div class="part-title">Exception Handling</div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-basics">15. Exception Handling Basics &amp; Throwable Hierarchy</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Throwable Hierarchy</div>
+      <div class="tree-body"><span class="n">Object</span>
+<span class="c">└──</span> <span class="i">Throwable</span> <span class="n">(message + cause + stack trace)</span>
+<span class="c">    ├──</span> <span class="i re">Error</span> <span class="n">— serious JVM problems, usually unrecoverable</span>
+<span class="c">    └──</span> <span class="i bl">Exception</span> <span class="n">— application can handle/recover</span>
+<span class="c">        ├──</span> <span class="am">Checked Exception</span> <span class="n">— checked at compile time</span>
+<span class="c">        └──</span> <span class="i gr">RuntimeException</span> <span class="n">— Unchecked Exception, checked at runtime</span></div>
+      <div class="note">Without exception handling: error occurs → program terminates. With it: error occurs → exception caught → alternative logic runs → application continues.</div>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">Error vs Exception</div>
+      <table>
+        <tr><th>Error</th><th>Exception</th></tr>
+        <tr><td>Serious JVM problem, app should not handle</td><td>Unexpected but recoverable situation</td></tr>
+        <tr><td>OutOfMemoryError, StackOverflowError, NoClassDefFoundError</td><td>IOException, SQLException, ArithmeticException, NullPointerException</td></tr>
+      </table>
+      <div class="note">Purpose of exception handling: maintain normal program flow, prevent crashes, improve reliability, meaningful error messages, simplify debugging.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-checked">16. Checked vs Unchecked Exceptions</div>
+  <div class="cmp-panel">
+    <div class="cmp-card comparable">
+      <div class="cmp-header"><span class="cmp-name bl">Checked Exception</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Checked At</span><span class="cmp-val">Compile Time</span></div>
+        <div class="cmp-row"><span class="cmp-key">Handling</span><span class="cmp-val">Compiler forces try-catch OR throws</span></div>
+        <div class="cmp-row"><span class="cmp-key">Nature</span><span class="cmp-val">Recoverable</span></div>
+        <div class="cmp-row"><span class="cmp-key">Examples</span><span class="cmp-val">IOException, SQLException, ClassNotFoundException, FileNotFoundException, InterruptedException, ParseException</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card comparator">
+      <div class="cmp-header"><span class="cmp-name pu">Unchecked Exception</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Checked At</span><span class="cmp-val">Runtime</span></div>
+        <div class="cmp-row"><span class="cmp-key">Handling</span><span class="cmp-val">Compiler does NOT force handling</span></div>
+        <div class="cmp-row"><span class="cmp-key">Nature</span><span class="cmp-val">Usually a programming mistake</span></div>
+        <div class="cmp-row"><span class="cmp-key">Examples</span><span class="cmp-val">NullPointerException, ArithmeticException, ArrayIndexOutOfBoundsException, IllegalArgumentException, NumberFormatException, ClassCastException, ConcurrentModificationException</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Real Project Scenarios</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">IOException</span><span class="naming-arrow">→</span><span class="naming-meaning">Reading a CSV file</span></div>
+    <div class="naming-card"><span class="naming-prefix">SQLException</span><span class="naming-arrow">→</span><span class="naming-meaning">Database query failure</span></div>
+    <div class="naming-card"><span class="naming-prefix">InterruptedException</span><span class="naming-arrow">→</span><span class="naming-meaning">Background job interrupted</span></div>
+    <div class="naming-card"><span class="naming-prefix">NumberFormatException</span><span class="naming-arrow">→</span><span class="naming-meaning">Invalid user input</span></div>
+    <div class="naming-card"><span class="naming-prefix">NullPointerException</span><span class="naming-arrow">→</span><span class="naming-meaning">Missing API response field</span></div>
+    <div class="naming-card"><span class="naming-prefix">ArithmeticException</span><span class="naming-arrow">→</span><span class="naming-meaning">Division by zero in business calculation</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-trycatch">17. try / catch / finally — Execution Flow</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <table>
+        <tr><th>Block</th><th>Rule</th></tr>
+        <tr><td class="cell-hl">try</td><td>Contains risky code; only one try block before catch/finally</td></tr>
+        <tr><td class="cell-hl">catch</td><td>Handles a specific exception; can have multiple catch blocks, ordered specific → generic</td></tr>
+        <tr><td class="cell-hl">finally</td><td>Always executes (exception or not); used for cleanup — close resources, release connections</td></tr>
+        <tr><td>Multi-Catch (Java 7+)</td><td><code>catch(IOException | SQLException e)</code> — less code, better readability</td></tr>
+      </table>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Execution Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">try</div>
+        <span class="pipe-arrow">↓ No Exception</span>
+        <div class="pipe-box inter">Skip catch → finally → Continue</div>
+        <span class="pipe-arrow">↓ Exception Occurs</span>
+        <div class="pipe-box term">Matching catch → finally → Continue</div>
+      </div>
+      <div class="note">return inside try: finally still executes, then the method returns. <code>System.exit()</code> terminates the JVM — finally will NOT execute. Only one finally is allowed per try.</div>
+    </div>
+  </div>
+
+  <div class="section-label">final vs finally vs finalize()</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">final</span><span class="naming-arrow">→</span><span class="naming-meaning">Keyword — cannot change (variable/method/class)</span></div>
+    <div class="naming-card"><span class="naming-prefix">finally</span><span class="naming-arrow">→</span><span class="naming-meaning">Block — always executes</span></div>
+    <div class="naming-card"><span class="naming-prefix">finalize()</span><span class="naming-arrow">→</span><span class="naming-meaning">Method — called before GC, deprecated, don't use</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-throw">18. throw vs throws &amp; Exception Propagation</div>
+  <div class="cmp-panel">
+    <div class="cmp-card comparable">
+      <div class="cmp-header"><span class="cmp-name bl">throw</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Type</span><span class="cmp-val">Keyword — actually throws one exception</span></div>
+        <div class="cmp-row"><span class="cmp-key">Used</span><span class="cmp-val">Inside a method body, creates an exception object</span></div>
+        <div class="cmp-row"><span class="cmp-key">Syntax</span><span class="cmp-val code">throw new Exception(...);</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card comparator">
+      <div class="cmp-header"><span class="cmp-name pu">throws</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Type</span><span class="cmp-val">Declares possible exceptions in method signature</span></div>
+        <div class="cmp-row"><span class="cmp-key">Used</span><span class="cmp-val">Can declare multiple, does not itself throw anything</span></div>
+        <div class="cmp-row"><span class="cmp-key">Syntax</span><span class="cmp-val code">void readFile() throws IOException</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-panel" style="margin-top:10px;">
+    <div class="tree-title">Exception Propagation Flow</div>
+    <div class="flow-row">
+      <div class="pipe-box source">main()</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">service()</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">repository()</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box term">Exception thrown</div><span class="pipe-arrow">→ propagates back →</span>
+      <div class="pipe-box gc">Handled at main()/service()</div>
+    </div>
+    <div class="note">Checked exceptions must be handled or declared at every level. Unchecked exceptions automatically propagate until caught.</div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-custom">19. Custom &amp; Business Exceptions</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Custom Exception Hierarchy</div>
+      <div class="tree-body"><span class="n">Exception</span>
+<span class="c">└──</span> <span class="i am">BusinessException</span>
+<span class="c">    ├──</span> <span class="am">UserNotFoundException</span>
+<span class="c">    ├──</span> <span class="am">PaymentFailedException</span>
+<span class="c">    └──</span> <span class="am">CourseNotFoundException</span></div>
+      <div class="note">Create custom exceptions for: User Not Found, Insufficient Balance, Course Already Exists, Certificate Expired, Invalid OTP, Payment Failed.</div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card comparable">
+        <div class="cmp-header"><span class="cmp-name bl">Checked Custom Exception</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Extends</span><span class="cmp-val">Exception</span></div>
+          <div class="cmp-row"><span class="cmp-key">Handling</span><span class="cmp-val">Compiler forces handling, recoverable</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card comparator">
+        <div class="cmp-header"><span class="cmp-name pu">Runtime Custom Exception</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Extends</span><span class="cmp-val">RuntimeException</span></div>
+          <div class="cmp-row"><span class="cmp-key">Handling</span><span class="cmp-val">Preferred for business validation — Spring Boot standard</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Technical vs Business Exception</div>
+  <div class="naming-grid">
+    <div class="naming-card"><span class="naming-prefix">Technical</span><span class="naming-arrow">→</span><span class="naming-meaning">IOException, SQLException, Network Failure, Timeout</span></div>
+    <div class="naming-card"><span class="naming-prefix">Business</span><span class="naming-arrow">→</span><span class="naming-meaning">Duplicate User, Invalid Password, Invalid OTP, Course Closed</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-twr">20. Try-With-Resources, Suppressed &amp; Exception Chaining</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Try-With-Resources (Java 7+)</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Open Resource</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Use Resource</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Resource Automatically Closed (finally not required)</div>
+      </div>
+      <div class="note">Works with AutoCloseable/Closeable: FileInputStream, BufferedReader, Scanner, Connection, PreparedStatement, ResultSet, Socket. Benefits: less boilerplate, no resource leaks, recommended for JDBC.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Suppressed Exception &amp; Exception Chaining</div>
+      <div class="tree-body"><span class="i am">Suppressed Exception</span> <span class="n">→ occurs when a primary exception already exists and another exception occurs while closing a resource; it gets attached to the primary exception</span>
+<span class="i bl">Exception Chaining</span> <span class="n">→ wraps one exception inside another to preserve the original cause (e.g. SQLException → RepositoryException → ServiceException → Controller)</span></div>
+      <div class="note">Why chaining? Preserve root cause, better debugging, layer separation — enterprise standard.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Stack Trace</div>
+  <div class="note">Sequence of method calls leading to the exception. Read bottom → top; the root cause is usually the last "Caused by".</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-spring">21. Spring Boot Exception Handling</div>
+  <div class="flow-panel">
+    <div class="tree-title">Global Exception Flow</div>
+    <div class="flow-row">
+      <div class="pipe-box source">Client Request</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">Controller</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">Service</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">Repository</div><span class="pipe-arrow">→ Exception →</span>
+      <div class="pipe-box term">Global Exception Handler</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box gc">JSON Error Response → Client</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:10px;">
+    <div class="table-panel">
+      <div class="tree-title">Local vs Global Exception Handling</div>
+      <table>
+        <tr><th>Local (try-catch)</th><th>Global (@ControllerAdvice)</th></tr>
+        <tr><td>Inside method, repeated code, hard to maintain</td><td>Centralized, reusable, recommended</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:10px;">@ControllerAdvice vs @RestControllerAdvice</div>
+      <table>
+        <tr><th>@ControllerAdvice</th><th>@RestControllerAdvice</th></tr>
+        <tr><td>MVC + REST, needs @ResponseBody for JSON</td><td>= @ControllerAdvice + @ResponseBody, returns JSON automatically — preferred for REST APIs</td></tr>
+      </table>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">@ResponseStatus vs ResponseStatusException</div>
+      <table>
+        <tr><th>@ResponseStatus</th><th>ResponseStatusException</th></tr>
+        <tr><td>Static mapping on a custom exception class</td><td>Dynamic HTTP status without creating a custom exception class</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:10px;">@ExceptionHandler — Example Mappings</div>
+      <table>
+        <tr><td>UserNotFoundException</td><td class="cell-hl">404</td></tr>
+        <tr><td>DuplicateUserException</td><td class="cell-hl">409</td></tr>
+        <tr><td>IllegalArgumentException / Validation Exception</td><td class="cell-hl">400</td></tr>
+        <tr><td>AccessDeniedException</td><td class="cell-hl">403</td></tr>
+        <tr><td>AuthenticationException</td><td class="cell-hl">401</td></tr>
+        <tr><td>Unhandled Exception</td><td class="cell-hl">500</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label">ProblemDetail (Spring Boot 3 · RFC 9457) &amp; Standard Error Response</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">ProblemDetail Fields</div>
+      <div class="tree-body"><span class="n">type · title · status · detail · instance</span></div>
+      <div class="note">Standard, REST-friendly, extensible error format provided by Spring Boot 3.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Recommended Error Response Fields</div>
+      <div class="tree-body"><span class="n">timestamp · status · error · message · path · traceId · requestId · errors (validation)</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-validation">22. Validation Exceptions &amp; HTTP Status Cheat Sheet</div>
+  <div class="two-col">
+    <div class="table-panel">
+      <div class="tree-title">Validation Flow</div>
+      <div class="flow-row">
+        <div class="pipe-box source">@RequestBody</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box inter">@Valid</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box term">MethodArgumentNotValidException</div><span class="pipe-arrow">→</span>
+        <div class="pipe-box gc">Global Handler → Validation Errors</div>
+      </div>
+      <div class="note">Common annotations: @NotNull @NotBlank @NotEmpty @Size @Email @Pattern @Positive @Min @Max @Past @Future</div>
+      <table style="margin-top:10px;">
+        <tr><th>Exception</th><th>Occurs When</th></tr>
+        <tr><td>MethodArgumentNotValidException</td><td>@RequestBody validation fails</td></tr>
+        <tr><td>ConstraintViolationException</td><td>@PathVariable / @RequestParam validation fails</td></tr>
+        <tr><td>BindException</td><td>Object binding fails (form data, query params)</td></tr>
+        <tr><td>HttpMessageNotReadableException</td><td>Invalid/malformed JSON, wrong data type</td></tr>
+        <tr><td>HttpRequestMethodNotSupportedException</td><td>Wrong HTTP method (e.g. GET instead of POST)</td></tr>
+        <tr><td>NoHandlerFoundException</td><td>Requested URL not found → 404</td></tr>
+      </table>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title">HTTP Status Cheat Sheet</div>
+      <table>
+        <tr><td class="cell-hl">200</td><td>OK</td></tr>
+        <tr><td class="cell-hl">201</td><td>Created</td></tr>
+        <tr><td class="cell-hl">204</td><td>No Content</td></tr>
+        <tr><td class="cell-hl">400</td><td>Bad Request</td></tr>
+        <tr><td class="cell-hl">401</td><td>Unauthorized</td></tr>
+        <tr><td class="cell-hl">403</td><td>Forbidden</td></tr>
+        <tr><td class="cell-hl">404</td><td>Not Found</td></tr>
+        <tr><td class="cell-hl">405</td><td>Method Not Allowed</td></tr>
+        <tr><td class="cell-hl">409</td><td>Conflict</td></tr>
+        <tr><td class="cell-hl">422</td><td>Unprocessable Entity (optional)</td></tr>
+        <tr><td class="cell-hl">500</td><td>Internal Server Error</td></tr>
+        <tr><td class="cell-hl">503</td><td>Service Unavailable</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label">Real Project Scenarios</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">User Registration</span><span class="naming-arrow">→</span><span class="naming-meaning">Duplicate Email → 409 Conflict</span></div>
+    <div class="naming-card"><span class="naming-prefix">Login</span><span class="naming-arrow">→</span><span class="naming-meaning">Invalid Credentials → 401 Unauthorized</span></div>
+    <div class="naming-card"><span class="naming-prefix">Certificate Portal</span><span class="naming-arrow">→</span><span class="naming-meaning">Certificate Not Found → 404</span></div>
+    <div class="naming-card"><span class="naming-prefix">Course Enrollment</span><span class="naming-arrow">→</span><span class="naming-meaning">Course Full → 400 Bad Request</span></div>
+    <div class="naming-card"><span class="naming-prefix">Payment</span><span class="naming-arrow">→</span><span class="naming-meaning">Gateway Timeout → 503 Service Unavailable</span></div>
+    <div class="naming-card"><span class="naming-prefix">Database</span><span class="naming-arrow">→</span><span class="naming-meaning">Constraint Violation → 409 Conflict</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-practices">23. Best Practices &amp; Anti-Patterns</div>
+  <div class="two-col">
+    <div class="revision-panel">
+      <div class="tree-title">✓ Best Practices</div>
+      <div class="revision-grid cols-1">
+        <div class="revision-item"><span class="chk">✓</span>Catch specific exceptions first, most specific → most generic</div>
+        <div class="revision-item"><span class="chk">✓</span>Never catch Throwable; never ignore exceptions</div>
+        <div class="revision-item"><span class="chk">✓</span>Keep try blocks small; always close resources</div>
+        <div class="revision-item"><span class="chk">✓</span>Use try-with-resources for JDBC/file IO</div>
+        <div class="revision-item"><span class="chk">✓</span>Log exceptions properly; log once, handle once</div>
+        <div class="revision-item"><span class="chk">✓</span>Create business-specific exceptions; extend RuntimeException for business errors</div>
+        <div class="revision-item"><span class="chk">✓</span>Preserve root cause via exception chaining</div>
+        <div class="revision-item"><span class="chk">✓</span>Use @RestControllerAdvice + standard ErrorResponse DTO</div>
+        <div class="revision-item"><span class="chk">✓</span>Map correct HTTP status codes; validate input using @Valid</div>
+        <div class="revision-item"><span class="chk">✓</span>Don't expose internal stack trace to clients; include correlation/trace ID</div>
+      </div>
+    </div>
+    <div class="table-panel">
+      <div class="tree-title" style="color:var(--re);">✗ Anti-Patterns</div>
+      <table>
+        <tr><td>✗ Catch Exception / Throwable everywhere</td></tr>
+        <tr><td>✗ Empty catch block</td></tr>
+        <tr><td>✗ Printing stack trace in production</td></tr>
+        <tr><td>✗ Using exceptions for normal control flow</td></tr>
+        <tr><td>✗ Throwing generic Exception</td></tr>
+        <tr><td>✗ Swallowing exceptions silently</td></tr>
+        <tr><td>✗ Returning null instead of throwing an exception</td></tr>
+      </table>
+      <div class="note">Logging strategy: Business Exception → WARN, Validation Error → INFO, Technical Exception → ERROR. Never log passwords, OTPs, JWTs, or other sensitive data.</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exc-revision">24. Exception Handling — One-Liner Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">›</span><b>Throwable</b> → Parent of Errors &amp; Exceptions</div>
+      <div class="revision-item"><span class="chk">›</span><b>Error</b> → JVM Problem</div>
+      <div class="revision-item"><span class="chk">›</span><b>Exception</b> → Recoverable Problem</div>
+      <div class="revision-item"><span class="chk">›</span><b>Checked Exception</b> → Compile Time</div>
+      <div class="revision-item"><span class="chk">›</span><b>Unchecked Exception</b> → Runtime</div>
+      <div class="revision-item"><span class="chk">›</span><b>try</b> → Risky Code</div>
+      <div class="revision-item"><span class="chk">›</span><b>catch</b> → Handle Exception</div>
+      <div class="revision-item"><span class="chk">›</span><b>finally</b> → Cleanup Block</div>
+      <div class="revision-item"><span class="chk">›</span><b>Multi-Catch</b> → One catch for multiple exceptions</div>
+      <div class="revision-item"><span class="chk">›</span><b>throw</b> → Explicitly throw exception</div>
+      <div class="revision-item"><span class="chk">›</span><b>throws</b> → Declare possible exception</div>
+      <div class="revision-item"><span class="chk">›</span><b>Propagation</b> → Travels to caller until handled</div>
+      <div class="revision-item"><span class="chk">›</span><b>Custom Exception</b> → Business-meaningful exception</div>
+      <div class="revision-item"><span class="chk">›</span><b>Try-With-Resources</b> → Auto resource cleanup</div>
+      <div class="revision-item"><span class="chk">›</span><b>AutoCloseable</b> → Interface enabling auto-close</div>
+      <div class="revision-item"><span class="chk">›</span><b>Suppressed Exception</b> → Exception during resource close</div>
+      <div class="revision-item"><span class="chk">›</span><b>Exception Chaining</b> → Wrap original exception (preserve cause)</div>
+      <div class="revision-item"><span class="chk">›</span><b>Stack Trace</b> → Method call history to the exception</div>
+      <div class="revision-item"><span class="chk">›</span><b>@ControllerAdvice</b> → Global exception handler</div>
+      <div class="revision-item"><span class="chk">›</span><b>@RestControllerAdvice</b> → REST global handler (JSON)</div>
+      <div class="revision-item"><span class="chk">›</span><b>@ExceptionHandler</b> → Handles a specific exception</div>
+      <div class="revision-item"><span class="chk">›</span><b>@ResponseStatus</b> → Static HTTP status</div>
+      <div class="revision-item"><span class="chk">›</span><b>ResponseStatusException</b> → Dynamic HTTP status</div>
+      <div class="revision-item"><span class="chk">›</span><b>ProblemDetail</b> → Standard Spring Boot 3 error format</div>
+      <div class="revision-item"><span class="chk">›</span><b>MethodArgumentNotValidException</b> → Request body validation</div>
+      <div class="revision-item"><span class="chk">›</span><b>ConstraintViolationException</b> → Parameter validation</div>
+      <div class="revision-item"><span class="chk">›</span><b>AccessDeniedException</b> → 403</div>
+      <div class="revision-item"><span class="chk">›</span><b>AuthenticationException</b> → 401</div>
+      <div class="revision-item"><span class="chk">›</span><b>Global Handler</b> → Central error management</div>
+      <div class="revision-item"><span class="chk">›</span><b>final vs finally vs finalize()</b> → constant / cleanup block / deprecated GC hook</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="flow">25. Final Combined Revision Flow</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">15-Minute Multithreading Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Fundamentals → Thread Lifecycle</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Thread Creation (Runnable/Callable)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Thread Safety (Sync/Volatile/Atomic/CAS)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Locking &amp; Deadlock</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Executor Framework &amp; Thread Pools</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Concurrent Collections &amp; Sync Utilities</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Fork-Join / CompletableFuture / @Async / Kafka</div>
+      </div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">15-Minute Exception Handling Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Throwable Hierarchy → Checked/Unchecked</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">try / catch / finally</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">throw vs throws → Propagation</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Custom Exception → Try-With-Resources</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">@ControllerAdvice → @ExceptionHandler</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">ProblemDetail → Validation Exceptions</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Logging → Production Best Practices</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Interviewers Expect You To Explain</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="i gr">✓ Thread Lifecycle &amp; Internal Working of Executors</span>  <span class="i bl">✓ Race Conditions &amp; Synchronization Strategies</span>
+<span class="i am">✓ Deadlock Causes &amp; Prevention</span>  <span class="i pu">✓ CompletableFuture / Parallel Streams Trade-offs</span>
+<span class="i cy">✓ Checked vs Unchecked Exception Design Choices</span>  <span class="i gr">✓ Global Exception Handling in Spring Boot</span>
+<span class="i bl">✓ Exception Chaining &amp; Root-Cause Preservation</span>  <span class="i re">✓ Real Production Troubleshooting (deadlocks, thread dumps, pool exhaustion)</span></div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
