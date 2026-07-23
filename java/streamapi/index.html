@@ -197,8 +197,7 @@
     <div class="problem-card">
       <div class="problem-title">Count Employees by Department</div>
       <div class="problem-code">employees.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Employee::getDepartment, <span class="cl">Collectors</span>.counting()));</div>
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getDepartment, <span class="cl">Collectors</span>.counting()));</div>
     </div>
     <div class="problem-card">
       <div class="problem-title">Average Salary by Department</div>
@@ -238,13 +237,10 @@ list.stream()
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
     </div>
     <div class="problem-card">
-      <div class="problem-title">Duplicate Employee Names &#11088; &#11088;</div>
-      <div class="problem-code">employees.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getName, <span class="cl">Collectors</span>.counting()))
-   .entrySet().stream()
-   .<span class="mt">filter</span>(en -&gt; en.getValue() &gt; 1)
-   .<span class="mt">map</span>(Map.Entry::getKey)     //.map(entry -> entry.getKey())
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toSet());</div>
+      <div class="problem-title">Sum of Salary by Department</div>
+      <div class="problem-code">list.stream()
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getDepartment,
+       <span class="cl">Collectors</span>.summingDouble(Employee::getSalary)));</div>
     </div>
     <div class="problem-card">
       <div class="problem-title">Salary &gt; 20000 AND Gender Male</div>
@@ -253,13 +249,16 @@ list.stream()
    .<span class="mt">filter</span>(e -&gt; e.getGender().equalsIgnoreCase(<span class="st">"Male"</span>))
    .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toList());</div>
     </div>
-    <div class="problem-card">
-      <div class="problem-title">Sum of Salary by Department</div>
-      <div class="problem-code">list.stream()
-   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(
-       Employee::getDepartment,
-       <span class="cl">Collectors</span>.summingDouble(Employee::getSalary)));</div>
+	<div class="problem-card">
+      <div class="problem-title">Duplicate Employee Names &#11088; &#11088;</div>
+      <div class="problem-code">employees.stream()
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.groupingBy(Employee::getName, <span class="cl">Collectors</span>.counting()))
+   .entrySet().stream()
+   .<span class="mt">filter</span>(en -&gt; en.getValue() &gt; 1)
+   .<span class="mt">map</span>(Map.Entry::getKey)     //.map(e -> e.getKey())
+   .<span class="mt">collect</span>(<span class="cl">Collectors</span>.toSet());</div>
     </div>
+    
     <div class="problem-card">
       <div class="problem-title">First Non-Repeating Character | String str = "swiss &#11088; &#11088; </div>
       <div class="problem-code">str.chars().mapToObj(c -&gt; (<span class="kw">char</span>) c)
