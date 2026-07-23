@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Boot — Complete Interview Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14; --panel:#12161f; --panel2:#151a24; --border:#232a38; --border-soft:#1b212d;
+  --text:#c9d1d9; --dim:#6e7681; --dim2:#8892a0;
+  --cy:#39c5cf; --bl:#58a6ff; --gr:#3fb950; --am:#e3b341; --pu:#a371f7; --re:#f778ba; --or:#ff9a5a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'JetBrains Mono', monospace; font-size:14px; line-height:1.55;
+  padding:28px 16px 80px;
+}
+.page{max-width:1180px; margin:0 auto;}
+
+/* HEADER */
+.header{border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:22px;}
+.header-top{display:flex; align-items:baseline; gap:10px;}
+.prompt{color:var(--gr); font-weight:700; font-size:20px;}
+.title{font-size:22px; font-weight:700; color:#fff; letter-spacing:.3px;}
+.subtitle{color:var(--dim); margin-top:6px; font-size:13px;}
+.toc{margin-top:14px; display:flex; flex-wrap:wrap; gap:6px 10px;}
+.toc a{color:var(--cy); text-decoration:none; font-size:12px; border:1px solid var(--border-soft); padding:3px 9px; border-radius:20px;}
+.toc a:hover{border-color:var(--cy);}
+
+/* SECTION LABEL */
+.section-label{
+  font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:var(--dim2);
+  margin:34px 0 10px; padding-bottom:6px; border-bottom:1px dashed var(--border);
+  display:flex; align-items:center; gap:8px;
+}
+.section-label::before{content:"//"; color:var(--gr);}
+.section-label.big{font-size:14px; color:#fff; margin-top:46px; padding:10px 0; border-bottom:1px solid var(--border);}
+.section-label.big::before{content:"§";}
+
+/* CARDS GRID */
+.cards-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cards-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.cards-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.cards-grid.cols-6{grid-template-columns:repeat(6,1fr);}
+.card{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:12px 14px; border-left:3px solid var(--dim);}
+.card-name{font-weight:700; color:#fff; font-size:13px; margin-bottom:4px;}
+.card-desc{color:var(--dim2); font-size:12px;}
+.card-cy{border-left-color:var(--cy);} .card-cy .card-name{color:var(--cy);}
+.card-bl{border-left-color:var(--bl);} .card-bl .card-name{color:var(--bl);}
+.card-gr{border-left-color:var(--gr);} .card-gr .card-name{color:var(--gr);}
+.card-am{border-left-color:var(--am);} .card-am .card-name{color:var(--am);}
+.card-pu{border-left-color:var(--pu);} .card-pu .card-name{color:var(--pu);}
+.card-re{border-left-color:var(--re);} .card-re .card-name{color:var(--re);}
+.card-or{border-left-color:var(--or);} .card-or .card-name{color:var(--or);}
+
+/* LEGEND */
+.legend{display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--panel2); border:1px solid var(--border-soft); border-radius:6px; padding:8px 14px; margin-top:10px;}
+.legend-label{color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:1px;}
+.legend-items{display:flex; gap:14px; flex-wrap:wrap;}
+.legend-item{font-size:12px; color:var(--dim2); display:flex; align-items:center; gap:6px;}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+.dot-cy{background:var(--cy);} .dot-bl{background:var(--bl);} .dot-gr{background:var(--gr);}
+.dot-am{background:var(--am);} .dot-pu{background:var(--pu);} .dot-re{background:var(--re);} .dot-or{background:var(--or);}
+
+/* NAMING / KEY POINT GRID */
+.naming-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+.naming-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.naming-card{background:var(--panel); border:1px solid var(--border-soft); border-radius:6px; padding:10px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+.naming-prefix{color:#fff; font-weight:700; font-size:12.5px; white-space:nowrap;}
+.naming-arrow{color:var(--dim);}
+.naming-meaning{color:var(--dim2); font-size:12.5px;}
+
+/* TWO / THREE COL LAYOUT */
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+
+/* TREE PANEL */
+.tree-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.tree-title{font-size:12.5px; font-weight:700; color:#fff; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;}
+.tree-body{font-size:12.5px; white-space:pre-wrap; line-height:1.75;}
+.tree-body .c{color:var(--dim); }
+.tree-body .n{color:var(--dim2);}
+.tree-body .i{font-weight:700;}
+.tree-body .cy{color:var(--cy);} .tree-body .bl{color:var(--bl);} .tree-body .gr{color:var(--gr);}
+.tree-body .am{color:var(--am);} .tree-body .pu{color:var(--pu);} .tree-body .re{color:var(--re);}
+
+/* API TABLE */
+table.api-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+table.api-table td{padding:5px 6px; border-bottom:1px solid var(--border-soft); vertical-align:top;}
+.api-code{font-weight:700; white-space:nowrap; width:1%;}
+.api-code.cy{color:var(--cy);} .api-code.bl{color:var(--bl);} .api-code.gr{color:var(--gr);}
+.api-code.am{color:var(--am);} .api-code.pu{color:var(--pu);} .api-code.re{color:var(--re);}
+.api-desc{color:var(--dim2);}
+.api-desc code{color:var(--am); background:rgba(255,255,255,.04); padding:1px 5px; border-radius:4px;}
+
+/* PILLAR PANEL */
+.pillar-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.pillar-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.pillar-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.pillar-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.pillar-card{border:1px solid var(--border-soft); border-radius:6px; padding:12px 14px; background:var(--panel2);}
+.pillar-name{font-weight:700; font-size:13.5px; margin-bottom:6px;}
+.pillar-name.bl{color:var(--bl);} .pillar-name.gr{color:var(--gr);} .pillar-name.am{color:var(--am);} .pillar-name.pu{color:var(--pu);} .pillar-name.cy{color:var(--cy);} .pillar-name.re{color:var(--re);}
+.pillar-def{color:var(--dim2); font-size:12.5px; margin-bottom:8px;}
+.pillar-tag{display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin:0 5px 5px 0; border:1px solid var(--border);}
+.tag-bl{color:var(--bl); border-color:rgba(88,166,255,.35);}
+.tag-gr{color:var(--gr); border-color:rgba(63,185,80,.35);}
+.tag-am{color:var(--am); border-color:rgba(227,179,65,.35);}
+.tag-pu{color:var(--pu); border-color:rgba(163,113,247,.35);}
+.tag-cy{color:var(--cy); border-color:rgba(57,197,207,.35);}
+.tag-re{color:var(--re); border-color:rgba(247,120,186,.35);}
+.pillar-example{margin-top:8px; font-size:12px; color:var(--dim2); border-top:1px dashed var(--border-soft); padding-top:6px;}
+.pillar-example b{color:#fff;}
+
+/* TABLE PANEL (real tables) */
+.table-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.table-panel table, .bottom-grid table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px;}
+.table-panel th, .bottom-grid th{text-align:left; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border);}
+.table-panel td, .bottom-grid td{padding:6px 8px; border-bottom:1px solid var(--border-soft); color:var(--dim2);}
+.yes{color:var(--gr); font-weight:700;}
+.no{color:var(--re); font-weight:700;}
+.cell-hl{color:var(--am); font-weight:700;}
+.bottom-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+/* CMP PANEL (comparisons) */
+.cmp-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:2px;}
+.cmp-card{padding:10px 4px;}
+.cmp-header{margin-bottom:6px;}
+.cmp-name{font-weight:700; font-size:13.5px;}
+.cmp-name.bl{color:var(--bl);} .cmp-name.pu{color:var(--pu);} .cmp-name.gr{color:var(--gr);} .cmp-name.am{color:var(--am);} .cmp-name.cy{color:var(--cy);} .cmp-name.re{color:var(--re);}
+.cmp-rows{display:flex; flex-direction:column; gap:3px;}
+.cmp-row{display:flex; gap:10px; font-size:12.5px;}
+.cmp-key{color:var(--dim); width:100px; flex-shrink:0;}
+.cmp-val{color:var(--dim2);}
+.cmp-val.code{color:var(--am); font-size:12px;}
+.cmp-val.green{color:var(--gr);}
+.cmp-val.purple{color:var(--pu);}
+.cmp-divider{height:1px; background:var(--border-soft); margin:4px 0;}
+
+/* FLOW / PIPELINE */
+.flow-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.flow-row{display:flex; align-items:center; flex-wrap:wrap; gap:8px;}
+.pipe-box{border:1px solid var(--border); border-radius:6px; padding:7px 12px; font-size:12px; font-weight:700; background:var(--panel2);}
+.pipe-box.source{color:var(--cy); border-color:rgba(57,197,207,.4);}
+.pipe-box.inter{color:var(--bl); border-color:rgba(88,166,255,.4);}
+.pipe-box.term{color:var(--am); border-color:rgba(227,179,65,.4);}
+.pipe-box.gc{color:var(--gr); border-color:rgba(63,185,80,.4);}
+.pipe-box.warn{color:var(--re); border-color:rgba(247,120,186,.4);}
+.pipe-arrow{color:var(--dim);}
+.flow-vert{display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
+.flow-vert .pipe-arrow{align-self:center; margin-left:60px;}
+
+/* PROBLEM / CODE CARDS */
+.problem-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+.problem-card{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px; border-left:3px solid var(--gr);}
+.problem-title{font-weight:700; color:var(--gr); font-size:12.5px; margin-bottom:6px;}
+.problem-code{font-size:12px; color:var(--dim2); background:var(--panel2); border-radius:6px; padding:8px 10px; white-space:pre-wrap; line-height:1.6;}
+.problem-code .kw{color:var(--pu);}
+.problem-code .cl{color:var(--am);}
+.problem-code .mt{color:var(--bl);}
+.problem-code .st{color:var(--gr);}
+.problem-code .cm{color:var(--dim); font-style:italic;}
+
+/* REVISION CHECKLIST */
+.revision-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.revision-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px 20px;}
+.revision-grid.cols-1{grid-template-columns:1fr;}
+.revision-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.revision-item{font-size:12.5px; color:var(--dim2); display:flex; gap:8px;}
+.chk{color:var(--gr); font-weight:700;}
+
+/* Q&A */
+.qa{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px;}
+.qa .q{color:#fff; font-weight:700; font-size:13px; margin-bottom:6px;}
+.qa .q::before{content:"Q: "; color:var(--am);}
+.qa .a{color:var(--dim2); font-size:12.5px;}
+
+/* MISC */
+code{font-family:'JetBrains Mono', monospace;}
+.note{font-size:12px; color:var(--dim); margin-top:8px;}
+.badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.badge{font-size:11px; padding:3px 9px; border:1px solid var(--border); border-radius:20px; color:var(--dim2);}
+
+@media(max-width:820px){
+  .cards-grid, .cards-grid.cols-3, .cards-grid.cols-5, .cards-grid.cols-6{grid-template-columns:repeat(2,1fr);}
+  .two-col, .three-col, .bottom-grid, .pillar-grid, .pillar-grid.cols-3, .pillar-grid.cols-5, .naming-grid, .naming-grid.cols-3, .revision-grid, .revision-grid.cols-3, .problem-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Spring Boot — Complete Interview Revision</span>
+    </div>
+    <div class="subtitle">// 5-7 Yrs Experience — Auto Configuration, REST, JPA, Security, Production &amp; Microservices</div>
+    <div class="toc">
+      <a href="#why">Why Spring Boot?</a>
+      <a href="#sba">@SpringBootApplication</a>
+      <a href="#startup">Startup Flow &amp; Runners</a>
+      <a href="#autoconfig">Auto Configuration</a>
+      <a href="#starters">Starters, Initializr &amp; Embedded Server</a>
+      <a href="#iocdi">IoC &amp; DI</a>
+      <a href="#lifecycle">Bean Lifecycle &amp; Scopes</a>
+      <a href="#stereotypes">Stereotype Annotations</a>
+      <a href="#config">Configuration &amp; Profiles</a>
+      <a href="#conditional">Conditional Annotations</a>
+      <a href="#mvc">Spring MVC &amp; REST</a>
+      <a href="#validation">Validation</a>
+      <a href="#exceptions">Exception Handling</a>
+      <a href="#jpa">Spring Data JPA</a>
+      <a href="#relationships">Relationships, N+1 &amp; Performance</a>
+      <a href="#hibernate">Hibernate &amp; Persistence Context</a>
+      <a href="#transactions">Transactions &amp; Locking</a>
+      <a href="#pool">Connection Pooling</a>
+      <a href="#security">Spring Security &amp; JWT</a>
+      <a href="#caching">Caching</a>
+      <a href="#async">Async Processing</a>
+      <a href="#testing">Testing</a>
+      <a href="#actuator">Actuator</a>
+      <a href="#production">DevTools, Packaging &amp; Production</a>
+      <a href="#microservices">Microservices Communication</a>
+      <a href="#patterns">Design Patterns</a>
+      <a href="#issues">Production Issue Troubleshooting</a>
+      <a href="#differences">Top Interview Differences</a>
+      <a href="#scenarios">Real Project Scenarios</a>
+      <a href="#oneliners">Interview One-Liners</a>
+      <a href="#flow15">15-Minute Final Revision</a>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="why">1. What Is Spring Boot? Why Spring Boot?</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="n">Spring Boot is an </span><span class="i am">opinionated framework</span><span class="n">, an extension built on top of the Spring Framework, used to build production-ready, stand-alone applications with minimal configuration.</span>
+<span class="n">Opinionated Framework → provides sensible defaults so developers focus on business logic instead of configuration.</span>
+<span class="i gr">Spring Boot = Spring Framework + Automation</span></div>
+  </div>
+
+  <div class="two-col" style="margin-top:10px;">
+    <div class="flow-panel">
+      <div class="tree-title">Without Spring Boot</div>
+      <div class="flow-vert">
+        <div class="pipe-box warn">Create Project</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box warn">Add Dependencies</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box warn">Configure XML / Java Config</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box warn">Configure Tomcat, DispatcherServlet, Database, Logging</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box warn">More Boilerplate</div>
+      </div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">With Spring Boot</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Create Project</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Add Starter</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Run Application</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Ready</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Spring vs Spring Boot</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Spring Framework</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Configuration</span><span class="cmp-val">More Configuration — XML / Java Config</span></div>
+        <div class="cmp-row"><span class="cmp-key">Server</span><span class="cmp-val">External Server Required</span></div>
+        <div class="cmp-row"><span class="cmp-key">Dependencies</span><span class="cmp-val">Manual Dependency Management</span></div>
+        <div class="cmp-row"><span class="cmp-key">Nature</span><span class="cmp-val">Flexible, Foundation Layer</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">Spring Boot</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Configuration</span><span class="cmp-val">Minimal Configuration, Opinionated Defaults</span></div>
+        <div class="cmp-row"><span class="cmp-key">Server</span><span class="cmp-val">Embedded Tomcat / Jetty / Undertow</span></div>
+        <div class="cmp-row"><span class="cmp-key">Dependencies</span><span class="cmp-val">Starter Dependencies, Auto Configuration</span></div>
+        <div class="cmp-row"><span class="cmp-key">Nature</span><span class="cmp-val">Rapid Development, Production Ready</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Features / Advantages Of Spring Boot</div>
+  <div class="cards-grid cols-5">
+    <div class="card card-cy"><div class="card-name">Auto Configuration</div></div>
+    <div class="card card-bl"><div class="card-name">Starter Dependencies</div></div>
+    <div class="card card-gr"><div class="card-name">Embedded Server</div></div>
+    <div class="card card-am"><div class="card-name">Production Ready</div></div>
+    <div class="card card-pu"><div class="card-name">Actuator</div></div>
+    <div class="card card-re"><div class="card-name">DevTools</div></div>
+    <div class="card card-or"><div class="card-name">Rapid Development</div></div>
+    <div class="card card-cy"><div class="card-name">Less Boilerplate</div></div>
+    <div class="card card-bl"><div class="card-name">Easy Deployment</div></div>
+    <div class="card card-gr"><div class="card-name">Profiles &amp; External Config</div></div>
+  </div>
+
+  <div class="section-label">Spring Ecosystem</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="n">Java</span>
+<span class="c"> ├──</span> <span class="i bl">Spring Framework</span> <span class="n">→ Core (IoC, DI), MVC, AOP, JDBC, Security, Data</span>
+<span class="c"> └──</span> <span class="i gr">Spring Boot</span> <span class="n">→ Auto Configuration, Starter Dependencies, Embedded Server, Actuator, Production Ready, Microservices</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="sba">2. @SpringBootApplication</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Combines</div>
+      <div class="tree-body"><span class="i cy">@SpringBootConfiguration</span> <span class="n">(specialization of @Configuration — marks main configuration class, contains @Bean definitions)</span>
+<span class="i bl">@EnableAutoConfiguration</span> <span class="n">(creates beans automatically based on classpath)</span>
+<span class="i gr">@ComponentScan</span> <span class="n">(scans package for Spring Beans)</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">@SpringBootApplication Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Application Starts</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Configuration Loaded</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Auto Configuration</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Component Scan → Beans Created</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Embedded Server Starts → Application Ready</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Main Class Kept In Root Package so Component Scan covers all sub-packages by default.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="startup">3. Spring Boot Startup Flow, Runners &amp; Startup Events</div>
+  <div class="flow-panel">
+    <div class="tree-title">SpringApplication.run() — Internal Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">main()</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">SpringApplication.run() → Prepare Environment</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Create ApplicationContext → Apply Initializers</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Load application.properties → Load Active Profile</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Component Scan → Auto Configuration → Create Beans</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Dependency Injection → @PostConstruct → Context Refreshed</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">CommandLineRunner → ApplicationRunner</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Embedded Server Starts → Application Ready</div>
+    </div>
+  </div>
+  <div class="note">SpringApplication.run() responsibilities: Create SpringApplication, Start IoC Container, Create ApplicationContext, Perform Component Scan, Auto Configure Beans, Refresh Context, Execute Runners, Start Embedded Server.</div>
+
+  <div class="section-label">Startup Events (Published In Order)</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="i cy">ApplicationStartingEvent</span> <span class="c">→</span> <span class="i bl">EnvironmentPreparedEvent</span> <span class="c">→</span> <span class="i gr">ContextInitializedEvent</span> <span class="c">→</span> <span class="i am">ContextRefreshedEvent</span> <span class="c">→</span> <span class="i pu">ApplicationStartedEvent</span> <span class="c">→</span> <span class="i gr">ApplicationReadyEvent</span> <span class="c">→ (On Failure)</span> <span class="i re">ApplicationFailedEvent</span></div>
+  </div>
+
+  <div class="section-label">CommandLineRunner vs ApplicationRunner</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">CommandLineRunner</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Method</span><span class="cmp-val code">run(String... args)</span></div>
+        <div class="cmp-row"><span class="cmp-key">Executed</span><span class="cmp-val">After ApplicationContext is loaded, before app is fully ready</span></div>
+        <div class="cmp-row"><span class="cmp-key">Use</span><span class="cmp-val">Simple startup tasks — DB init, cache warmup, seed data</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">ApplicationRunner</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Method</span><span class="cmp-val code">run(ApplicationArguments args)</span></div>
+        <div class="cmp-row"><span class="cmp-key">Benefit</span><span class="cmp-val">Named / option arguments, better CLI support</span></div>
+        <div class="cmp-row"><span class="cmp-key">Use</span><span class="cmp-val">Complex CLI apps, parse startup options, batch applications</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Multiple runners can co-exist; execution order controlled by <code>@Order</code>. Use ApplicationReadyEvent for post-startup tasks like starting a scheduler or warming external APIs. Keep runner logic lightweight and idempotent; fail fast on critical startup validation.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="autoconfig">4. Auto Configuration &amp; Internal Working</div>
+  <div class="flow-panel">
+    <div class="tree-title">Auto Configuration Internal Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Application Starts → @EnableAutoConfiguration</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Read Classpath → Detect Dependencies</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Load Auto Configuration Classes (AutoConfiguration.imports)</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Check @Conditional Annotations</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Create Required Beans → Skip Existing Beans → Application Ready</div>
+    </div>
+  </div>
+  <div class="note">Example: <code>spring-boot-starter-web</code> → auto-configures Tomcat, DispatcherServlet, Spring MVC, Jackson — no manual configuration required. <code>spring-boot-starter-data-jpa</code> → detects Hibernate on classpath → creates EntityManager, DataSource, TransactionManager automatically.</div>
+
+  <div class="section-label">Conditional Annotations Used Internally</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">@ConditionalOnClass</span><span class="naming-arrow">→</span><span class="naming-meaning">Bean created if specified class exists in classpath</span></div>
+    <div class="naming-card"><span class="naming-prefix">@ConditionalOnMissingBean</span><span class="naming-arrow">→</span><span class="naming-meaning">Bean created only if no existing bean of same type exists (default beans)</span></div>
+    <div class="naming-card"><span class="naming-prefix">@ConditionalOnBean</span><span class="naming-arrow">→</span><span class="naming-meaning">Bean created only if another bean already exists</span></div>
+    <div class="naming-card"><span class="naming-prefix">@ConditionalOnProperty</span><span class="naming-arrow">→</span><span class="naming-meaning">Bean created based on a matching property value</span></div>
+    <div class="naming-card"><span class="naming-prefix">@ConditionalOnMissingClass</span><span class="naming-arrow">→</span><span class="naming-meaning">Bean created if specified class is absent</span></div>
+    <div class="naming-card"><span class="naming-prefix">@Conditional</span><span class="naming-arrow">→</span><span class="naming-meaning">Base annotation used to build custom conditions</span></div>
+  </div>
+
+  <div class="section-label">Why Auto Configuration?</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Reduce Boilerplate</div>
+      <div class="revision-item"><span class="chk">✓</span>Faster Development</div>
+      <div class="revision-item"><span class="chk">✓</span>Sensible Defaults</div>
+      <div class="revision-item"><span class="chk">✓</span>Easy Customization</div>
+      <div class="revision-item"><span class="chk">✓</span>Production Ready</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="starters">5. Starter Dependencies, Spring Initializr &amp; Embedded Server</div>
+  <div class="section-label">Common Starters</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">spring-boot-starter-web</span><span class="naming-arrow">→</span><span class="naming-meaning">REST APIs, Embedded Tomcat, DispatcherServlet, Spring MVC, Jackson</span></div>
+    <div class="naming-card"><span class="naming-prefix">spring-boot-starter-data-jpa</span><span class="naming-arrow">→</span><span class="naming-meaning">Hibernate, Spring Data JPA, Transactions</span></div>
+    <div class="naming-card"><span class="naming-prefix">spring-boot-starter-security</span><span class="naming-arrow">→</span><span class="naming-meaning">Spring Security — Authentication &amp; Authorization</span></div>
+    <div class="naming-card"><span class="naming-prefix">spring-boot-starter-validation</span><span class="naming-arrow">→</span><span class="naming-meaning">Jakarta Validation — @NotNull, @Valid</span></div>
+    <div class="naming-card"><span class="naming-prefix">spring-boot-starter-test</span><span class="naming-arrow">→</span><span class="naming-meaning">JUnit, Mockito, Spring Test</span></div>
+    <div class="naming-card"><span class="naming-prefix">spring-boot-starter-actuator</span><span class="naming-arrow">→</span><span class="naming-meaning">Production Monitoring</span></div>
+  </div>
+  <div class="note">Starter Dependency = predefined dependency bundle containing required libraries for a specific feature. Without a starter you'd need many individual dependencies; with a starter, one dependency includes everything needed.</div>
+
+  <div class="two-col" style="margin-top:10px;">
+    <div class="tree-panel">
+      <div class="tree-title">Spring Initializr</div>
+      <div class="tree-body"><span class="n">Project generator used to create Spring Boot projects. Provides: Java Version, Spring Boot Version, Maven/Gradle, Packaging, Dependencies, Project Structure.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Embedded Server</div>
+      <div class="tree-body"><span class="n">Server packaged inside the application itself. Default: </span><span class="i am">Tomcat</span><span class="n">. Also supports: </span><span class="i bl">Jetty</span><span class="n">, </span><span class="i pu">Undertow</span><span class="n">.</span>
+<span class="n">Benefits: No External Installation, Easy Deployment, Single Executable JAR, Same Environment Everywhere, Cloud Friendly.</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">JAR vs WAR</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">JAR</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Contains</span><span class="cmp-val">Application + Embedded Server + Dependencies</span></div>
+        <div class="cmp-row"><span class="cmp-key">Run</span><span class="cmp-val code">java -jar app.jar</span></div>
+        <div class="cmp-row"><span class="cmp-key">Preferred For</span><span class="cmp-val">Microservices, Docker, Kubernetes, AWS, Azure, Standalone Apps</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">WAR</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Contains</span><span class="cmp-val">Application Only</span></div>
+        <div class="cmp-row"><span class="cmp-key">Requires</span><span class="cmp-val">External Server — Tomcat, JBoss, WebLogic</span></div>
+        <div class="cmp-row"><span class="cmp-key">Preferred For</span><span class="cmp-val">Legacy Enterprise, Shared Application Server, Organizational Standards</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="iocdi">6. IoC &amp; Dependency Injection</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">IoC (Inversion Of Control)</div>
+      <div class="tree-body"><span class="i re">Traditional:</span> <span class="n">Service service = new Service();</span>
+<span class="i gr">Spring:</span> <span class="n">Spring creates the object, Spring manages the object, Spring injects the object.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">DI Internal Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Component Scan</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Bean Created → Stored In IoC Container</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Dependency Resolved → Injected</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Bean Ready For Use</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Injection Types</div>
+  <div class="pillar-panel">
+    <div class="pillar-grid cols-3">
+      <div class="pillar-card">
+        <div class="pillar-name gr">Constructor Injection ⭐</div>
+        <div class="pillar-def">Recommended / Best Practice</div>
+        <span class="pillar-tag tag-gr">Immutable</span><span class="pillar-tag tag-gr">Mandatory Dependency</span><span class="pillar-tag tag-gr">Easy Testing</span>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name am">Setter Injection</div>
+        <div class="pillar-def">Optional Dependency</div>
+        <span class="pillar-tag tag-am">Object May Be Partially Initialized</span>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name re">Field Injection</div>
+        <div class="pillar-def">Simple, uses Reflection</div>
+        <span class="pillar-tag tag-re">Hard To Test</span><span class="pillar-tag tag-re">Avoid In Production</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">@Autowired vs @Resource vs @Qualifier vs @Primary</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Annotation</th><th>Resolution</th><th>Purpose</th></tr>
+      <tr><td class="cell-hl">@Autowired</td><td>By Type → @Qualifier → Name</td><td>Automatic bean injection</td></tr>
+      <tr><td class="cell-hl">@Resource</td><td>By Name → Fallback: By Type</td><td>Injects by name first</td></tr>
+      <tr><td class="cell-hl">@Qualifier</td><td>—</td><td>Resolve multiple-bean ambiguity</td></tr>
+      <tr><td class="cell-hl">@Primary</td><td>—</td><td>Default bean when multiple beans exist</td></tr>
+    </table>
+  </div>
+
+  <div class="section-label">Autowiring Resolution Order &amp; Circular Dependency</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">@Autowired → By Type</div>
+      <span class="pipe-arrow">↓ Multiple Beans?</span>
+      <div class="pipe-box inter">@Qualifier</div>
+      <span class="pipe-arrow">↓ Still Multiple?</span>
+      <div class="pipe-box term">@Primary</div>
+      <span class="pipe-arrow">↓ Still Ambiguous?</span>
+      <div class="pipe-box warn">NoUniqueBeanDefinitionException</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="lifecycle">7. Spring Bean, Bean Lifecycle &amp; Scopes</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Bean Lifecycle</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Container Start → Bean Instantiation</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Dependency Injection</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">@PostConstruct → Bean Ready</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Application Running</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">@PreDestroy → Bean Destroyed</div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Bean Scopes</div>
+      <div class="tree-body"><span class="i gr">Singleton</span> <span class="n">→ One Bean (Default)</span>
+<span class="i bl">Prototype</span> <span class="n">→ New Bean Every Request</span>
+<span class="i am">Request</span> <span class="n">→ One Per HTTP Request</span>
+<span class="i pu">Session</span> <span class="n">→ One Per User Session</span>
+<span class="i cy">Application</span> <span class="n">→ One Per ServletContext</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="stereotypes">8. Stereotype Annotations &amp; @Bean vs @Component vs @Configuration</div>
+  <div class="tree-panel">
+    <div class="tree-title">Component Hierarchy</div>
+    <div class="tree-body"><span class="n">@Component</span>
+<span class="c">   ├──</span> <span class="i gr">@Service</span> <span class="n">— Business Logic</span>
+<span class="c">   ├──</span> <span class="i am">@Repository</span> <span class="n">— Database Layer + Exception Translation</span>
+<span class="c">   └──</span> <span class="i bl">@Controller</span> <span class="n">— MVC, Returns View (JSP/HTML)</span>
+<span class="n">                  └── </span><span class="i cy">@RestController</span> <span class="n">= @Controller + @ResponseBody → Returns JSON/XML</span></div>
+  </div>
+
+  <div class="section-label">@Configuration vs @Component vs @Bean</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">@Component</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Behavior</span><span class="cmp-val">Bean automatically discovered via Component Scan</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">@Configuration</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Behavior</span><span class="cmp-val">Creates a Configuration class; contains @Bean methods</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">@Bean</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Behavior</span><span class="cmp-val">Bean created manually inside a @Configuration class</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Real usage: <code>@Bean</code> → AWS S3 Client, Mail Sender, ObjectMapper, RestTemplate, WebClient.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="config">9. Configuration, Profiles &amp; External Config</div>
+  <div class="tree-panel">
+    <div class="tree-title">Configuration Sources (Read In Order)</div>
+    <div class="tree-body"><span class="n">application.properties → application.yml → Environment Variables → Command Line Arguments → System Properties → External Configuration Files</span></div>
+  </div>
+
+  <div class="section-label">Property Resolution Priority (Highest → Lowest)</div>
+  <div class="flow-panel">
+    <div class="flow-row">
+      <div class="pipe-box warn">Command Line Args</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box term">Java System Properties</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">Environment Variables</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box inter">External application.properties</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box source">Internal application.properties</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box gc">Default Values</div>
+    </div>
+  </div>
+
+  <div class="section-label">application.properties vs application.yml</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">application.properties</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Format</span><span class="cmp-val code">server.port=8081</span></div>
+        <div class="cmp-row"><span class="cmp-key">Best For</span><span class="cmp-val">Simple, small configuration</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">application.yml</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Format</span><span class="cmp-val">Hierarchical (server → port → 8080)</span></div>
+        <div class="cmp-row"><span class="cmp-key">Best For</span><span class="cmp-val">Cleaner, large / nested configuration</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Example properties: <code>server.port=8081</code>, <code>spring.datasource.url=...</code>, <code>spring.jpa.hibernate.ddl-auto=update</code>, <code>logging.level.root=INFO</code></div>
+
+  <div class="section-label">Profiles</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="n">application.properties (Common) → application-dev.properties → application-test.properties → application-stqa.properties → application-prod.properties</span>
+<span class="n">Activate: </span><span class="i am">spring.profiles.active=dev</span>
+<span class="n">@Profile("dev") → loads a bean only for a specific environment (e.g. MockEmailService in dev, AwsSesEmailService in production).</span></div>
+  </div>
+
+  <div class="section-label">@Value vs @ConfigurationProperties</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">@Value</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Reads</span><span class="cmp-val">Single property — e.g. @Value("${app.name}")</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">@ConfigurationProperties</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Reads</span><span class="cmp-val">Group of related properties into a Java object — Type Safe, Cleaner, Recommended</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note"><code>@ConfigurationPropertiesScan</code> → automatically scans and registers @ConfigurationProperties classes as beans (no need for @Component on the config class). <code>Environment</code> interface → reads properties, active profile and feature flags programmatically.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="conditional">10. Conditional Beans — Feature Toggles</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">Application Starts → Read Configuration</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Evaluate Condition</div>
+      <span class="pipe-arrow">↓ True</span>
+      <div class="pipe-box gc">Create Bean</div>
+      <span class="pipe-arrow">↓ False</span>
+      <div class="pipe-box warn">Skip Bean</div>
+    </div>
+  </div>
+  <div class="note">Real examples: <code>payment.gateway=stripe</code> → creates StripeService (else PayPalService); <code>notification.email.enabled=true</code> → creates EmailService; Redis / Kafka / SMTP beans created only when enabled.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="mvc">11. Spring MVC &amp; REST</div>
+  <div class="flow-panel">
+    <div class="tree-title">Request Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Browser / Postman</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">DispatcherServlet (Front Controller) → HandlerMapping</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Controller → Service → Repository → Database</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Entity → DTO → Jackson</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">JSON Response</div>
+    </div>
+  </div>
+  <div class="note">DispatcherServlet responsibilities: Receive Request → Find Controller → Execute Controller → Return Response.</div>
+
+  <div class="section-label">MVC Architecture &amp; DispatcherServlet Internals</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Model — View — Controller</div>
+      <div class="tree-body"><span class="i cy">Model</span> <span class="n">→ Application data &amp; business logic (User, Order, DTO, Entity)</span>
+<span class="i bl">View</span> <span class="n">→ Displays data (JSP, Thymeleaf, HTML, JSON, XML)</span>
+<span class="i gr">Controller</span> <span class="n">→ Handles requests, calls Service layer, returns View or JSON</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">DispatcherServlet Internal Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">HTTP Request → DispatcherServlet</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">HandlerMapping (finds controller) → HandlerAdapter (invokes it)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Controller → Service → Repository → Database</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">ViewResolver / HttpMessageConverter → HTTP Response</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">HandlerMapping → maps incoming URL to the correct controller method (GET /users → UserController.getUsers()). HandlerAdapter → invokes the matched controller method, handling parameters, return values &amp; annotations. ViewResolver → resolves a logical view name into an actual view (home → /WEB-INF/views/home.jsp) — used mainly in traditional MVC (JSP/Thymeleaf), not REST APIs.</div>
+
+  <div class="section-label">@Controller vs @RestController</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">@Controller</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Returns a View name, uses ViewResolver — traditional web applications</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">@RestController</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">= @Controller + @ResponseBody. Returns JSON/XML directly via HttpMessageConverter, without a ViewResolver — REST APIs, Microservices</span></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">REST — Representational State Transfer</div>
+  <div class="cards-grid">
+    <div class="card card-cy"><div class="card-name">Stateless</div></div>
+    <div class="card card-bl"><div class="card-name">Client-Server</div></div>
+    <div class="card card-gr"><div class="card-name">HTTP Based</div></div>
+    <div class="card card-am"><div class="card-name">CRUD ↔ HTTP</div></div>
+  </div>
+
+  <div class="section-label">HTTP Methods &amp; CRUD</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Method</th><th>CRUD</th><th>Meaning</th></tr>
+      <tr><td class="cell-hl">GET</td><td>Read</td><td>Retrieve</td></tr>
+      <tr><td class="cell-hl">POST</td><td>Create</td><td>Create a resource</td></tr>
+      <tr><td class="cell-hl">PUT</td><td>Update</td><td>Complete update of a resource</td></tr>
+      <tr><td class="cell-hl">PATCH</td><td>Update</td><td>Partial update of a resource</td></tr>
+      <tr><td class="cell-hl">DELETE</td><td>Delete</td><td>Delete a resource</td></tr>
+    </table>
+  </div>
+
+  <div class="section-label">Core REST Annotations</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">@RequestMapping("/reports")</span><span class="naming-arrow">→</span><span class="naming-meaning">Map an HTTP request URL to a controller class</span></div>
+    <div class="naming-card"><span class="naming-prefix">@GetMapping / @PostMapping / @PutMapping / @DeleteMapping / @PatchMapping</span><span class="naming-arrow">→</span><span class="naming-meaning">HTTP-method-specific mappings</span></div>
+    <div class="naming-card"><span class="naming-prefix">@PathVariable</span><span class="naming-arrow">→</span><span class="naming-meaning">Extracts values from the URL path — /users/101</span></div>
+    <div class="naming-card"><span class="naming-prefix">@RequestParam</span><span class="naming-arrow">→</span><span class="naming-meaning">Extracts query parameter values — /users?id=101</span></div>
+    <div class="naming-card"><span class="naming-prefix">@RequestBody</span><span class="naming-arrow">→</span><span class="naming-meaning">JSON → Java Object (via Jackson)</span></div>
+    <div class="naming-card"><span class="naming-prefix">@ModelAttribute</span><span class="naming-arrow">→</span><span class="naming-meaning">Form data / query parameters → Object</span></div>
+    <div class="naming-card"><span class="naming-prefix">@RequestHeader</span><span class="naming-arrow">→</span><span class="naming-meaning">Reads an HTTP header — Authorization, Content-Type, Accept, X-Correlation-Id</span></div>
+    <div class="naming-card"><span class="naming-prefix">@ResponseStatus</span><span class="naming-arrow">→</span><span class="naming-meaning">Returns a fixed HTTP status without building a ResponseEntity</span></div>
+  </div>
+  <div class="note">Request Data Sources → Handler: URL Path → @PathVariable, Query Parameter → @RequestParam, Request Body → @RequestBody, HTTP Header → @RequestHeader.</div>
+
+  <div class="section-label">Content Negotiation</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Content Negotiation</div>
+      <div class="tree-body"><span class="n">Client chooses the desired request/response format.</span>
+<span class="i cy">Accept</span> <span class="n">header → expected response format</span>
+<span class="i bl">Content-Type</span> <span class="n">header → request body format</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">@Produces / @Consumes</div>
+      <div class="tree-body"><span class="i gr">produces</span> <span class="n">→ specifies the response format (JSON, XML, Text)</span>
+<span class="i am">consumes</span> <span class="n">→ specifies the accepted request format (application/json, application/xml)</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">ResponseEntity &amp; JSON Conversion</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">ResponseEntity&lt;T&gt;</div>
+      <div class="tree-body"><span class="n">Contains: Body + Headers + Status Code.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">JSON Conversion</div>
+      <div class="tree-body"><span class="n">Java Object → HttpMessageConverter → Jackson → JSON (and reverse, automatically).</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">HTTP Status Codes</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Code</th><th>Meaning</th></tr>
+      <tr><td class="yes">200 OK / 201 Created / 204 No Content</td><td>2xx — Success</td></tr>
+      <tr><td class="cell-hl">400 Bad Request / 401 Unauthorized / 403 Forbidden / 404 Not Found / 409 Conflict</td><td>4xx — Client Error</td></tr>
+      <tr><td class="no">500 Internal Server Error / 503 Service Unavailable</td><td>5xx — Server Error</td></tr>
+    </table>
+  </div>
+
+  <div class="section-label">REST API Best Practices</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Use Nouns (/api/users, not /getUsers)</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Proper HTTP Methods</div>
+      <div class="revision-item"><span class="chk">✓</span>Return DTO, Never Entity</div>
+      <div class="revision-item"><span class="chk">✓</span>Meaningful HTTP Status Codes</div>
+      <div class="revision-item"><span class="chk">✓</span>Global Exception Handling</div>
+      <div class="revision-item"><span class="chk">✓</span>Validate Input</div>
+      <div class="revision-item"><span class="chk">✓</span>Pagination, Sorting, Filtering</div>
+      <div class="revision-item"><span class="chk">✓</span>Version APIs (/api/v1/users)</div>
+      <div class="revision-item"><span class="chk">✓</span>Secure APIs — JWT, OAuth2, HTTPS</div>
+    </div>
+  </div>
+
+  <div class="section-label">REST Constraints (Architectural Style)</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">Client-Server</span><span class="naming-arrow">→</span><span class="naming-meaning">Separate UI and backend</span></div>
+    <div class="naming-card"><span class="naming-prefix">Stateless</span><span class="naming-arrow">→</span><span class="naming-meaning">No session stored on server</span></div>
+    <div class="naming-card"><span class="naming-prefix">Cacheable</span><span class="naming-arrow">→</span><span class="naming-meaning">Improve performance</span></div>
+    <div class="naming-card"><span class="naming-prefix">Uniform Interface</span><span class="naming-arrow">→</span><span class="naming-meaning">Consistent API design</span></div>
+    <div class="naming-card"><span class="naming-prefix">Layered System</span><span class="naming-arrow">→</span><span class="naming-meaning">Client doesn't know the backend architecture</span></div>
+    <div class="naming-card"><span class="naming-prefix">Code On Demand (Optional)</span><span class="naming-arrow">→</span><span class="naming-meaning">Server can send code (JavaScript) to client</span></div>
+  </div>
+  <div class="note">Resource design: use nouns — /users, /users/101, /orders, /orders/500/items. Avoid verbs — /getUsers, /createUser, /deleteUser, /updateUser.</div>
+
+  <div class="section-label">Safe vs Idempotent HTTP Methods</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Property</th><th>Methods</th><th>Meaning</th></tr>
+      <tr><td class="cell-hl">Safe</td><td>GET, HEAD, OPTIONS</td><td>Do not modify data</td></tr>
+      <tr><td class="cell-hl">Idempotent</td><td>GET, PUT, DELETE, HEAD, OPTIONS</td><td>Repeating produces the same result</td></tr>
+      <tr><td class="no">Not Idempotent</td><td>POST</td><td>Repeating creates a new resource each time</td></tr>
+    </table>
+  </div>
+  <div class="note">PUT → replaces the entire resource, idempotent. PATCH → updates selected fields, usually idempotent depending on implementation.</div>
+
+  <div class="section-label">API Versioning, CORS &amp; HATEOAS</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">API Versioning Strategies</div>
+      <div class="tree-body"><span class="i gr">URI Versioning (Recommended)</span> <span class="n">→ /api/v1/users, /api/v2/users</span>
+<span class="i bl">Header Versioning</span> <span class="n">→ API-Version:1</span>
+<span class="i am">Media Type Versioning</span> <span class="n">→ application/vnd.company.v1+json</span>
+<span class="i re">Query Parameter (Not Preferred)</span> <span class="n">→ /users?version=1</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">CORS &amp; HATEOAS</div>
+      <div class="tree-body"><span class="n">CORS (Cross-Origin Resource Sharing) → lets a browser access resources from another origin (e.g. frontend on localhost:3000 calling backend on localhost:8080). Key headers: Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers.</span>
+<span class="n">HATEOAS (Hypermedia As The Engine Of Application State) → response contains links to related resources — e.g. a User resource includes Self, Orders and Update links.</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">REST API Checklist</div>
+  <div class="revision-panel">
+    <div class="revision-grid cols-3">
+      <div class="revision-item"><span class="chk">✓</span>Proper URI</div>
+      <div class="revision-item"><span class="chk">✓</span>Proper HTTP Method</div>
+      <div class="revision-item"><span class="chk">✓</span>Proper Status Code</div>
+      <div class="revision-item"><span class="chk">✓</span>Validation</div>
+      <div class="revision-item"><span class="chk">✓</span>Exception Handling</div>
+      <div class="revision-item"><span class="chk">✓</span>Pagination, Filtering, Sorting</div>
+      <div class="revision-item"><span class="chk">✓</span>Versioning</div>
+      <div class="revision-item"><span class="chk">✓</span>Security (JWT/OAuth2)</div>
+      <div class="revision-item"><span class="chk">✓</span>Correlation ID For Tracing</div>
+      <div class="revision-item"><span class="chk">✓</span>Logging &amp; Monitoring (Actuator/Micrometer)</div>
+      <div class="revision-item"><span class="chk">✓</span>Swagger / OpenAPI Documentation</div>
+      <div class="revision-item"><span class="chk">✓</span>Rate Limiting</div>
+      <div class="revision-item"><span class="chk">✓</span>Idempotency For Critical Operations</div>
+      <div class="revision-item"><span class="chk">✓</span>Consistent Error Response</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="validation">12. Validation</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Common Validation Annotations</div>
+      <div class="tree-body"><span class="n">@NotNull, @NotBlank, @NotEmpty, @Size, @Email, @Pattern, @Min, @Max, @Positive</span>
+<span class="n">Controller: @Valid RequestDTO</span>
+<span class="n">Custom message: @NotBlank(message="Name is required")</span></div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name bl">@Valid</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-val">Bean Validation, Nested Validation, Mostly Used On DTOs</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name gr">@Validated</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-val">Supports Validation Groups, Method Validation, Service Layer</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">BindingResult &amp; Validation Groups</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">BindingResult</div>
+      <div class="tree-body"><span class="n">Captures validation errors without throwing an exception. Flow: Validation → Errors Stored → Controller Checks → Custom Response.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Validation Groups</div>
+      <div class="tree-body"><span class="n">Apply different validation rules for different operations — e.g. Create User → Password Required; Update User → Password Optional.</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="exceptions">13. Exception Handling</div>
+  <div class="flow-panel">
+    <div class="tree-title">Exception Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Request → Controller → Service → Repository</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box warn">Exception</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">@ControllerAdvice → @ExceptionHandler</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Custom Error Response → Client</div>
+    </div>
+  </div>
+  <div class="note">Goal: Provide Consistent Error Response, Avoid Stacktrace To Client, Centralize Error Handling. @ControllerAdvice = Global Exception Handler (Centralized, Reusable, Cleaner Controllers). @ExceptionHandler handles a specific exception and returns a custom response (e.g. UserNotFoundException → 404 NOT FOUND).</div>
+
+  <div class="section-label">Common Exceptions &amp; Custom Error Response</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Exception</th><th>Meaning</th></tr>
+      <tr><td class="cell-hl">MethodArgumentNotValidException</td><td>@RequestBody / DTO Validation Failed (400)</td></tr>
+      <tr><td class="cell-hl">ConstraintViolationException</td><td>@PathVariable / @RequestParam Validation Failed</td></tr>
+      <tr><td class="cell-hl">BindException</td><td>Form / Object Binding Failed</td></tr>
+      <tr><td class="cell-hl">HttpMessageNotReadableException</td><td>Invalid JSON Or Malformed Request</td></tr>
+      <tr><td class="cell-hl">EntityNotFoundException</td><td>Resource Missing (404)</td></tr>
+      <tr><td class="cell-hl">DataIntegrityViolationException</td><td>Constraint Violation (409)</td></tr>
+      <tr><td class="cell-hl">SQLException</td><td>Database Error</td></tr>
+      <tr><td class="cell-hl">AccessDeniedException</td><td>Forbidden (403)</td></tr>
+      <tr><td class="cell-hl">AuthenticationException</td><td>Unauthorized (401)</td></tr>
+    </table>
+  </div>
+  <div class="note">Typical custom error response fields: timestamp, status, error, message, path.</div>
+
+  <div class="section-label">@ControllerAdvice vs @RestControllerAdvice &amp; ProblemDetail</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">@ControllerAdvice</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Global handler for Spring MVC — can return a View or a Response</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">@RestControllerAdvice</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">= @ControllerAdvice + @ResponseBody — always returns a JSON error response, preferred for REST APIs</span></div></div>
+    </div>
+  </div>
+  <div class="note"><code>ProblemDetail</code> — standard error response introduced in Spring Boot 3, based on RFC 9457. Provides: status, title, detail, instance, type.</div>
+
+  <div class="section-label">Exception → HTTP Status Mapping</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Scenario</th><th>Status</th></tr>
+      <tr><td>Validation Exception</td><td class="cell-hl">400 Bad Request</td></tr>
+      <tr><td>Authentication Failure</td><td class="cell-hl">401 Unauthorized</td></tr>
+      <tr><td>Access Denied</td><td class="cell-hl">403 Forbidden</td></tr>
+      <tr><td>Entity Not Found</td><td class="cell-hl">404 Not Found</td></tr>
+      <tr><td>Duplicate Record</td><td class="cell-hl">409 Conflict</td></tr>
+      <tr><td>Business Rule Failure</td><td class="cell-hl">422 Unprocessable Entity</td></tr>
+      <tr><td>Unexpected Exception</td><td class="no">500 Internal Server Error</td></tr>
+    </table>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="jpa">14. Spring Data JPA — Basics, Entity &amp; Repository</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="i cy">JPA</span> <span class="n">→ Java Persistence API, Specification (not implementation)</span>
+<span class="i bl">Hibernate</span> <span class="n">→ Implementation of JPA</span>
+<span class="i gr">Spring Data JPA</span> <span class="n">→ Abstraction that makes Hibernate/JPA easier</span></div>
+  </div>
+  <div class="flow-panel" style="margin-top:10px;">
+    <div class="tree-title">Spring Data JPA Architecture</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Controller → Service</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Repository (JpaRepository)</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Hibernate → JDBC</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Database</div>
+    </div>
+  </div>
+
+  <div class="section-label">Entity Annotations &amp; Primary Key Generation</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Common Entity Annotations</div>
+      <div class="tree-body"><span class="n">@Entity (marks entity), @Table (table name), @Id (primary key), @GeneratedValue (auto ID), @Column, @Version (optimistic lock), @Transient (ignore field), @Lob, @CreationTimestamp, @UpdateTimestamp</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Primary Key Generation</div>
+      <div class="tree-body"><span class="i bl">IDENTITY</span> <span class="n">→ DB Auto Increment</span>
+<span class="i am">AUTO</span> <span class="n">→ Spring decides</span>
+<span class="i gr">SEQUENCE</span> <span class="n">→ Uses DB Sequence</span>
+<span class="i pu">UUID</span> <span class="n">→ Globally Unique — best for Cloud, Microservices, Distributed Systems</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">CrudRepository vs JpaRepository &amp; Derived Queries</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">CrudRepository</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Basic CRUD only</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">JpaRepository</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">CRUD + Pagination + Sorting + Flush + Batch Operations</span></div></div>
+    </div>
+  </div>
+  <div class="note">Common methods: save(), findById(), findAll(), delete(), deleteById(), count(), existsById(), flush(), saveAll(). Derived query methods (no SQL required): findByEmail(), findByStatus(), findByNameContaining(), findBySalaryGreaterThan(), findByStatusAndRole(). <code>@Query</code> used when a derived method isn't enough — supports JPQL or Native SQL.</div>
+
+  <div class="section-label">JPQL vs SQL</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">JPQL</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Works on Entities &amp; Fields — SELECT e FROM Employee e</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">SQL</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Works on Tables &amp; Columns — SELECT * FROM employee</span></div></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="relationships">15. JPA Relationships, Cascade, N+1 &amp; Performance</div>
+  <div class="tree-panel">
+    <div class="tree-title">JPA Relationships</div>
+    <div class="tree-body"><span class="i cy">@OneToOne</span> <span class="n">— Employee ↔ Aadhaar</span>
+<span class="i bl">@OneToMany</span> <span class="n">— Customer ↔ Orders</span>
+<span class="i gr">@ManyToOne</span> <span class="n">— Orders ↔ Customer</span>
+<span class="i am">@ManyToMany</span> <span class="n">— Student ↔ Course</span></div>
+  </div>
+
+  <div class="two-col" style="margin-top:10px;">
+    <div class="tree-panel">
+      <div class="tree-title">Cascade Types</div>
+      <div class="tree-body"><span class="n">A parent operation is automatically applied to the child entity.</span>
+<span class="n">Types: ALL, PERSIST, MERGE, REMOVE, REFRESH, DETACH</span></div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name gr">LAZY ⭐ (Default For Collections)</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Load When Needed, Less Memory, Better Performance, may cause LazyInitializationException</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name am">EAGER</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Load Immediately, More Queries/Memory, can cause N+1</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Rule: default to LAZY, load only required data.</div>
+
+  <div class="section-label">N+1 Query Problem &amp; How To Solve</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box warn">1 Query For Parent (e.g. 100 Employees)</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box warn">100 More Queries For Each Child</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box warn">101 Queries Total → Slow APIs, High DB Load</div>
+    </div>
+  </div>
+  <div class="revision-panel" style="margin-top:10px;">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Fetch Join — Single query loads Employee + Department + Address</div>
+      <div class="revision-item"><span class="chk">✓</span>@EntityGraph — specify which associations to load, without changing fetch type</div>
+      <div class="revision-item"><span class="chk">✓</span>DTO Projection — return only required fields, not the entity</div>
+      <div class="revision-item"><span class="chk">✓</span>Batch Fetching</div>
+      <div class="revision-item"><span class="chk">✓</span>Avoid Unnecessary EAGER</div>
+    </div>
+  </div>
+
+  <div class="section-label">Pagination, Sorting &amp; Indexing</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Pagination &amp; Sorting</div>
+      <div class="tree-body"><span class="n">Avoid SELECT * loading millions of rows — use Pageable → Page&lt;Employee&gt; (page, size). Sort.by("salary") ASC/DESC. Pagination + Sorting can be combined.</span>
+<span class="n">Benefits: Less Memory, Fast API, Scalable.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Indexing</div>
+      <div class="tree-body"><span class="n">Create index on: Primary Keys, Foreign Keys, Search Columns, Frequently Filtered/Joined Columns.</span>
+<span class="n">Benefits: Fast Queries, Less Full Table Scan.</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Database Performance Checklist</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Proper Indexes</div>
+      <div class="revision-item"><span class="chk">✓</span>Pagination</div>
+      <div class="revision-item"><span class="chk">✓</span>DTO Projection</div>
+      <div class="revision-item"><span class="chk">✓</span>Fetch Join / EntityGraph</div>
+      <div class="revision-item"><span class="chk">✓</span>Batch Processing</div>
+      <div class="revision-item"><span class="chk">✓</span>Connection Pool Tuning</div>
+      <div class="revision-item"><span class="chk">✓</span>Query Optimization</div>
+      <div class="revision-item"><span class="chk">✓</span>Cache Frequently Used Data</div>
+      <div class="revision-item"><span class="chk">✓</span>Avoid SELECT *</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="hibernate">16. Hibernate &amp; Persistence Context</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Hibernate — ORM Framework</div>
+      <div class="tree-body"><span class="n">Converts Java Object → SQL → Database. Developer writes Java; Hibernate writes SQL.</span>
+<span class="n">Flow: Entity → Persistence Context → Hibernate → SQL → Database.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Persistence Context / First Level Cache</div>
+      <div class="tree-body"><span class="n">First Level Cache is Session Level, Enabled By Default. Maintains managed entities — same entity loaded once during the transaction, avoiding repeated DB calls.</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="transactions">17. Transactions, Propagation, Isolation &amp; Locking</div>
+  <div class="flow-panel">
+    <div class="tree-title">@Transactional — Why?</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Begin Transaction → Execute SQL</div>
+      <span class="pipe-arrow">↓ Success</span>
+      <div class="pipe-box gc">Commit</div>
+      <span class="pipe-arrow">↓ Exception</span>
+      <div class="pipe-box warn">Rollback</div>
+    </div>
+  </div>
+  <div class="note">Without a transaction: Insert Success, Update Failed, Delete Skipped → Data Inconsistent. With a transaction: everything Commits or everything Rolls back.</div>
+
+  <div class="cards-grid" style="margin-top:10px;">
+    <div class="card card-cy"><div class="card-name">Atomicity</div></div>
+    <div class="card card-bl"><div class="card-name">Consistency</div></div>
+    <div class="card card-gr"><div class="card-name">Isolation</div></div>
+    <div class="card card-am"><div class="card-name">Durability</div></div>
+  </div>
+  <div class="note">A = Atomicity, C = Consistency, I = Isolation, D = Durability (ACID).</div>
+
+  <div class="section-label">Propagation Types</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">REQUIRED ⭐ (Default)</span><span class="naming-arrow">→</span><span class="naming-meaning">Join existing transaction, else create new</span></div>
+    <div class="naming-card"><span class="naming-prefix">REQUIRES_NEW</span><span class="naming-arrow">→</span><span class="naming-meaning">Always start a new transaction</span></div>
+    <div class="naming-card"><span class="naming-prefix">SUPPORTS</span><span class="naming-arrow">→</span><span class="naming-meaning">Join if exists, else run non-transactional</span></div>
+    <div class="naming-card"><span class="naming-prefix">MANDATORY</span><span class="naming-arrow">→</span><span class="naming-meaning">Must have an existing transaction</span></div>
+    <div class="naming-card"><span class="naming-prefix">NOT_SUPPORTED</span><span class="naming-arrow">→</span><span class="naming-meaning">Suspend existing transaction</span></div>
+    <div class="naming-card"><span class="naming-prefix">NEVER</span><span class="naming-arrow">→</span><span class="naming-meaning">No transaction allowed</span></div>
+  </div>
+
+  <div class="section-label">Isolation Levels</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">READ_UNCOMMITTED</span><span class="naming-arrow">→</span><span class="naming-meaning">Dirty Reads Possible</span></div>
+    <div class="naming-card"><span class="naming-prefix">READ_COMMITTED ⭐</span><span class="naming-arrow">→</span><span class="naming-meaning">Only Committed Data</span></div>
+    <div class="naming-card"><span class="naming-prefix">REPEATABLE_READ</span><span class="naming-arrow">→</span><span class="naming-meaning">Same Row, Same Value</span></div>
+    <div class="naming-card"><span class="naming-prefix">SERIALIZABLE</span><span class="naming-arrow">→</span><span class="naming-meaning">Highest Isolation, Slowest</span></div>
+  </div>
+
+  <div class="section-label">Optimistic vs Pessimistic Locking</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">Optimistic Locking</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-val">Uses @Version, no lock during read, version checked during update — detects conflicts. If version changed → OptimisticLockException. Best for rare conflicts.</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name re">Pessimistic Locking</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-val">Locks the record immediately using a DB lock, other users wait — prevents conflicts before update. Best for Banking, Inventory, Seat Booking.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="pool">18. Connection Pooling — HikariCP</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">HikariCP — Default Connection Pool</div>
+      <div class="tree-body"><span class="n">Fast, Lightweight, Reusable Connections — avoids creating a new connection for every request.</span>
+<span class="n">Important properties: maximumPoolSize, minimumIdle, connectionTimeout, idleTimeout, maxLifetime.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Connection Pool Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">API Request → Borrow Connection</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Execute SQL</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Return Connection To Pool</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="security">19. Spring Security, JWT &amp; OAuth2</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Authentication vs Authorization</div>
+      <div class="tree-body"><span class="i cy">Authentication</span> <span class="n">→ WHO ARE YOU? Login → Verify Identity</span>
+<span class="i am">Authorization</span> <span class="n">→ WHAT CAN YOU ACCESS? Role Check → Permission Check</span>
+<span class="n">Remember: Authentication always happens before Authorization.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Security Request Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Request → SecurityFilterChain</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Authentication → Authorization</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Controller → Response</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Spring Security Components: SecurityFilterChain, UserDetailsService, AuthenticationManager, PasswordEncoder, AuthenticationProvider, JWT Filter.</div>
+
+  <div class="section-label">JWT Flow &amp; Structure</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">POST /login → AuthenticationManager → UserDetailsService</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Generate JWT → Return Token → Client Stores Token</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Authorization: Bearer &lt;token&gt; → JWT Filter → Validate Token</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">SecurityContext → Controller</div>
+    </div>
+  </div>
+  <div class="note">JWT Structure = Header.Payload.Signature — Header (Algorithm, Token Type), Payload (Username, Roles, Claims, Expiry), Signature (Verification, Tamper Protection). JWT = Stateless Authentication.</div>
+
+  <div class="section-label">JWT vs Session &amp; OAuth2 vs OIDC</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">JWT</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Stateless, Scalable, Stored Client Side, Preferred For REST</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Session</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Stateful, Stored Server Side, Traditional MVC</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">OAuth2</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Authorization Framework — can use JWT internally</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name pu">OpenID Connect (OIDC)</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">OAuth2 + Authentication — provides Identity, User Information, ID Token</span></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">BCrypt, RBAC &amp; CSRF</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">BCrypt Password Encoder</div>
+      <div class="tree-body"><span class="n">Plain Password → BCrypt → Hash → Database. Never store plain passwords.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Role Based Access &amp; CSRF</div>
+      <div class="tree-body"><span class="n">Roles: ADMIN, USER, TRAINER, CANDIDATE — hasRole("ADMIN"), @PreAuthorize, hasAuthority().</span>
+<span class="n">CSRF (Cross Site Request Forgery): enabled by default for session-based apps, usually disabled for stateless JWT APIs.</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="caching">20. Caching</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Cache Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Client → Cache</div>
+        <span class="pipe-arrow">↓ Found</span>
+        <div class="pipe-box gc">Return</div>
+        <span class="pipe-arrow">↓ Not Found</span>
+        <div class="pipe-box inter">Database → Store In Cache → Return</div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Cache Annotations &amp; Providers</div>
+      <div class="tree-body"><span class="n">@EnableCaching enables caching.</span>
+<span class="i cy">@Cacheable</span> <span class="n">→ Read &amp; Store</span>
+<span class="i bl">@CachePut</span> <span class="n">→ Update Cache</span>
+<span class="i re">@CacheEvict</span> <span class="n">→ Remove Cache</span>
+<span class="n">Providers: </span><span class="i gr">Redis ⭐</span><span class="n">, Caffeine, EhCache, Hazelcast.</span></div>
+    </div>
+  </div>
+  <div class="note">When to cache: Master Data — Country, State, Role, Configuration, Lookup Tables, frequently read / rarely updated. When NOT to cache: Payments, Transactions, frequently updated or sensitive data.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="async">21. Async Processing</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">@Async</div>
+      <div class="tree-body"><span class="n">Runs a method in a separate thread. Use cases: Send Email, Generate Report, Notification, File Upload.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Async Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Save User → Return Response</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Background Thread → Send Email</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="testing">22. Testing</div>
+  <div class="cards-grid">
+    <div class="card card-cy"><div class="card-name">Unit Test</div><div class="card-desc">One class, mocked dependencies — JUnit + Mockito</div></div>
+    <div class="card card-bl"><div class="card-name">Integration Test</div><div class="card-desc">Loads Spring Context, tests multiple components</div></div>
+    <div class="card card-gr"><div class="card-name">@SpringBootTest</div><div class="card-desc">Loads the entire application context</div></div>
+    <div class="card card-am"><div class="card-name">@DataJpaTest</div><div class="card-desc">Loads only JPA components — repository testing</div></div>
+    <div class="card card-pu"><div class="card-name">@WebMvcTest</div><div class="card-desc">Controller layer only</div></div>
+    <div class="card card-re"><div class="card-name">MockMvc</div><div class="card-desc">Tests controllers without starting a real server</div></div>
+  </div>
+  <div class="note">Testcontainers: starts real PostgreSQL / Redis / Kafka / RabbitMQ inside Docker — production-like testing, no H2 differences. Mockito: mocks dependencies to focus on business logic without a database (@Mock, @InjectMocks).</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="actuator">23. Spring Boot Actuator</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="n">Provides production-ready monitoring, management and health information for the application.</span>
+<span class="n">Without Actuator: no visibility into application status. With Actuator: Health, Metrics, Environment, Beans, Logs, Thread Dump, Heap Dump, Monitoring.</span></div>
+  </div>
+  <div class="section-label">Common Actuator Endpoints</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">/actuator/health</span><span class="naming-arrow">→</span><span class="naming-meaning">Application health</span></div>
+    <div class="naming-card"><span class="naming-prefix">/actuator/info</span><span class="naming-arrow">→</span><span class="naming-meaning">Application information</span></div>
+    <div class="naming-card"><span class="naming-prefix">/actuator/metrics</span><span class="naming-arrow">→</span><span class="naming-meaning">Performance metrics</span></div>
+    <div class="naming-card"><span class="naming-prefix">/actuator/env</span><span class="naming-arrow">→</span><span class="naming-meaning">Environment properties</span></div>
+    <div class="naming-card"><span class="naming-prefix">/actuator/beans</span><span class="naming-arrow">→</span><span class="naming-meaning">Spring beans</span></div>
+    <div class="naming-card"><span class="naming-prefix">/actuator/mappings</span><span class="naming-arrow">→</span><span class="naming-meaning">All REST endpoints</span></div>
+    <div class="naming-card"><span class="naming-prefix">/actuator/loggers</span><span class="naming-arrow">→</span><span class="naming-meaning">Logging configuration</span></div>
+    <div class="naming-card"><span class="naming-prefix">/actuator/threaddump</span><span class="naming-arrow">→</span><span class="naming-meaning">Running threads</span></div>
+    <div class="naming-card"><span class="naming-prefix">/actuator/heapdump</span><span class="naming-arrow">→</span><span class="naming-meaning">Heap memory dump</span></div>
+  </div>
+  <div class="note">Health Status values: UP (working), DOWN (critical failure), OUT_OF_SERVICE (temporarily unavailable), UNKNOWN (cannot determine). Default health checks: Database, Disk Space, Ping, Redis, RabbitMQ, MongoDB, Elasticsearch — plus Custom Health Indicators (e.g. Payment Gateway, External API, Kafka, SMTP availability).</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="production">24. DevTools, Packaging &amp; Production Configuration</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">DevTools</div>
+      <div class="tree-body"><span class="n">Automatic Restart, Live Reload, Disable Template Cache — Development Only.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Production Configuration Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">HTTPS → Database Pool → Logging</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Security → Monitoring → External Configuration</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Graceful Shutdown → Caching</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Logging: DEBUG for Development (detailed logs); INFO/WARN/ERROR only for Production. Graceful Shutdown allows running requests to complete before the app stops — no data loss, safer deployment. Externalized Secrets (passwords, API keys, JWT secrets, DB credentials) must never live in source code — use Environment Variables, Secret Manager, Vault, or Kubernetes Secrets.</div>
+
+  <div class="section-label">Zero Downtime Deployment &amp; Docker</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Zero Downtime Deployment</div>
+      <div class="tree-body"><span class="n">Rolling Deployment, Blue-Green, Canary Release, Load Balancer, Health Checks.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Docker Deployment Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Build JAR → Docker Image</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Docker Hub → Docker Compose</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">EC2 → Container Running</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Enterprise Production Best Practices</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Use Executable JAR For Microservices</div>
+      <div class="revision-item"><span class="chk">✓</span>Keep Secrets Outside Source Code</div>
+      <div class="revision-item"><span class="chk">✓</span>Enable &amp; Secure Only Required Actuator Endpoints</div>
+      <div class="revision-item"><span class="chk">✓</span>Use HTTPS In Production</div>
+      <div class="revision-item"><span class="chk">✓</span>Configure HikariCP Properly</div>
+      <div class="revision-item"><span class="chk">✓</span>Use INFO Logging In Production</div>
+      <div class="revision-item"><span class="chk">✓</span>Enable Graceful Shutdown</div>
+      <div class="revision-item"><span class="chk">✓</span>Monitor JVM, Database &amp; HTTP Metrics</div>
+      <div class="revision-item"><span class="chk">✓</span>Disable DevTools In Production</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Readiness &amp; Liveness Probes In Kubernetes</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="microservices">25. Microservices Communication</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">RestTemplate (Legacy)</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Blocking</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">WebClient ⭐</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Modern, Non-Blocking, Reactive</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">OpenFeign / Feign Client ⭐</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Declarative HTTP Client, Less Boilerplate, preferred for microservices</span></div></div>
+    </div>
+  </div>
+  <div class="note">Kafka → Async Communication: Producer → Topic → Consumer. @KafkaListener. Consumer Group → Scalability. Offset → Message Position.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="patterns">26. Common Design Patterns In Spring</div>
+  <div class="cards-grid cols-5">
+    <div class="card card-cy"><div class="card-name">Singleton</div><div class="card-desc">Beans</div></div>
+    <div class="card card-bl"><div class="card-name">Factory</div><div class="card-desc">Bean Creation</div></div>
+    <div class="card card-gr"><div class="card-name">Proxy</div><div class="card-desc">@Transactional, @Cacheable, @Async</div></div>
+    <div class="card card-am"><div class="card-name">Template</div><div class="card-desc">JdbcTemplate, KafkaTemplate</div></div>
+    <div class="card card-pu"><div class="card-name">Observer</div><div class="card-desc">Events</div></div>
+    <div class="card card-re"><div class="card-name">MVC</div><div class="card-desc">Controller-Service-Repository</div></div>
+    <div class="card card-or"><div class="card-name">Dependency Injection</div><div class="card-desc">IoC</div></div>
+    <div class="card card-cy"><div class="card-name">Builder</div></div>
+    <div class="card card-bl"><div class="card-name">Strategy</div></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="issues">27. Production Issue Troubleshooting</div>
+  <div class="flow-panel">
+    <div class="tree-title">General Troubleshooting Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">API Slow → Check SQL → Indexes → N+1</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">External APIs → Thread Dump → GC</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Connection Pool</div>
+    </div>
+  </div>
+
+  <div class="problem-grid" style="margin-top:10px;">
+    <div class="problem-card">
+      <div class="problem-title">1. API Slow</div>
+      <div class="problem-code">Slow SQL, N+1, No Index, External Service, Large JSON, Small Connection Pool</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">2. Application Slow</div>
+      <div class="problem-code">CPU, Memory, GC, Thread Pool, Deadlock, Blocking Calls</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">3. Connection Pool Exhausted</div>
+      <div class="problem-code">Connection Leak, Long Running Query, Database Down, Pool Too Small, Deadlock</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">4. Memory Increasing</div>
+      <div class="problem-code">Memory Leak, Large Cache, Static Collection, Huge Objects</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">5. 401 / 403 Errors</div>
+      <div class="problem-code">JWT Expired, Wrong Role, Invalid Token, Security Config</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">6. Works Locally, Fails In Production</div>
+      <div class="problem-code">Wrong Profile, Missing ENV, Firewall, Port, Database URL, Secrets</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">7. Deployment Successful, Old Behavior Persists</div>
+      <div class="problem-code">Old JAR, Browser Cache, Load Balancer, Rolling Deployment, Config Not Updated</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">8. @Transactional Not Working</div>
+      <div class="problem-code">Method Private, Self Invocation, Checked Exception, Wrong Proxy</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">9. LazyInitializationException</div>
+      <div class="problem-code">Session Closed, Access Lazy Entity Outside Transaction — Fix: DTO, Fetch Join, EntityGraph</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-title">10. Duplicate Records</div>
+      <div class="problem-code">Retry, Double Click, Race Condition — Fix: Unique Constraint, Idempotency, Transaction</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="differences">28. Top Interview Differences</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">Spring vs Spring Boot</span></div>
+    <div class="naming-card"><span class="naming-prefix">@Controller vs @RestController</span></div>
+    <div class="naming-card"><span class="naming-prefix">@Component vs @Bean</span></div>
+    <div class="naming-card"><span class="naming-prefix">@Configuration vs @Component</span></div>
+    <div class="naming-card"><span class="naming-prefix">@Autowired vs @Resource</span></div>
+    <div class="naming-card"><span class="naming-prefix">Constructor vs Field Injection</span></div>
+    <div class="naming-card"><span class="naming-prefix">@PathVariable vs @RequestParam</span></div>
+    <div class="naming-card"><span class="naming-prefix">PUT vs PATCH</span></div>
+    <div class="naming-card"><span class="naming-prefix">JPA vs Hibernate vs Spring Data JPA</span></div>
+    <div class="naming-card"><span class="naming-prefix">JPQL vs SQL</span></div>
+    <div class="naming-card"><span class="naming-prefix">CrudRepository vs JpaRepository</span></div>
+    <div class="naming-card"><span class="naming-prefix">LAZY vs EAGER</span></div>
+    <div class="naming-card"><span class="naming-prefix">Authentication vs Authorization</span></div>
+    <div class="naming-card"><span class="naming-prefix">JWT vs Session</span></div>
+    <div class="naming-card"><span class="naming-prefix">OAuth2 vs JWT vs OpenID Connect</span></div>
+    <div class="naming-card"><span class="naming-prefix">@Valid vs @Validated</span></div>
+    <div class="naming-card"><span class="naming-prefix">JAR vs WAR</span></div>
+    <div class="naming-card"><span class="naming-prefix">BeanFactory vs ApplicationContext</span></div>
+    <div class="naming-card"><span class="naming-prefix">RestTemplate vs WebClient vs Feign</span></div>
+    <div class="naming-card"><span class="naming-prefix">Optimistic vs Pessimistic Locking</span></div>
+    <div class="naming-card"><span class="naming-prefix">Cache vs Session</span></div>
+    <div class="naming-card"><span class="naming-prefix">Monolith vs Microservices</span></div>
+    <div class="naming-card"><span class="naming-prefix">Synchronous vs Asynchronous</span></div>
+    <div class="naming-card"><span class="naming-prefix">Blocking vs Non-Blocking</span></div>
+    <div class="naming-card"><span class="naming-prefix">DTO vs Entity vs VO</span></div>
+    <div class="naming-card"><span class="naming-prefix">SOAP vs REST</span></div>
+    <div class="naming-card"><span class="naming-prefix">HTTP vs HTTPS</span></div>
+    <div class="naming-card"><span class="naming-prefix">UUID vs Sequence</span></div>
+    <div class="naming-card"><span class="naming-prefix">save() vs saveAndFlush()</span></div>
+    <div class="naming-card"><span class="naming-prefix">@RequestBody vs @ModelAttribute</span></div>
+    <div class="naming-card"><span class="naming-prefix">CommandLineRunner vs ApplicationRunner</span></div>
+    <div class="naming-card"><span class="naming-prefix">Cacheable vs CacheEvict</span></div>
+    <div class="naming-card"><span class="naming-prefix">Singleton vs Prototype</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="scenarios">29. Real Project Scenarios</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">Banking API</span><span class="naming-arrow">→</span><span class="naming-meaning">spring-boot-starter-web → REST APIs</span></div>
+    <div class="naming-card"><span class="naming-prefix">CertifyHub</span><span class="naming-arrow">→</span><span class="naming-meaning">spring-boot-starter-data-jpa → Hibernate configured automatically; UserController → UserService → UserRepository</span></div>
+    <div class="naming-card"><span class="naming-prefix">Authentication Service</span><span class="naming-arrow">→</span><span class="naming-meaning">spring-boot-starter-security → security beans created</span></div>
+    <div class="naming-card"><span class="naming-prefix">Microservice Deployment</span><span class="naming-arrow">→</span><span class="naming-meaning">Executable JAR → Docker → java -jar app.jar</span></div>
+    <div class="naming-card"><span class="naming-prefix">CertifyHub Startup</span><span class="naming-arrow">→</span><span class="naming-meaning">Load Default Roles → Create Admin User → Load Permission Cache → Verify DB Connection</span></div>
+    <div class="naming-card"><span class="naming-prefix">Payment Service</span><span class="naming-arrow">→</span><span class="naming-meaning">payment.gateway=stripe → Create Stripe Bean (@ConditionalOnProperty)</span></div>
+    <div class="naming-card"><span class="naming-prefix">Notification Service</span><span class="naming-arrow">→</span><span class="naming-meaning">notification.email.enabled=true → Create Email Sender</span></div>
+    <div class="naming-card"><span class="naming-prefix">CertifyHub Health</span><span class="naming-arrow">→</span><span class="naming-meaning">Health Endpoint monitored by Kubernetes</span></div>
+    <div class="naming-card"><span class="naming-prefix">Banking Application</span><span class="naming-arrow">→</span><span class="naming-meaning">Custom Health Check → Payment Gateway → Database → Redis</span></div>
+    <div class="naming-card"><span class="naming-prefix">AWS Deployment</span><span class="naming-arrow">→</span><span class="naming-meaning">CloudWatch → Actuator Metrics → Auto Scaling</span></div>
+    <div class="naming-card"><span class="naming-prefix">@PostConstruct</span><span class="naming-arrow">→</span><span class="naming-meaning">Load Country Cache</span></div>
+    <div class="naming-card"><span class="naming-prefix">@PreDestroy</span><span class="naming-arrow">→</span><span class="naming-meaning">Close Kafka Producer</span></div>
+    <div class="naming-card"><span class="naming-prefix">@Qualifier</span><span class="naming-arrow">→</span><span class="naming-meaning">Choose StripePaymentService over PaypalPaymentService</span></div>
+    <div class="naming-card"><span class="naming-prefix">Development / Testing / Production</span><span class="naming-arrow">→</span><span class="naming-meaning">Local PostgreSQL + Debug → Test DB + Mocks → AWS RDS + INFO Logging + Redis</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="oneliners">30. Top Interview One-Liner Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid cols-3">
+      <div class="revision-item"><span class="chk">›</span><b>Spring Boot</b> → Opinionated Spring Framework</div>
+      <div class="revision-item"><span class="chk">›</span><b>IoC</b> → Spring Creates Objects</div>
+      <div class="revision-item"><span class="chk">›</span><b>DI</b> → Spring Injects Objects</div>
+      <div class="revision-item"><span class="chk">›</span><b>Bean</b> → Object Managed By Spring</div>
+      <div class="revision-item"><span class="chk">›</span><b>ApplicationContext</b> → Spring Container</div>
+      <div class="revision-item"><span class="chk">›</span><b>BeanFactory</b> → Basic Container</div>
+      <div class="revision-item"><span class="chk">›</span><b>@SpringBootApplication</b> → Main Boot Annotation</div>
+      <div class="revision-item"><span class="chk">›</span><b>Auto Configuration</b> → Configure Beans Automatically</div>
+      <div class="revision-item"><span class="chk">›</span><b>Starter</b> → Dependency Bundle</div>
+      <div class="revision-item"><span class="chk">›</span><b>Embedded Server</b> → Built-in Server</div>
+      <div class="revision-item"><span class="chk">›</span><b>Spring Initializr</b> → Project Generator</div>
+      <div class="revision-item"><span class="chk">›</span><b>DispatcherServlet</b> → Front Controller</div>
+      <div class="revision-item"><span class="chk">›</span><b>@RestController</b> → REST API</div>
+      <div class="revision-item"><span class="chk">›</span><b>ResponseEntity</b> → Full HTTP Response</div>
+      <div class="revision-item"><span class="chk">›</span><b>DTO</b> → Transfer Object</div>
+      <div class="revision-item"><span class="chk">›</span><b>Entity</b> → Database Table</div>
+      <div class="revision-item"><span class="chk">›</span><b>Repository</b> → Database Layer</div>
+      <div class="revision-item"><span class="chk">›</span><b>JPA</b> → Specification</div>
+      <div class="revision-item"><span class="chk">›</span><b>Hibernate</b> → JPA Implementation</div>
+      <div class="revision-item"><span class="chk">›</span><b>JPQL</b> → Entity Query</div>
+      <div class="revision-item"><span class="chk">›</span><b>LAZY</b> → Load On Demand</div>
+      <div class="revision-item"><span class="chk">›</span><b>EAGER</b> → Load Immediately</div>
+      <div class="revision-item"><span class="chk">›</span><b>Fetch Join</b> → Solve N+1</div>
+      <div class="revision-item"><span class="chk">›</span><b>EntityGraph</b> → Optimized Fetch</div>
+      <div class="revision-item"><span class="chk">›</span><b>@Transactional</b> → Commit / Rollback</div>
+      <div class="revision-item"><span class="chk">›</span><b>Propagation</b> → Transaction Behavior</div>
+      <div class="revision-item"><span class="chk">›</span><b>Isolation</b> → Data Visibility</div>
+      <div class="revision-item"><span class="chk">›</span><b>Optimistic Lock</b> → @Version</div>
+      <div class="revision-item"><span class="chk">›</span><b>Pessimistic Lock</b> → DB Lock</div>
+      <div class="revision-item"><span class="chk">›</span><b>Persistence Context</b> → First Level Cache</div>
+      <div class="revision-item"><span class="chk">›</span><b>HikariCP</b> → Connection Pool</div>
+      <div class="revision-item"><span class="chk">›</span><b>Validation</b> → Prevent Bad Data</div>
+      <div class="revision-item"><span class="chk">›</span><b>@ControllerAdvice</b> → Global Exception</div>
+      <div class="revision-item"><span class="chk">›</span><b>Spring Security</b> → Authentication + Authorization</div>
+      <div class="revision-item"><span class="chk">›</span><b>JWT</b> → Stateless Authentication</div>
+      <div class="revision-item"><span class="chk">›</span><b>BCrypt</b> → Password Hashing</div>
+      <div class="revision-item"><span class="chk">›</span><b>OAuth2</b> → Authorization Framework</div>
+      <div class="revision-item"><span class="chk">›</span><b>OIDC</b> → Authentication Layer</div>
+      <div class="revision-item"><span class="chk">›</span><b>Redis</b> → Distributed Cache</div>
+      <div class="revision-item"><span class="chk">›</span><b>@Cacheable</b> → Read Cache</div>
+      <div class="revision-item"><span class="chk">›</span><b>@Async</b> → Background Thread</div>
+      <div class="revision-item"><span class="chk">›</span><b>MockMvc</b> → Controller Testing</div>
+      <div class="revision-item"><span class="chk">›</span><b>Mockito</b> → Mock Dependencies</div>
+      <div class="revision-item"><span class="chk">›</span><b>Testcontainers</b> → Real Integration Tests</div>
+      <div class="revision-item"><span class="chk">›</span><b>Actuator</b> → Monitoring</div>
+      <div class="revision-item"><span class="chk">›</span><b>DevTools</b> → Development Productivity</div>
+      <div class="revision-item"><span class="chk">›</span><b>Executable JAR</b> → Standalone Deployment</div>
+      <div class="revision-item"><span class="chk">›</span><b>WAR</b> → External Server Deployment</div>
+      <div class="revision-item"><span class="chk">›</span><b>Graceful Shutdown</b> → Safe Application Stop</div>
+      <div class="revision-item"><span class="chk">›</span><b>WebClient</b> → Non-Blocking Client</div>
+      <div class="revision-item"><span class="chk">›</span><b>Feign</b> → Declarative HTTP Client</div>
+      <div class="revision-item"><span class="chk">›</span><b>UUID</b> → Distributed Unique ID</div>
+      <div class="revision-item"><span class="chk">›</span><b>Soft Delete</b> → Logical Delete</div>
+      <div class="revision-item"><span class="chk">›</span><b>Audit Logging</b> → Track Changes</div>
+      <div class="revision-item"><span class="chk">›</span><b>Idempotency</b> → Same Request = Same Result</div>
+      <div class="revision-item"><span class="chk">›</span><b>Pagination</b> → Large Data Handling</div>
+      <div class="revision-item"><span class="chk">›</span><b>Docker</b> → Package Application</div>
+      <div class="revision-item"><span class="chk">›</span><b>Microservice</b> → Independently Deployable Service</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="flow15">31. 15-Minute Final Revision Flow</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">Spring Boot → @SpringBootApplication → Auto Configuration</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Starter Dependencies → Embedded Server → SpringApplication.run()</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">IoC → DI → Beans → Configuration → Profiles</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">REST → DispatcherServlet → Jackson → DTO → Validation → Global Exception</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">JPA → Hibernate → Repository → Transactions → Pagination → Sorting</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">LAZY → N+1 → Fetch Join → Security → JWT → RBAC → BCrypt</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Cache → Redis → Async → JUnit → Mockito</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Actuator → HikariCP → DevTools → JAR vs WAR → Docker → Production</div>
+    </div>
+  </div>
+
+  <div class="section-label">5–7 Years Interview Mantra — Interviewers Expect You To Explain</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="i gr">✓ Why, not just What</span>  <span class="i bl">✓ Internal working of Spring Boot (Auto Configuration, Startup Flow)</span>
+<span class="i am">✓ Real production issues you've faced &amp; how you fixed them</span>  <span class="i pu">✓ Performance optimization (N+1, Indexing, Caching)</span>
+<span class="i cy">✓ Transaction management (Propagation, Isolation, Locking)</span>  <span class="i gr">✓ Security concepts (JWT, OAuth2, RBAC) with real examples</span>
+<span class="i re">✓ JPA optimization &amp; REST best practices</span>  <span class="i am">✓ Monitoring &amp; deployment (Actuator, Docker, Zero Downtime)</span>
+<span class="i bl">✓ Trade-offs between approaches, with real project examples</span></div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
