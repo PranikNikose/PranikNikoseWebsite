@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Knowledge Hub | Pranik Nikose</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0A0F1E;
+            color: #F0EDE6;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: #111827;
+            border-bottom: 1px solid #222;
+        }
+
+        header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        header p {
+            color: #b5b5b5;
+            font-size: 18px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 25px;
+            text-decoration: none;
+            background: #4F46E5;
+            color: white;
+            padding: 12px 22px;
+            border-radius: 6px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 50px 0;
+        }
+
+        h2 {
+            color: #4F46E5;
+            margin-bottom: 25px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: #1A2035;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #2c3555;
+            transition: .3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #4F46E5;
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #b5b5b5;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card a {
+            text-decoration: none;
+            background: #4F46E5;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            margin-top: 60px;
+            border-top: 1px solid #222;
+            color: gray;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>⚙️ DevOps Knowledge Hub</h1>
+
+    <p>
+        Hands-on Tutorials • Interview Questions • CI/CD • Cloud • Deployment Guides
+    </p>
+
+    <a href="/" class="back-btn">
+        ← Back to Portfolio
+    </a>
+
+</header>
+
+<div class="container">
+
+    <h2>Version Control</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Git</h3>
+            <p>
+                Git basics, branching strategies, merge, rebase,
+                GitHub workflow, and interview questions.
+            </p>
+
+            <a href="/devops/git/">Open</a>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <h2>Containers & Orchestration</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Docker</h3>
+            <p>
+                Images, Containers, Dockerfile, Docker Compose,
+                Networking, Volumes and Best Practices.
+            </p>
+
+            <a href="/devops/docker/">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Kubernetes</h3>
+            <p>
+                Pods, Deployments, Services,
+                ConfigMaps, Secrets, Ingress,
+                Helm and Interview Questions.
+            </p>
+
+            <a href="/devops/kubernetes/">Open</a>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <h2>CI/CD</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Jenkins</h3>
+            <p>
+                Pipelines, Declarative Pipeline,
+                Jenkinsfile, Agents,
+                Build Automation and CI/CD.
+            </p>
+
+            <a href="/devops/jenkins/">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>CI/CD Pipeline</h3>
+            <p>
+                Continuous Integration,
+                Continuous Delivery,
+                Build, Test and Deployment Pipeline.
+            </p>
+
+            <a href="/devops/cicd/">Open</a>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <h2>Cloud & Infrastructure</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>AWS</h3>
+            <p>
+                EC2, IAM, VPC, S3,
+                RDS, CloudWatch,
+                Load Balancer and Auto Scaling.
+            </p>
+
+            <a href="/devops/aws/">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Terraform</h3>
+            <p>
+                Infrastructure as Code,
+                Providers, Resources,
+                Variables, Modules and State Management.
+            </p>
+
+            <a href="/devops/terraform/">Open</a>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <h2>Linux & Web Server</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Linux</h3>
+            <p>
+                Essential Linux commands,
+                Shell Scripting,
+                File System,
+                Permissions and Process Management.
+            </p>
+
+            <a href="/devops/linux/">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Nginx</h3>
+            <p>
+                Reverse Proxy,
+                Load Balancing,
+                SSL Configuration,
+                Static Hosting and Routing.
+            </p>
+
+            <a href="/devops/nginx/">Open</a>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <h2>Deployment & Architecture</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Microservices Deployment</h3>
+            <p>
+                Docker, Kubernetes,
+                API Gateway,
+                Service Discovery,
+                Monitoring and Logging.
+            </p>
+
+            <a href="/devops/microservices-deployment/">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Coming Soon...</h3>
+            <p>
+                ArgoCD, Grafana, Prometheus,
+                ELK Stack, SonarQube,
+                Ansible and more.
+            </p>
+
+            <a href="#">Soon</a>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+
+    © 2026 Pranik Nikose | DevOps Knowledge Hub
+
+</footer>
+
+</body>
+
+</html>
