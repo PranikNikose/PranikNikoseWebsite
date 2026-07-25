@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Security &amp; JWT — Complete Interview Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14; --panel:#12161f; --panel2:#151a24; --border:#232a38; --border-soft:#1b212d;
+  --text:#c9d1d9; --dim:#6e7681; --dim2:#8892a0;
+  --cy:#39c5cf; --bl:#58a6ff; --gr:#3fb950; --am:#e3b341; --pu:#a371f7; --re:#f778ba; --or:#ff9a5a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'JetBrains Mono', monospace; font-size:14px; line-height:1.55;
+  padding:28px 16px 80px;
+}
+.page{max-width:1180px; margin:0 auto;}
+
+/* HEADER */
+.header{border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:22px;}
+.header-top{display:flex; align-items:baseline; gap:10px;}
+.prompt{color:var(--gr); font-weight:700; font-size:20px;}
+.title{font-size:22px; font-weight:700; color:#fff; letter-spacing:.3px;}
+.subtitle{color:var(--dim); margin-top:6px; font-size:13px;}
+.toc{margin-top:14px; display:flex; flex-wrap:wrap; gap:6px 10px;}
+.toc a{color:var(--cy); text-decoration:none; font-size:12px; border:1px solid var(--border-soft); padding:3px 9px; border-radius:20px;}
+.toc a:hover{border-color:var(--cy);}
+
+/* SECTION LABEL */
+.section-label{
+  font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:var(--dim2);
+  margin:34px 0 10px; padding-bottom:6px; border-bottom:1px dashed var(--border);
+  display:flex; align-items:center; gap:8px;
+}
+.section-label::before{content:"//"; color:var(--gr);}
+.section-label.big{font-size:14px; color:#fff; margin-top:46px; padding:10px 0; border-bottom:1px solid var(--border);}
+.section-label.big::before{content:"§";}
+
+/* CARDS GRID */
+.cards-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cards-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.cards-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.cards-grid.cols-6{grid-template-columns:repeat(6,1fr);}
+.card{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:12px 14px; border-left:3px solid var(--dim);}
+.card-name{font-weight:700; color:#fff; font-size:13px; margin-bottom:4px;}
+.card-desc{color:var(--dim2); font-size:12px;}
+.card-cy{border-left-color:var(--cy);} .card-cy .card-name{color:var(--cy);}
+.card-bl{border-left-color:var(--bl);} .card-bl .card-name{color:var(--bl);}
+.card-gr{border-left-color:var(--gr);} .card-gr .card-name{color:var(--gr);}
+.card-am{border-left-color:var(--am);} .card-am .card-name{color:var(--am);}
+.card-pu{border-left-color:var(--pu);} .card-pu .card-name{color:var(--pu);}
+.card-re{border-left-color:var(--re);} .card-re .card-name{color:var(--re);}
+.card-or{border-left-color:var(--or);} .card-or .card-name{color:var(--or);}
+
+/* LEGEND */
+.legend{display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--panel2); border:1px solid var(--border-soft); border-radius:6px; padding:8px 14px; margin-top:10px;}
+.legend-label{color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:1px;}
+.legend-items{display:flex; gap:14px; flex-wrap:wrap;}
+.legend-item{font-size:12px; color:var(--dim2); display:flex; align-items:center; gap:6px;}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+.dot-cy{background:var(--cy);} .dot-bl{background:var(--bl);} .dot-gr{background:var(--gr);}
+.dot-am{background:var(--am);} .dot-pu{background:var(--pu);} .dot-re{background:var(--re);} .dot-or{background:var(--or);}
+
+/* NAMING / KEY POINT GRID */
+.naming-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+.naming-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.naming-card{background:var(--panel); border:1px solid var(--border-soft); border-radius:6px; padding:10px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+.naming-prefix{color:#fff; font-weight:700; font-size:12.5px; white-space:nowrap;}
+.naming-arrow{color:var(--dim);}
+.naming-meaning{color:var(--dim2); font-size:12.5px;}
+
+/* TWO / THREE COL LAYOUT */
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+
+/* TREE PANEL */
+.tree-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.tree-title{font-size:12.5px; font-weight:700; color:#fff; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;}
+.tree-body{font-size:12.5px; white-space:pre-wrap; line-height:1.75;}
+.tree-body .c{color:var(--dim); }
+.tree-body .n{color:var(--dim2);}
+.tree-body .i{font-weight:700;}
+.tree-body .cy{color:var(--cy);} .tree-body .bl{color:var(--bl);} .tree-body .gr{color:var(--gr);}
+.tree-body .am{color:var(--am);} .tree-body .pu{color:var(--pu);} .tree-body .re{color:var(--re);}
+
+/* API TABLE */
+table.api-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+table.api-table td{padding:5px 6px; border-bottom:1px solid var(--border-soft); vertical-align:top;}
+.api-code{font-weight:700; white-space:nowrap; width:1%;}
+.api-code.cy{color:var(--cy);} .api-code.bl{color:var(--bl);} .api-code.gr{color:var(--gr);}
+.api-code.am{color:var(--am);} .api-code.pu{color:var(--pu);} .api-code.re{color:var(--re);}
+.api-desc{color:var(--dim2);}
+.api-desc code{color:var(--am); background:rgba(255,255,255,.04); padding:1px 5px; border-radius:4px;}
+
+/* PILLAR PANEL */
+.pillar-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.pillar-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.pillar-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.pillar-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.pillar-card{border:1px solid var(--border-soft); border-radius:6px; padding:12px 14px; background:var(--panel2);}
+.pillar-name{font-weight:700; font-size:13.5px; margin-bottom:6px;}
+.pillar-name.bl{color:var(--bl);} .pillar-name.gr{color:var(--gr);} .pillar-name.am{color:var(--am);} .pillar-name.pu{color:var(--pu);} .pillar-name.cy{color:var(--cy);} .pillar-name.re{color:var(--re);}
+.pillar-def{color:var(--dim2); font-size:12.5px; margin-bottom:8px;}
+.pillar-tag{display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin:0 5px 5px 0; border:1px solid var(--border);}
+.tag-bl{color:var(--bl); border-color:rgba(88,166,255,.35);}
+.tag-gr{color:var(--gr); border-color:rgba(63,185,80,.35);}
+.tag-am{color:var(--am); border-color:rgba(227,179,65,.35);}
+.tag-pu{color:var(--pu); border-color:rgba(163,113,247,.35);}
+.tag-cy{color:var(--cy); border-color:rgba(57,197,207,.35);}
+.tag-re{color:var(--re); border-color:rgba(247,120,186,.35);}
+.pillar-example{margin-top:8px; font-size:12px; color:var(--dim2); border-top:1px dashed var(--border-soft); padding-top:6px;}
+.pillar-example b{color:#fff;}
+
+/* TABLE PANEL (real tables) */
+.table-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.table-panel table, .bottom-grid table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px;}
+.table-panel th, .bottom-grid th{text-align:left; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border);}
+.table-panel td, .bottom-grid td{padding:6px 8px; border-bottom:1px solid var(--border-soft); color:var(--dim2);}
+.yes{color:var(--gr); font-weight:700;}
+.no{color:var(--re); font-weight:700;}
+.cell-hl{color:var(--am); font-weight:700;}
+.bottom-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+/* CMP PANEL (comparisons) */
+.cmp-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:2px;}
+.cmp-card{padding:10px 4px;}
+.cmp-header{margin-bottom:6px;}
+.cmp-name{font-weight:700; font-size:13.5px;}
+.cmp-name.bl{color:var(--bl);} .cmp-name.pu{color:var(--pu);} .cmp-name.gr{color:var(--gr);} .cmp-name.am{color:var(--am);} .cmp-name.cy{color:var(--cy);} .cmp-name.re{color:var(--re);}
+.cmp-rows{display:flex; flex-direction:column; gap:3px;}
+.cmp-row{display:flex; gap:10px; font-size:12.5px;}
+.cmp-key{color:var(--dim); width:100px; flex-shrink:0;}
+.cmp-val{color:var(--dim2);}
+.cmp-val.code{color:var(--am); font-size:12px;}
+.cmp-val.green{color:var(--gr);}
+.cmp-val.purple{color:var(--pu);}
+.cmp-divider{height:1px; background:var(--border-soft); margin:4px 0;}
+
+/* FLOW / PIPELINE */
+.flow-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.flow-row{display:flex; align-items:center; flex-wrap:wrap; gap:8px;}
+.pipe-box{border:1px solid var(--border); border-radius:6px; padding:7px 12px; font-size:12px; font-weight:700; background:var(--panel2);}
+.pipe-box.source{color:var(--cy); border-color:rgba(57,197,207,.4);}
+.pipe-box.inter{color:var(--bl); border-color:rgba(88,166,255,.4);}
+.pipe-box.term{color:var(--am); border-color:rgba(227,179,65,.4);}
+.pipe-box.gc{color:var(--gr); border-color:rgba(63,185,80,.4);}
+.pipe-box.warn{color:var(--re); border-color:rgba(247,120,186,.4);}
+.pipe-arrow{color:var(--dim);}
+.flow-vert{display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
+.flow-vert .pipe-arrow{align-self:center; margin-left:60px;}
+
+/* PROBLEM / CODE CARDS */
+.problem-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+.problem-card{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px; border-left:3px solid var(--gr);}
+.problem-title{font-weight:700; color:var(--gr); font-size:12.5px; margin-bottom:6px;}
+.problem-code{font-size:12px; color:var(--dim2); background:var(--panel2); border-radius:6px; padding:8px 10px; white-space:pre-wrap; line-height:1.6;}
+.problem-code .kw{color:var(--pu);}
+.problem-code .cl{color:var(--am);}
+.problem-code .mt{color:var(--bl);}
+.problem-code .st{color:var(--gr);}
+.problem-code .cm{color:var(--dim); font-style:italic;}
+
+/* REVISION CHECKLIST */
+.revision-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.revision-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px 20px;}
+.revision-grid.cols-1{grid-template-columns:1fr;}
+.revision-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.revision-item{font-size:12.5px; color:var(--dim2); display:flex; gap:8px;}
+.chk{color:var(--gr); font-weight:700;}
+
+/* Q&A */
+.qa{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px;}
+.qa .q{color:#fff; font-weight:700; font-size:13px; margin-bottom:6px;}
+.qa .q::before{content:"Q: "; color:var(--am);}
+.qa .a{color:var(--dim2); font-size:12.5px;}
+
+/* MISC */
+code{font-family:'JetBrains Mono', monospace;}
+.note{font-size:12px; color:var(--dim); margin-top:8px;}
+.badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.badge{font-size:11px; padding:3px 9px; border:1px solid var(--border); border-radius:20px; color:var(--dim2);}
+
+@media(max-width:820px){
+  .cards-grid, .cards-grid.cols-3, .cards-grid.cols-5, .cards-grid.cols-6{grid-template-columns:repeat(2,1fr);}
+  .two-col, .three-col, .bottom-grid, .pillar-grid, .pillar-grid.cols-3, .pillar-grid.cols-5, .naming-grid, .naming-grid.cols-3, .revision-grid, .revision-grid.cols-3, .problem-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Spring Security &amp; JWT — Complete Interview Revision</span>
+    </div>
+    <div class="subtitle">// 5-7 Yrs Experience — Authentication, Authorization, JWT, RBAC, OAuth2/OIDC &amp; Production Security</div>
+    <div class="toc">
+      <a href="#fundamentals">Spring Security Fundamentals</a>
+      <a href="#components">Filter Chain &amp; Core Components</a>
+      <a href="#authnprocess">Authentication Process &amp; PasswordEncoder</a>
+      <a href="#jwtbasics">JWT Fundamentals</a>
+      <a href="#jwtfilter">JWT Filter &amp; Stateless Auth</a>
+      <a href="#authz">Authorization &amp; RBAC</a>
+      <a href="#methodsec">Method Security</a>
+      <a href="#csrfcors">SecurityContextHolder, CSRF &amp; CORS</a>
+      <a href="#oauth2">OAuth2 &amp; OpenID Connect</a>
+      <a href="#headers">Security Headers, HTTPS &amp; Token Storage</a>
+      <a href="#refresh">Refresh Token Strategy &amp; Logout</a>
+      <a href="#attacks">Common Attacks &amp; Mitigation</a>
+      <a href="#production">Production Security Flow &amp; Checklist</a>
+      <a href="#differences">Top Interview Differences</a>
+      <a href="#scenarios">Real Project Scenarios</a>
+      <a href="#oneliners">Interview One-Liners</a>
+      <a href="#flow15">15-Minute Final Revision</a>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="fundamentals">1. Spring Security Fundamentals</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="n">Spring Security is a framework that provides </span><span class="i cy">Authentication</span><span class="n">, </span><span class="i bl">Authorization</span><span class="n">, and protection against common security attacks for Spring applications.</span></div>
+  </div>
+
+  <div class="two-col" style="margin-top:10px;">
+    <div class="flow-panel">
+      <div class="tree-title">Without Security</div>
+      <div class="flow-vert">
+        <div class="pipe-box warn">Anyone Can Access Application</div>
+      </div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">With Spring Security</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Verify User</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Check Permissions</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Allow Or Deny Access → Return Response</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Security Features</div>
+  <div class="cards-grid cols-5">
+    <div class="card card-cy"><div class="card-name">Authentication</div></div>
+    <div class="card card-bl"><div class="card-name">Authorization</div></div>
+    <div class="card card-gr"><div class="card-name">Password Encryption</div></div>
+    <div class="card card-am"><div class="card-name">Session Management</div></div>
+    <div class="card card-pu"><div class="card-name">JWT Support</div></div>
+    <div class="card card-re"><div class="card-name">OAuth2</div></div>
+    <div class="card card-or"><div class="card-name">CSRF Protection</div></div>
+    <div class="card card-cy"><div class="card-name">CORS Support</div></div>
+    <div class="card card-bl"><div class="card-name">Method Security</div></div>
+  </div>
+
+  <div class="section-label">Security Architecture &amp; Authentication vs Authorization</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Security Architecture</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Client → HTTP Request</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Security Filter Chain → Authentication → Authorization</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Controller → Service → Repository → Database</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">HTTP Response</div>
+      </div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name cy">Authentication</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Verifies WHO the user is — identity verification. Example: Username + Password → Identity Verified</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name am">Authorization</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Determines WHAT an authenticated user can access. Example: ADMIN → Create/Delete User; USER → View/Update Profile</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Spring Security Request Flow</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">Client Request → Security Filter Chain</div>
+      <span class="pipe-arrow">↓ Not Authenticated</span>
+      <div class="pipe-box inter">Authentication</div>
+      <span class="pipe-arrow">↓ Success</span>
+      <div class="pipe-box inter">Authorization</div>
+      <span class="pipe-arrow">↓ Permission Granted</span>
+      <div class="pipe-box gc">Controller → Response</div>
+    </div>
+  </div>
+  <div class="note">Authentication Failed → <b>401 Unauthorized</b>. Authenticated but permission denied → <b>403 Forbidden</b>. Request successful → <b>200</b>.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="components">2. Security Filter Chain &amp; Core Components</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">SecurityFilterChain (Spring Security 6)</div>
+      <div class="tree-body"><span class="n">A chain of security filters that intercepts every HTTP request before it reaches the controller — the main configuration class used to configure Spring Security behavior.</span>
+<span class="n">Responsibilities: Define Public URLs, Secure Endpoints, Configure Authentication, Configure Authorization, Register Filters.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Filter Chain Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">HTTP Request → Security Filters</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Authentication → Authorization</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Controller → HTTP Response</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">UserDetails, UserDetailsService, Authentication Object</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">UserDetails</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Represents authenticated user information used by Spring Security — contains Username, Password, Authorities, Account Status, Lock Status, Expiry Information</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">UserDetailsService</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Loads user information from database, file, LDAP or an external system. Main responsibility: find user by username, return UserDetails</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">Authentication Object</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Represents the current authentication request or authenticated user — contains Principal, Credentials, Authorities, Authentication Status</span></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">SecurityContext, SecurityContextHolder, Principal &amp; GrantedAuthority</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">SecurityContext &amp; SecurityContextHolder</div>
+      <div class="tree-body"><span class="i cy">SecurityContext</span> <span class="n">→ stores the current user's authentication information during request processing.</span>
+<span class="i bl">SecurityContextHolder</span> <span class="n">→ provides access to the SecurityContext anywhere in the application; used to retrieve the current logged-in user.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Principal vs GrantedAuthority</div>
+      <div class="tree-body"><span class="i gr">Principal</span> <span class="n">→ WHO the user is (typically the username or a custom user object)</span>
+<span class="i am">GrantedAuthority</span> <span class="n">→ WHAT the user can do (a permission or role — e.g. ROLE_ADMIN, ROLE_USER, READ_USER, WRITE_USER)</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Spring Security Component Flow</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">Client → SecurityFilterChain</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">AuthenticationManager → UserDetailsService → Database</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">UserDetails → Authentication → SecurityContext</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Controller</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="authnprocess">3. Authentication Process &amp; PasswordEncoder</div>
+  <div class="flow-panel">
+    <div class="tree-title">Authentication Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Client → Login Request → UsernamePasswordAuthenticationToken</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">AuthenticationManager → AuthenticationProvider → UserDetailsService → Database</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">UserDetails → Password Verification</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Authentication Success → SecurityContext → Response</div>
+    </div>
+  </div>
+
+  <div class="section-label">PasswordEncoder &amp; Common Encoders</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">PasswordEncoder</div>
+      <div class="tree-body"><span class="n">Encrypts passwords before storing, and verifies passwords during login. Purpose: secure password storage, prevent plain text passwords, compare passwords safely.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Common Password Encoders</div>
+      <div class="tree-body"><span class="i gr">BCryptPasswordEncoder</span> <span class="n">→ Recommended</span>
+<span class="i bl">Pbkdf2PasswordEncoder</span> <span class="n">→ PBKDF2 Algorithm</span>
+<span class="i am">SCryptPasswordEncoder</span> <span class="n">→ Memory-Hard Algorithm</span>
+<span class="i re">NoOpPasswordEncoder</span> <span class="n">→ Plain Text (Not Recommended)</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Why BCrypt?</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="n">Spring's default, recommended password encoder. Features: Salted Hash, Adaptive Algorithm, Slow Hashing, Resistant To Brute Force Attacks.</span>
+<span class="n">Same password → different hash every time, because a random salt is added — Password → Hash1 ($2a$...) and Password → Hash2 ($2a$...) are different but both valid.</span></div>
+  </div>
+
+  <div class="section-label">AuthenticationManager vs AuthenticationProvider</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">AuthenticationManager</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Main component responsible for authenticating users — receives the authentication request, delegates to AuthenticationProvider, returns the authentication result</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">AuthenticationProvider</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Component that performs the actual authentication logic — loads the user, verifies the password, creates the Authentication object</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">DaoAuthenticationProvider</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Default AuthenticationProvider, used with UserDetailsService and PasswordEncoder. Flow: Load User → Compare Password → Authentication Success</span></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">UsernamePasswordAuthenticationToken &amp; Login Failure Reasons</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">UsernamePasswordAuthenticationToken</div>
+      <div class="tree-body"><span class="n">Represents the authentication request before login, and the authenticated user after login.</span>
+<span class="i re">Before</span><span class="n">: Username, Password, Authenticated = false</span>
+<span class="i gr">After</span><span class="n">: Principal, Authorities, Authenticated = true</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Login Failure Reasons</div>
+      <div class="tree-body"><span class="n">Wrong Password, Disabled User, Locked Account, Expired Account, User Not Found</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="jwtbasics">4. JWT Fundamentals</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">JWT (JSON Web Token)</div>
+      <div class="tree-body"><span class="n">A compact, self-contained, secure token used for Stateless Authentication.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Why JWT?</div>
+      <div class="flow-vert">
+        <div class="pipe-box warn">Without JWT → Server Stores Session → More Memory → Session Replication Needed</div>
+        <span class="pipe-arrow">↕</span>
+        <div class="pipe-box gc">With JWT → Client Stores Token → Server Stays Stateless → Better Scalability</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">JWT Structure</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="n">JWT = </span><span class="i cy">Header</span><span class="n">.</span><span class="i bl">Payload</span><span class="n">.</span><span class="i am">Signature</span> <span class="n">(e.g. xxxxx.yyyyy.zzzzz)</span></div>
+  </div>
+  <div class="pillar-panel" style="margin-top:10px;">
+    <div class="pillar-grid cols-3">
+      <div class="pillar-card">
+        <div class="pillar-name cy">Header</div>
+        <div class="pillar-def">Contains Algorithm &amp; Token Type — <code>alg: HS256</code>, <code>typ: JWT</code></div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name bl">Payload</div>
+        <div class="pillar-def">Contains Claims (user information) — Username, Role, Subject (User ID), Issued Time (iat), Expiration Time (exp)</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name am">Signature</div>
+        <div class="pillar-def">Verifies token integrity and prevents tampering — generated using Header + Payload + Secret Key</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">JWT Flow &amp; Authorization Header</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">User Login → AuthenticationManager → Credentials Valid</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Generate JWT → Return Token → Client Stores Token</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Future Requests → Authorization: Bearer &lt;JWT_TOKEN&gt;</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">JWT Validation → Controller</div>
+    </div>
+  </div>
+
+  <div class="section-label">Access Token vs Refresh Token</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Access Token</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Short-lived, used to access protected APIs — short expiry, sent in every request, contains user claims</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">Refresh Token</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Long-lived, used to generate a new access token without logging in again — better security, better UX</span></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">JWT Generation &amp; Validation</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Generation</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Authentication Success → Collect User Details</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Create Claims → Set Expiration</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Sign Token → Return JWT</div>
+      </div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Validation</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Check Signature → Valid?</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Check Expiration → Not Expired?</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Extract Username → Load User → Authentication Success</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="jwtfilter">5. JWT Filter, OncePerRequestFilter &amp; Stateless Auth</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">JWT Filter</div>
+      <div class="tree-body"><span class="n">Custom filter that intercepts every request to validate the JWT. Responsibilities: Read Authorization Header, Extract Token, Validate Token, Load User, Set Authentication.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">OncePerRequestFilter</div>
+      <div class="tree-body"><span class="n">Spring Security base class that ensures a filter executes only once per HTTP request. Why use it: prevent duplicate execution, ideal for JWT validation.</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">JWT Filter Flow</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">Incoming Request → Authorization Header → Bearer Token?</div>
+      <span class="pipe-arrow">↓ Yes</span>
+      <div class="pipe-box inter">Extract JWT → Validate JWT → Load UserDetails</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Create Authentication → SecurityContextHolder</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Continue Filter Chain → Controller</div>
+    </div>
+  </div>
+
+  <div class="section-label">Stateful vs Stateless &amp; Token Refresh</div>
+  <div class="two-col">
+    <div class="cmp-panel">
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name bl">Stateful</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Session stored on the server</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name gr">Stateless</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">JWT stored on the client, server stores nothing — each request must contain a valid JWT</span></div></div>
+      </div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Token Refresh Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Login → Access Token + Refresh Token</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Access Token Expires → Send Refresh Token</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Validate → New Access Token → Continue</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Full JWT Authentication Flow (Login + Protected API)</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">POST /login → UsernamePasswordAuthenticationToken → AuthenticationManager → DaoAuthenticationProvider → UserDetailsService</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Authentication Success → Generate JWT → Return Token</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">GET /users (Bearer JWT) → JWT Filter → Validate Token</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">SecurityContextHolder → Controller → Response</div>
+    </div>
+  </div>
+
+  <div class="section-label">JWT Advantages &amp; Limitations</div>
+  <div class="two-col">
+    <div class="revision-panel">
+      <div class="tree-title" style="margin-bottom:8px;">Advantages</div>
+      <div class="revision-grid cols-1">
+        <div class="revision-item"><span class="chk">✓</span>Stateless</div>
+        <div class="revision-item"><span class="chk">✓</span>Scalable</div>
+        <div class="revision-item"><span class="chk">✓</span>Faster, No Session Storage</div>
+        <div class="revision-item"><span class="chk">✓</span>Suitable For Microservices</div>
+        <div class="revision-item"><span class="chk">✓</span>Easy API Authentication</div>
+      </div>
+    </div>
+    <div class="revision-panel">
+      <div class="tree-title" style="margin-bottom:8px;">Limitations</div>
+      <div class="revision-grid cols-1">
+        <div class="revision-item"><span class="chk">✗</span>Cannot Easily Revoke</div>
+        <div class="revision-item"><span class="chk">✗</span>Larger Than A Session ID</div>
+        <div class="revision-item"><span class="chk">✗</span>Secret Key Must Be Protected</div>
+        <div class="revision-item"><span class="chk">✗</span>Short Expiry Recommended</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="authz">6. Authorization &amp; Role-Based Access Control (RBAC)</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">RBAC</div>
+      <div class="tree-body"><span class="n">Restricts application access based on user roles.</span>
+<span class="i re">ADMIN</span> <span class="n">→ Manage Users, Create Reports</span>
+<span class="i am">TRAINER</span> <span class="n">→ Manage Courses, Manage Exams</span>
+<span class="i gr">STUDENT</span> <span class="n">→ View Courses, Take Exams</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Authorization Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Client Request → JWT Validated → Authentication</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Extract Roles → Authorization</div>
+        <span class="pipe-arrow">↓ Granted</span>
+        <div class="pipe-box gc">Controller → Response</div>
+        <span class="pipe-arrow">↓ Denied</span>
+        <div class="pipe-box warn">403 Forbidden</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Role vs Authority, Role Hierarchy, hasRole() vs hasAuthority()</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Role</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">High-level access, e.g. ROLE_ADMIN. Role hierarchy: ROLE_ADMIN → ROLE_TRAINER → ROLE_STUDENT (higher roles can inherit lower role permissions)</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">Authority</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Specific / fine-grained permission, e.g. DELETE_USER, READ_USER, WRITE_USER</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">hasRole()</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Checks role, automatically adds the ROLE_ prefix</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name pu">hasAuthority()</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Checks the exact authority, no prefix added</span></div></div>
+    </div>
+  </div>
+  <div class="note">URL-Level Security example: <code>/admin/**</code> → ROLE_ADMIN, <code>/student/**</code> → ROLE_STUDENT.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="methodsec">7. Method Security</div>
+  <div class="flow-panel">
+    <div class="tree-title">Method Security Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Request → Authentication → Authorization</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">@PreAuthorize</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Method Executes → Response</div>
+    </div>
+  </div>
+  <div class="note">Protects individual Service or Controller methods using annotations. <code>@EnableMethodSecurity</code> enables method-level authorization checks.</div>
+
+  <div class="section-label">@PreAuthorize vs @PostAuthorize vs @Secured vs @RolesAllowed</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Annotation</th><th>Behavior</th></tr>
+      <tr><td class="cell-hl">@PreAuthorize ⭐</td><td>Checks permission before method executes — most flexible; supports role checks, authority checks, custom SpEL expressions</td></tr>
+      <tr><td class="cell-hl">@PostAuthorize</td><td>Checks permission after method executes — used for validating the returned object / ownership verification</td></tr>
+      <tr><td class="cell-hl">@Secured</td><td>Restricts a method using roles only — simple</td></tr>
+      <tr><td class="cell-hl">@RolesAllowed</td><td>JSR-250 standard annotation for role-based access</td></tr>
+    </table>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="csrfcors">8. SecurityContextHolder Usage, CSRF &amp; CORS</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Current User Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">JWT Filter → Authentication</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">SecurityContextHolder → Service Layer</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Current User Available</div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">SecurityContextHolder — Common Uses</div>
+      <div class="tree-body"><span class="n">Current Username, Current Roles, Audit Logging, Ownership Validation</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">CSRF vs CORS</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name re">CSRF (Cross-Site Request Forgery)</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-val">An attack where a malicious site sends unauthorized requests using the victim's session. Applies to session-based auth (enable protection); usually disabled for stateless JWT APIs (no server session).</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">CORS (Cross-Origin Resource Sharing)</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-val">Allows a browser to access resources from another origin — e.g. frontend on localhost:5173 calling backend on localhost:8080. Headers: Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">CSRF protects against forged requests; CORS allows legitimate cross-origin browser requests. They solve different problems and are configured independently.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="oauth2">9. OAuth2 &amp; OpenID Connect</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">OAuth2</div>
+      <div class="tree-body"><span class="n">An authorization framework that allows applications to access protected resources on behalf of a user, without sharing passwords.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Why OAuth2?</div>
+      <div class="flow-vert">
+        <div class="pipe-box warn">Without → User Shares Password With Every App → Security Risk</div>
+        <span class="pipe-arrow">↕</span>
+        <div class="pipe-box gc">With → User Grants Permission → App Gets Access Token → No Password Shared</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">OAuth2 Roles &amp; Authorization Code Flow</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">OAuth2 Roles</div>
+      <div class="tree-body"><span class="i cy">Resource Owner</span> <span class="n">→ User</span>
+<span class="i bl">Client</span> <span class="n">→ Application</span>
+<span class="i am">Authorization Server</span> <span class="n">→ Issues Access Tokens</span>
+<span class="i gr">Resource Server</span> <span class="n">→ Protected API</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Authorization Code Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">User → Client App → Authorization Server → Login</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Authorization Code → Client → Exchange Code</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Access Token → Resource Server → Protected Resource</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">OpenID Connect (OIDC) &amp; OAuth2 vs OIDC</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">OIDC</div>
+      <div class="tree-body"><span class="n">An identity layer built on top of OAuth2 — provides Authentication + User Identity.</span>
+<span class="n">Token types: </span><span class="i bl">Access Token</span> <span class="n">(API Access), </span><span class="i gr">ID Token</span> <span class="n">(User Identity), </span><span class="i am">Refresh Token</span> <span class="n">(Renew Access Token)</span></div>
+    </div>
+    <div class="cmp-panel">
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name bl">OAuth2</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Authorization only</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name gr">OIDC</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Authentication + Authorization</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">JWT vs Session</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">JWT</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Stateless, stored on client, scalable — preferred for REST APIs</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Session</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Stateful, stored on server, simpler — for traditional web apps</span></div></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="headers">10. Security Headers, HTTPS, Password Policy &amp; Token Storage</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Common Security Headers</div>
+      <div class="tree-body"><span class="i cy">X-Content-Type-Options</span> <span class="n">→ Prevent MIME Sniffing</span>
+<span class="i bl">X-Frame-Options</span> <span class="n">→ Prevent Clickjacking</span>
+<span class="i am">Content-Security-Policy</span> <span class="n">→ Restrict Script Sources</span>
+<span class="i gr">Strict-Transport-Security</span> <span class="n">→ Force HTTPS</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">HTTPS &amp; Password Policy</div>
+      <div class="tree-body"><span class="n">HTTPS encrypts communication between client and server — Confidentiality, Integrity, Authentication.</span>
+<span class="n">Password Policy: Minimum 8–12 characters, uppercase, lowercase, number, special character, password expiry (if required), prevent password reuse.</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Token Storage Comparison</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Storage</th><th>Characteristics</th></tr>
+      <tr><td class="cell-hl">HttpOnly Secure Cookie ⭐</td><td>Recommended for browser apps — more secure, not accessible by JavaScript</td></tr>
+      <tr><td class="cell-hl">Memory</td><td>Common for SPAs — lost on refresh, less persistent</td></tr>
+      <tr><td class="cell-hl">Local Storage</td><td>Convenient, persistent — but higher XSS risk</td></tr>
+    </table>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="refresh">11. Refresh Token Strategy, Rotation &amp; Logout</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Refresh Token Strategy</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Login → Access Token + Refresh Token</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Access Token Expires → Refresh Token Validated</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">New Access Token → Continue</div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Refresh Token Rotation</div>
+      <div class="tree-body"><span class="n">Issue a new refresh token whenever one is used. Benefits: reduce token theft risk, detect reuse, better security.</span></div>
+    </div>
+  </div>
+  <div class="note">Logout: JWT → client deletes the token. Refresh Token → invalidate or remove from storage. Future requests → 401 Unauthorized.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="attacks">12. Common Security Attacks &amp; Mitigation</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Attack</th><th>Mitigation</th></tr>
+      <tr><td class="cell-hl">XSS (Cross-Site Scripting)</td><td>Escape output, Content Security Policy</td></tr>
+      <tr><td class="cell-hl">CSRF (Cross-Site Request Forgery)</td><td>Enable CSRF protection for session-based apps</td></tr>
+      <tr><td class="cell-hl">SQL Injection</td><td>Parameterized queries, JPA, Prepared Statements</td></tr>
+      <tr><td class="cell-hl">Brute Force (repeated login attempts)</td><td>Rate limiting, account lockout, monitoring</td></tr>
+    </table>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="production">13. Production Security Flow &amp; Checklist</div>
+  <div class="flow-panel">
+    <div class="tree-title">Production Security Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Client → HTTPS → SecurityFilterChain</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">JWT Validation → Authorization</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Business Logic → Database</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Response</div>
+    </div>
+  </div>
+  <div class="revision-panel" style="margin-top:10px;">
+    <div class="revision-grid cols-3">
+      <div class="revision-item"><span class="chk">✓</span>Use HTTPS Everywhere</div>
+      <div class="revision-item"><span class="chk">✓</span>Use BCrypt For Passwords</div>
+      <div class="revision-item"><span class="chk">✓</span>Keep JWT Short-Lived</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Refresh Token Rotation</div>
+      <div class="revision-item"><span class="chk">✓</span>Store Tokens Securely</div>
+      <div class="revision-item"><span class="chk">✓</span>Validate JWT On Every Request</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Least Privilege Access</div>
+      <div class="revision-item"><span class="chk">✓</span>Enable Security Headers</div>
+      <div class="revision-item"><span class="chk">✓</span>Restrict CORS Origins</div>
+      <div class="revision-item"><span class="chk">✓</span>Disable CSRF Only For Stateless JWT APIs</div>
+      <div class="revision-item"><span class="chk">✓</span>Log Authentication/Authorization Failures</div>
+      <div class="revision-item"><span class="chk">✓</span>Rotate Secrets And Keys</div>
+      <div class="revision-item"><span class="chk">✓</span>Keep Dependencies Updated</div>
+      <div class="revision-item"><span class="chk">✓</span>Perform Regular Security Audits</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="differences">14. Top Interview Differences</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">Authentication vs Authorization</span></div>
+    <div class="naming-card"><span class="naming-prefix">AuthenticationManager vs AuthenticationProvider</span></div>
+    <div class="naming-card"><span class="naming-prefix">Principal vs GrantedAuthority</span></div>
+    <div class="naming-card"><span class="naming-prefix">Role vs Authority</span></div>
+    <div class="naming-card"><span class="naming-prefix">hasRole() vs hasAuthority()</span></div>
+    <div class="naming-card"><span class="naming-prefix">@PreAuthorize vs @PostAuthorize</span></div>
+    <div class="naming-card"><span class="naming-prefix">@Secured vs @RolesAllowed</span></div>
+    <div class="naming-card"><span class="naming-prefix">Access Token vs Refresh Token</span></div>
+    <div class="naming-card"><span class="naming-prefix">JWT vs Session</span></div>
+    <div class="naming-card"><span class="naming-prefix">Stateful vs Stateless</span></div>
+    <div class="naming-card"><span class="naming-prefix">CSRF vs CORS</span></div>
+    <div class="naming-card"><span class="naming-prefix">OAuth2 vs OpenID Connect</span></div>
+    <div class="naming-card"><span class="naming-prefix">BCrypt vs NoOpPasswordEncoder</span></div>
+    <div class="naming-card"><span class="naming-prefix">401 vs 403</span></div>
+    <div class="naming-card"><span class="naming-prefix">HttpOnly Cookie vs Local Storage</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="scenarios">15. Real Project Scenarios</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">CertifyHub Login</span><span class="naming-arrow">→</span><span class="naming-meaning">AuthenticationManager → DaoAuthenticationProvider → UserDetailsService → PostgreSQL → BCrypt Compare → Generate JWT</span></div>
+    <div class="naming-card"><span class="naming-prefix">Admin / Student Login</span><span class="naming-arrow">→</span><span class="naming-meaning">ROLE_ADMIN / ROLE_STUDENT → JWT Returned</span></div>
+    <div class="naming-card"><span class="naming-prefix">Every API</span><span class="naming-arrow">→</span><span class="naming-meaning">Authorization Header → JWT Filter → Validate JWT → Load User → Access Granted</span></div>
+    <div class="naming-card"><span class="naming-prefix">Expired Access Token</span><span class="naming-arrow">→</span><span class="naming-meaning">Client sends Refresh Token → receive new Access Token</span></div>
+    <div class="naming-card"><span class="naming-prefix">Microservices</span><span class="naming-arrow">→</span><span class="naming-meaning">JWT passed between services → no shared session required</span></div>
+    <div class="naming-card"><span class="naming-prefix">Course Service</span><span class="naming-arrow">→</span><span class="naming-meaning">@PreAuthorize → ROLE_TRAINER only</span></div>
+    <div class="naming-card"><span class="naming-prefix">Audit Service</span><span class="naming-arrow">→</span><span class="naming-meaning">SecurityContextHolder → Current Username → Audit Entry</span></div>
+    <div class="naming-card"><span class="naming-prefix">React Frontend (localhost:5173)</span><span class="naming-arrow">→</span><span class="naming-meaning">Spring Boot → Enable CORS</span></div>
+    <div class="naming-card"><span class="naming-prefix">JWT Authentication</span><span class="naming-arrow">→</span><span class="naming-meaning">CSRF Disabled → Stateless API</span></div>
+    <div class="naming-card"><span class="naming-prefix">Google Login</span><span class="naming-arrow">→</span><span class="naming-meaning">OAuth2 → OIDC → User Profile → JWT Generated</span></div>
+    <div class="naming-card"><span class="naming-prefix">Admin APIs</span><span class="naming-arrow">→</span><span class="naming-meaning">ROLE_ADMIN → Method Security → Audit Logging</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="oneliners">16. Interview One-Liner Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid cols-3">
+      <div class="revision-item"><span class="chk">›</span><b>Spring Security</b> → Security Framework</div>
+      <div class="revision-item"><span class="chk">›</span><b>Authentication</b> → Verify Identity</div>
+      <div class="revision-item"><span class="chk">›</span><b>Authorization</b> → Verify Permission</div>
+      <div class="revision-item"><span class="chk">›</span><b>SecurityFilterChain</b> → Security Configuration</div>
+      <div class="revision-item"><span class="chk">›</span><b>UserDetails</b> → User Information</div>
+      <div class="revision-item"><span class="chk">›</span><b>UserDetailsService</b> → Load User</div>
+      <div class="revision-item"><span class="chk">›</span><b>SecurityContext</b> → Current Authentication</div>
+      <div class="revision-item"><span class="chk">›</span><b>SecurityContextHolder</b> → Access SecurityContext</div>
+      <div class="revision-item"><span class="chk">›</span><b>Principal</b> → Logged-In User</div>
+      <div class="revision-item"><span class="chk">›</span><b>GrantedAuthority</b> → Permission Or Role</div>
+      <div class="revision-item"><span class="chk">›</span><b>PasswordEncoder</b> → Password Hashing</div>
+      <div class="revision-item"><span class="chk">›</span><b>BCrypt</b> → Salted Password Hash</div>
+      <div class="revision-item"><span class="chk">›</span><b>AuthenticationManager</b> → Authentication Coordinator</div>
+      <div class="revision-item"><span class="chk">›</span><b>AuthenticationProvider</b> → Credential Verification</div>
+      <div class="revision-item"><span class="chk">›</span><b>DaoAuthenticationProvider</b> → Database Authentication</div>
+      <div class="revision-item"><span class="chk">›</span><b>UsernamePasswordAuthenticationToken</b> → Authentication Object</div>
+      <div class="revision-item"><span class="chk">›</span><b>JWT</b> → Stateless Authentication Token</div>
+      <div class="revision-item"><span class="chk">›</span><b>Header</b> → Algorithm Info</div>
+      <div class="revision-item"><span class="chk">›</span><b>Payload</b> → User Claims</div>
+      <div class="revision-item"><span class="chk">›</span><b>Signature</b> → Integrity Verification</div>
+      <div class="revision-item"><span class="chk">›</span><b>Bearer Token</b> → Authorization Header Token</div>
+      <div class="revision-item"><span class="chk">›</span><b>JWT Filter</b> → Validate Token</div>
+      <div class="revision-item"><span class="chk">›</span><b>OncePerRequestFilter</b> → Executes Once Per Request</div>
+      <div class="revision-item"><span class="chk">›</span><b>Access Token</b> → API Access</div>
+      <div class="revision-item"><span class="chk">›</span><b>Refresh Token</b> → Renew Access Token</div>
+      <div class="revision-item"><span class="chk">›</span><b>Stateless</b> → No Server Session</div>
+      <div class="revision-item"><span class="chk">›</span><b>RBAC</b> → Role-Based Access Control</div>
+      <div class="revision-item"><span class="chk">›</span><b>Role</b> → High-Level Permission</div>
+      <div class="revision-item"><span class="chk">›</span><b>Authority</b> → Fine-Grained Permission</div>
+      <div class="revision-item"><span class="chk">›</span><b>hasRole()</b> → Check Role</div>
+      <div class="revision-item"><span class="chk">›</span><b>hasAuthority()</b> → Check Permission</div>
+      <div class="revision-item"><span class="chk">›</span><b>@EnableMethodSecurity</b> → Enable Method Security</div>
+      <div class="revision-item"><span class="chk">›</span><b>@PreAuthorize</b> → Before Execution</div>
+      <div class="revision-item"><span class="chk">›</span><b>@PostAuthorize</b> → After Execution</div>
+      <div class="revision-item"><span class="chk">›</span><b>CSRF</b> → Forged Request Protection</div>
+      <div class="revision-item"><span class="chk">›</span><b>CORS</b> → Cross-Origin Access</div>
+      <div class="revision-item"><span class="chk">›</span><b>OAuth2</b> → Authorization Framework</div>
+      <div class="revision-item"><span class="chk">›</span><b>OIDC</b> → Identity Layer</div>
+      <div class="revision-item"><span class="chk">›</span><b>ID Token</b> → User Identity</div>
+      <div class="revision-item"><span class="chk">›</span><b>HTTPS</b> → Encrypted Communication</div>
+      <div class="revision-item"><span class="chk">›</span><b>Security Headers</b> → Browser Protection</div>
+      <div class="revision-item"><span class="chk">›</span><b>Refresh Token Rotation</b> → Issue New Refresh Token</div>
+      <div class="revision-item"><span class="chk">›</span><b>Least Privilege</b> → Minimum Required Access</div>
+      <div class="revision-item"><span class="chk">›</span><b>401</b> → Unauthorized</div>
+      <div class="revision-item"><span class="chk">›</span><b>403</b> → Forbidden</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="flow15">17. 15-Minute Final Revision Flow</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">Spring Security → Authentication → Authorization → SecurityFilterChain</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">UserDetails → UserDetailsService → PasswordEncoder → BCrypt</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">AuthenticationManager → AuthenticationProvider</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">JWT → Header → Payload → Signature → JWT Filter → OncePerRequestFilter → SecurityContextHolder</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">RBAC → Method Security → CSRF → CORS</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">OAuth2 → OpenID Connect → HTTPS → Refresh Token</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Production Security</div>
+    </div>
+  </div>
+
+  <div class="section-label">5–7 Years Interview Mantra — Interviewers Expect You To Explain</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="i gr">✓ Why, not just What — Authentication vs Authorization, JWT vs Session, OAuth2 vs OIDC</span>
+<span class="i bl">✓ Full request lifecycle through SecurityFilterChain, JWT Filter, and SecurityContextHolder</span>
+<span class="i am">✓ Real production security decisions — token storage, refresh token rotation, CORS restriction</span>
+<span class="i pu">✓ RBAC and method security design for real endpoints (roles vs fine-grained authorities)</span>
+<span class="i cy">✓ Attack mitigation you've actually implemented — CSRF, XSS, SQL Injection, Brute Force</span>
+<span class="i re">✓ Trade-offs between approaches, backed by real project examples</span></div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
