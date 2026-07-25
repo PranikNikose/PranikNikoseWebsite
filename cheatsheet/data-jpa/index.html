@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Data JPA &amp; Hibernate — Complete Interview Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e14; --panel:#12161f; --panel2:#151a24; --border:#232a38; --border-soft:#1b212d;
+  --text:#c9d1d9; --dim:#6e7681; --dim2:#8892a0;
+  --cy:#39c5cf; --bl:#58a6ff; --gr:#3fb950; --am:#e3b341; --pu:#a371f7; --re:#f778ba; --or:#ff9a5a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'JetBrains Mono', monospace; font-size:14px; line-height:1.55;
+  padding:28px 16px 80px;
+}
+.page{max-width:1180px; margin:0 auto;}
+
+/* HEADER */
+.header{border-bottom:1px solid var(--border); padding-bottom:16px; margin-bottom:22px;}
+.header-top{display:flex; align-items:baseline; gap:10px;}
+.prompt{color:var(--gr); font-weight:700; font-size:20px;}
+.title{font-size:22px; font-weight:700; color:#fff; letter-spacing:.3px;}
+.subtitle{color:var(--dim); margin-top:6px; font-size:13px;}
+.toc{margin-top:14px; display:flex; flex-wrap:wrap; gap:6px 10px;}
+.toc a{color:var(--cy); text-decoration:none; font-size:12px; border:1px solid var(--border-soft); padding:3px 9px; border-radius:20px;}
+.toc a:hover{border-color:var(--cy);}
+
+/* SECTION LABEL */
+.section-label{
+  font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:var(--dim2);
+  margin:34px 0 10px; padding-bottom:6px; border-bottom:1px dashed var(--border);
+  display:flex; align-items:center; gap:8px;
+}
+.section-label::before{content:"//"; color:var(--gr);}
+.section-label.big{font-size:14px; color:#fff; margin-top:46px; padding:10px 0; border-bottom:1px solid var(--border);}
+.section-label.big::before{content:"§";}
+
+/* CARDS GRID */
+.cards-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.cards-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.cards-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.cards-grid.cols-6{grid-template-columns:repeat(6,1fr);}
+.card{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:12px 14px; border-left:3px solid var(--dim);}
+.card-name{font-weight:700; color:#fff; font-size:13px; margin-bottom:4px;}
+.card-desc{color:var(--dim2); font-size:12px;}
+.card-cy{border-left-color:var(--cy);} .card-cy .card-name{color:var(--cy);}
+.card-bl{border-left-color:var(--bl);} .card-bl .card-name{color:var(--bl);}
+.card-gr{border-left-color:var(--gr);} .card-gr .card-name{color:var(--gr);}
+.card-am{border-left-color:var(--am);} .card-am .card-name{color:var(--am);}
+.card-pu{border-left-color:var(--pu);} .card-pu .card-name{color:var(--pu);}
+.card-re{border-left-color:var(--re);} .card-re .card-name{color:var(--re);}
+.card-or{border-left-color:var(--or);} .card-or .card-name{color:var(--or);}
+
+/* LEGEND */
+.legend{display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--panel2); border:1px solid var(--border-soft); border-radius:6px; padding:8px 14px; margin-top:10px;}
+.legend-label{color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:1px;}
+.legend-items{display:flex; gap:14px; flex-wrap:wrap;}
+.legend-item{font-size:12px; color:var(--dim2); display:flex; align-items:center; gap:6px;}
+.dot{width:8px; height:8px; border-radius:50%; display:inline-block;}
+.dot-cy{background:var(--cy);} .dot-bl{background:var(--bl);} .dot-gr{background:var(--gr);}
+.dot-am{background:var(--am);} .dot-pu{background:var(--pu);} .dot-re{background:var(--re);} .dot-or{background:var(--or);}
+
+/* NAMING / KEY POINT GRID */
+.naming-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+.naming-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.naming-card{background:var(--panel); border:1px solid var(--border-soft); border-radius:6px; padding:10px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+.naming-prefix{color:#fff; font-weight:700; font-size:12.5px; white-space:nowrap;}
+.naming-arrow{color:var(--dim);}
+.naming-meaning{color:var(--dim2); font-size:12.5px;}
+
+/* TWO / THREE COL LAYOUT */
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+
+/* TREE PANEL */
+.tree-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.tree-title{font-size:12.5px; font-weight:700; color:#fff; margin-bottom:8px; text-transform:uppercase; letter-spacing:.5px;}
+.tree-body{font-size:12.5px; white-space:pre-wrap; line-height:1.75;}
+.tree-body .c{color:var(--dim); }
+.tree-body .n{color:var(--dim2);}
+.tree-body .i{font-weight:700;}
+.tree-body .cy{color:var(--cy);} .tree-body .bl{color:var(--bl);} .tree-body .gr{color:var(--gr);}
+.tree-body .am{color:var(--am);} .tree-body .pu{color:var(--pu);} .tree-body .re{color:var(--re);}
+
+/* API TABLE */
+table.api-table{width:100%; border-collapse:collapse; font-size:12.5px;}
+table.api-table td{padding:5px 6px; border-bottom:1px solid var(--border-soft); vertical-align:top;}
+.api-code{font-weight:700; white-space:nowrap; width:1%;}
+.api-code.cy{color:var(--cy);} .api-code.bl{color:var(--bl);} .api-code.gr{color:var(--gr);}
+.api-code.am{color:var(--am);} .api-code.pu{color:var(--pu);} .api-code.re{color:var(--re);}
+.api-desc{color:var(--dim2);}
+.api-desc code{color:var(--am); background:rgba(255,255,255,.04); padding:1px 5px; border-radius:4px;}
+
+/* PILLAR PANEL */
+.pillar-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.pillar-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+.pillar-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.pillar-grid.cols-5{grid-template-columns:repeat(5,1fr);}
+.pillar-card{border:1px solid var(--border-soft); border-radius:6px; padding:12px 14px; background:var(--panel2);}
+.pillar-name{font-weight:700; font-size:13.5px; margin-bottom:6px;}
+.pillar-name.bl{color:var(--bl);} .pillar-name.gr{color:var(--gr);} .pillar-name.am{color:var(--am);} .pillar-name.pu{color:var(--pu);} .pillar-name.cy{color:var(--cy);} .pillar-name.re{color:var(--re);}
+.pillar-def{color:var(--dim2); font-size:12.5px; margin-bottom:8px;}
+.pillar-tag{display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; margin:0 5px 5px 0; border:1px solid var(--border);}
+.tag-bl{color:var(--bl); border-color:rgba(88,166,255,.35);}
+.tag-gr{color:var(--gr); border-color:rgba(63,185,80,.35);}
+.tag-am{color:var(--am); border-color:rgba(227,179,65,.35);}
+.tag-pu{color:var(--pu); border-color:rgba(163,113,247,.35);}
+.tag-cy{color:var(--cy); border-color:rgba(57,197,207,.35);}
+.tag-re{color:var(--re); border-color:rgba(247,120,186,.35);}
+.pillar-example{margin-top:8px; font-size:12px; color:var(--dim2); border-top:1px dashed var(--border-soft); padding-top:6px;}
+.pillar-example b{color:#fff;}
+
+/* TABLE PANEL (real tables) */
+.table-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px;}
+.table-panel table, .bottom-grid table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px;}
+.table-panel th, .bottom-grid th{text-align:left; color:#fff; font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:6px 8px; border-bottom:1px solid var(--border);}
+.table-panel td, .bottom-grid td{padding:6px 8px; border-bottom:1px solid var(--border-soft); color:var(--dim2);}
+.yes{color:var(--gr); font-weight:700;}
+.no{color:var(--re); font-weight:700;}
+.cell-hl{color:var(--am); font-weight:700;}
+.bottom-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+/* CMP PANEL (comparisons) */
+.cmp-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:2px;}
+.cmp-card{padding:10px 4px;}
+.cmp-header{margin-bottom:6px;}
+.cmp-name{font-weight:700; font-size:13.5px;}
+.cmp-name.bl{color:var(--bl);} .cmp-name.pu{color:var(--pu);} .cmp-name.gr{color:var(--gr);} .cmp-name.am{color:var(--am);} .cmp-name.cy{color:var(--cy);} .cmp-name.re{color:var(--re);}
+.cmp-rows{display:flex; flex-direction:column; gap:3px;}
+.cmp-row{display:flex; gap:10px; font-size:12.5px;}
+.cmp-key{color:var(--dim); width:100px; flex-shrink:0;}
+.cmp-val{color:var(--dim2);}
+.cmp-val.code{color:var(--am); font-size:12px;}
+.cmp-val.green{color:var(--gr);}
+.cmp-val.purple{color:var(--pu);}
+.cmp-divider{height:1px; background:var(--border-soft); margin:4px 0;}
+
+/* FLOW / PIPELINE */
+.flow-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.flow-row{display:flex; align-items:center; flex-wrap:wrap; gap:8px;}
+.pipe-box{border:1px solid var(--border); border-radius:6px; padding:7px 12px; font-size:12px; font-weight:700; background:var(--panel2);}
+.pipe-box.source{color:var(--cy); border-color:rgba(57,197,207,.4);}
+.pipe-box.inter{color:var(--bl); border-color:rgba(88,166,255,.4);}
+.pipe-box.term{color:var(--am); border-color:rgba(227,179,65,.4);}
+.pipe-box.gc{color:var(--gr); border-color:rgba(63,185,80,.4);}
+.pipe-box.warn{color:var(--re); border-color:rgba(247,120,186,.4);}
+.pipe-arrow{color:var(--dim);}
+.flow-vert{display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
+.flow-vert .pipe-arrow{align-self:center; margin-left:60px;}
+
+/* PROBLEM / CODE CARDS */
+.problem-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+.problem-card{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px; border-left:3px solid var(--gr);}
+.problem-title{font-weight:700; color:var(--gr); font-size:12.5px; margin-bottom:6px;}
+.problem-code{font-size:12px; color:var(--dim2); background:var(--panel2); border-radius:6px; padding:8px 10px; white-space:pre-wrap; line-height:1.6;}
+.problem-code .kw{color:var(--pu);}
+.problem-code .cl{color:var(--am);}
+.problem-code .mt{color:var(--bl);}
+.problem-code .st{color:var(--gr);}
+.problem-code .cm{color:var(--dim); font-style:italic;}
+
+/* REVISION CHECKLIST */
+.revision-panel{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px;}
+.revision-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:6px 20px;}
+.revision-grid.cols-1{grid-template-columns:1fr;}
+.revision-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.revision-item{font-size:12.5px; color:var(--dim2); display:flex; gap:8px;}
+.chk{color:var(--gr); font-weight:700;}
+
+/* Q&A */
+.qa{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:10px;}
+.qa .q{color:#fff; font-weight:700; font-size:13px; margin-bottom:6px;}
+.qa .q::before{content:"Q: "; color:var(--am);}
+.qa .a{color:var(--dim2); font-size:12.5px;}
+
+/* MISC */
+code{font-family:'JetBrains Mono', monospace;}
+.note{font-size:12px; color:var(--dim); margin-top:8px;}
+.badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+.badge{font-size:11px; padding:3px 9px; border:1px solid var(--border); border-radius:20px; color:var(--dim2);}
+
+@media(max-width:820px){
+  .cards-grid, .cards-grid.cols-3, .cards-grid.cols-5, .cards-grid.cols-6{grid-template-columns:repeat(2,1fr);}
+  .two-col, .three-col, .bottom-grid, .pillar-grid, .pillar-grid.cols-3, .pillar-grid.cols-5, .naming-grid, .naming-grid.cols-3, .revision-grid, .revision-grid.cols-3, .problem-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Spring Data JPA &amp; Hibernate — Complete Interview Revision</span>
+    </div>
+    <div class="subtitle">// 5-7 Yrs Experience — ORM, Entity Lifecycle, Relationships, Querying, Transactions, Locking &amp; Performance</div>
+    <div class="toc">
+      <a href="#orm">ORM, JPA &amp; Hibernate</a>
+      <a href="#entity">Entity &amp; Repository Basics</a>
+      <a href="#emgr">EntityManager &amp; Persistence Context</a>
+      <a href="#lifecycle">Entity Lifecycle</a>
+      <a href="#dirty">Dirty Checking, Flush &amp; Commit</a>
+      <a href="#relationships">Entity Relationships</a>
+      <a href="#cascade">Cascade &amp; Orphan Removal</a>
+      <a href="#fetch">Fetch Types, N+1 &amp; EntityGraph</a>
+      <a href="#query">Querying — JPQL, Native, Specifications</a>
+      <a href="#pagination">Pagination &amp; Sorting</a>
+      <a href="#transactions">Transactions, Propagation &amp; Isolation</a>
+      <a href="#locking">Locking &amp; Deadlocks</a>
+      <a href="#pool">HikariCP Connection Pooling</a>
+      <a href="#caching">Caching Levels</a>
+      <a href="#batch">Batch Processing</a>
+      <a href="#performance">Performance Tuning</a>
+      <a href="#differences">Top Interview Differences</a>
+      <a href="#scenarios">Real Project Scenarios</a>
+      <a href="#oneliners">Interview One-Liners</a>
+      <a href="#flow15">15-Minute Final Revision</a>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="orm">1. ORM, JPA, Hibernate &amp; Spring Data JPA</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Without ORM</div>
+      <div class="flow-vert">
+        <div class="pipe-box warn">Java Object</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box warn">Write SQL → Execute JDBC</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box warn">Convert ResultSet → Create Object</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box warn">Return Object</div>
+      </div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">With ORM</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Java Object</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">ORM Framework → SQL Generated Automatically</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Database</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Java Object</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">ORM (Object Relational Mapping) → maps Java Objects to Database Tables automatically. Benefits: Less Boilerplate Code, Database Independent, Automatic CRUD, Object-Oriented Programming, Better Productivity, Easier Maintenance.</div>
+
+  <div class="section-label">JPA, Hibernate &amp; Spring Data JPA Stack</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Definitions</div>
+      <div class="tree-body"><span class="i cy">JPA</span> <span class="n">(Java Persistence API) → a Specification for ORM in Java. Defines interfaces, rules, annotations — but provides no implementation.</span>
+<span class="i bl">Hibernate</span> <span class="n">→ the most popular implementation of the JPA specification. Responsibilities: ORM, SQL Generation, Caching, Dirty Checking, Lazy Loading, Transactions, Performance Optimization.</span>
+<span class="i gr">Spring Data JPA</span> <span class="n">→ builds on top of JPA to reduce boilerplate. Provides Repository interfaces, automatic queries, pagination, sorting, specifications.</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">Spring Data JPA Stack</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Application</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">Spring Data JPA</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">JPA (Specification)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">Hibernate (Implementation)</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box term">JDBC</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">Database</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">JPA vs Hibernate vs Spring Data JPA</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">JPA</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Specification, Standard API, Interfaces, Portable</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">Hibernate</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Implementation, Framework, Concrete Classes, Feature Rich — uses EntityManager, manual repository code</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">Spring Data JPA</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Repository Abstraction, Less Code, Automatic CRUD</span></div></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="entity">2. Entity &amp; Repository Basics</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Entity — Common Annotations</div>
+      <div class="tree-body"><span class="n">An Entity represents a database table; each object represents one row.</span>
+<span class="i cy">@Entity</span> <span class="n">marks entity</span>  <span class="i bl">@Table</span> <span class="n">database table</span>  <span class="i gr">@Id</span> <span class="n">primary key</span>
+<span class="i am">@GeneratedValue</span> <span class="n">generate primary key</span>  <span class="i pu">@Column</span> <span class="n">map column</span>
+<span class="i re">@Transient</span> <span class="n">ignore field</span>  <span class="i cy">@Enumerated</span> <span class="n">store enum</span>  <span class="i bl">@Lob</span> <span class="n">large object</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Primary Key Generation</div>
+      <div class="tree-body"><span class="i am">AUTO</span> <span class="n">→ Provider Chooses</span>
+<span class="i bl">IDENTITY</span> <span class="n">→ Database Auto Increment</span>
+<span class="i gr">SEQUENCE</span> <span class="n">→ Database Sequence</span>
+<span class="i pu">TABLE</span> <span class="n">→ Sequence Table (rarely used, slowest)</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Repository Hierarchy</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="n">Repository</span>
+<span class="c">   └──</span> <span class="i bl">CrudRepository</span> <span class="n">→ Basic CRUD (save, findById, findAll, delete)</span>
+<span class="c">          └──</span> <span class="i am">PagingAndSortingRepository</span> <span class="n">→ Extends CrudRepository, adds Pagination + Sorting</span>
+<span class="c">                 └──</span> <span class="i gr">JpaRepository</span> <span class="n">→ Extends PagingAndSortingRepository, adds Batch Operations, Flush, JPA-specific methods</span></div>
+  </div>
+
+  <div class="section-label">Repository Comparison</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Repository</th><th>Provides</th></tr>
+      <tr><td class="cell-hl">CrudRepository</td><td>CRUD Only</td></tr>
+      <tr><td class="cell-hl">PagingAndSortingRepository</td><td>CRUD + Pagination + Sorting</td></tr>
+      <tr><td class="cell-hl">JpaRepository ⭐</td><td>Everything + Flush + Batch + JPA Features (recommended default)</td></tr>
+    </table>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="emgr">3. EntityManager &amp; Persistence Context</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">EntityManager</div>
+      <div class="tree-body"><span class="n">Core interface of JPA — responsible for managing entities, the persistence context, and database operations.</span>
+<span class="n">Common methods: </span><span class="i am">persist(), merge(), find(), remove(), flush(), refresh(), detach()</span></div>
+    </div>
+    <div class="flow-panel">
+      <div class="tree-title">EntityManager Flow</div>
+      <div class="flow-vert">
+        <div class="pipe-box source">Application → Repository</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box inter">EntityManager → Hibernate</div>
+        <span class="pipe-arrow">↓</span>
+        <div class="pipe-box gc">JDBC → Database</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Persistence Context &amp; Persistence Unit</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Persistence Context</div>
+      <div class="tree-body"><span class="n">First-Level Cache, managed by EntityManager. Stores managed entities during a transaction.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Persistence Unit</div>
+      <div class="tree-body"><span class="n">Configuration that defines entities, database, persistence provider, transaction settings — usually configured automatically in Spring Boot.</span></div>
+    </div>
+  </div>
+  <div class="revision-panel" style="margin-top:10px;">
+    <div class="tree-title" style="margin-bottom:8px;">Why Persistence Context?</div>
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span>Avoid Duplicate Queries</div>
+      <div class="revision-item"><span class="chk">✓</span>Track Entity Changes</div>
+      <div class="revision-item"><span class="chk">✓</span>Dirty Checking</div>
+      <div class="revision-item"><span class="chk">✓</span>Improve Performance</div>
+      <div class="revision-item"><span class="chk">✓</span>Maintain Entity Identity</div>
+    </div>
+  </div>
+
+  <div class="section-label">Spring Data JPA Request Flow</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">Client → Controller → Service</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">JpaRepository → EntityManager</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Hibernate → JDBC → Database</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Entity → JSON Response</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="lifecycle">4. Entity Lifecycle</div>
+  <div class="flow-panel">
+    <div class="tree-title">Entity Lifecycle Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">new Entity → Transient</div>
+      <span class="pipe-arrow">↓ persist()</span>
+      <div class="pipe-box inter">Persistent</div>
+      <span class="pipe-arrow">↓ detach()</span>
+      <div class="pipe-box term">Detached</div>
+      <span class="pipe-arrow">↓ merge()</span>
+      <div class="pipe-box inter">Persistent</div>
+      <span class="pipe-arrow">↓ remove()</span>
+      <div class="pipe-box warn">Removed</div>
+      <span class="pipe-arrow">↓ Commit</span>
+      <div class="pipe-box gc">Deleted</div>
+    </div>
+  </div>
+
+  <div class="pillar-panel" style="margin-top:10px;">
+    <div class="pillar-grid">
+      <div class="pillar-card">
+        <div class="pillar-name cy">Transient</div>
+        <div class="pillar-def">New object created using <code>new</code> — not managed by EntityManager, not stored in database (e.g. <code>User user = new User();</code>)</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name gr">Persistent</div>
+        <div class="pillar-def">Managed by the Persistence Context — changes automatically tracked and synchronized with the database</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name am">Detached</div>
+        <div class="pillar-def">Entity exists but is no longer managed. Caused by: Transaction Ends, detach(), EntityManager Closed, clear()</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-name re">Removed</div>
+        <div class="pillar-def">Entity marked for deletion — will be deleted during flush or commit</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">EntityManager Operations</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Method</th><th>Purpose</th></tr>
+      <tr><td class="cell-hl">persist()</td><td>Insert a new (Transient only) entity → becomes Persistent; INSERT generated during flush/commit</td></tr>
+      <tr><td class="cell-hl">merge()</td><td>Copy a Detached entity's state into a Persistent entity — INSERT or UPDATE, returns the managed entity</td></tr>
+      <tr><td class="cell-hl">find()</td><td>Retrieve an entity immediately by primary key — checks Persistence Context first, else queries DB</td></tr>
+      <tr><td class="cell-hl">getReference()</td><td>Return a lazy proxy without immediately fetching data — DB query occurs only when data is accessed</td></tr>
+      <tr><td class="cell-hl">remove()</td><td>Mark entity for deletion — moves to Removed state; DELETE executed at flush/commit</td></tr>
+      <tr><td class="cell-hl">refresh()</td><td>Reload entity from database — discard local changes, get latest DB values</td></tr>
+      <tr><td class="cell-hl">detach()</td><td>Remove entity from Persistence Context — further changes are not tracked</td></tr>
+      <tr><td class="cell-hl">flush()</td><td>Synchronize Persistence Context with the database</td></tr>
+    </table>
+  </div>
+
+  <div class="section-label">persist() vs merge() &amp; find() vs getReference()</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">persist()</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">New Entity, INSERT, fails if the entity already exists</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">merge()</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Existing / Detached Entity, INSERT or UPDATE, returns a managed entity</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">find()</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Immediately loads the entity</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name pu">getReference()</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Returns a proxy, loads on demand</span></div></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="dirty">5. Dirty Checking, Flush vs Commit &amp; save() vs saveAndFlush()</div>
+  <div class="flow-panel">
+    <div class="tree-title">Dirty Checking Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">find() → Persistent Entity</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Modify Field (no explicit save())</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Commit → Hibernate Detects Change</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">UPDATE Executed Automatically</div>
+    </div>
+  </div>
+  <div class="note">Dirty Checking works when: the entity is Persistent, inside an active transaction, and managed. It does <b>not</b> work for a Detached entity.</div>
+
+  <div class="section-label">Flush vs Commit</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Flush</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Synchronizes Persistence Context with DB without ending the transaction — executes SQL, transaction still active, can still rollback</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">Commit</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Flush → Ends transaction → Changes become permanent → Releases resources</span></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">save() vs saveAndFlush()</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">save()</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Saves entity, flush happens later at commit (default) — better performance</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">saveAndFlush()</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Save + immediate flush to DB — more database calls. Use when you need a DB-generated value immediately, an immediate query, or stored procedures</span></div></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="relationships">6. Entity Relationships</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="i cy">@OneToOne</span> <span class="n">→ One record related to exactly one record — User ↔ Profile, Employee ↔ Passport</span>
+<span class="i bl">@OneToMany</span> <span class="n">→ One parent has multiple children — Department → Employees, Order → Order Items</span>
+<span class="i gr">@ManyToOne</span> <span class="n">→ Many records belong to one parent — Employees → Department, Orders → Customer</span>
+<span class="i am">@ManyToMany</span> <span class="n">→ Many records related to many records, using a join table — Students ↔ Courses, Users ↔ Roles</span></div>
+  </div>
+
+  <div class="section-label">Owning Side, Inverse Side, mappedBy, @JoinColumn &amp; @JoinTable</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Owning Side vs Inverse Side</div>
+      <div class="tree-body"><span class="i gr">Owning Side</span> <span class="n">→ the entity that owns the foreign key, controls the relationship &amp; updates. Usually the @ManyToOne / @JoinColumn side.</span>
+<span class="i am">Inverse Side</span> <span class="n">→ the entity using </span><span class="i am">mappedBy</span><span class="n">, does not own the relationship — avoids duplicate relationship mapping. Benefits: single foreign key, no duplicate mapping, better consistency.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">@JoinColumn vs @JoinTable</div>
+      <div class="tree-body"><span class="i cy">@JoinColumn</span> <span class="n">→ defines the foreign key column in the database (e.g. employee.department_id)</span>
+<span class="i bl">@JoinTable</span> <span class="n">→ defines the join table for @ManyToMany relationships</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="cascade">7. Cascade Types &amp; Orphan Removal</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">CascadeType.PERSIST</span><span class="naming-arrow">→</span><span class="naming-meaning">Parent saved → Child saved</span></div>
+    <div class="naming-card"><span class="naming-prefix">CascadeType.MERGE</span><span class="naming-arrow">→</span><span class="naming-meaning">Parent updated → Child updated</span></div>
+    <div class="naming-card"><span class="naming-prefix">CascadeType.REMOVE</span><span class="naming-arrow">→</span><span class="naming-meaning">Parent deleted → Child deleted</span></div>
+    <div class="naming-card"><span class="naming-prefix">CascadeType.REFRESH</span><span class="naming-arrow">→</span><span class="naming-meaning">Parent reloaded → Child reloaded</span></div>
+    <div class="naming-card"><span class="naming-prefix">CascadeType.DETACH</span><span class="naming-arrow">→</span><span class="naming-meaning">Parent detached → Child detached</span></div>
+    <div class="naming-card"><span class="naming-prefix">CascadeType.ALL</span><span class="naming-arrow">→</span><span class="naming-meaning">Includes PERSIST, MERGE, REMOVE, REFRESH, DETACH</span></div>
+  </div>
+
+  <div class="section-label">Orphan Removal &amp; Cascade vs Orphan Removal</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Cascade REMOVE</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Deletes child when the parent is deleted</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">Orphan Removal</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Deletes child automatically when removed from the parent's collection — e.g. Order → remove Item → Item deleted automatically</span></div></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="fetch">8. Fetch Types, N+1 Problem, Fetch Join &amp; @EntityGraph</div>
+  <div class="section-label">Default Fetch Types Per Relationship</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Relationship</th><th>Default Fetch Type</th></tr>
+      <tr><td class="cell-hl">@OneToMany</td><td class="yes">LAZY</td></tr>
+      <tr><td class="cell-hl">@ManyToMany</td><td class="yes">LAZY</td></tr>
+      <tr><td class="cell-hl">@ManyToOne</td><td class="no">EAGER</td></tr>
+      <tr><td class="cell-hl">@OneToOne</td><td class="no">EAGER</td></tr>
+    </table>
+  </div>
+  <div class="note">Rule of thumb: override @ManyToOne / @OneToOne to LAZY explicitly in most real projects, since their EAGER default is a common source of unwanted extra queries.</div>
+
+  <div class="section-label">LAZY vs EAGER</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">LAZY ⭐</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Load related entity only when needed — better performance, less memory, recommended for most relationships</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">EAGER</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Load related entity immediately with parent — extra queries, slower performance, more memory</span></div></div>
+    </div>
+  </div>
+
+  <div class="section-label">LazyInitializationException</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Cause</div>
+      <div class="tree-body"><span class="n">Occurs when a lazy entity is accessed outside an active transaction — common cause: the session/transaction is closed before the child entity is loaded.</span></div>
+    </div>
+    <div class="revision-panel">
+      <div class="tree-title" style="margin-bottom:8px;">How To Avoid It</div>
+      <div class="revision-grid cols-1">
+        <div class="revision-item"><span class="chk">✓</span>Use Fetch Join</div>
+        <div class="revision-item"><span class="chk">✓</span>Use @EntityGraph</div>
+        <div class="revision-item"><span class="chk">✓</span>Use DTO Projection</div>
+        <div class="revision-item"><span class="chk">✓</span>Access the entity inside the transaction</div>
+        <div class="revision-item"><span class="chk">✗</span>Don't just switch everything to EAGER</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">N+1 Query Problem &amp; Solutions</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box warn">Load Departments → 1 Query</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box warn">Loop Departments → Load Employees → N Queries</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box warn">Total = 1 + N Queries → Slow, High DB Load, Poor Scalability</div>
+    </div>
+  </div>
+  <div class="section-label">Fetch Strategy Comparison</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Strategy</th><th>Behavior</th></tr>
+      <tr><td class="cell-hl">LAZY</td><td>Best performance, default choice</td></tr>
+      <tr><td class="cell-hl">EAGER</td><td>Immediate load — use carefully</td></tr>
+      <tr><td class="cell-hl">Fetch Join (JPQL JOIN FETCH)</td><td>Loads parent + child in a single query — recommended, eliminates N+1</td></tr>
+      <tr><td class="cell-hl">@EntityGraph</td><td>Specifies related entities to load without changing the default fetch strategy — controlled fetching at the repository level</td></tr>
+    </table>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="query">9. Querying — Derived, JPQL, Native, Specifications &amp; Criteria API</div>
+  <div class="cards-grid cols-3">
+    <div class="card card-cy"><div class="card-name">Derived Query</div><div class="card-desc">Query generated from method name</div></div>
+    <div class="card card-bl"><div class="card-name">JPQL</div><div class="card-desc">Object-oriented query on entities</div></div>
+    <div class="card card-am"><div class="card-name">Native SQL</div><div class="card-desc">Database-specific SQL</div></div>
+    <div class="card card-gr"><div class="card-name">@NamedQuery</div><div class="card-desc">Reusable predefined JPQL</div></div>
+    <div class="card card-pu"><div class="card-name">Specifications</div><div class="card-desc">Dynamic, type-safe query building</div></div>
+    <div class="card card-re"><div class="card-name">Criteria API</div><div class="card-desc">Programmatic dynamic query without JPQL</div></div>
+  </div>
+
+  <div class="section-label">Derived Query Methods &amp; Common Keywords</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Examples</div>
+      <div class="tree-body"><span class="n">findByEmail(), findByStatus(), findByUsernameAndRole(), findByAgeGreaterThan(), findByNameContaining()</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Common Derived Keywords</div>
+      <div class="tree-body"><span class="n">And, Or, Between, Like, Containing, StartingWith, EndingWith, In, OrderBy</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">JPQL vs SQL vs Native Query</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">JPQL</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Queries Entities &amp; Fields, database independent, portable, object-oriented, preferred by default</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">Native Query</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Queries Tables &amp; Columns directly, database specific, more powerful — use for complex SQL, stored procedures, vendor functions, DB optimization</span></div></div>
+    </div>
+  </div>
+  <div class="note"><code>@NamedQuery</code> — predefined JPQL attached to an entity, executed by name; reusable, validated at startup, better organization. <code>@Query</code> — write custom JPQL or Native SQL directly inside the repository, supports parameters.</div>
+
+  <div class="section-label">Specifications &amp; Criteria API</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Specifications</div>
+      <div class="tree-body"><span class="n">Dynamic, type-safe query building using the Criteria API. Use cases: dynamic filters, search screens, optional parameters, enterprise reporting.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Criteria API</div>
+      <div class="tree-body"><span class="n">Programmatic API for building dynamic queries without writing JPQL. Advantages: dynamic, type safe, flexible.</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="pagination">10. Pagination &amp; Sorting</div>
+  <div class="flow-panel">
+    <div class="tree-title">Pagination Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Client → Page = 0, Size = 20</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Repository → LIMIT / OFFSET</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Database → Page Result</div>
+    </div>
+  </div>
+  <div class="section-label">Page vs Slice</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Page</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Contains content, total elements, total pages, current page, hasNext/hasPrevious — includes an extra COUNT query</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">Slice</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Contains content and hasNext only, no total count — faster, better for large tables / infinite scrolling</span></div></div>
+    </div>
+  </div>
+  <div class="note">Sorting examples: Name ASC, CreatedDate DESC, Salary ASC — applied via a Sort object → ORDER BY → sorted result.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="transactions">11. Transactions, Propagation, Isolation &amp; Concurrency</div>
+  <div class="cards-grid">
+    <div class="card card-cy"><div class="card-name">Atomicity</div><div class="card-desc">All or nothing</div></div>
+    <div class="card card-bl"><div class="card-name">Consistency</div><div class="card-desc">Valid state</div></div>
+    <div class="card card-gr"><div class="card-name">Isolation</div><div class="card-desc">Concurrent safety</div></div>
+    <div class="card card-am"><div class="card-name">Durability</div><div class="card-desc">Permanent storage</div></div>
+  </div>
+  <div class="flow-panel" style="margin-top:10px;">
+    <div class="tree-title">@Transactional Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">Method Starts → Transaction Begins</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Database Operations</div>
+      <span class="pipe-arrow">↓ Success</span>
+      <div class="pipe-box gc">Commit</div>
+      <span class="pipe-arrow">↓ Failure</span>
+      <div class="pipe-box warn">Rollback</div>
+    </div>
+  </div>
+  <div class="note">@Transactional benefits: automatic commit, automatic rollback, declarative transaction management.</div>
+
+  <div class="section-label">Propagation Types</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">REQUIRED ⭐ (Default)</span><span class="naming-arrow">→</span><span class="naming-meaning">Join existing transaction, or create new</span></div>
+    <div class="naming-card"><span class="naming-prefix">REQUIRES_NEW</span><span class="naming-arrow">→</span><span class="naming-meaning">Suspend current, start a new transaction</span></div>
+    <div class="naming-card"><span class="naming-prefix">SUPPORTS</span><span class="naming-arrow">→</span><span class="naming-meaning">Join if exists, otherwise non-transactional</span></div>
+    <div class="naming-card"><span class="naming-prefix">NOT_SUPPORTED</span><span class="naming-arrow">→</span><span class="naming-meaning">Execute without a transaction</span></div>
+    <div class="naming-card"><span class="naming-prefix">MANDATORY</span><span class="naming-arrow">→</span><span class="naming-meaning">Must have an existing transaction</span></div>
+    <div class="naming-card"><span class="naming-prefix">NEVER</span><span class="naming-arrow">→</span><span class="naming-meaning">Fails if a transaction exists</span></div>
+    <div class="naming-card"><span class="naming-prefix">NESTED</span><span class="naming-arrow">→</span><span class="naming-meaning">Nested transaction using savepoints</span></div>
+  </div>
+
+  <div class="section-label">Isolation Levels &amp; Concurrency Problems</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Isolation Levels</div>
+      <div class="tree-body"><span class="i re">READ_UNCOMMITTED</span> <span class="n">→ allows dirty reads</span>
+<span class="i am">READ_COMMITTED ⭐</span> <span class="n">→ prevents dirty reads (default in many databases)</span>
+<span class="i bl">REPEATABLE_READ</span> <span class="n">→ prevents non-repeatable reads</span>
+<span class="i gr">SERIALIZABLE</span> <span class="n">→ highest isolation, lowest concurrency</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Common Concurrency Problems</div>
+      <div class="tree-body"><span class="i re">Dirty Read</span> <span class="n">→ reads uncommitted data</span>
+<span class="i am">Non-Repeatable Read</span> <span class="n">→ same row, different values on re-read</span>
+<span class="i pu">Phantom Read</span> <span class="n">→ new rows appear during a transaction</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Read-Only Transactions &amp; Rollback Rules</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Read-Only Transaction</div>
+      <div class="tree-body"><span class="n">Optimizes read operations. Benefits: better performance, prevents accidental updates, database optimization.</span></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Rollback Rules</div>
+      <div class="tree-body"><span class="n">Default: rolls back on RuntimeException and Error. A checked exception does NOT trigger rollback unless explicitly configured.</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="locking">12. Locking — Optimistic, Pessimistic &amp; Deadlocks</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">Optimistic Locking</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-val">Assumes conflicts are rare — checks a @Version column before update. No immediate lock, higher performance, best for read-heavy systems.</span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name re">Pessimistic Locking</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-val">Locks the database row immediately to prevent other transactions from modifying it. Lower concurrency, best for high-conflict systems.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="flow-panel" style="margin-top:10px;">
+    <div class="tree-title">Optimistic Lock Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">User A reads Version = 1 | User B reads Version = 1</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">User A updates → Version = 2</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box warn">User B updates → Version Mismatch → OptimisticLockException</div>
+    </div>
+  </div>
+  <div class="note"><code>@Version</code> — maintains the entity version automatically for optimistic locking. Benefits: prevent lost updates, high concurrency, better performance.</div>
+
+  <div class="section-label">Lock Modes</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">OPTIMISTIC</span><span class="naming-arrow">→</span><span class="naming-meaning">Version check</span></div>
+    <div class="naming-card"><span class="naming-prefix">OPTIMISTIC_FORCE_INCREMENT</span><span class="naming-arrow">→</span><span class="naming-meaning">Increment version</span></div>
+    <div class="naming-card"><span class="naming-prefix">PESSIMISTIC_READ</span><span class="naming-arrow">→</span><span class="naming-meaning">Read lock</span></div>
+    <div class="naming-card"><span class="naming-prefix">PESSIMISTIC_WRITE</span><span class="naming-arrow">→</span><span class="naming-meaning">Exclusive write lock</span></div>
+    <div class="naming-card"><span class="naming-prefix">PESSIMISTIC_FORCE_INCREMENT</span><span class="naming-arrow">→</span><span class="naming-meaning">Write lock + version increment</span></div>
+  </div>
+
+  <div class="section-label">Deadlock &amp; How To Avoid It</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Deadlock Example</div>
+      <div class="flow-vert">
+        <div class="pipe-box warn">Transaction A locks Row 1, needs Row 2</div>
+        <span class="pipe-arrow">↔</span>
+        <div class="pipe-box warn">Transaction B locks Row 2, needs Row 1 → Deadlock</div>
+      </div>
+    </div>
+    <div class="revision-panel">
+      <div class="tree-title" style="margin-bottom:8px;">How To Avoid Deadlock</div>
+      <div class="revision-grid cols-1">
+        <div class="revision-item"><span class="chk">✓</span>Access tables in the same order</div>
+        <div class="revision-item"><span class="chk">✓</span>Keep transactions short</div>
+        <div class="revision-item"><span class="chk">✓</span>Commit quickly</div>
+        <div class="revision-item"><span class="chk">✓</span>Avoid long locks</div>
+        <div class="revision-item"><span class="chk">✓</span>Use proper indexes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="pool">13. HikariCP Connection Pooling</div>
+  <div class="two-col">
+    <div class="flow-panel">
+      <div class="tree-title">Why Connection Pool?</div>
+      <div class="flow-vert">
+        <div class="pipe-box warn">Without Pool → New Connection Every Request → Slow</div>
+        <span class="pipe-arrow">↕</span>
+        <div class="pipe-box gc">With Pool → Reuse Existing Connections → Fast</div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">HikariCP — Default Pool In Spring Boot</div>
+      <div class="tree-body"><span class="n">Flow: Application → Request Connection → HikariCP → Available Connection → Database → Return Connection → Pool.</span>
+<span class="n">Important settings: </span><span class="i am">maximumPoolSize, minimumIdle, connectionTimeout, idleTimeout, maxLifetime</span></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="caching">14. Caching Levels</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">First-Level Cache</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Scope: one EntityManager / one transaction. Automatically enabled — no configuration needed.</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">Second-Level Cache</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Scope: application-wide, shared across multiple sessions. Optional — requires a cache provider (Ehcache, Caffeine, Infinispan).</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name pu">Query Cache</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Stores query results alongside the second-level cache — reduces repeated database queries.</span></div></div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="batch">15. JDBC Batch Processing</div>
+  <div class="flow-panel">
+    <div class="tree-title">Batch Processing Flow</div>
+    <div class="flow-vert">
+      <div class="pipe-box source">100 Inserts</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Hibernate Batch → Single Database Round Trip</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">Better Performance</div>
+    </div>
+  </div>
+  <div class="note">Benefits of batching: fewer network calls, faster inserts, faster updates, lower database load. Execute multiple SQL statements together instead of one by one.</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="performance">16. Performance Tuning &amp; Production Checklist</div>
+  <div class="section-label">Common Performance Problems</div>
+  <div class="problem-grid">
+    <div class="problem-card"><div class="problem-title">N+1 Queries</div><div class="problem-code">Too many SQL statements — fix with Fetch Join / @EntityGraph</div></div>
+    <div class="problem-card"><div class="problem-title">EAGER Fetching</div><div class="problem-code">Loads unnecessary data</div></div>
+    <div class="problem-card"><div class="problem-title">Missing Pagination</div><div class="problem-code">Huge result sets in memory</div></div>
+    <div class="problem-card"><div class="problem-title">Long Transactions</div><div class="problem-code">Lock contention</div></div>
+    <div class="problem-card"><div class="problem-title">Missing Indexes</div><div class="problem-code">Slow queries</div></div>
+    <div class="problem-card"><div class="problem-title">Too Many Flushes</div><div class="problem-code">Extra SQL execution</div></div>
+  </div>
+
+  <div class="section-label">Hibernate Performance Tuning &amp; Production Checklist</div>
+  <div class="revision-panel">
+    <div class="revision-grid cols-3">
+      <div class="revision-item"><span class="chk">✓</span>Use LAZY Loading</div>
+      <div class="revision-item"><span class="chk">✓</span>Solve N+1 via Fetch Join / EntityGraph</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Pagination</div>
+      <div class="revision-item"><span class="chk">✓</span>Enable JDBC Batch</div>
+      <div class="revision-item"><span class="chk">✓</span>Keep Transactions Short</div>
+      <div class="revision-item"><span class="chk">✓</span>Monitor SQL Logs (dev only)</div>
+      <div class="revision-item"><span class="chk">✓</span>Index Frequently Queried Columns</div>
+      <div class="revision-item"><span class="chk">✓</span>Fetch Only Required Columns Using DTO Projection</div>
+      <div class="revision-item"><span class="chk">✓</span>Avoid Unnecessary saveAndFlush()</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Connection Pooling</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Optimistic Locking</div>
+      <div class="revision-item"><span class="chk">✓</span>Use Specifications For Dynamic Search</div>
+      <div class="revision-item"><span class="chk">✓</span>Tune Pool Size</div>
+      <div class="revision-item"><span class="chk">✓</span>Disable Verbose SQL Logging In Production</div>
+      <div class="revision-item"><span class="chk">✓</span>Cache Frequently Accessed Data Carefully</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="differences">17. Top Interview Differences</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">JPA vs Hibernate</span></div>
+    <div class="naming-card"><span class="naming-prefix">Hibernate vs Spring Data JPA</span></div>
+    <div class="naming-card"><span class="naming-prefix">CrudRepository vs JpaRepository</span></div>
+    <div class="naming-card"><span class="naming-prefix">persist() vs merge()</span></div>
+    <div class="naming-card"><span class="naming-prefix">find() vs getReference()</span></div>
+    <div class="naming-card"><span class="naming-prefix">save() vs saveAndFlush()</span></div>
+    <div class="naming-card"><span class="naming-prefix">Flush vs Commit</span></div>
+    <div class="naming-card"><span class="naming-prefix">Transient vs Persistent vs Detached vs Removed</span></div>
+    <div class="naming-card"><span class="naming-prefix">Owning Side vs Inverse Side</span></div>
+    <div class="naming-card"><span class="naming-prefix">Cascade vs Orphan Removal</span></div>
+    <div class="naming-card"><span class="naming-prefix">LAZY vs EAGER</span></div>
+    <div class="naming-card"><span class="naming-prefix">JPQL vs SQL vs Native Query</span></div>
+    <div class="naming-card"><span class="naming-prefix">Page vs Slice</span></div>
+    <div class="naming-card"><span class="naming-prefix">Optimistic vs Pessimistic Locking</span></div>
+    <div class="naming-card"><span class="naming-prefix">First-Level vs Second-Level Cache</span></div>
+    <div class="naming-card"><span class="naming-prefix">Propagation REQUIRED vs REQUIRES_NEW</span></div>
+    <div class="naming-card"><span class="naming-prefix">Dirty Read vs Non-Repeatable Read vs Phantom Read</span></div>
+    <div class="naming-card"><span class="naming-prefix">Fetch Join vs @EntityGraph</span></div>
+    <div class="naming-card"><span class="naming-prefix">Specifications vs Criteria API</span></div>
+    <div class="naming-card"><span class="naming-prefix">@NamedQuery vs @Query</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="scenarios">18. Real Project Scenarios</div>
+  <div class="naming-grid cols-3">
+    <div class="naming-card"><span class="naming-prefix">CertifyHub — User Entity</span><span class="naming-arrow">→</span><span class="naming-meaning">app_user Table; UserRepository extends JpaRepository → CRUD APIs</span></div>
+    <div class="naming-card"><span class="naming-prefix">Update Profile</span><span class="naming-arrow">→</span><span class="naming-meaning">find() → Modify Name → Commit → Dirty Checking → UPDATE (no explicit save needed)</span></div>
+    <div class="naming-card"><span class="naming-prefix">Large Batch Import</span><span class="naming-arrow">→</span><span class="naming-meaning">save() → Flush At Commit</span></div>
+    <div class="naming-card"><span class="naming-prefix">Generate Certificate</span><span class="naming-arrow">→</span><span class="naming-meaning">saveAndFlush() → Need Generated ID Immediately</span></div>
+    <div class="naming-card"><span class="naming-prefix">Course → Modules</span><span class="naming-arrow">→</span><span class="naming-meaning">@OneToMany</span></div>
+    <div class="naming-card"><span class="naming-prefix">Student ↔ Courses</span><span class="naming-arrow">→</span><span class="naming-meaning">@ManyToMany</span></div>
+    <div class="naming-card"><span class="naming-prefix">Course List Needing Modules</span><span class="naming-arrow">→</span><span class="naming-meaning">Use Fetch Join instead of N+1 queries</span></div>
+    <div class="naming-card"><span class="naming-prefix">Dashboard — Users With Roles</span><span class="naming-arrow">→</span><span class="naming-meaning">Use @EntityGraph</span></div>
+    <div class="naming-card"><span class="naming-prefix">Search Users</span><span class="naming-arrow">→</span><span class="naming-meaning">Specifications → Dynamic Filters</span></div>
+    <div class="naming-card"><span class="naming-prefix">Monthly Reports</span><span class="naming-arrow">→</span><span class="naming-meaning">Native Query → Database Functions</span></div>
+    <div class="naming-card"><span class="naming-prefix">Create User + Audit Log</span><span class="naming-arrow">→</span><span class="naming-meaning">REQUIRES_NEW → Audit commits independently</span></div>
+    <div class="naming-card"><span class="naming-prefix">Certificate Update</span><span class="naming-arrow">→</span><span class="naming-meaning">Optimistic Locking → Prevent concurrent updates</span></div>
+    <div class="naming-card"><span class="naming-prefix">Admin Report</span><span class="naming-arrow">→</span><span class="naming-meaning">Pagination + Batch Processing → Fast Response</span></div>
+    <div class="naming-card"><span class="naming-prefix">Bulk Student Import</span><span class="naming-arrow">→</span><span class="naming-meaning">JDBC Batch → Thousands Of Inserts</span></div>
+    <div class="naming-card"><span class="naming-prefix">Production</span><span class="naming-arrow">→</span><span class="naming-meaning">HikariCP → Reusable Connections → Better Throughput</span></div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="oneliners">19. Interview One-Liner Revision</div>
+  <div class="revision-panel">
+    <div class="revision-grid cols-3">
+      <div class="revision-item"><span class="chk">›</span><b>ORM</b> → Object Relational Mapping</div>
+      <div class="revision-item"><span class="chk">›</span><b>JPA</b> → Persistence Specification</div>
+      <div class="revision-item"><span class="chk">›</span><b>Hibernate</b> → JPA Implementation</div>
+      <div class="revision-item"><span class="chk">›</span><b>Spring Data JPA</b> → Repository Abstraction</div>
+      <div class="revision-item"><span class="chk">›</span><b>Entity</b> → Table Mapping</div>
+      <div class="revision-item"><span class="chk">›</span><b>Repository</b> → Data Access Layer</div>
+      <div class="revision-item"><span class="chk">›</span><b>CrudRepository</b> → Basic CRUD</div>
+      <div class="revision-item"><span class="chk">›</span><b>JpaRepository</b> → Full JPA Repository</div>
+      <div class="revision-item"><span class="chk">›</span><b>EntityManager</b> → JPA Core Interface</div>
+      <div class="revision-item"><span class="chk">›</span><b>Persistence Context</b> → First-Level Cache</div>
+      <div class="revision-item"><span class="chk">›</span><b>Persistence Unit</b> → JPA Configuration</div>
+      <div class="revision-item"><span class="chk">›</span><b>Transient</b> → New Object</div>
+      <div class="revision-item"><span class="chk">›</span><b>Persistent</b> → Managed Entity</div>
+      <div class="revision-item"><span class="chk">›</span><b>Detached</b> → Unmanaged Entity</div>
+      <div class="revision-item"><span class="chk">›</span><b>Removed</b> → Marked For Delete</div>
+      <div class="revision-item"><span class="chk">›</span><b>persist()</b> → Insert New Entity</div>
+      <div class="revision-item"><span class="chk">›</span><b>merge()</b> → Update / Reattach Entity</div>
+      <div class="revision-item"><span class="chk">›</span><b>find()</b> → Immediate Fetch</div>
+      <div class="revision-item"><span class="chk">›</span><b>getReference()</b> → Lazy Proxy</div>
+      <div class="revision-item"><span class="chk">›</span><b>Dirty Checking</b> → Automatic Update</div>
+      <div class="revision-item"><span class="chk">›</span><b>Flush</b> → Sync SQL</div>
+      <div class="revision-item"><span class="chk">›</span><b>Commit</b> → Permanent Save</div>
+      <div class="revision-item"><span class="chk">›</span><b>mappedBy</b> → Inverse Side</div>
+      <div class="revision-item"><span class="chk">›</span><b>Owning Side</b> → Controls Relationship</div>
+      <div class="revision-item"><span class="chk">›</span><b>Cascade</b> → Parent Operation Propagation</div>
+      <div class="revision-item"><span class="chk">›</span><b>Orphan Removal</b> → Delete Orphan Child</div>
+      <div class="revision-item"><span class="chk">›</span><b>LAZY</b> → Load On Demand</div>
+      <div class="revision-item"><span class="chk">›</span><b>EAGER</b> → Load Immediately</div>
+      <div class="revision-item"><span class="chk">›</span><b>LazyInitializationException</b> → Lazy Access Outside Transaction</div>
+      <div class="revision-item"><span class="chk">›</span><b>N+1</b> → One Plus N Queries</div>
+      <div class="revision-item"><span class="chk">›</span><b>Fetch Join</b> → Single Query Fetch</div>
+      <div class="revision-item"><span class="chk">›</span><b>@EntityGraph</b> → Controlled Fetch Strategy</div>
+      <div class="revision-item"><span class="chk">›</span><b>JPQL</b> → Entity Query Language</div>
+      <div class="revision-item"><span class="chk">›</span><b>Native Query</b> → Database SQL</div>
+      <div class="revision-item"><span class="chk">›</span><b>Specifications</b> → Dynamic Query</div>
+      <div class="revision-item"><span class="chk">›</span><b>Criteria API</b> → Programmatic Query</div>
+      <div class="revision-item"><span class="chk">›</span><b>Page</b> → Total Count</div>
+      <div class="revision-item"><span class="chk">›</span><b>Slice</b> → No Count</div>
+      <div class="revision-item"><span class="chk">›</span><b>Propagation</b> → Nested Transaction Rules</div>
+      <div class="revision-item"><span class="chk">›</span><b>Isolation</b> → Concurrency Control</div>
+      <div class="revision-item"><span class="chk">›</span><b>ReadOnly</b> → Optimized Read Transaction</div>
+      <div class="revision-item"><span class="chk">›</span><b>Optimistic Lock</b> → Version Based</div>
+      <div class="revision-item"><span class="chk">›</span><b>Pessimistic Lock</b> → Database Lock</div>
+      <div class="revision-item"><span class="chk">›</span><b>Deadlock</b> → Circular Waiting</div>
+      <div class="revision-item"><span class="chk">›</span><b>HikariCP</b> → Connection Pool</div>
+      <div class="revision-item"><span class="chk">›</span><b>First-Level Cache</b> → Session Cache</div>
+      <div class="revision-item"><span class="chk">›</span><b>Second-Level Cache</b> → Shared Cache</div>
+      <div class="revision-item"><span class="chk">›</span><b>Query Cache</b> → Cached Query Results</div>
+      <div class="revision-item"><span class="chk">›</span><b>JDBC Batch</b> → Bulk SQL Execution</div>
+      <div class="revision-item"><span class="chk">›</span><b>DTO Projection</b> → Fetch Required Fields</div>
+    </div>
+  </div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="flow15">20. 15-Minute Final Revision Flow</div>
+  <div class="flow-panel">
+    <div class="flow-vert">
+      <div class="pipe-box source">ORM → JPA → Hibernate → Spring Data JPA</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Entity → JpaRepository → EntityManager → Persistence Context</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box inter">Entity Lifecycle → Dirty Checking → Flush → Commit</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Relationships → Cascade → Fetch Types → N+1 → Fetch Join → EntityGraph</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">JPQL → Native Query → Specifications → Pagination</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box term">Transactions → Propagation → Isolation → Optimistic Lock → Pessimistic Lock</div>
+      <span class="pipe-arrow">↓</span>
+      <div class="pipe-box gc">HikariCP → Batch Processing → Caching → Performance Tuning</div>
+    </div>
+  </div>
+
+  <div class="section-label">5–7 Years Interview Mantra — Interviewers Expect You To Explain</div>
+  <div class="tree-panel">
+    <div class="tree-body"><span class="i gr">✓ Why, not just What (Specification vs Implementation, JPA vs Hibernate vs Spring Data JPA)</span>
+<span class="i bl">✓ Entity lifecycle internals — Transient/Persistent/Detached/Removed and what triggers each transition</span>
+<span class="i am">✓ How to detect and fix N+1 — Fetch Join, @EntityGraph, DTO Projection</span>
+<span class="i pu">✓ Transaction management — Propagation, Isolation, Rollback rules, with real production examples</span>
+<span class="i cy">✓ Locking strategy trade-offs — Optimistic vs Pessimistic, when to use each</span>
+<span class="i re">✓ Performance tuning — indexing, pagination, batching, connection pool sizing</span>
+<span class="i am">✓ Real production issues you've faced with Hibernate/JPA and how you fixed them</span></div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

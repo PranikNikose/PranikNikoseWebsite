@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Notes — Interview Preparation Notebook</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-mark">§</span>
+    <div class="brand-text">
+      <h1>Interview&nbsp;Notes</h1>
+      <p class="brand-sub">a working notebook, not a slideshow</p>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button id="btnRevision" class="btn btn-outline" title="Toggle Revision Mode">
+      <span class="ico">◐</span> Revision Mode
+    </button>
+    <button id="btnNewNote" class="btn btn-primary" title="Ctrl + N">
+      <span class="ico">+</span> New Note
+    </button>
+  </div>
+</header>
+
+<div class="app-shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+
+    <section class="panel">
+      <h2 class="panel-title">Dashboard</h2>
+      <div class="stat-grid" id="dashboardStats">
+        <!-- injected -->
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">Search</h2>
+      <input type="search" id="searchInput" class="input" placeholder="Search questions, answers, tags…" autocomplete="off">
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">Filter</h2>
+
+      <label class="field-label" for="categoryFilter">Category</label>
+      <select id="categoryFilter" class="input">
+        <option value="all">All categories</option>
+      </select>
+
+      <label class="field-label" for="difficultyFilter">Difficulty</label>
+      <select id="difficultyFilter" class="input">
+        <option value="all">All difficulties</option>
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="favoritesOnly">
+        <span>Favorites only</span>
+      </label>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">Sort</h2>
+      <select id="sortSelect" class="input">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="category">Category (A–Z)</option>
+        <option value="difficulty">Difficulty</option>
+        <option value="favorites">Favorites first</option>
+        <option value="alphabetical">Alphabetical (question)</option>
+      </select>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">Statistics</h2>
+      <ul class="stat-list" id="statsList">
+        <!-- injected -->
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">Data</h2>
+      <div class="stack-buttons">
+        <button id="btnExport" class="btn btn-ghost">Export JSON</button>
+        <button id="btnImportTrigger" class="btn btn-ghost">Import JSON</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+        <button id="btnReset" class="btn btn-ghost btn-danger-ghost">Reset to Defaults</button>
+      </div>
+    </section>
+
+    <p class="shortcut-hint">
+      <kbd>Ctrl</kbd>+<kbd>N</kbd> new · <kbd>Ctrl</kbd>+<kbd>S</kbd> save · <kbd>Esc</kbd> cancel
+    </p>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="main-toolbar">
+      <p id="resultsCount" class="results-count">0 notes</p>
+      <p id="revisionBanner" class="revision-banner hidden">Revision Mode — answers hidden, click a question to reveal</p>
+    </div>
+
+    <div id="notesList" class="notes-list">
+      <!-- injected note cards -->
+    </div>
+
+    <div id="emptyState" class="empty-state hidden">
+      <p class="empty-title">No notes match this view</p>
+      <p class="empty-sub">Try clearing filters or search, or create a new note.</p>
+    </div>
+  </main>
+</div>
+
+<!-- ============ NOTE EDITOR MODAL ============ -->
+<div id="editorOverlay" class="overlay hidden">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+    <div class="modal-header">
+      <h2 id="editorTitle">New Note</h2>
+      <button id="btnCloseEditor" class="icon-btn" aria-label="Close">×</button>
+    </div>
+
+    <form id="noteForm" class="modal-body">
+      <input type="hidden" id="noteId">
+
+      <div class="form-row">
+        <label class="field-label" for="noteCategory">Category</label>
+        <input type="text" id="noteCategory" class="input" list="categoryOptions" placeholder="e.g. Docker" required>
+        <datalist id="categoryOptions"></datalist>
+      </div>
+
+      <div class="form-row">
+        <label class="field-label">Questions <span class="hint">(at least one)</span></label>
+        <div id="questionsEditor" class="questions-editor"></div>
+        <button type="button" id="btnAddQuestion" class="btn btn-ghost btn-small">+ Add question</button>
+      </div>
+
+      <div class="form-row">
+        <label class="field-label" for="noteAnswer">
+          Answer <span class="hint">(markdown: **bold**, *italic*, `code`, ```code block```, # heading, - list)</span>
+        </label>
+        <textarea id="noteAnswer" class="input textarea" rows="8" required></textarea>
+      </div>
+
+      <div class="form-row-split">
+        <div class="form-row">
+          <label class="field-label" for="noteTags">Tags <span class="hint">(comma separated)</span></label>
+          <input type="text" id="noteTags" class="input" placeholder="docker, container, devops">
+        </div>
+
+        <div class="form-row">
+          <label class="field-label" for="noteDifficulty">Difficulty</label>
+          <select id="noteDifficulty" class="input">
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="noteFavorite">
+        <span>Mark as favorite</span>
+      </label>
+    </form>
+
+    <div class="modal-footer">
+      <button id="btnCancelEditor" type="button" class="btn btn-outline">Cancel</button>
+      <button id="btnSaveNote" type="submit" form="noteForm" class="btn btn-primary">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM DIALOG ============ -->
+<div id="confirmOverlay" class="overlay hidden">
+  <div class="modal modal-small" role="alertdialog" aria-modal="true">
+    <div class="modal-header">
+      <h2 id="confirmTitle">Are you sure?</h2>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button id="btnConfirmCancel" class="btn btn-outline">Cancel</button>
+      <button id="btnConfirmOk" class="btn btn-danger">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOASTS ============ -->
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
