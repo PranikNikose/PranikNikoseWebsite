@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Boot &amp; Core Java — Interview Revision Master</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page { size: A4; margin: 8mm; }
+
+  :root {
+    --bg:         #0D1117;
+    --surface:    #161B22;
+    --border:     #21262D;
+    --dim:        #444D56;
+    --muted:      #6E7681;
+    --text:       #C9D1D9;
+    --text-bright:#E6EDF3;
+
+    --blue:       #58A6FF;
+    --blue-dim:   #1F3A5F;
+    --green:      #3FB950;
+    --green-dim:  #1A3A1A;
+    --amber:      #E3B341;
+    --amber-dim:  #3D2E0A;
+    --purple:     #BC8CFF;
+    --purple-dim: #2A1A4A;
+    --cyan:       #39D4C4;
+    --cyan-dim:   #0D2E2B;
+    --red:        #F85149;
+    --red-dim:    #3A0D0D;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 9.5px;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    width: 210mm;
+    margin: 0 auto;
+  }
+
+  .page { padding: 0; }
+  a { color: inherit; }
+
+  /* ── HEADER ──────────────────────────────────────────── */
+  .header { border-bottom: 1px solid var(--border); padding-bottom: 7px; margin-bottom: 10px; }
+  .header-top { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+  .header-left { display: flex; align-items: baseline; gap: 10px; }
+  .prompt { color: var(--green); font-weight: 600; font-size: 10px; }
+  .title { font-size: 17px; font-weight: 700; color: var(--text-bright); letter-spacing: -0.3px; }
+  .subtitle { color: var(--muted); font-size: 9px; margin-top: 2px; padding-left: 18px; }
+  .toc { font-size: 7.6px; color: var(--dim); text-align: right; line-height: 1.6; max-width: 260px; }
+  .toc b { color: var(--muted); }
+
+  /* ── NAV / JUMP BAR ──────────────────────────────────── */
+  .navbar { display:flex; flex-wrap:wrap; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:6px 8px; margin-bottom:10px; }
+  .navbar a { font-size:7.6px; color:var(--blue); background:var(--blue-dim); padding:2px 6px; border-radius:2px; text-decoration:none; font-weight:600; }
+
+  .section-label {
+    font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-bright); margin: 14px 0 5px 0; padding: 4px 6px;
+    background: var(--surface); border-left: 3px solid var(--green); border-radius: 2px;
+  }
+  .section-label.first { margin-top: 0; }
+  .sub-label { font-size: 7.6px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin: 6px 0 4px; }
+
+  /* ── QUICK REF CARDS ─────────────────────────────────── */
+  .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
+  .cards-grid.c6 { grid-template-columns: repeat(6, 1fr); }
+  .cards-grid.c3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 6px 7px; border-left-width: 3px; }
+  .card-name { font-weight: 700; font-size: 9.5px; margin-bottom: 2px; }
+  .card-desc { font-size: 7.8px; color: var(--muted); line-height: 1.4; }
+
+  .c-bl { border-left-color: var(--blue); }   .c-bl .card-name { color: var(--blue); }
+  .c-gr { border-left-color: var(--green); }  .c-gr .card-name { color: var(--green); }
+  .c-am { border-left-color: var(--amber); }  .c-am .card-name { color: var(--amber); }
+  .c-pu { border-left-color: var(--purple); } .c-pu .card-name { color: var(--purple); }
+  .c-cy { border-left-color: var(--cyan); }   .c-cy .card-name { color: var(--cyan); }
+  .c-rd { border-left-color: var(--red); }    .c-rd .card-name { color: var(--red); }
+
+  /* ── LEGEND ──────────────────────────────────────────── */
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 5px 10px; margin-bottom: 10px; }
+  .legend-label { font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-right: 4px; }
+  .legend-items { display: flex; flex-wrap: wrap; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 8.5px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-bl { background: var(--blue); } .dot-gr { background: var(--green); } .dot-am { background: var(--amber); }
+  .dot-pu { background: var(--purple); } .dot-cy { background: var(--cyan); } .dot-rd { background: var(--red); }
+
+  /* ── NAMING / KEY POINTS ─────────────────────────────── */
+  .naming-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
+  .naming-grid.c1 { grid-template-columns: 1fr; }
+  .naming-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; display: flex; align-items: center; gap: 8px; }
+  .naming-prefix { font-weight: 700; font-size: 9px; color: var(--text-bright); background: var(--border); border-radius: 3px; padding: 2px 6px; white-space: nowrap; }
+  .naming-arrow { color: var(--dim); font-size: 9px; }
+  .naming-meaning { font-size: 8.3px; color: var(--muted); }
+
+  /* ── PANELS ──────────────────────────────────────────── */
+  .tree-panel, .table-panel, .flow-panel, .cmp-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; margin-bottom: 6px; overflow: hidden; }
+  .tree-title { font-size: 8px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+
+  /* ── API TABLE (definition-style rows) ──────────────── */
+  .api-table { width: 100%; border-collapse: collapse; font-size: 8.3px; }
+  .api-table td { padding: 2.5px 4px; vertical-align: top; border-bottom: 1px solid var(--border); }
+  .api-table tr:last-child td { border-bottom: none; }
+  .api-code { font-weight: 700; white-space: nowrap; }
+  .api-code.bl { color: var(--blue); } .api-code.am { color: var(--amber); } .api-code.pu { color: var(--purple); }
+  .api-code.cy { color: var(--cyan); } .api-code.rd { color: var(--red); } .api-code.gr { color: var(--green); }
+  .api-desc { color: var(--muted); }
+  .api-desc code, .tree-body code { color: var(--text); background: var(--bg); padding: 0 3px; border-radius: 2px; }
+
+  /* ── REGULAR TABLES ──────────────────────────────────── */
+  table.grid-table { width: 100%; border-collapse: collapse; font-size: 8.2px; }
+  table.grid-table th { text-align: left; color: var(--dim); font-size: 7.4px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 5px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  table.grid-table td { padding: 3px 5px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  table.grid-table tr:last-child td { border-bottom: none; }
+  table.grid-table td.yes { color: var(--green); font-weight: 700; }
+  table.grid-table td.no { color: var(--red); font-weight: 700; }
+  table.grid-table td.cell-hl { color: var(--amber); font-weight: 600; }
+  table.grid-table td.k { color: var(--blue); font-weight: 600; white-space: nowrap; }
+  table.grid-table td.k2 { color: var(--purple); font-weight: 600; white-space: nowrap; }
+
+  /* ── FLOW DIAGRAM ─────────────────────────────────────── */
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+  .flow-row.vertical { flex-direction: column; }
+  .flow-box { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 4px 9px; font-size: 8.3px; color: var(--text-bright); text-align: center; font-weight: 500; white-space: nowrap; }
+  .flow-box.source { border-color: var(--cyan);  color: var(--cyan); font-weight: 700; }
+  .flow-box.inter  { border-color: var(--blue);  color: var(--blue); }
+  .flow-box.term   { border-color: var(--amber); color: var(--amber); font-weight: 700; }
+  .flow-box.warn   { border-color: var(--red); color: var(--red); font-weight: 700; }
+  .flow-box.ok     { border-color: var(--green); color: var(--green); font-weight: 700; }
+  .flow-arrow { color: var(--dim); font-size: 11px; }
+  .flow-arrow.down { display:block; text-align:center; }
+  .flow-sub-title { font-size: 7.5px; color: var(--muted); text-align: center; margin-top: 6px; margin-bottom: 2px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* ── COMPARISON PANEL ─────────────────────────────────── */
+  .cmp-panel { display: flex; flex-direction: column; gap: 6px; }
+  .cmp-card { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 6px 8px; }
+  .cmp-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .cmp-name { font-weight: 700; font-size: 10px; }
+  .cmp-name.bl { color: var(--blue); } .cmp-name.pu { color: var(--purple); } .cmp-name.gr { color: var(--green); } .cmp-name.am { color: var(--amber); }
+  .cmp-rows { display: flex; flex-direction: column; gap: 2px; }
+  .cmp-row { display: flex; gap: 6px; font-size: 8px; align-items: baseline; }
+  .cmp-key { color: var(--dim); white-space: nowrap; min-width: 62px; }
+  .cmp-val { color: var(--text); }
+  .cmp-val.code { color: var(--amber); font-weight: 600; }
+  .cmp-val.green { color: var(--green); } .cmp-val.purple { color: var(--purple); }
+  .cmp-divider { height: 1px; background: var(--border); }
+
+  /* pillar / category grid (ACID, metrics, security layers) */
+  .pillar-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; margin-bottom: 6px; }
+  .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .pillar-grid.c5 { grid-template-columns: repeat(5, 1fr); }
+  .pillar-card { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 6px 8px; border-top-width: 3px; }
+  .pillar-card.p-bl { border-top-color: var(--blue); } .pillar-card.p-gr { border-top-color: var(--green); }
+  .pillar-card.p-am { border-top-color: var(--amber); } .pillar-card.p-pu { border-top-color: var(--purple); }
+  .pillar-card.p-cy { border-top-color: var(--cyan); } .pillar-card.p-rd { border-top-color: var(--red); }
+  .pillar-name { font-weight: 700; font-size: 9px; margin-bottom: 3px; }
+  .pillar-name.bl{color:var(--blue);} .pillar-name.gr{color:var(--green);} .pillar-name.am{color:var(--amber);}
+  .pillar-name.pu{color:var(--purple);} .pillar-name.cy{color:var(--cyan);} .pillar-name.rd{color:var(--red);}
+  .pillar-def { font-size: 7.7px; color: var(--muted); line-height: 1.4; }
+  .pillar-example { font-size: 7.4px; color: var(--text); margin-top: 3px; border-top: 1px dashed var(--border); padding-top: 3px; }
+  .pillar-example b { color: var(--text-bright); }
+
+  /* ── PROBLEM / SCENARIO CARDS ─────────────────────────── */
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .problem-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; border-left: 3px solid var(--green); page-break-inside: avoid; }
+  .problem-title { font-size: 8.3px; font-weight: 700; color: var(--green); margin-bottom: 3px; }
+  .problem-body { font-size: 7.8px; color: var(--muted); line-height: 1.45; }
+  .problem-body b { color: var(--text); }
+
+  .code-block { font-size: 7.8px; color: var(--text); background: var(--bg); border-radius: 3px; padding: 4px 6px; white-space: pre; overflow: hidden; line-height: 1.45; border: 1px solid var(--border); }
+  .code-block .kw { color: var(--purple); } .code-block .mt { color: var(--blue); } .code-block .cl { color: var(--amber); }
+  .code-block .an { color: var(--green); } .code-block .cm { color: var(--muted); }
+
+  /* ── REVISION SUMMARY ─────────────────────────────────── */
+  .revision-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
+  .revision-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px 14px; }
+  .revision-item { font-size: 8.3px; color: var(--text); display: flex; gap: 5px; }
+  .revision-item .chk { color: var(--green); font-weight: 700; }
+
+  footer { text-align:center; color: var(--dim); font-size: 7.5px; margin-top: 14px; padding-top: 6px; border-top: 1px solid var(--border); }
+
+  @media print {
+    html, body { width: 210mm; }
+    .tree-panel, .table-panel, .flow-panel, .cmp-panel, .pillar-panel, .problem-card { page-break-inside: avoid; }
+    .navbar { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <span class="prompt">$</span>
+        <span class="title">Spring Boot &amp; Core Java — Revision Master</span>
+      </div>
+      <div class="toc"><b>6–7 YOE Backend Engineer</b> — Spring Core · Boot · MVC · Data JPA · Security · Microservices · Production Ops</div>
+    </div>
+    <div class="subtitle">// Read top-to-bottom once before every interview — annotations, flows, lifecycles, differences &amp; real scenarios in one page</div>
+  </div>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <a href="#ioc">IoC/DI</a><a href="#lifecycle">Bean Lifecycle</a><a href="#autoconfig">Auto-Config</a><a href="#config">Config/Profiles</a>
+    <a href="#mvc">MVC/REST</a><a href="#exception">Exceptions</a><a href="#jpa">JPA/Relations</a><a href="#n1">N+1</a>
+    <a href="#txn">Transactions</a><a href="#lock">Locking</a><a href="#cache">Caching</a><a href="#security">Security/JWT</a>
+    <a href="#patterns">Design Patterns</a><a href="#async">Async</a><a href="#testing">Testing</a><a href="#microservices">Microservices/Kafka</a>
+    <a href="#perf">Perf Tuning</a><a href="#monitor">Monitoring</a><a href="#diff">Differences</a><a href="#scenarios">Troubleshooting</a>
+    <a href="#sysdesign">System Design</a><a href="#deploy">Deployment</a><a href="#summary">30-sec Summary</a>
+  </div>
+
+  <!-- QUICK REF: SPRING ECOSYSTEM -->
+  <div class="section-label first">Spring Ecosystem Overview</div>
+  <div class="cards-grid c6">
+    <div class="card c-bl"><div class="card-name">Spring Core</div><div class="card-desc">IoC Container + DI — foundation of everything</div></div>
+    <div class="card c-gr"><div class="card-name">Spring Boot</div><div class="card-desc">Opinionated fmwk — auto-config, starters, embedded server</div></div>
+    <div class="card c-am"><div class="card-name">Spring MVC</div><div class="card-desc">Web layer — DispatcherServlet, Controllers</div></div>
+    <div class="card c-pu"><div class="card-name">Spring Data JPA</div><div class="card-desc">Repository abstraction over JPA/Hibernate</div></div>
+    <div class="card c-cy"><div class="card-name">Spring Security</div><div class="card-desc">AuthN + AuthZ, JWT/OAuth2, filter chain</div></div>
+    <div class="card c-rd"><div class="card-name">Spring Cloud</div><div class="card-desc">Microservices — Feign, Gateway, Config Server</div></div>
+  </div>
+
+  <div class="naming-grid c1">
+    <div class="naming-card">
+      <span class="naming-prefix">Spring Boot =</span>
+      <span class="naming-meaning">Opinionated framework built on top of Spring — auto-configuration + starter dependencies + embedded server + production-ready features (Actuator) → minimal config, less boilerplate.</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">Starter Package</span>
+      <span class="naming-meaning">A predefined dependency-package management bundle containing the required libraries on classpath for a specific functionality.</span>
+    </div>
+    <div class="naming-card">
+      <span class="naming-prefix">@Configuration + @Bean</span>
+      <span class="naming-meaning"><code>@Bean</code> return type is a Spring bean; used inside a config class to create &amp; register a bean in the container — can override auto-configured beans.</span>
+    </div>
+  </div>
+
+  <div class="tree-panel">
+    <div class="tree-title">@SpringBootApplication = Bootstraps the App</div>
+    <table class="api-table">
+      <tr><td class="api-code bl">@SpringBootApplication</td><td class="api-desc">= <code>@Configuration</code> + <code>@EnableAutoConfiguration</code> + <code>@ComponentScan</code> — single entry-point annotation on main class.</td></tr>
+      <tr><td class="api-code gr">@Configuration</td><td class="api-desc">Marks the class as a source of Spring bean definitions.</td></tr>
+      <tr><td class="api-code am">@EnableAutoConfiguration</td><td class="api-desc">Enables auto-config mechanism — auto-configures beans based on dependencies present on the classpath.</td></tr>
+      <tr><td class="api-code pu">@ComponentScan</td><td class="api-desc">Scans the package for <code>@Controller</code>, <code>@Service</code>, <code>@Repository</code>, <code>@Component</code> and registers them as beans.</td></tr>
+    </table>
+  </div>
+
+  <!-- ── IoC & DI ───────────────────────────────────────── -->
+  <div class="section-label" id="ioc">Spring IoC &amp; Dependency Injection</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">IoC vs DI</div>
+      <div class="api-table">
+        <table class="api-table" style="width:100%">
+          <tr><td class="api-code cy">IoC</td><td class="api-desc">Inversion of Control — the <b>Spring Container</b> manages object creation instead of the application code.</td></tr>
+          <tr><td class="api-code bl">DI</td><td class="api-desc">Dependency Injection — an IoC principle; dependencies are injected by the container rather than created by the class itself.</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Injection Types</div>
+      <table class="api-table">
+        <tr><td class="api-code gr">Constructor ⭐</td><td class="api-desc">Recommended — immutable, mandatory deps, easy to unit test.</td></tr>
+        <tr><td class="api-code am">Setter</td><td class="api-desc">Optional dependencies; mutable.</td></tr>
+        <tr><td class="api-code rd">Field (Avoid)</td><td class="api-desc">Hard to test, hides dependencies, not immutable.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="cmp-panel">
+      <div class="tree-title">@Autowired vs @Resource vs @Qualifier</div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name bl">@Autowired</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-key">Resolves by</span><span class="cmp-val">Type → @Qualifier → Name</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name pu">@Resource</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-key">Resolves by</span><span class="cmp-val">Name → fallback: Type</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name am">@Qualifier / @Primary / @Lazy</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">@Qualifier</span><span class="cmp-val">Resolves multiple-bean ambiguity by name</span></div>
+          <div class="cmp-row"><span class="cmp-key">@Primary</span><span class="cmp-val">Default bean when multiple candidates exist</span></div>
+          <div class="cmp-row"><span class="cmp-key">@Lazy</span><span class="cmp-val">Bean created only when first needed, not at startup</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">BeanFactory vs ApplicationContext</div>
+      <table class="grid-table">
+        <tr><th>Feature</th><th>BeanFactory</th><th>ApplicationContext</th></tr>
+        <tr><td>Role</td><td>Basic IoC container</td><td class="cell-hl">Extends BeanFactory + advanced features</td></tr>
+        <tr><td>Loading</td><td>Lazy</td><td>Eager (singleton beans)</td></tr>
+        <tr><td>Extras</td><td>—</td><td>Events, i18n, AOP integration</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:8px;">Get Bean Info</div>
+      <div class="api-desc" style="font-size:8px;">
+        <code>applicationContext.getBeanDefinitionNames()</code>, <code>getBeanDefinitionCount()</code>, or hit <code>/actuator/beans</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── APPLICATION STARTUP & DI LIFECYCLE (from source notes) ── -->
+  <div class="section-label" id="startuplifecycle">Application Startup Lifecycle &amp; DI Lifecycle</div>
+  <div class="flow-panel">
+    <div class="tree-title">Startup Lifecycle</div>
+    <div class="flow-row">
+      <div class="flow-box source">main()</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">SpringApplication.run()</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Create ApplicationContext / IoC Container</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Load Configuration (app.properties/yaml)</div>
+    </div>
+    <div class="flow-row" style="margin-top:6px;">
+      <div class="flow-box inter">Component Scanning</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Create Beans</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Dependency Injection</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Auto-Configuration from Classpath</div>
+    </div>
+    <div class="flow-row" style="margin-top:6px;">
+      <div class="flow-box inter">Bean Initialization</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">AppContext Initialization</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Embedded Tomcat Starts</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Application Ready</div>
+    </div>
+  </div>
+  <div class="naming-grid c1">
+    <div class="naming-card"><span class="naming-prefix">DI Lifecycle</span><span class="naming-meaning">Component Scan → Bean Creation → Dependency Resolution → Dependency Injection → Bean Ready for Use.</span></div>
+  </div>
+
+  <!-- ── BEAN LIFECYCLE ─────────────────────────────────── -->
+  <div class="section-label" id="lifecycle">Bean Lifecycle &amp; Scopes</div>
+  <div class="flow-panel">
+    <div class="tree-title">Bean Lifecycle — object created, managed &amp; destroyed by the Container</div>
+    <div class="flow-row">
+      <div class="flow-box source">Container Start</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Component Scan</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Bean Creation</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">DI (Dependency Resolution)</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">@PostConstruct (Init)</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Bean Ready</div>
+    </div>
+    <div class="flow-row" style="margin-top:6px;">
+      <div class="flow-box ok">Application Running</div><span class="flow-arrow">→</span>
+      <div class="flow-box term">@PreDestroy</div><span class="flow-arrow">→</span>
+      <div class="flow-box warn">Bean Destroyed</div>
+    </div>
+    <div class="flow-sub-title">Component Scan → Bean Creation → Dependency Resolution → Dependency Injection → Bean Ready for Use</div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Bean Scopes</div>
+      <table class="api-table">
+        <tr><td class="api-code gr">Singleton (default)</td><td class="api-desc">One bean per container.</td></tr>
+        <tr><td class="api-code bl">Prototype</td><td class="api-desc">New bean every time it's requested.</td></tr>
+        <tr><td class="api-code am">Request</td><td class="api-desc">One bean per HTTP request.</td></tr>
+        <tr><td class="api-code pu">Session</td><td class="api-desc">One bean per HTTP session.</td></tr>
+        <tr><td class="api-code cy">Application</td><td class="api-desc">One bean per ServletContext.</td></tr>
+        <tr><td class="api-code rd">WebSocket</td><td class="api-desc">One bean per WebSocket session.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Stereotype Annotations</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">@Component</td><td class="api-desc">Generic bean — Spring creates &amp; manages its lifecycle in the IoC container.</td></tr>
+        <tr><td class="api-code gr">@Service</td><td class="api-desc">Marks the business/service layer.</td></tr>
+        <tr><td class="api-code am">@Repository</td><td class="api-desc">Marks the DAO layer + enables exception translation.</td></tr>
+        <tr><td class="api-code pu">@Controller</td><td class="api-desc">Handles requests, returns a <b>view</b> (JSP/HTML).</td></tr>
+        <tr><td class="api-code cy">@RestController</td><td class="api-desc">Handles requests, returns <b>JSON/XML</b> data directly.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── AUTO CONFIGURATION ─────────────────────────────── -->
+  <div class="section-label" id="autoconfig">Spring Boot Auto-Configuration</div>
+  <div class="flow-panel">
+    <div class="tree-title">Auto-Configuration Flow</div>
+    <div class="flow-row">
+      <div class="flow-box source">@SpringBootApplication</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">@EnableAutoConfiguration</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Reads spring.factories / AutoConfiguration.imports</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Checks Classpath Deps</div>
+    </div>
+    <div class="flow-row" style="margin-top:6px;">
+      <div class="flow-box inter">Finds @AutoConfiguration Classes</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">@Conditional Checks</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Bean Creation</div><span class="flow-arrow">→</span>
+      <div class="flow-box term">Stored in IoC Container</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Application Ready</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Conditional Annotations</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">@ConditionalOnClass</td><td class="api-desc">Creates bean if a specific class is present on classpath.</td></tr>
+        <tr><td class="api-code am">@ConditionalOnMissingClass</td><td class="api-desc">Creates bean if a specific class is NOT present.</td></tr>
+        <tr><td class="api-code gr">@ConditionalOnBean</td><td class="api-desc">Creates bean only if another bean is present.</td></tr>
+        <tr><td class="api-code rd">@ConditionalOnMissingBean</td><td class="api-desc">Creates bean only if not already present — used to let users override auto-config.</td></tr>
+        <tr><td class="api-code pu">@ConditionalOnProperty</td><td class="api-desc">Creates bean based on a configuration property value.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Exclude Auto-Configuration</div>
+      <div class="code-block"><span class="cm">// application.properties</span>
+spring.autoconfigure.exclude=DataSourceAutoConfiguration
+
+<span class="cm">// or on main class</span>
+<span class="an">@SpringBootApplication</span>(exclude = {DataSourceAutoConfiguration.<span class="kw">class</span>})</div>
+      <div class="sub-label" style="margin-top:6px;">spring-boot-starter-parent</div>
+      <div class="api-desc" style="font-size:8px;">Parent POM — manages dependency versions, plugin configs &amp; default build settings.</div>
+    </div>
+  </div>
+
+  <!-- ── CONFIGURATION ──────────────────────────────────── -->
+  <div class="section-label" id="config">Configuration, Profiles &amp; Embedded Server</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Externalized Configuration</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">@Value</td><td class="api-desc">Single property → <code>@Value("${app.name}")</code></td></tr>
+        <tr><td class="api-code gr">@ConfigurationProperties</td><td class="api-desc">Multiple properties → <code>@ConfigurationProperties(prefix="app")</code></td></tr>
+        <tr><td class="api-code am">Environment</td><td class="api-desc">Dynamic access → <code>environment.getProperty("app.name")</code></td></tr>
+        <tr><td class="api-code pu">application.properties</td><td class="api-desc">Simple key-value pairs.</td></tr>
+        <tr><td class="api-code cy">application.yml</td><td class="api-desc">Hierarchical structure — best for complex config.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Profiles &amp; Embedded Server</div>
+      <div class="api-desc" style="font-size:8.2px;">
+        <b style="color:var(--text)">Profiles</b> — environment-specific config: <code>dev</code>, <code>testing</code>, <code>prod</code>. Activate with <code>spring.profile.active=dev</code> or class-level <code>@Profile("dev")</code>.<br><br>
+        <b style="color:var(--text)">Embedded server</b> — default <b>Tomcat</b>; can override with Jetty/Undertow. To deploy on external server, package as WAR and remove embedded container.<br><br>
+        <b style="color:var(--text)">Non-web app</b> — Yes, disable via <code>spring.main.web-application-type=none</code> — used for batch jobs, scheduled tasks, CLI apps, Kafka consumers.
+      </div>
+    </div>
+  </div>
+
+  <div class="naming-grid c1">
+    <div class="naming-card"><span class="naming-prefix">DevTools</span><span class="naming-meaning">Auto-restart on code change · LiveReload · dev-friendly settings.</span></div>
+    <div class="naming-card"><span class="naming-prefix">Actuator</span><span class="naming-meaning">Production-ready REST endpoints: <code>/actuator/health</code>, <code>/metrics</code>, <code>/info</code>, <code>/beans</code>. Custom endpoint via <code>@Endpoint</code>.</span></div>
+    <div class="naming-card"><span class="naming-prefix">File Upload</span><span class="naming-meaning"><code>MultipartFile</code> interface + <code>@RequestParam</code>.</span></div>
+    <div class="naming-card"><span class="naming-prefix">Content Negotiation</span><span class="naming-meaning">Send JSON or XML — whichever format the client requests.</span></div>
+  </div>
+
+  <!-- ── SPRING MVC / REST ──────────────────────────────── -->
+  <div class="section-label" id="mvc">Spring MVC &amp; REST API</div>
+  <div class="naming-grid c1">
+    <div class="naming-card"><span class="naming-prefix">REST</span><span class="naming-meaning">REpresentational State Transfer — a web service communication style between client &amp; server using HTTP methods (GET, POST, PUT, PATCH, DELETE).</span></div>
+  </div>
+  <div class="flow-panel">
+    <div class="tree-title">Request Flow</div>
+    <div class="flow-row">
+      <div class="flow-box source">Client</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">DispatcherServlet<br><span style="font-size:7px;color:var(--muted)">(Front Controller)</span></div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Controller</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Service</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Repository</div><span class="flow-arrow">→</span>
+      <div class="flow-box term">Database</div>
+    </div>
+    <div class="flow-sub-title">Response: Java Object → JSON via Jackson (HttpMessageConverter) → returned to client</div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">HTTP Method Mapping Annotations</div>
+      <table class="api-table">
+        <tr><td class="api-code gr">@GetMapping</td><td class="api-desc">Retrieve data.</td></tr>
+        <tr><td class="api-code bl">@PostMapping</td><td class="api-desc">Create data.</td></tr>
+        <tr><td class="api-code am">@PutMapping</td><td class="api-desc">Update entire resource.</td></tr>
+        <tr><td class="api-code rd">@DeleteMapping</td><td class="api-desc">Delete data.</td></tr>
+        <tr><td class="api-code pu">@RequestMapping</td><td class="api-desc">Maps a URL to a controller class/handler method — e.g. <code>@RequestMapping("/reports")</code></td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Parameter-Binding Annotations</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">@PathVariable</td><td class="api-desc">Extracts values from URL path — <code>/users/102</code></td></tr>
+        <tr><td class="api-code am">@RequestParam</td><td class="api-desc">Extracts query params — <code>/users?id=102</code>; used for filter/search/sort/paginate.</td></tr>
+        <tr><td class="api-code gr">@RequestBody</td><td class="api-desc">Converts JSON request body → Java Object.</td></tr>
+        <tr><td class="api-code pu">@ModelAttribute</td><td class="api-desc">Binds form data / query params → Object.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">ResponseEntity &amp; HTTP Status Codes</div>
+      <div class="api-desc" style="font-size:8px;margin-bottom:5px;"><code style="color:var(--text)">ResponseEntity&lt;T&gt;</code> — represents the complete HTTP response including headers, status code, message, and response body.</div>
+      <table class="grid-table">
+        <tr><td class="k">200 OK</td><td>Request processed successfully</td></tr>
+        <tr><td class="k">201 Created</td><td>Resource created successfully</td></tr>
+        <tr><td class="k">204 No Content</td><td>Successful, no response body</td></tr>
+        <tr><td class="k2">400 Bad Request</td><td>Invalid request from client</td></tr>
+        <tr><td class="k2">401 Unauthorized</td><td>Authentication required/failed</td></tr>
+        <tr><td class="k2">403 Forbidden</td><td>Access denied (authorization)</td></tr>
+        <tr><td class="k2">404 Not Found</td><td>Resource not found</td></tr>
+        <tr><td class="k2">409 Conflict</td><td>Resource state conflict</td></tr>
+        <tr><td class="k2">500 Internal Server Error</td><td>Unexpected server-side error</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">JSON Conversion &amp; Validation</div>
+      <div class="api-desc" style="font-size:8.2px;">
+        Handled automatically by <b style="color:var(--text)">HttpMessageConverter</b>; default library = <b style="color:var(--text)">Jackson</b>.<br><br>
+        <code>@JsonProperty</code> rename field · <code>@JsonIgnore</code> exclude field · <code>@JsonInclude</code> conditional include · <code>@JsonFormat</code> date/time format<br><br>
+        <b style="color:var(--text)">Validation:</b> <code>@NotBlank</code>, <code>@NotNull</code>, <code>@Email</code> on DTO fields + <code>@Valid</code> on controller param triggers validation. Customize: <code>@NotBlank(message="name is required")</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EXCEPTION HANDLING ─────────────────────────────── -->
+  <div class="section-label" id="exception">Global Exception Handling</div>
+  <div class="flow-panel">
+    <div class="flow-row">
+      <div class="flow-box source">Custom Exception<br><span style="font-size:7px;color:var(--muted)">extends RuntimeException</span></div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">@ControllerAdvice<br><span style="font-size:7px;color:var(--muted)">handles globally</span></div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">@ExceptionHandler<br><span style="font-size:7px;color:var(--muted)">catches specific exception</span></div><span class="flow-arrow">→</span>
+      <div class="flow-box term">Custom Error Response<br><span style="font-size:7px;color:var(--muted)">status, msg, timestamp, data</span></div>
+    </div>
+    <div class="flow-sub-title">Default (no custom handler) → BasicErrorController returns Spring Boot's standard error response</div>
+  </div>
+
+  <!-- ── SPRING DATA JPA ─────────────────────────────────── -->
+  <div class="section-label" id="jpa">Spring Data JPA &amp; Relationships</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">JPA vs Hibernate vs Spring Data JPA</div>
+      <table class="grid-table">
+        <tr><th>JPA</th><th>Hibernate</th><th>Spring Data JPA</th></tr>
+        <tr><td>Specification (rules/interfaces)</td><td>Implementation of JPA</td><td class="cell-hl">Abstraction over JPA/Hibernate</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:8px;">Repository Hierarchy</div>
+      <div class="flow-row">
+        <div class="flow-box source">Repository</div><span class="flow-arrow">→</span>
+        <div class="flow-box inter">CrudRepository</div><span class="flow-arrow">→</span>
+        <div class="flow-box inter">PagingAndSortingRepository</div><span class="flow-arrow">→</span>
+        <div class="flow-box term">JpaRepository</div>
+      </div>
+      <div class="api-desc" style="font-size:8px;margin-top:5px;">Common methods: <code>save()</code> <code>findById()</code> <code>findAll()</code> <code>deleteById()</code></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">CrudRepository vs JpaRepository</div>
+      <table class="grid-table">
+        <tr><th>CrudRepository</th><th>JpaRepository</th></tr>
+        <tr><td>Basic CRUD ops only</td><td class="cell-hl">Extends CRUD + pagination + sorting + batch ops</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:8px;">JPQL vs SQL</div>
+      <table class="grid-table">
+        <tr><th>JPQL</th><th>SQL</th></tr>
+        <tr><td>Works on entities &amp; fields</td><td>Works on tables &amp; columns</td></tr>
+      </table>
+      <div class="api-desc" style="font-size:8px;margin-top:6px;"><b style="color:var(--text)">Derived query methods</b> — Spring builds the query from method naming convention. <b style="color:var(--text)">@Query</b> — write custom JPQL/native SQL when derived methods aren't enough.</div>
+    </div>
+  </div>
+
+  <div class="tree-panel">
+    <div class="tree-title">JPA Relationships &amp; Fetch Strategy</div>
+    <table class="api-table">
+      <tr><td class="api-code bl">@OneToOne</td><td class="api-desc">One entity ↔ exactly one entity. <b>Ex:</b> Employee ↔ AadhaarCard.</td></tr>
+      <tr><td class="api-code gr">@OneToMany</td><td class="api-desc">One entity → many entities. <b>Ex:</b> Customer → Orders.</td></tr>
+      <tr><td class="api-code am">@ManyToOne</td><td class="api-desc">Many entities → one entity. <b>Ex:</b> Orders → Customer.</td></tr>
+      <tr><td class="api-code pu">@ManyToMany</td><td class="api-desc">Many ↔ many. <b>Ex:</b> Students ↔ Courses.</td></tr>
+    </table>
+    <div class="two-col" style="margin-top:6px;">
+      <div class="naming-card"><span class="naming-prefix">Lazy ⭐</span><span class="naming-meaning">Load related data only when accessed.</span></div>
+      <div class="naming-card"><span class="naming-prefix">Eager</span><span class="naming-meaning">Load related data immediately with parent entity.</span></div>
+    </div>
+    <div class="api-desc" style="font-size:8px;margin-top:6px;"><b style="color:var(--text)">Cascade Types</b> (parent op → propagates to child): <code>PERSIST</code> <code>MERGE</code> <code>REMOVE</code> <code>ALL</code></div>
+  </div>
+
+  <!-- ── N+1 ─────────────────────────────────────────────── -->
+  <div class="section-label" id="n1">N+1 Query Problem</div>
+  <div class="flow-panel">
+    <div class="flow-row">
+      <div class="flow-box warn">1 Query (Parent)</div><span class="flow-arrow">+</span>
+      <div class="flow-box warn">N Queries (Child, one per row)</div>
+    </div>
+    <div class="flow-sub-title">Fetching N Departments triggers 1 query for departments + N queries for each department's employees</div>
+    <div class="tree-title" style="margin-top:8px;">Identify &amp; Fix</div>
+    <div class="api-desc" style="font-size:8.2px;">
+      <b style="color:var(--text)">Identify:</b> enable Hibernate SQL logs → look for 1 parent query followed by many repeated child queries.<br><br>
+      <b style="color:var(--text)">Fix:</b> <code>Join Fetch</code> (fetch parent+child in single query) · <code>@EntityGraph</code> (control which relations load together) · <code>DTO Projection</code> (select only required fields, avoids entity graph loading entirely)
+    </div>
+  </div>
+
+  <!-- ── PAGINATION ─────────────────────────────────────── -->
+  <div class="naming-grid c1">
+    <div class="naming-card"><span class="naming-prefix">Pagination</span><span class="naming-meaning"><code>Pageable</code> interface retrieves data in chunks, returns <code>Page&lt;T&gt;</code>. <b>Sorting:</b> <code>Sort.by("name")</code> or combined with Pageable. Benefits: better performance, less memory, faster APIs.</span></div>
+  </div>
+
+  <!-- ── TRANSACTIONS ────────────────────────────────────── -->
+  <div class="section-label" id="txn">Transactions, ACID &amp; @Transactional</div>
+  <div class="pillar-panel">
+    <div class="tree-title">ACID Properties</div>
+    <div class="pillar-grid">
+      <div class="pillar-card p-bl"><div class="pillar-name bl">Atomicity</div><div class="pillar-def">All or nothing — transaction fully completes or fully rolls back.</div></div>
+      <div class="pillar-card p-gr"><div class="pillar-name gr">Consistency</div><div class="pillar-def">Moves DB from one valid state to another, respecting all rules/constraints.</div></div>
+      <div class="pillar-card p-am"><div class="pillar-name am">Isolation</div><div class="pillar-def">Concurrent transactions execute without interfering with each other.</div></div>
+      <div class="pillar-card p-pu"><div class="pillar-name pu">Durability</div><div class="pillar-def">Once committed, data is permanently saved even after a crash.</div></div>
+    </div>
+  </div>
+
+  <div class="flow-panel">
+    <div class="tree-title">@Transactional Internal Working</div>
+    <div class="flow-row">
+      <div class="flow-box source">Request</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Proxy w/ @Transactional</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Starts Transaction</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Execute Business Method</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Commit (success) / Rollback (failure)</div>
+    </div>
+    <div class="api-desc" style="font-size:8px;margin-top:6px;"><b style="color:var(--text)">Rollback not happening?</b> Check exception type (must be unchecked), ensure exception isn't swallowed, verify proxy-based behavior (self-invocation bypasses proxy!), configure <code>rollbackFor</code> for checked exceptions.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Propagation — how a method behaves when called by another transactional method</div>
+      <table class="api-table">
+        <tr><td class="api-code gr">REQUIRED ⭐</td><td class="api-desc">Join existing or create new.</td></tr>
+        <tr><td class="api-code bl">REQUIRES_NEW</td><td class="api-desc">Always create a new transaction (suspends outer one).</td></tr>
+        <tr><td class="api-code am">SUPPORTS</td><td class="api-desc">Join if exists, else run non-transactional.</td></tr>
+        <tr><td class="api-code pu">MANDATORY</td><td class="api-desc">Transaction must already exist, else throws.</td></tr>
+        <tr><td class="api-code cy">NOT_SUPPORTED</td><td class="api-desc">Suspends existing transaction, runs without one.</td></tr>
+        <tr><td class="api-code rd">NEVER</td><td class="api-desc">Fails if a transaction exists.</td></tr>
+        <tr><td class="api-code bl">NESTED</td><td class="api-desc">Transaction inside another, using savepoints.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Isolation Levels — what data a transaction can see</div>
+      <table class="api-table">
+        <tr><td class="api-code rd">READ_UNCOMMITTED</td><td class="api-desc">Reads even uncommitted data (dirty read).</td></tr>
+        <tr><td class="api-code gr">READ_COMMITTED ⭐</td><td class="api-desc">Reads only committed data.</td></tr>
+        <tr><td class="api-code am">REPEATABLE_READ</td><td class="api-desc">Same row always returns same value within txn.</td></tr>
+        <tr><td class="api-code pu">SERIALIZABLE</td><td class="api-desc">One transaction at a time — safest, slowest.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── LOCKING ─────────────────────────────────────────── -->
+  <div class="section-label" id="lock">Optimistic vs Pessimistic Locking</div>
+  <div class="cmp-panel">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">Optimistic Locking</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Mechanism</span><span class="cmp-val">Uses <code style="color:var(--amber)">@Version</code> field to detect conflicts <b>during</b> update</span></div>
+        <div class="cmp-row"><span class="cmp-key">Ex: Candidate Profile</span><span class="cmp-val">Admin A &amp; B both read v1 → A saves → v2 → B saves with v1 → Hibernate throws <code style="color:var(--red)">OptimisticLockException</code></span></div>
+      </div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name pu">Pessimistic Locking</span></div>
+      <div class="cmp-rows">
+        <div class="cmp-row"><span class="cmp-key">Mechanism</span><span class="cmp-val">Locks DB row until current transaction completes — prevents conflict <b>before</b> update</span></div>
+        <div class="cmp-row"><span class="cmp-key">Ex: Bank Withdrawal</span><span class="cmp-val">User A withdraws → row locked → User B must wait → A completes → B reads updated balance</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CACHING ─────────────────────────────────────────── -->
+  <div class="section-label" id="cache">Caching</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Cache Annotations</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">@EnableCaching</td><td class="api-desc">Enables caching in the app.</td></tr>
+        <tr><td class="api-code gr">@Cacheable ⭐</td><td class="api-desc">Reads from cache; on miss, executes method &amp; stores result.</td></tr>
+        <tr><td class="api-code am">@CachePut</td><td class="api-desc">Always executes method and updates the cache.</td></tr>
+        <tr><td class="api-code rd">@CacheEvict</td><td class="api-desc">Removes specific / all cache entries.</td></tr>
+        <tr><td class="api-code pu">@Caching</td><td class="api-desc">Combines multiple cache ops on one method.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Cache Providers</div>
+      <table class="api-table">
+        <tr><td class="api-code rd">Redis ⭐</td><td class="api-desc">Distributed cache.</td></tr>
+        <tr><td class="api-code bl">Caffeine</td><td class="api-desc">Local in-memory cache.</td></tr>
+        <tr><td class="api-code am">EhCache</td><td class="api-desc">Local in-memory cache.</td></tr>
+        <tr><td class="api-code pu">Hazelcast</td><td class="api-desc">Distributed in-memory data grid.</td></tr>
+      </table>
+      <div class="api-desc" style="font-size:8px;margin-top:4px;">Flow: first request → fetch from DB → store in cache → subsequent requests served from cache until invalidated/updated.</div>
+    </div>
+  </div>
+
+  <!-- ── SECURITY ────────────────────────────────────────── -->
+  <div class="section-label" id="security">Spring Security, JWT &amp; OAuth2</div>
+  <div class="naming-grid">
+    <div class="naming-card"><span class="naming-prefix">Authentication</span><span class="naming-meaning">Who are you? Verifies identity — session, JWT, OTP.</span></div>
+    <div class="naming-card"><span class="naming-prefix">Authorization</span><span class="naming-meaning">What can you access? Restricts resources/actions for an authenticated user.</span></div>
+  </div>
+
+  <div class="flow-panel">
+    <div class="tree-title">Security Filter Chain Flow</div>
+    <div class="flow-row">
+      <div class="flow-box source">Client Request</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">SecurityFilterChain<br><span style="font-size:7px;color:var(--muted)">Auth Filter → AuthZ Filter → CSRF/CORS</span></div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Controller</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Service</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Repository</div><span class="flow-arrow">→</span>
+      <div class="flow-box term">DB</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Response</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">JWT — Stateless Authentication</div>
+      <div class="api-desc" style="font-size:8.2px;">
+        Compact, URL-safe token: <code>Header.Payload.Signature</code><br><br>
+        <b style="color:var(--text)">Header:</b> token type + signing algorithm (HS256/RS256)<br>
+        <b style="color:var(--text)">Payload:</b> claims — userId, username, roles, iat, exp, sub<br>
+        <b style="color:var(--text)">Signature:</b> crypto signature of header+payload using secret/private key
+      </div>
+      <div class="flow-row" style="margin-top:6px;">
+        <div class="flow-box source">Login</div><span class="flow-arrow">→</span>
+        <div class="flow-box inter">Validate Creds</div><span class="flow-arrow">→</span>
+        <div class="flow-box inter">Generate JWT</div><span class="flow-arrow">→</span>
+        <div class="flow-box term">Return Token</div>
+      </div>
+      <div class="flow-sub-title">Subsequent requests: Authorization: Bearer &lt;token&gt;</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">OAuth2 vs OpenID Connect vs CSRF</div>
+      <table class="grid-table">
+        <tr><th>OAuth2</th><th>OpenID Connect</th></tr>
+        <tr><td>Authorization framework — grants access to resources via Access Token, without sharing credentials. <span style="color:var(--muted)">Eg: Login with Google</span></td>
+            <td class="cell-hl">Authentication layer on top of OAuth2 — adds an ID Token to authenticate the user. <span style="color:var(--muted)">Eg: Sign in with Google</span></td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:8px;">CSRF (Cross-Site Request Forgery)</div>
+      <div class="api-desc" style="font-size:8px;">Malicious site performs unwanted actions using an authenticated session. Spring Security validates a unique CSRF token on every state-changing request (POST/PUT/PATCH/DELETE). Default: enabled for session auth; usually disabled for JWT (stateless).</div>
+    </div>
+  </div>
+
+  <div class="naming-grid c1">
+    <div class="naming-card"><span class="naming-prefix">RBAC</span><span class="naming-meaning">Role-Based Access Control — assign roles to users, authorize via <code>hasRole()</code> (API level) or <code>@PreAuthorize()</code> (method level).</span></div>
+    <div class="naming-card"><span class="naming-prefix">BCrypt</span><span class="naming-meaning">Password hashing algorithm — converts plain-text passwords into irreversible encrypted hashes before storing in DB.</span></div>
+    <div class="naming-card"><span class="naming-prefix">Custom Auth Provider</span><span class="naming-meaning">Needed when the default provider isn't sufficient (default only checks username &amp; password).</span></div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Symmetric vs Asymmetric Encryption</div>
+      <table class="grid-table">
+        <tr><th>Symmetric</th><th>Asymmetric</th></tr>
+        <tr><td>Same key encrypts &amp; decrypts. <span style="color:var(--muted)">AES, DES, 3DES</span></td><td class="cell-hl">Different keys — encrypt with public key, decrypt with private key. <span style="color:var(--muted)">RSA, ECC</span></td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Storing Sensitive Data (e.g. account info)</div>
+      <div class="flow-row">
+        <div class="flow-box source">Receive Data</div><span class="flow-arrow">→</span>
+        <div class="flow-box inter">Encrypt (AES-256)</div><span class="flow-arrow">→</span>
+        <div class="flow-box inter">Store Encrypted</div><span class="flow-arrow">→</span>
+        <div class="flow-box term">Decrypt Only When Required</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DESIGN PATTERNS ─────────────────────────────────── -->
+  <div class="section-label" id="patterns">Design Patterns in Spring</div>
+  <div class="tree-panel">
+    <table class="api-table">
+      <tr><td class="api-code bl">Singleton</td><td class="api-desc">One bean per application context (IoC container).</td></tr>
+      <tr><td class="api-code gr">Factory</td><td class="api-desc">Spring uses BeanFactory / ApplicationContext to create &amp; manage bean objects.</td></tr>
+      <tr><td class="api-code am">Dependency Injection</td><td class="api-desc">IoC principle — Spring creates &amp; injects dependent objects instead of the class doing it.</td></tr>
+      <tr><td class="api-code pu">Proxy</td><td class="api-desc">Used behind <code>@Transactional</code>, <code>@Cacheable</code>, <code>@Async</code>.</td></tr>
+      <tr><td class="api-code cy">Template</td><td class="api-desc"><code>JdbcTemplate</code>, <code>KafkaTemplate</code> — boilerplate abstraction.</td></tr>
+      <tr><td class="api-code rd">Observer</td><td class="api-desc">Spring Application Events.</td></tr>
+      <tr><td class="api-code bl">MVC</td><td class="api-desc">Controller → Service → Repository separation.</td></tr>
+    </table>
+  </div>
+
+  <!-- ── ASYNC ───────────────────────────────────────────── -->
+  <div class="section-label" id="async">Async Processing</div>
+  <div class="naming-grid c1">
+    <div class="naming-card"><span class="naming-prefix">@Async</span><span class="naming-meaning">Runs a method asynchronously on a separate thread — long-running tasks (email, file processing, external API calls) don't block the caller. Enable with <code>@EnableAsync</code>. Flow: save user in DB → return response → send email in background. Use cases: email, notifications, report generation.</span></div>
+  </div>
+
+  <!-- ── TESTING ─────────────────────────────────────────── -->
+  <div class="section-label" id="testing">Testing</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Testing Types &amp; Annotations</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Unit Test</td><td class="api-desc">Tests a single component in isolation. Tools: JUnit 5, Mockito.</td></tr>
+        <tr><td class="api-code gr">Integration Test</td><td class="api-desc">Tests multiple components together.</td></tr>
+        <tr><td class="api-code am">@WebMvcTest</td><td class="api-desc">Tests Controller layer only.</td></tr>
+        <tr><td class="api-code pu">@DataJpaTest ⭐</td><td class="api-desc">Tests JPA repository layer; loads JPA layer only; uses H2 in-memory DB; rolls back after each test.</td></tr>
+        <tr><td class="api-code cy">@SpringBootTest</td><td class="api-desc">Loads full ApplicationContext (real beans) — integration testing.</td></tr>
+        <tr><td class="api-code rd">MockMvc</td><td class="api-desc">Tests Controller / REST endpoints without starting the web server.</td></tr>
+        <tr><td class="api-code bl">@Mock / @InjectMocks</td><td class="api-desc">Mockito annotations to mock dependencies and inject them into the class under test.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Mocking External APIs &amp; Testcontainers</div>
+      <div class="api-desc" style="font-size:8.2px;">
+        Unit testing external calls → <b style="color:var(--text)">Mockito</b>. Mocking external API server behavior → <b style="color:var(--text)">WireMock</b>.<br><br>
+        <b style="color:var(--text)">Testcontainers</b> — runs real MySQL / Redis / PostgreSQL / Kafka in Docker for production-like integration testing.
+      </div>
+      <div class="naming-grid c1" style="margin-top:6px;">
+        <div class="naming-card"><span class="naming-prefix">Benefits</span><span class="naming-meaning">Production-like testing · no H2-vs-real-DB behavior differences.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MICROSERVICES / KAFKA ──────────────────────────── -->
+  <div class="section-label" id="microservices">Microservices Communication &amp; Kafka</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">RestTemplate vs WebClient vs OpenFeign</div>
+      <table class="api-table">
+        <tr><td class="api-code rd">RestTemplate</td><td class="api-desc">Old / legacy, synchronous, blocking.</td></tr>
+        <tr><td class="api-code bl">WebClient</td><td class="api-desc">Reactive, non-blocking — used in new applications.</td></tr>
+        <tr><td class="api-code gr">OpenFeign ⭐</td><td class="api-desc">Declarative client for service-to-service calls in microservices.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Kafka — Async Communication</div>
+      <div class="flow-row">
+        <div class="flow-box source">Producer</div><span class="flow-arrow">→</span>
+        <div class="flow-box inter">Topic</div><span class="flow-arrow">→</span>
+        <div class="flow-box term">Consumer<br><span style="font-size:7px;color:var(--muted)">@KafkaListener</span></div>
+      </div>
+      <div class="api-desc" style="font-size:8px;margin-top:6px;"><b style="color:var(--text)">Consumer Group</b> → scalability. <b style="color:var(--text)">Offset</b> → message position tracking.</div>
+    </div>
+  </div>
+
+  <!-- ── PERFORMANCE ─────────────────────────────────────── -->
+  <div class="section-label" id="perf">Performance Tuning &amp; Connection Pooling</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">REST API Performance Tuning Checklist</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">1</td><td class="api-desc">Indexing</td></tr>
+        <tr><td class="api-code gr">2</td><td class="api-desc">Pagination</td></tr>
+        <tr><td class="api-code am">3</td><td class="api-desc">Caching</td></tr>
+        <tr><td class="api-code pu">4</td><td class="api-desc">DTO Projection</td></tr>
+        <tr><td class="api-code cy">5</td><td class="api-desc">Fetch Join / Entity Graph</td></tr>
+        <tr><td class="api-code rd">6</td><td class="api-desc">Async Processing</td></tr>
+        <tr><td class="api-code bl">7</td><td class="api-desc">Connection Pool Tuning</td></tr>
+        <tr><td class="api-code gr">8</td><td class="api-desc">Query Optimization</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Connection Pooling — HikariCP ⭐ (default)</div>
+      <div class="api-desc" style="font-size:8.2px;">Pre-created DB connections reused by the app instead of opening a new one per request — borrow from pool, use, return.</div>
+      <div class="code-block" style="margin-top:6px;">spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle
+spring.datasource.hikari.connection-timeout
+spring.datasource.hikari.idle-timeout
+spring.datasource.hikari.max-lifetime</div>
+    </div>
+  </div>
+
+  <!-- ── MONITORING ──────────────────────────────────────── -->
+  <div class="section-label" id="monitor">Production Monitoring</div>
+  <div class="pillar-panel">
+    <div class="pillar-grid c5">
+      <div class="pillar-card p-bl"><div class="pillar-name bl">Application</div><div class="pillar-def">API response time, throughput (TPS/RPS), error rate (4xx/5xx), latency.</div></div>
+      <div class="pillar-card p-gr"><div class="pillar-name gr">JVM</div><div class="pillar-def">Heap / non-heap memory, GC, thread count, CPU.</div></div>
+      <div class="pillar-card p-am"><div class="pillar-name am">Database</div><div class="pillar-def">Slow queries, pool usage, active connections, deadlocks.</div></div>
+      <div class="pillar-card p-pu"><div class="pillar-name pu">Infrastructure</div><div class="pillar-def">CPU, memory, disk, network, container/VM health.</div></div>
+      <div class="pillar-card p-cy"><div class="pillar-name cy">Business</div><div class="pillar-def">Successful/failed payments, bookings, certificate generation.</div></div>
+    </div>
+  </div>
+  <div class="naming-grid c1">
+    <div class="naming-card"><span class="naming-prefix">Tools</span><span class="naming-meaning">Actuator · Prometheus · Grafana · ELK stack.</span></div>
+  </div>
+
+  <!-- ── MOST ASKED DIFFERENCES ─────────────────────────── -->
+  <div class="section-label" id="diff">Most Asked Differences (Master Table)</div>
+  <table class="grid-table" style="margin-bottom:8px;">
+    <tr><th>Topic A</th><th>Topic B</th><th>Key Difference</th></tr>
+    <tr><td class="k">CrudRepository</td><td class="k2">JpaRepository</td><td>Basic CRUD only vs CRUD + pagination &amp; sorting</td></tr>
+    <tr><td class="k">JPQL</td><td class="k2">SQL</td><td>Entities/fields vs tables/columns</td></tr>
+    <tr><td class="k">Authentication</td><td class="k2">Authorization</td><td>Verify identity vs permitted actions/resources</td></tr>
+    <tr><td class="k">@Resource</td><td class="k2">@Autowired</td><td>Injects by Name→Type vs Type→Qualifier→Name</td></tr>
+    <tr><td class="k">Starter Dependencies</td><td class="k2">Manual Dependency Mgmt</td><td>Predefined bundled deps (e.g. spring-boot-starter-web) vs developer adds/maintains each lib (e.g. jjwt-api)</td></tr>
+    <tr><td class="k">@Configuration</td><td class="k2">@Component</td><td>Defines/manages beans via @Bean vs creates a Spring-managed bean itself</td></tr>
+    <tr><td class="k">BeanFactory</td><td class="k2">ApplicationContext</td><td>Basic IoC container vs extends it + advanced features</td></tr>
+    <tr><td class="k">JPA</td><td class="k2">Hibernate / Spring Data JPA</td><td>Specification vs Implementation vs Abstraction layer</td></tr>
+    <tr><td class="k">Optimistic Locking</td><td class="k2">Pessimistic Locking</td><td>Detect conflict via @Version vs prevent conflict via DB lock</td></tr>
+    <tr><td class="k">@Valid</td><td class="k2">@Validated</td><td>Basic bean validation vs adds validation groups + method-level validation</td></tr>
+    <tr><td class="k">@RequestBody</td><td class="k2">@ModelAttribute</td><td>JSON → Object (Jackson) vs Form/query params → Object</td></tr>
+    <tr><td class="k">@Controller</td><td class="k2">@RestController</td><td>Returns a view vs returns JSON/XML directly</td></tr>
+    <tr><td class="k">CommandLineRunner</td><td class="k2">ApplicationRunner</td><td>Raw String[] args vs typed ApplicationArguments API</td></tr>
+    <tr><td class="k">MVC</td><td class="k2">REST API</td><td>Returns views (JSP/HTML) via @Controller vs returns data (JSON/XML) via @RestController</td></tr>
+    <tr><td class="k">GET</td><td class="k2">POST</td><td>Retrieve (idempotent, no body needed) vs create resource (has body)</td></tr>
+    <tr><td class="k">PUT</td><td class="k2">PATCH</td><td>Replace entire resource vs partial update</td></tr>
+    <tr><td class="k">JWT</td><td class="k2">OAuth2</td><td>Token format/mechanism for stateless auth vs a full authorization framework/protocol</td></tr>
+    <tr><td class="k">OAuth2</td><td class="k2">OpenID Connect</td><td>Authorization only (access token) vs adds authentication (ID token) on top</td></tr>
+    <tr><td class="k">Eager Loading</td><td class="k2">Lazy Loading</td><td>Loads related data immediately vs only when accessed</td></tr>
+    <tr><td class="k">@Cacheable</td><td class="k2">@CacheEvict</td><td>Reads/populates cache vs removes cache entries</td></tr>
+    <tr><td class="k">Singleton Scope</td><td class="k2">Prototype Scope</td><td>One bean per container vs new bean on every request</td></tr>
+    <tr><td class="k">Monolith</td><td class="k2">Microservices</td><td>Single deployable unit vs independently deployable services</td></tr>
+    <tr><td class="k">save()</td><td class="k2">saveAndFlush()</td><td style="color:var(--muted);font-style:italic;">— listed in notes as a topic to revise, no detail written yet —</td></tr>
+    <tr><td class="k">Fetch Join</td><td class="k2">Entity Graph</td><td>JPQL-level join to fetch parent+child in one query vs declarative annotation controlling which associations load eagerly per query</td></tr>
+  </table>
+
+  <!-- ── TROUBLESHOOTING SCENARIOS ───────────────────────── -->
+  <div class="section-label" id="scenarios">Real-World Troubleshooting Scenarios</div>
+  <div class="problem-grid">
+    <div class="problem-card"><div class="problem-title">Multiple beans of same type — app fails to start</div><div class="problem-body">Spring throws <b>NoUniqueBeanDefinitionException</b>. Fix with <code>@Qualifier</code>, mark one <code>@Primary</code>, or inject by bean name.</div></div>
+    <div class="problem-card"><div class="problem-title">API randomly returns 401/403</div><div class="problem-body">Determine 401 (Authentication) vs 403 (Authorization). Verify JWT token, roles/permissions, Security config, token expiry, headers, logs.</div></div>
+    <div class="problem-card"><div class="problem-title">DB connection pool suddenly exhausted</div><div class="problem-body">Check logs + pool metrics. Root causes: connection leaks, slow queries, long transactions, traffic spike. Fix: optimize queries, release connections, tune HikariCP, scale.</div></div>
+    <div class="problem-card"><div class="problem-title">Memory usage keeps increasing</div><div class="problem-body">Determine leak vs normal growth. Monitor JVM heap, GC logs, heap dump. Fix: leaks, unclosed resources, large caches, excessive object creation.</div></div>
+    <div class="problem-card"><div class="problem-title">Users still see old behavior after deployment</div><div class="problem-body">Verify new version deployed, app restarted, caches refreshed, correct profile active, load balancer routing to updated instances.</div></div>
+    <div class="problem-card"><div class="problem-title">Logs missing in production</div><div class="problem-body">Check logging config, log level, file path, permissions, active profile, log rotation, forwarding to centralized logging.</div></div>
+    <div class="problem-card"><div class="problem-title">Inconsistent REST API response time</div><div class="problem-body">Investigate slow DB queries, external calls, thread/connection contention, GC pauses, network latency. Use APM tools, SQL plans, JVM metrics.</div></div>
+    <div class="problem-card"><div class="problem-title">Works locally, fails in production</div><div class="problem-body">Check logs, environment config, DB connectivity, dependencies, external services, server resources.</div></div>
+    <div class="problem-card"><div class="problem-title">Changed application.properties — no effect in prod</div><div class="problem-body">Check app restarted, correct file used, env vars overriding properties, correct profile active, latest build actually deployed.</div></div>
+    <div class="problem-card"><div class="problem-title">High traffic crash despite low CPU</div><div class="problem-body">Likely connection/thread pool exhaustion, memory issues, blocked threads, slow external APIs. Analyze thread dumps, heap, pools, dependencies.</div></div>
+    <div class="problem-card"><div class="problem-title">Handling duplicate API requests / idempotency</div><div class="problem-body">Use idempotency keys, DB unique constraints, validation checks; return the already-processed response for duplicates.</div></div>
+    <div class="problem-card"><div class="problem-title">Implementing audit logging / soft delete</div><div class="problem-body"><b>Audit:</b> capture user, action, timestamp, IP via AOP/service logging/JPA auditing. <b>Soft delete:</b> use a <code>deleted</code> flag + <code>@SQLDelete</code> + <code>@Where</code> to hide deleted rows.</div></div>
+    <div class="problem-card" style="border-left-color:var(--dim);"><div class="problem-title" style="color:var(--muted);">16. (blank in notes)</div><div class="problem-body" style="font-style:italic;">Listed as item 16 in the source notes with no question/answer written yet — a placeholder to fill in.</div></div>
+  </div>
+
+  <!-- ── PRODUCTION MISTAKES / WAR STORIES ──────────────── -->
+  <div class="sub-label">Production Issues Faced — STAR-style Answers</div>
+  <div class="problem-grid">
+    <div class="problem-card" style="border-left-color: var(--amber);"><div class="problem-title" style="color:var(--amber);">Admit cards not generated post-payment</div><div class="problem-body">Traced Payment → Seat Confirmation → Admit Card flow; found admit-card service failing due to missing config. <b>Fix:</b> corrected config + regenerated pending admit cards via batch job.</div></div>
+    <div class="problem-card" style="border-left-color: var(--amber);"><div class="problem-title" style="color:var(--amber);">Admin reports loading very slowly</div><div class="problem-body">Analyzed SQL — found missing indexes &amp; unnecessary joins. <b>Fix:</b> added indexes, optimized queries, added pagination. Result: 30s → 2s.</div></div>
+    <div class="problem-card" style="border-left-color: var(--amber);"><div class="problem-title" style="color:var(--amber);">Candidate approval screens slow (N+1)</div><div class="problem-body">Enabled Hibernate SQL logs, found N+1 while loading candidate documents. <b>Fix:</b> Join Fetch / Entity Graph.</div></div>
+    <div class="problem-card" style="border-left-color: var(--amber);"><div class="problem-title" style="color:var(--amber);">Payment deducted but seat not booked</div><div class="problem-body">Seat booking service timed out after payment succeeded. <b>Fix:</b> retry mechanism + reconciliation job + compensation handling.</div></div>
+    <div class="problem-card" style="border-left-color: var(--amber);"><div class="problem-title" style="color:var(--amber);">Seats shown available though all booked</div><div class="problem-body">Concurrent bookings updated seat counts incorrectly. <b>Fix:</b> transaction management + optimistic locking.</div></div>
+  </div>
+
+  <!-- ── SYSTEM DESIGN ───────────────────────────────────── -->
+  <div class="section-label" id="sysdesign">System Design — Payment Gateway Integration</div>
+  <div class="flow-panel">
+    <div class="flow-row vertical" style="gap:3px;">
+      <div class="flow-box source">User Clicks "Proceed"</div><span class="flow-arrow">↓</span>
+      <div class="flow-box inter">Create Order + Payment Record (PENDING)</div><span class="flow-arrow">↓</span>
+      <div class="flow-box inter">Redirect to Gateway (SBI ePay / ICICI Eazypay / Razorpay / Stripe / PayU)</div><span class="flow-arrow">↓</span>
+      <div class="flow-box inter">User Makes Payment</div><span class="flow-arrow">↓</span>
+      <div class="flow-box inter">Gateway Sends Callback/Webhook</div><span class="flow-arrow">↓</span>
+      <div class="flow-box inter">Verify Signature &amp; Validate Response</div><span class="flow-arrow">↓</span>
+      <div class="flow-box ok">Update Payment Status &amp; Complete Order</div>
+    </div>
+    <div class="api-desc" style="font-size:8px;margin-top:6px;">
+      <b style="color:var(--text)">Success:</b> show success, send email/SMS, proceed to next step. <b style="color:var(--text)">Failure:</b> show failure, allow retry (new payment attempt). <b style="color:var(--text)">Missed callback:</b> a scheduled reconciliation job runs every 30 min, checks all PENDING txns via the gateway's Transaction Status API and finalizes their status.
+    </div>
+  </div>
+
+  <!-- ── DEPLOYMENT ──────────────────────────────────────── -->
+  <div class="section-label" id="deploy">Zero-Downtime Deployment</div>
+  <div class="cards-grid">
+    <div class="card c-bl"><div class="card-name">Blue-Green</div><div class="card-desc">Two identical envs; deploy to inactive, switch traffic after validation.</div></div>
+    <div class="card c-gr"><div class="card-name">Rolling</div><div class="card-desc">Replace instances one by one, rest stay available.</div></div>
+    <div class="card c-am"><div class="card-name">Canary</div><div class="card-desc">Route small % of traffic to new version first, ramp up if healthy.</div></div>
+    <div class="card c-pu"><div class="card-name">K8s Rolling Update</div><div class="card-desc">Pods replaced gradually, desired healthy-pod count maintained.</div></div>
+  </div>
+  <div class="naming-grid c1">
+    <div class="naming-card"><span class="naming-prefix" style="background:var(--red-dim);color:var(--red);">Open Q</span><span class="naming-meaning" style="color:var(--muted);font-style:italic;">"Application behaves differently in Docker than locally. Why?" — listed in notes as a question to prepare, no answer written yet.</span></div>
+  </div>
+
+  <!-- ── 30 SEC SUMMARY ──────────────────────────────────── -->
+  <div class="section-label" id="summary">30-Second Spring Boot Summary</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span> Spring Boot = IoC + DI + Auto-Configuration + Starter Dependencies</div>
+      <div class="revision-item"><span class="chk">✓</span> Flow: Client → Controller → Service → Repository → Database</div>
+      <div class="revision-item"><span class="chk">✓</span> Security: Authentication + Authorization + JWT</div>
+      <div class="revision-item"><span class="chk">✓</span> Performance: Pagination + Caching + Indexing + HikariCP</div>
+      <div class="revision-item"><span class="chk">✓</span> JPA: Hibernate + JpaRepository + Transactions</div>
+      <div class="revision-item"><span class="chk">✓</span> Testing: JUnit + Mockito + Testcontainers</div>
+      <div class="revision-item"><span class="chk">✓</span> Microservices: OpenFeign + Kafka + API Gateway</div>
+      <div class="revision-item"><span class="chk">✓</span> @ConfigurationPropertiesScan — scans &amp; registers @ConfigurationProperties beans</div>
+      <div class="revision-item"><span class="chk">✓</span> SLF4J — logging facade used across the app</div>
+      <div class="revision-item"><span class="chk">✓</span> Content Negotiation — serve JSON or XML based on client Accept header</div>
+    </div>
+  </div>
+
+  <footer>Spring Boot &amp; Core Java Interview Revision — compiled from personal notes · covers annotations, lifecycles, flows, differences &amp; production war-stories</footer>
+
+</div><!-- /page -->
+</body>
+</html>
