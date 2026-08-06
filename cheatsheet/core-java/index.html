@@ -237,17 +237,21 @@
 <span class="c">    └──</span> <span class="am">Runtime — Overriding</span><span class="n">: Animal.speak() → Dog.speak() @Override, via Dynamic Method Dispatch: Animal a = new Dog();</span></div>
     </div>
     <div class="tree-panel">
-      <div class="tree-title">Abstraction: Interface vs Abstract Class</div>
+      <div class="tree-title">Abstraction:Abstract Class vs Interface</div>
       <div class="tree-body"><span class="c">│
-├──</span> <span class="i pu">Interface</span><span class="n">: 100% Contract — "What to do"</span>
-<span class="c">│   ├──</span> <span class="pu">Variables</span><span class="n">: public static final (constants only)</span>
-<span class="c">│   ├──</span> <span class="pu">Methods</span><span class="n">: Abstract, Default, Static</span>
-<span class="c">│   └──</span> <span class="pu">Inheritance</span><span class="n">: a class can implement multiple interfaces</span>
+├──</span> <span class="i bl">Abstract Class</span><span class="n">: Partial Implementation — "What + How"</span>
+<span class="c">│   ├──</span> <span class="bl">Variables</span><span class="n">: Instance, Static, Final variables</span>
+<span class="c">│   ├──</span> <span class="bl">Methods</span><span class="n">: Abstract and Concrete methods</span>
+<span class="c">│   ├──</span> <span class="bl">Constructors</span><span class="n">: Allowed</span>
+<span class="c">│   ├──</span> <span class="bl">Inheritance</span><span class="n">: Single inheritance</span>
+<span class="c">│   └──</span> <span class="bl">Keyword</span><span class="n">: extends</span>
 <span class="c">│
-└──</span> <span class="i bl">Abstract Class</span><span class="n">: Partial Implementation — "What + How (partial)"</span>
-<span class="c">    ├──</span> <span class="bl">Constructor</span><span class="n">: Allowed (called via super())</span>
-<span class="c">    ├──</span> <span class="bl">Methods</span><span class="n">: Abstract + Concrete together</span>
-<span class="c">    └──</span> <span class="bl">Inheritance</span><span class="n">: a class can extend only one abstract class</span></div>
+└──</span> <span class="i pu">Interface</span><span class="n">: Defines a Contract — "What to do"</span>
+<span class="c">    ├──</span> <span class="pu">Variables</span><span class="n">: public static final variables</span>
+<span class="c">    ├──</span> <span class="pu">Methods</span><span class="n">: Abstract, Default, Static (Private since Java 9)</span>
+<span class="c">    ├──</span> <span class="pu">Constructors</span><span class="n">: Not Allowed</span>
+<span class="c">    ├──</span> <span class="pu">Inheritance</span><span class="n">: Multiple inheritance</span>
+<span class="c">    └──</span> <span class="pu">Keyword</span><span class="n">: implements</span></div>
     </div>
   </div>
 
@@ -623,7 +627,7 @@
     <div class="naming-card"><span class="naming-prefix">Fail-Safe</span><span class="naming-arrow">→</span><span class="naming-meaning">iterates a snapshot copy, no exception (CopyOnWriteArrayList, ConcurrentHashMap)</span></div>
     <div class="naming-card"><span class="naming-prefix">HashSet internals</span><span class="naming-arrow">→</span><span class="naming-meaning">backed by a HashMap; element = key, dummy constant = value</span></div>
     <div class="naming-card"><span class="naming-prefix">TreeSet/TreeMap</span><span class="naming-arrow">→</span><span class="naming-meaning">Red-Black Tree; sort via Comparable or supplied Comparator</span></div>
-    <div class="naming-card"><span class="naming-prefix">Iterable vs Iterator</span><span class="naming-arrow">→</span><span class="naming-meaning">Iterable exposes <code>iterator()</code>; Iterator traverses via <code>hasNext()/next()</code></span></div>
+    <div class="naming-card"><span class="naming-prefix">Iterable vs Iterator</span><span class="naming-arrow">→</span><span class="naming-meaning">Iterable provides the <code>iterator()</code> to obtain an iterator; Iterator iterates elements using <code>hasNext()/next()</code></span></div>
     <div class="naming-card"><span class="naming-prefix">SortedMap vs NavigableMap</span><span class="naming-arrow">→</span><span class="naming-meaning">SortedMap = sorted keys; NavigableMap adds floor/ceiling/higher/lower navigation</span></div>
   </div>
   <div class="tip"><b>hashCode() / equals() contract:</b> Equal objects <b>must</b> have equal hashCodes. Same hashCode does <b>not</b> imply equal objects (collisions are normal). Override both together, and use immutable fields for map keys.</div>
@@ -647,7 +651,7 @@
 
   <!-- =========================================================== -->
   <div class="section-label big" id="threads">12. Multithreading Basics</div>
-
+  <div >Multithreading allows multiple threads to run concurrently within a single process.</div>
   <div class="tree-panel">
     <div class="tree-title">Thread Lifecycle</div>
     <div class="tree-body">NEW <span class="c">(created)</span> → RUNNABLE <span class="c">(start() called)</span> → RUNNING <span class="c">(CPU scheduled)</span> → <span class="am">WAITING / BLOCKED</span> <span class="c">(for lock/event)</span> → TERMINATED</div>
@@ -700,18 +704,22 @@
 
   <div class="section-label">Executor Framework & Async</div>
   <div class="naming-grid">
-    <div class="naming-card"><span class="naming-prefix">Why Executor over manual Thread?</span><span class="naming-arrow">→</span><span class="naming-meaning">Reuses threads via pool → less overhead, better resource control</span></div>
-    <div class="naming-card"><span class="naming-prefix">execute() vs submit()</span><span class="naming-arrow">→</span><span class="naming-meaning">execute() returns void; submit() returns a Future</span></div>
-    <div class="naming-card"><span class="naming-prefix">Future vs CompletableFuture</span><span class="naming-arrow">→</span><span class="naming-meaning">Future = blocking result holder; CompletableFuture = non-blocking, chainable async pipeline</span></div>
+  <div class="naming-card"><span class="naming-prefix">Executor Framework</span><span class="naming-arrow">→</span><span class="naming-meaning">Executor Framework automatically manages and executes threads using a thread pool instead of creating threads manually.</span></div>
+    <div class="naming-card"><span class="naming-prefix">Why Executor over manual Thread?</span><span class="naming-arrow">→</span><span class="naming-meaning">reuses existing threads via thread pool → less overhead, improves performance, better resource control</span></div>
+    <div class="naming-card"><span class="naming-prefix">execute() vs submit()</span><span class="naming-arrow">→</span><span class="naming-meaning">execute() - Executes a task and returns void; submit() - Executes a task and returns a Future object.</span>
+	</div>
+    <div class="naming-card"><span class="naming-prefix">Future vs CompletableFuture</span><span class="naming-arrow">→</span>
+	<div><span class="naming-meaning">Future = result of asynchronous computation, retreive result, blocking execution; </span><span class="naming-meaning">CompletableFuture = advanced Future,  asynchronous, non-blocking execution, task chaining.</span></div>
+	</div>
     <div class="naming-card"><span class="naming-prefix">ExecutorService lifecycle</span><span class="naming-arrow">→</span><span class="naming-meaning">Create → Submit → Execute → shutdown() (graceful) / shutdownNow() (force) → Terminate</span></div>
   </div>
 
   <div class="cards-grid cols-3">
     <div class="card card-cy"><div class="card-name">CountDownLatch</div><div class="card-desc">One thread waits for N other threads to finish (one-time use).</div></div>
     <div class="card card-bl"><div class="card-name">CyclicBarrier</div><div class="card-desc">N threads wait for each other at a barrier, then proceed together (reusable).</div></div>
-    <div class="card card-gr"><div class="card-name">Semaphore</div><div class="card-desc">Permit-based access control — limits concurrent access to a resource.</div></div>
-    <div class="card card-am"><div class="card-name">ThreadLocal</div><div class="card-desc">Each thread gets its own isolated copy of a variable.</div></div>
-    <div class="card card-pu"><div class="card-name">Fork/Join Framework</div><div class="card-desc">Java 7+ — recursively splits a big task into subtasks, runs in parallel, combines results.</div></div>
+    <div class="card card-gr"><div class="card-name">Semaphore</div><div class="card-desc">Permit-based access control (shared resource) —  permit before accessing resource & release after use.</div></div>
+    <div class="card card-am"><div class="card-name">ThreadLocal</div><div class="card-desc">Each thread gets its own independent copy of a variable. changes made by one thread are not visible to other threads. </div></div>
+    <div class="card card-pu"><div class="card-name">Fork/Join Framework</div><div class="card-desc">Java 7+ — divides a large task into smaller subtasks, executes in parallel, combines results.</div></div>
     <div class="card card-re"><div class="card-name">ConcurrentModificationException</div><div class="card-desc">Thrown when a collection is structurally modified while being iterated (fail-fast).</div></div>
   </div>
 
@@ -722,17 +730,17 @@
     <div class="card card-cy"><div class="card-name">Functional Interface</div><div class="card-desc">Exactly <b>one</b> abstract method (any number of default/static methods). Enables lambdas. <code>@FunctionalInterface</code> is optional but recommended.</div></div>
     <div class="card card-bl"><div class="card-name">Lambda Expressions</div><div class="card-desc">Concise implementation of a functional interface; reduces boilerplate vs anonymous classes.</div></div>
     <div class="card card-gr"><div class="card-name">Method References</div><div class="card-desc">Shorthand for a lambda that just calls an existing method: <code>System.out::println</code>.</div></div>
-    <div class="card card-am"><div class="card-name">Default / Static Interface Methods</div><div class="card-desc">Default: inherited by class, overridable, called on object. Static: belongs to interface, not overridable.</div></div>
+    <div class="card card-am"><div class="card-name">Default / Static Interface Methods</div><div class="card-desc">Default: Inherited by Class, Called using Object, overridden.</div><div class="card-desc">Static: belongs to interface, Called using interface, cannot overridden.</div></div>
   </div>
 
   <div class="section-label">Core Functional Interfaces</div>
   <div class="table-panel">
     <table>
       <tr><th>Interface</th><th>Signature</th><th>Purpose</th></tr>
-      <tr><td class="cell-hl">Predicate&lt;T&gt;</td><td><code>test(T) → boolean</code></td><td>Condition check</td></tr>
-      <tr><td class="cell-hl">Function&lt;T,R&gt;</td><td><code>apply(T) → R</code></td><td>Takes input, returns output</td></tr>
-      <tr><td class="cell-hl">Supplier&lt;T&gt;</td><td><code>get() → T</code></td><td>No input, returns output</td></tr>
       <tr><td class="cell-hl">Consumer&lt;T&gt;</td><td><code>accept(T) → void</code></td><td>Takes input, no output</td></tr>
+	  <tr><td class="cell-hl">Supplier&lt;T&gt;</td><td><code>get() → T</code></td><td>No input, returns output</td></tr>
+	  <tr><td class="cell-hl">Function&lt;T,R&gt;</td><td><code>apply(T) → R</code></td><td>Takes input, returns output</td></tr>
+	  <tr><td class="cell-hl">Predicate&lt;T&gt;</td><td><code>test(T) → boolean</code></td><td>Takes input, returns boolean</td></tr>
     </table>
   </div>
 
@@ -744,12 +752,13 @@
       <div class="pipe-box term">Terminal op (collect, forEach, reduce)</div>
     </div>
     <div class="note">Intermediate ops are <b>lazy</b> — nothing executes until a terminal op is invoked.</div>
+	 <div class="note">Source provides data to the stream. Intermediate operations prepare/transform the data and are lazy. Terminal operations execute the stream and produce the final result.</div>
   </div>
   <div class="naming-grid">
     <div class="naming-card"><span class="naming-prefix">map() vs flatMap()</span><span class="naming-arrow">→</span><span class="naming-meaning">map: 1-to-1 transform (List&lt;Employee&gt;→List&lt;List&lt;Skill&gt;&gt;). flatMap: transform + flatten (→List&lt;Skill&gt;)</span></div>
     <div class="naming-card"><span class="naming-prefix">Optional</span><span class="naming-arrow">→</span><span class="naming-meaning">Avoids NullPointerException. Best for method <b>return types</b> — avoid as a class field</span></div>
-    <div class="naming-card"><span class="naming-prefix">Parallel Streams</span><span class="naming-arrow">→</span><span class="naming-meaning">Uses common ForkJoinPool. Good for CPU-heavy, large datasets — not always faster; risk of overhead on small data</span></div>
-    <div class="naming-card"><span class="naming-prefix">Collectors</span><span class="naming-arrow">→</span><span class="naming-meaning">Build a container, accumulate stream elements, return final List/Set/Map/String/grouped result</span></div>
+    <div class="naming-card"><span class="naming-prefix">Parallel Streams</span><span class="naming-arrow">→</span><span class="naming-meaning"> Processes stream elements using multiple threads. Uses common ForkJoinPool, splits data into tasks, executes concurrently & combines results. Good for CPU-heavy, large datasets — not always faster; risk of overhead on small data.</span></div>
+    <div class="naming-card"><span class="naming-prefix">Collectors</span><span class="naming-arrow">→</span><span class="naming-meaning">collect or transform processed stream elements into final result such as a List, Set, Map, String, or grouped data.</span></div>
   </div>
   <div class="trap"><b>Trap:</b> Don't default to parallel streams for "performance" — measure first. Small collections or I/O-bound work often get <b>slower</b> due to thread coordination overhead.</div>
 
@@ -762,7 +771,7 @@
       <div class="cmp-header"><span class="cmp-name bl">Shallow Copy</span></div>
       <div class="cmp-rows">
         <div class="cmp-row"><span class="cmp-key">Primitives</span><span class="cmp-val">Copied</span></div>
-        <div class="cmp-row"><span class="cmp-key">References</span><span class="cmp-val">Shared — nested object changes reflect in both</span></div>
+        <div class="cmp-row"><span class="cmp-key">References</span><span class="cmp-val">Shallow copy copies references</span></div>
       </div>
     </div>
     <div class="cmp-divider"></div>
@@ -770,11 +779,11 @@
       <div class="cmp-header"><span class="cmp-name pu">Deep Copy</span></div>
       <div class="cmp-rows">
         <div class="cmp-row"><span class="cmp-key">Primitives</span><span class="cmp-val">Copied</span></div>
-        <div class="cmp-row"><span class="cmp-key">References</span><span class="cmp-val">Nested objects also copied → fully independent</span></div>
+        <div class="cmp-row"><span class="cmp-key">References</span><span class="cmp-val">deep copy creates independent copies of nested objects</span></div>
       </div>
     </div>
   </div>
-  <div class="note"><code>Cloneable</code> is a marker interface required for <code>clone()</code>, otherwise <code>CloneNotSupportedException</code>.</div>
+  <div class="note"><code>Cloneable</code> is a marker interface indicates object can be cloned, otherwise <code>CloneNotSupportedException</code>.</div>
 
   <div class="section-label">Immutable Class — How to Build</div>
   <div class="flow-panel">
@@ -782,7 +791,7 @@
       <div class="pipe-box source">final class</div><span class="pipe-arrow">→</span>
       <div class="pipe-box inter">private final fields</div><span class="pipe-arrow">→</span>
       <div class="pipe-box inter">No Setters</div><span class="pipe-arrow">→</span>
-      <div class="pipe-box term">Init via Constructor</div><span class="pipe-arrow">→</span>
+      <div class="pipe-box term">Initialize via Constructor</div><span class="pipe-arrow">→</span>
       <div class="pipe-box gc">Defensive Copies for mutable fields</div>
     </div>
     <div class="note">Benefits: Thread Safe, Simple, Secure, Cache Friendly, Reliable. Examples: String, Wrapper Classes, Record. Defensive copying = return a copy (not the original reference) of mutable internal state to protect encapsulation.</div>
@@ -880,7 +889,9 @@
       <div class="pipe-box term">Eligible for GC</div><span class="pipe-arrow">→</span>
       <div class="pipe-box gc">Memory Reclaimed</div>
     </div>
-    <div class="note">Eligible when: reference = null · out of scope · anonymous object · reassigned reference · island of isolation. GC Roots are the starting points for reachability analysis — anything reachable from a root is "alive". <code>System.gc()</code> only requests GC, not guaranteed.</div>
+    <div class="note">Eligible when: reference = null · out of scope · anonymous object · reassigned reference · island of isolation.</div>
+	<div class="note">GC Roots are the starting points for reachability analysis — anything reachable from a GC root is "alive". & not reachable becomes eligble for GC</div>
+	<div class="note"><code>System.gc()</code> only requests GC, not guaranteed.</div>
   </div>
 
   <div class="table-panel">
@@ -891,10 +902,10 @@
       <tr><td>StackOverflowError</td><td>Deep or infinite recursion exhausts the Stack</td></tr>
       <tr><td>Young → Old Generation</td><td>New objects start in Young Gen; survivors of repeated GC cycles get promoted to Old Gen</td></tr>
       <tr><td>Minor vs Major GC</td><td>Minor: cleans Young Gen, fast. Major/Full: cleans Old Gen, slower/expensive</td></tr>
-      <tr><td>Stop-The-World</td><td>JVM pauses <b>all</b> app threads during (parts of) GC</td></tr>
+      <tr><td>Stop-The-World</td><td>JVM pauses <b>all</b> application threads during (parts of) Garbage Collection</td></tr>
       <tr><td>PermGen → Metaspace</td><td>PermGen (fixed size, caused OOM) removed in Java 8, replaced by dynamically-growing Metaspace</td></tr>
       <tr><td>JIT Compiler</td><td>Converts hot bytecode to native machine code at runtime for speed</td></tr>
-      <tr><td>GC Algorithms</td><td>Mark-Sweep (mark live, remove rest), Mark-Compact (+ compact memory), Generational Copying (move survivors between regions)</td></tr>
+      <tr><td>GC Algorithms</td><td>Mark-Sweep (<b>Mark</b> Live Objects, <b>Remove</b> Unused Objects), Mark-Compact (Mark Live Objects, Remove Unused Objects, Compact Memory), Generational Copying (Copy/Move Live Objects from one memory area to another)</td></tr>
       <tr><td>Analyzing memory leaks</td><td>Heap dump + Eclipse MAT / VisualVM → find retained objects with no legitimate live reference</td></tr>
       <tr><td>GC drawbacks</td><td>STW pauses, CPU/memory overhead, unpredictable timing, latency spikes under load</td></tr>
     </table>
