@@ -171,7 +171,7 @@
       <div class="tree-title">Type Casting & Operators</div>
       <div class="tree-body"><span class="i gr">Implicit</span> <span class="n">small→large, automatic, safe (int → long)</span>
 <span class="i am">Explicit</span> <span class="n">large→small, manual cast, may lose data (double)→(int)</span>
-<span class="n">Arithmetic + − * / % · Relational == != &gt; &lt; · Logical &amp;&amp; || · Bitwise &amp; | ^ · Shift &lt;&lt; &gt;&gt; &gt;&gt;&gt; · Ternary ?:</span></div>
+<span class="n">Arithmetic + − * / % · Relational == != &gt; &lt; · Logical &amp;&amp; || · Bitwise &amp; | ^ · Shift &lt;&lt; &gt;&gt; &gt;&gt;&gt; · Ternary ? :</span></div>
     </div>
   </div>
 
@@ -278,7 +278,7 @@
   </div>
 
   <div class="trap"><b>Trap — Why no multiple inheritance via classes?</b> Avoids the Diamond Problem — ambiguity over which parent method to inherit when two parents define the same method. Solved in Java via interfaces + default methods with explicit resolution required.</div>
-  <div class="trap"><b>Trap — Object Slicing:</b> Not possible in Java (unlike C++) — Java always uses references, never copies objects by value.</div>
+  <div class="trap"><b>Trap — Object Slicing:</b>child object is converted to a parent object by value; Not possible in Java (unlike C++) — Java always uses references, never copies objects by value.</div>
 
   <!-- =========================================================== -->
   <div class="section-label big" id="construct">4. Constructors, this/super, Overload vs Override</div>
@@ -356,7 +356,11 @@
       <div class="tree-body"><span class="c">│
 ├──</span> <span class="i cy">String s1 = "Java";</span> <span class="n">→ String Constant Pool (special Heap area), reused if value already exists</span>
 <span class="c">└──</span> <span class="i am">String s2 = new String("Java");</span> <span class="n">→ new Heap Object, separate from pool</span></div>
-      <div class="note">intern() returns the pooled reference for a <code>new String()</code>. Pool purpose: reuse objects, save memory, improve performance.</div>
+	<div class="note">
+	  <code>new String()</code> → new String object + literal may exist in pool<br>
+	  <code>intern()</code> → pooled reference
+	</div>
+    <div class="note">Pool purpose: reuse objects, save memory, improve performance.</div>
     </div>
     <div class="cmp-panel">
       <div class="cmp-card">
