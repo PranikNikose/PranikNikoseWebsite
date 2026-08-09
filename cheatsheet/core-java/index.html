@@ -417,7 +417,7 @@
       <tr><td>Access</td><td>Index-based, fast, continuous memory</td><td>Index-based, rich utility API (add/remove/search)</td></tr>
     </table>
   </div>
-  <div class="naming-grid cols-3">
+  <div class="naming-grid cols-3" style="margin-top:10px;">
     <div class="naming-card"><span class="naming-prefix">for</span><span class="naming-arrow">→</span><span class="naming-meaning">iteration count known</span></div>
     <div class="naming-card"><span class="naming-prefix">while</span><span class="naming-arrow">→</span><span class="naming-meaning">count unknown</span></div>
     <div class="naming-card"><span class="naming-prefix">do-while</span><span class="naming-arrow">→</span><span class="naming-meaning">runs ≥ once (condition checked after)</span></div>
@@ -532,7 +532,7 @@
     </div>
   </div>
 
-  <div class="naming-grid">
+  <div class="naming-grid" style="margin-top:10px;">
     <div class="naming-card"><span class="naming-prefix">throw</span><span class="naming-arrow">→</span><span class="naming-meaning">explicitly throws an exception instance</span></div>
     <div class="naming-card"><span class="naming-prefix">throws</span><span class="naming-arrow">→</span><span class="naming-meaning">declares that a method might throw an exception</span></div>
     <div class="naming-card"><span class="naming-prefix">finally</span><span class="naming-arrow">→</span><span class="naming-meaning">executes regardless of exception occurs or not (cleanup)</span></div>
@@ -562,6 +562,62 @@
       <tr><td>Access</td><td>Index-based</td><td>No index</td><td>Key-based</td></tr>
     </table>
   </div>
+
+  <div class="section-label">Naming Patterns</div>
+  <div class="naming-grid">
+    <div class="naming-card"><span class="naming-prefix">Hash</span><span class="naming-arrow">→</span><span class="naming-meaning">No Insertion Order Guarantee</span></div>
+    <div class="naming-card"><span class="naming-prefix">Linked</span><span class="naming-arrow">→</span><span class="naming-meaning">Insertion Order</span></div>
+    <div class="naming-card"><span class="naming-prefix">Tree</span><span class="naming-arrow">→</span><span class="naming-meaning">Sorted Order</span></div>
+  </div>
+
+  <div class="section-label">Collection & Map Hierarchy</div>
+  <div class="tree-panel">
+      <div class="tree-title">Collection Framework Hierarchy</div>
+      <div class="tree-body"><span class="c">│
+│</span>
+<span class="c">├──</span> <span class="i">Collection (I)</span><span class="n">: Root Interface for List, Set and Queue.</span>
+<span class="c">│   │
+│   ├──</span> <span class="i bl">List (I)</span><span class="n">: Duplicate Allowed, Insertion Order Preserved, Index Based</span>
+<span class="c">│   │   ├──</span> <span class="bl">ArrayList (C)</span><span class="n">: Dynamic Array Structure, Random Access Fast, Middle Insertion/Deletion Slow</span>
+<span class="c">│   │   ├──</span> <span class="bl">LinkedList (C)</span><span class="n">: Doubly Linked List Structure,Insertion/Deletion Fast, Random Access Slow</span>
+<span class="c">│   │   ├──</span> <span class="cy">Vector (C)</span><span class="n">: Same as ArrayList, Synchronized &amp; Thread Safe, Legacy</span>
+<span class="c">│   │   │   └──</span> <span class="cy">Stack (C)</span><span class="n">: Last In First Out (LIFO)</span>
+<span class="c">│   │
+│   ├──</span> <span class="i gr">Set (I)</span><span class="n">: Unique Elements (No Duplicates)</span>
+<span class="c">│   │   ├──</span> <span class="gr">HashSet (C)</span><span class="n">: No Insertion Order Guarantee</span>
+<span class="c">│   │   │   └──</span> <span class="gr">LinkedHashSet (C)</span><span class="n">: Insertion Order</span>
+<span class="c">│   │   │
+│   │   └──</span> <span class="i gr">SortedSet (I)</span><span class="n">: Elements are automatically stored in sorted order</span>
+<span class="c">│   │       └──</span> <span class="i gr">NavigableSet (I)</span><span class="n">: SortedSet + Navigation Methods</span>
+<span class="c">│   │           └──</span> <span class="gr">TreeSet (C)</span><span class="n">: Sorted Order, Red-Black Tree</span>
+<span class="c">│   │
+│   └──</span> <span class="i am">Queue (I)</span><span class="n">: First In First Out (FIFO)</span>
+<span class="c">│       ├──</span> <span class="am">PriorityQueue (C)</span><span class="n">: Based on Priority (Default: Ascending Order)</span>
+<span class="c">│       ├──</span> <span class="i am">Deque (I)</span><span class="n">: Double Ended Queue</span>
+<span class="c">│       │   ├──</span> <span class="am">ArrayDeque (C)</span>
+<span class="c">│       │   └──</span> <span class="am">LinkedList (C)</span>
+<span class="c">│       │
+│       └──</span> <span class="i cy">BlockingQueue (I)</span><span class="n">: Multithreading</span>
+<span class="c">│           ├──</span> <span class="cy">LinkedBlockingQueue (C)</span>
+<span class="c">│           ├──</span> <span class="cy">ArrayBlockingQueue (C)</span>
+<span class="c">│           └──</span> <span class="cy">PriorityBlockingQueue (C)</span></div>
+    </div>
+    <div class="tree-panel" style="margin-top:8px;">
+      <div class="tree-title">Map Hierarchy</div>
+      <div class="tree-body"><span class="c">└──</span> <span class="i pu">Map (I)</span><span class="n">: Key-Value Pair, Keys Unique, Values Duplicate</span>
+<span class="c">    │
+    ├──</span> <span class="pu">HashMap (C)</span><span class="n">: No Insertion Order Guarantee, 1 Null Key Allowed</span>
+<span class="c">    │   └──</span> <span class="pu">LinkedHashMap (C)</span><span class="n">: Insertion Order, 1 Null Key Allowed</span>
+<span class="c">    │
+    ├──</span> <span class="pu">WeakHashMap (C)</span><span class="n">: If key has no strong reference, GC can remove the corresponding entry</span>
+<span class="c">    ├──</span> <span class="pu">IdentityHashMap (C)</span><span class="n">: Uses == instead of equals() for key comparison</span>
+<span class="c">    ├──</span> <span class="re">Hashtable (C)</span><span class="n">: Synchronized &amp; Thread Safe, No Null Key/Value, Legacy, Whole Map Locked</span>
+<span class="c">    ├──</span> <span class="cy">ConcurrentHashMap (C)</span><span class="n">: Modern Thread Safe Map, No Null Key/Value, Better Performance than Hashtable, Bucket/Node Locked</span>
+<span class="c">    │
+    └──</span> <span class="i pu">SortedMap (I)</span><span class="n">: Keys are automatically stored in sorted order</span>
+<span class="c">        └──</span> <span class="i pu">NavigableMap (I)</span><span class="n">: SortedMap + Navigation Methods</span>
+<span class="c">            └──</span> <span class="pu">TreeMap (C)</span><span class="n">: Sorted by Key, No Null Key, Red-Black Tree</span></div>
+    </div>
 
   <div class="section-label">ArrayList vs LinkedList vs Vector</div>
   <div class="cmp-panel">
@@ -594,25 +650,88 @@
   </div>
 
   <div class="section-label">HashMap — Internal Working (High Frequency)</div>
-  
+
   <div class="flow-panel">
-    <div class="flow-row">
-      <div class="pipe-box source">put(key,val)</div><span class="pipe-arrow">→</span>
-      <div class="pipe-box inter">hashCode() → bucket index</div><span class="pipe-arrow">→</span>
-      <div class="pipe-box inter">empty? store directly : collision → LinkedList</div><span class="pipe-arrow">→</span>
-      <div class="pipe-box term">&gt;8 nodes in bucket → Red-Black Tree (Java 8 treeification)</div>
+    <div class="flow-cols">
+      <!-- PUT flow -->
+      <div>
+        <div class="flow-col-title">put(key, value)</div>
+        <div class="flow-step">
+          <div class="flow-box root">HashMap</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-box action">Array of Buckets</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-box hash">hashCode(key)</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-box bucket">Bucket Index Calculation</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-box" style="color:#fff;border-color:var(--dim);">Bucket Empty?</div>
+          <div class="flow-branch-arrows"><div class="flow-arrow">↓</div><div class="flow-arrow">↓</div></div>
+          <div class="flow-branch">
+            <div class="flow-branch-item">
+              <div class="flow-branch-label">Yes</div>
+              <div class="flow-box store">Store Entry</div>
+            </div>
+            <div class="flow-branch-item">
+              <div class="flow-branch-label">No</div>
+              <div class="flow-box coll">Collision</div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-box ll">Linked List</div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-box" style="color:#fff;border-color:var(--dim);">Nodes &gt; 8?</div>
+              <div class="flow-branch-arrows"><div class="flow-arrow">↓</div><div class="flow-arrow">↓</div></div>
+              <div class="flow-branch">
+                <div class="flow-branch-item">
+                  <div class="flow-branch-label">Yes</div>
+                  <div class="flow-box tree">Red-Black Tree</div>
+                </div>
+                <div class="flow-branch-item">
+                  <div class="flow-branch-label">No</div>
+                  <div class="flow-box ll">Linked List</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- GET flow -->
+      <div>
+        <div class="flow-col-title">get(key)</div>
+        <div class="flow-step">
+          <div class="flow-box action">get(key)</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-box hash">hashCode(key)</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-box bucket">Find Bucket</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-box eq">equals(key)</div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-box ret">Return Value</div>
+        </div>
+        <div class="rule-box">
+          <div class="rule-row">
+            <span class="rule-kw">hashCode()</span>
+            <span class="rule-arr">→</span>
+            <span class="rule-desc">Finds Bucket</span>
+          </div>
+          <div class="rule-row">
+            <span class="rule-kw">equals()&nbsp;&nbsp;</span>
+            <span class="rule-arr">→</span>
+            <span class="rule-desc">Finds Exact Object</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="note"><code>get(key)</code>: hashCode() locates bucket → equals() finds exact key within the bucket.</div>
   </div>
 
   <div class="section-label">Map Family Comparison</div>
   <div class="table-panel">
     <table>
       <tr><th></th><th>HashMap</th><th>LinkedHashMap</th><th>TreeMap</th><th>Hashtable</th><th>ConcurrentHashMap</th></tr>
-      <tr><td>Order</td><td>No order</td><td>Insertion order</td><td>Sorted (Red-Black Tree)</td><td>No order</td></tr>
-      <tr><td>Null key</td><td class="yes">1 allowed</td><td class="yes">1 allowed</td><td class="no">Not allowed</td><td class="no">Not allowed</td></tr>
-      <tr><td>Thread-safe</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes (whole map locked)</td></tr>
-      <tr><td>Use when</td><td>Default fast map</td><td>Need HashMap speed + insertion order</td><td>Need sorted keys, O(log n) ops</td><td>Legacy code only</td></tr>
+      <tr><td>Order</td><td>No order</td><td>Insertion order</td><td>Sorted (Red-Black Tree)</td><td>No order</td><td>No order</td></tr>
+      <tr><td>Null key</td><td class="yes">1 allowed</td><td class="yes">1 allowed</td><td class="no">Not allowed</td><td class="no">Not allowed</td><td class="no">Not allowed</td></tr>
+      <tr><td>Thread-safe</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes (whole map locked)</td><td class="yes">Yes (bucket/node-level)</td></tr>
+      <tr><td>Use when</td><td>Default fast map</td><td>Need HashMap speed + insertion order</td><td>Need sorted keys, O(log n) ops</td><td>Legacy code only</td><td>High-concurrency reads/writes</td></tr>
     </table>
   </div>
 
@@ -649,20 +768,20 @@
       <tr><td>Perf under concurrency</td><td>N/A single-thread</td><td>Slow</td><td>Slow</td><td class="cell-hl">Fast (fine-grained locking)</td></tr>
     </table>
   </div>
-  <div class="cards-grid cols-2">
+  <div class="cards-grid cols-2" style="margin-top:10px;">
     <div class="card card-cy"><div class="card-name">CopyOnWriteArrayList</div><div class="card-desc">Every write creates a new array copy. Best for read-heavy, rarely-written lists. Fail-safe iteration.</div></div>
     <div class="card card-bl"><div class="card-name">Custom List/Set/Map</div><div class="card-desc">Custom List → dynamic array. Custom Set → backed by a Map (dedupe). Custom Map → hash table + buckets + key-value nodes.</div></div>
   </div>
 
   <!-- =========================================================== -->
   <div class="section-label big" id="threads">12. Multithreading Basics</div>
-  <div >Multithreading allows multiple threads to run concurrently within a single process.</div>
+  <div class="section-intro">Multithreading allows multiple threads to run concurrently within a single process.</div>
   <div class="tree-panel">
     <div class="tree-title">Thread Lifecycle</div>
     <div class="tree-body">NEW <span class="c">(created)</span> → RUNNABLE <span class="c">(start() called)</span> → RUNNING <span class="c">(CPU scheduled)</span> → <span class="am">WAITING / BLOCKED</span> <span class="c">(for lock/event)</span> → TERMINATED</div>
   </div>
 
-  <div class="naming-grid">
+  <div class="naming-grid" style="margin-top:10px;">
     <div class="naming-card"><span class="naming-prefix">Process vs Thread</span><span class="naming-arrow">→</span><span class="naming-meaning">Process = independent running program; Thread = smallest execution unit inside a process</span></div>
     <div class="naming-card"><span class="naming-prefix">Runnable vs Thread</span><span class="naming-arrow">→</span><span class="naming-meaning">Runnable defines the task; Thread class executes it</span></div>
     <div class="naming-card"><span class="naming-prefix">start() vs run()</span><span class="naming-arrow">→</span><span class="naming-meaning">start() creates a new thread and invokes run(); run() alone just executes task on the current thread — no new thread!</span></div>
@@ -719,7 +838,7 @@
     <div class="naming-card"><span class="naming-prefix">ExecutorService lifecycle</span><span class="naming-arrow">→</span><span class="naming-meaning">Create → Submit → Execute → shutdown() (graceful) / shutdownNow() (force) → Terminate</span></div>
   </div>
 
-  <div class="cards-grid cols-3">
+  <div class="cards-grid cols-3" style="margin-top:10px;">
     <div class="card card-cy"><div class="card-name">CountDownLatch</div><div class="card-desc">One thread waits for N other threads to finish (one-time use).</div></div>
     <div class="card card-bl"><div class="card-name">CyclicBarrier</div><div class="card-desc">N threads wait for each other at a barrier, then proceed together (reusable).</div></div>
     <div class="card card-gr"><div class="card-name">Semaphore</div><div class="card-desc">Permit-based access control (shared resource) —  permit before accessing resource & release after use.</div></div>
@@ -759,7 +878,7 @@
     <div class="note">Intermediate ops are <b>lazy</b> — nothing executes until a terminal op is invoked.</div>
 	 <div class="note">Source provides data to the stream. Intermediate operations prepare/transform the data and are lazy. Terminal operations execute the stream and produce the final result.</div>
   </div>
-  <div class="naming-grid">
+  <div class="naming-grid" style="margin-top:10px;">
     <div class="naming-card"><span class="naming-prefix">map() vs flatMap()</span><span class="naming-arrow">→</span><span class="naming-meaning">map: 1-to-1 transform (List&lt;Employee&gt;→List&lt;List&lt;Skill&gt;&gt;). flatMap: transform + flatten (→List&lt;Skill&gt;)</span></div>
     <div class="naming-card"><span class="naming-prefix">Optional</span><span class="naming-arrow">→</span><span class="naming-meaning">Avoids NullPointerException. Best for method <b>return types</b> — avoid as a class field</span></div>
     <div class="naming-card"><span class="naming-prefix">Parallel Streams</span><span class="naming-arrow">→</span><span class="naming-meaning"> Processes stream elements using multiple threads. Uses common ForkJoinPool, splits data into tasks, executes concurrently & combines results. Good for CPU-heavy, large datasets — not always faster; risk of overhead on small data.</span></div>
@@ -768,7 +887,7 @@
   <div class="trap"><b>Trap:</b> Don't default to parallel streams for "performance" — measure first. Small collections or I/O-bound work often get <b>slower</b> due to thread coordination overhead.</div>
 
   <!-- =========================================================== -->
-  <div class="section-label big" id="equality">15. Cloning, Immutability, equals/hashCode, Comparable vs Comparator</div>
+  <div class="section-label big" id="equality">15. Cloning, Immutability, equals/hashCode</div>
 
   <div class="section-label">Shallow vs Deep Copy</div>
   <div class="cmp-panel">
@@ -825,16 +944,6 @@
         <div class="pipe-box gc">Correct Entry</div>
       </div>
       <div class="note">Rule: Equal objects must have the same hashCode(). Overriding only equals() breaks HashMap/HashSet.</div>
-    </div>
-  </div>
-
-  <div class="section-label">Comparable vs Comparator (recap)</div>
-  <div class="cmp-panel">
-    <div class="cmp-card">
-      <div class="cmp-rows">
-        <div class="cmp-row"><span class="cmp-key">Comparable</span><span class="cmp-val">Single / Natural Ordering, inside class, <code>compareTo()</code></span></div>
-        <div class="cmp-row"><span class="cmp-key">Comparator</span><span class="cmp-val">Multiple / Custom Ordering, outside class, <code>compare()</code></span></div>
-      </div>
     </div>
   </div>
 
@@ -899,7 +1008,7 @@
 	<div class="note"><code>System.gc()</code> only requests GC, not guaranteed.</div>
   </div>
 
-  <div class="table-panel">
+  <div class="table-panel" style="margin-top:10px;">
     <table>
       <tr><td>Memory Leak</td><td>Unused object but reference <b>still exists</b> → never collected. Common causes: static collections, unclosed resources, listeners, unbounded caches, ThreadLocal.</td></tr>
       <tr><td>Strong / Weak / Soft / Phantom Ref</td><td>Strong → one normal reference, so GC cannot remove it. Weak → no strong reference, so GC can remove it (used in caching). Soft → removes when memory is low. Phantom → advanced cleanup, rare in interviews.</td></tr>

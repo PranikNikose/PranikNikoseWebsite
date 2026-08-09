@@ -17,6 +17,7 @@ body{
 .prompt{color:var(--gr); font-weight:700; font-size:20px;}
 .title{font-size:22px; font-weight:700; color:#fff; letter-spacing:.3px;}
 .subtitle{color:var(--dim); margin-top:6px; font-size:13px;}
+.section-intro{color:var(--dim2); font-size:13px; margin:4px 0 12px;}
 .toc{margin-top:14px; display:flex; flex-wrap:wrap; gap:6px 10px;}
 .toc a{color:var(--cy); text-decoration:none; font-size:12px; border:1px solid var(--border-soft); padding:3px 9px; border-radius:20px;}
 .toc a:hover{border-color:var(--cy);}
@@ -78,6 +79,7 @@ body{
 .tree-body .i{font-weight:700;}
 .tree-body .cy{color:var(--cy);} .tree-body .bl{color:var(--bl);} .tree-body .gr{color:var(--gr);}
 .tree-body .am{color:var(--am);} .tree-body .pu{color:var(--pu);} .tree-body .re{color:var(--re);}
+.tree-body .dim{color:var(--dim);}
 
 /* API TABLE */
 table.api-table{width:100%; border-collapse:collapse; font-size:12.5px;}
@@ -140,6 +142,36 @@ table.api-table td{padding:5px 6px; border-bottom:1px solid var(--border-soft); 
 .flow-vert{display:flex; flex-direction:column; align-items:flex-start; gap:6px;}
 .flow-vert .pipe-arrow{align-self:center; margin-left:60px;}
 
+/* BRANCHING FLOW (HashMap put/get) */
+.flow-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.flow-col-title{font-size:11px; font-weight:600; color:var(--pu); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; padding-bottom:5px; border-bottom:1px solid var(--border);}
+.flow-step{display:flex; flex-direction:column; align-items:center; margin-bottom:0;}
+.flow-box{background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:5px 10px; font-size:12px; color:#fff; text-align:center; width:100%; font-weight:500;}
+.flow-box.root{border-color:var(--pu); color:var(--pu); font-weight:700;}
+.flow-box.action{border-color:var(--bl); color:var(--bl);}
+.flow-box.hash{border-color:var(--am); color:var(--am);}
+.flow-box.bucket{border-color:var(--cy); color:var(--cy);}
+.flow-box.store{border-color:var(--gr); color:var(--gr);}
+.flow-box.coll{border-color:var(--re); color:var(--re);}
+.flow-box.tree{border-color:var(--am); color:var(--am);}
+.flow-box.ll{border-color:var(--bl); color:var(--bl);}
+.flow-box.eq{border-color:var(--gr); color:var(--gr);}
+.flow-box.ret{border-color:var(--pu); color:var(--pu);}
+.flow-box.warn{border-color:var(--re); color:var(--re);}
+.flow-sub-title{color:var(--dim); font-size:12px; margin-top:8px;}
+.flow-cols .flow-arrow{color:var(--dim); font-size:12px; line-height:1.2; text-align:center; margin:2px 0;}
+.flow-branch-arrows{display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; margin:2px 0;}
+.flow-branch-arrows .flow-arrow{margin:0;}
+.flow-branch{display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; margin-top:2px;}
+.flow-branch-item{display:flex; flex-direction:column; align-items:center;}
+.flow-branch-label{font-size:10.5px; color:var(--dim2); margin-bottom:3px;}
+
+.rule-box{margin-top:10px; background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:8px 10px; display:flex; flex-direction:column; gap:5px;}
+.rule-row{display:flex; align-items:center; gap:8px; font-size:12px;}
+.rule-kw{color:var(--am); font-weight:700; white-space:nowrap;}
+.rule-arr{color:var(--dim);}
+.rule-desc{color:var(--dim2);}
+
 /* PROBLEM / CODE CARDS */
 .problem-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
 .problem-card{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px;}
@@ -185,5 +217,5 @@ code{font-family:'JetBrains Mono', monospace;}
 
 @media(max-width:820px){
   .cards-grid, .cards-grid.cols-3, .cards-grid.cols-5, .cards-grid.cols-2{grid-template-columns:repeat(2,1fr);}
-  .two-col, .three-col, .tree-section, .bottom-grid, .pillar-grid, .problem-grid, .naming-grid, .naming-grid.cols-3, .revision-grid, .radar-grid{grid-template-columns:1fr;}
+  .two-col, .three-col, .tree-section, .bottom-grid, .pillar-grid, .problem-grid, .naming-grid, .naming-grid.cols-3, .revision-grid, .radar-grid, .flow-cols{grid-template-columns:1fr;}
 }
