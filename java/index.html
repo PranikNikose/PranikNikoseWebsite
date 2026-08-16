@@ -5,228 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Java Knowledge Hub | Pranik Nikose</title>
     <link rel="stylesheet" href="/css/main.css">
-    <style>
-      /* Reset */
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-/* Body */
-body{
-background:#0A0F1E;
-color:#F0EDE6;
-font-family:Arial,Helvetica,sans-serif;
-line-height:1.6;
-}
-
-/* Header */
-header{
-text-align:center;
-padding:60px 20px;
-background:#111827;
-border-bottom:1px solid #222;
-}
-
-header h1{
-font-size:42px;
-margin-bottom:15px;
-}
-
-header p{
-font-size:18px;
-color:#B5B5B5;
-margin-bottom:10px;
-}
-
-/* Back Button */
-.back-btn{
-display:inline-flex;
-justify-content:center;
-align-items:center;
-width:220px;
-height:46px;
-margin-top:20px;
-background:#4F46E5;
-color:#fff;
-text-decoration:none;
-border-radius:6px;
-font-weight:600;
-transition:.3s;
-}
-
-.back-btn:hover{
-background:#4338CA;
-}
-
-/* Container */
-.container{
-width:90%;
-max-width:1250px;
-margin:auto;
-padding:45px 0;
-}
-
-/* Section Heading */
-.container h2{
-color:#4F46E5;
-font-size:30px;
-margin-bottom:22px;
-}
-
-/* Grid */
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:22px;
-}
-
-/* Card */
-.card{
-background:#1A2035;
-border:1px solid #2C3555;
-border-radius:10px;
-padding:20px;
-height:235px;
-display:flex;
-flex-direction:column;
-transition:.3s;
-}
-
-.card:hover{
-transform:translateY(-5px);
-border-color:#4F46E5;
-box-shadow:0 8px 18px rgba(0,0,0,.35);
-}
-
-/* Card Heading */
-.card h3{
-font-size:20px;
-font-weight:700;
-height:48px;
-display:flex;
-align-items:center;
-margin-bottom:12px;
-color:#F0EDE6;
-}
-
-/* Card Description */
-.card p{
-font-size:14px;
-color:#B5B5B5;
-line-height:1.6;
-flex:1;
-margin-bottom:18px;
-}
-
-/* Card Button */
-.card a{
-display:flex;
-justify-content:center;
-align-items:center;
-width:100px;
-height:38px;
-margin-top:auto;
-background:#4F46E5;
-color:#fff;
-text-decoration:none;
-border-radius:5px;
-font-size:14px;
-font-weight:600;
-transition:.3s;
-}
-
-.card a:hover{
-background:#4338CA;
-}
-
-/* Footer */
-footer{
-margin-top:50px;
-padding:35px 20px;
-text-align:center;
-border-top:1px solid #222;
-color:#888;
-font-size:14px;
-}
-
-/* Tablet */
-@media(max-width:992px){
-
-header h1{
-font-size:36px;
-}
-
-header p{
-font-size:17px;
-}
-
-.container{
-width:92%;
-}
-
-.grid{
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-}
-
-.card{
-height:230px;
-}
-
-}
-
-/* Mobile */
-@media(max-width:768px){
-
-header{
-padding:45px 20px;
-}
-
-header h1{
-font-size:30px;
-}
-
-header p{
-font-size:16px;
-}
-
-.back-btn{
-width:100%;
-max-width:240px;
-}
-
-.container{
-width:94%;
-padding:35px 0;
-}
-
-.container h2{
-font-size:26px;
-}
-
-.grid{
-grid-template-columns:1fr;
-gap:18px;
-}
-
-.card{
-height:auto;
-min-height:220px;
-}
-
-.card h3{
-height:auto;
-min-height:42px;
-font-size:19px;
-}
-
-.card a{
-width:100%;
-}
-
-}
-    </style>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <header>
@@ -298,14 +77,34 @@ width:100%;
           <a href="/java/design-patterns/" target="_blank">Open</a>
         </div>
         <div class="card">
-          <h3>Java Interview Questions</h3>
-          <p> Frequently Asked Interview Questions with Answers and Examples. </p>
-          <a href="/java/interview/" target="_blank">Open</a>
-        </div>
-        <div class="card">
           <h3>Coming Soon...</h3>
           <p> More Java concepts, tutorials and enterprise examples will be added regularly. </p>
           <a href="#" target="_blank">Soon</a>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <h2>Interview Preparation</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Java Interview Questions</h3>
+          <p> Frequently Asked Core Java Interview Questions with Answers and Examples. </p>
+          <a href="/interview/java/" target="_blank">Open</a>
+        </div>
+        <div class="card">
+          <h3>Coding Interview Questions</h3>
+          <p> Programming Problems, Patterns and Coding Round Interview Preparation. </p>
+          <a href="/interview/coding/" target="_blank">Open</a>
+        </div>
+        <div class="card">
+          <h3>Spring Boot Interview Questions</h3>
+          <p> Spring Boot, REST APIs, Security and JPA Interview Questions with Answers. </p>
+          <a href="/interview/springboot/" target="_blank">Open</a>
+        </div>
+        <div class="card">
+          <h3>Microservices Interview Questions</h3>
+          <p> API Gateway, Eureka, Config Server, Resilience4j and Distributed Systems Interview Questions. </p>
+          <a href="/interview/microservices/" target="_blank">Open</a>
         </div>
       </div>
     </div>
