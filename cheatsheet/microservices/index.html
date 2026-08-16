@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microservices — Interview Revision Master</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page { size: A4; margin: 8mm; }
+
+  :root {
+    --bg:         #0D1117;
+    --surface:    #161B22;
+    --border:     #21262D;
+    --dim:        #444D56;
+    --muted:      #6E7681;
+    --text:       #C9D1D9;
+    --text-bright:#E6EDF3;
+
+    --blue:       #58A6FF;
+    --blue-dim:   #1F3A5F;
+    --green:      #3FB950;
+    --green-dim:  #1A3A1A;
+    --amber:      #E3B341;
+    --amber-dim:  #3D2E0A;
+    --purple:     #BC8CFF;
+    --purple-dim: #2A1A4A;
+    --cyan:       #39D4C4;
+    --cyan-dim:   #0D2E2B;
+    --red:        #F85149;
+    --red-dim:    #3A0D0D;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 9.5px;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    width: 210mm;
+    margin: 0 auto;
+  }
+
+  .page { padding: 0; }
+  a { color: inherit; }
+
+  /* ── HEADER ──────────────────────────────────────────── */
+  .header { border-bottom: 1px solid var(--border); padding-bottom: 7px; margin-bottom: 10px; }
+  .header-top { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+  .header-left { display: flex; align-items: baseline; gap: 10px; }
+  .prompt { color: var(--green); font-weight: 600; font-size: 10px; }
+  .title { font-size: 17px; font-weight: 700; color: var(--text-bright); letter-spacing: -0.3px; }
+  .subtitle { color: var(--muted); font-size: 9px; margin-top: 2px; padding-left: 18px; }
+  .toc { font-size: 7.6px; color: var(--dim); text-align: right; line-height: 1.6; max-width: 260px; }
+  .toc b { color: var(--muted); }
+
+  /* ── NAV / JUMP BAR ──────────────────────────────────── */
+  .navbar { display:flex; flex-wrap:wrap; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:6px 8px; margin-bottom:10px; }
+  .navbar a { font-size:7.6px; color:var(--blue); background:var(--blue-dim); padding:2px 6px; border-radius:2px; text-decoration:none; font-weight:600; }
+
+  .section-label {
+    font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-bright); margin: 14px 0 5px 0; padding: 4px 6px;
+    background: var(--surface); border-left: 3px solid var(--green); border-radius: 2px;
+  }
+  .section-label.first { margin-top: 0; }
+  .sub-label { font-size: 7.6px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin: 6px 0 4px; }
+
+  /* ── QUICK REF CARDS ─────────────────────────────────── */
+  .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
+  .cards-grid.c6 { grid-template-columns: repeat(6, 1fr); }
+  .cards-grid.c3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 6px 7px; border-left-width: 3px; }
+  .card-name { font-weight: 700; font-size: 9.5px; margin-bottom: 2px; }
+  .card-desc { font-size: 7.8px; color: var(--muted); line-height: 1.4; }
+
+  .c-bl { border-left-color: var(--blue); }   .c-bl .card-name { color: var(--blue); }
+  .c-gr { border-left-color: var(--green); }  .c-gr .card-name { color: var(--green); }
+  .c-am { border-left-color: var(--amber); }  .c-am .card-name { color: var(--amber); }
+  .c-pu { border-left-color: var(--purple); } .c-pu .card-name { color: var(--purple); }
+  .c-cy { border-left-color: var(--cyan); }   .c-cy .card-name { color: var(--cyan); }
+  .c-rd { border-left-color: var(--red); }    .c-rd .card-name { color: var(--red); }
+
+  /* ── NAMING / KEY POINTS ─────────────────────────────── */
+  .naming-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 10px; }
+  .naming-grid.c1 { grid-template-columns: 1fr; }
+  .naming-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; display: flex; align-items: center; gap: 8px; }
+  .naming-prefix { font-weight: 700; font-size: 9px; color: var(--text-bright); background: var(--border); border-radius: 3px; padding: 2px 6px; white-space: nowrap; }
+  .naming-arrow { color: var(--dim); font-size: 9px; }
+  .naming-meaning { font-size: 8.3px; color: var(--muted); }
+
+  /* ── PANELS ──────────────────────────────────────────── */
+  .tree-panel, .table-panel, .flow-panel, .cmp-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; margin-bottom: 6px; overflow: hidden; }
+  .tree-title { font-size: 8px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+
+  /* ── API TABLE (definition-style rows) ──────────────── */
+  .api-table { width: 100%; border-collapse: collapse; font-size: 8.3px; }
+  .api-table td { padding: 2.5px 4px; vertical-align: top; border-bottom: 1px solid var(--border); }
+  .api-table tr:last-child td { border-bottom: none; }
+  .api-code { font-weight: 700; white-space: nowrap; }
+  .api-code.bl { color: var(--blue); } .api-code.am { color: var(--amber); } .api-code.pu { color: var(--purple); }
+  .api-code.cy { color: var(--cyan); } .api-code.rd { color: var(--red); } .api-code.gr { color: var(--green); }
+  .api-desc { color: var(--muted); }
+  .api-desc code, .tree-body code { color: var(--text); background: var(--bg); padding: 0 3px; border-radius: 2px; }
+
+  /* ── REGULAR TABLES ──────────────────────────────────── */
+  table.grid-table { width: 100%; border-collapse: collapse; font-size: 8.2px; }
+  table.grid-table th { text-align: left; color: var(--dim); font-size: 7.4px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 5px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  table.grid-table td { padding: 3px 5px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  table.grid-table tr:last-child td { border-bottom: none; }
+  table.grid-table td.yes { color: var(--green); font-weight: 700; }
+  table.grid-table td.no { color: var(--red); font-weight: 700; }
+  table.grid-table td.cell-hl { color: var(--amber); font-weight: 600; }
+  table.grid-table td.k { color: var(--blue); font-weight: 600; white-space: nowrap; }
+  table.grid-table td.k2 { color: var(--purple); font-weight: 600; white-space: nowrap; }
+
+  /* ── FLOW DIAGRAM ─────────────────────────────────────── */
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+  .flow-row.vertical { flex-direction: column; }
+  .flow-box { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 4px 9px; font-size: 8.3px; color: var(--text-bright); text-align: center; font-weight: 500; white-space: nowrap; }
+  .flow-box.source { border-color: var(--cyan);  color: var(--cyan); font-weight: 700; }
+  .flow-box.inter  { border-color: var(--blue);  color: var(--blue); }
+  .flow-box.term   { border-color: var(--amber); color: var(--amber); font-weight: 700; }
+  .flow-box.warn   { border-color: var(--red); color: var(--red); font-weight: 700; }
+  .flow-box.ok     { border-color: var(--green); color: var(--green); font-weight: 700; }
+  .flow-arrow { color: var(--dim); font-size: 11px; }
+  .flow-arrow.down { display:block; text-align:center; }
+  .flow-sub-title { font-size: 7.5px; color: var(--muted); text-align: center; margin-top: 6px; margin-bottom: 2px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* ── COMPARISON PANEL ─────────────────────────────────── */
+  .cmp-panel { display: flex; flex-direction: column; gap: 6px; }
+  .cmp-card { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 6px 8px; }
+  .cmp-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .cmp-name { font-weight: 700; font-size: 10px; }
+  .cmp-name.bl { color: var(--blue); } .cmp-name.pu { color: var(--purple); } .cmp-name.gr { color: var(--green); } .cmp-name.am { color: var(--amber); }
+  .cmp-rows { display: flex; flex-direction: column; gap: 2px; }
+  .cmp-row { display: flex; gap: 6px; font-size: 8px; align-items: baseline; }
+  .cmp-key { color: var(--dim); white-space: nowrap; min-width: 62px; }
+  .cmp-val { color: var(--text); }
+  .cmp-val.code { color: var(--amber); font-weight: 600; }
+  .cmp-val.green { color: var(--green); } .cmp-val.purple { color: var(--purple); }
+  .cmp-divider { height: 1px; background: var(--border); }
+
+  /* pillar / category grid */
+  .pillar-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; margin-bottom: 6px; }
+  .pillar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .pillar-grid.c5 { grid-template-columns: repeat(5, 1fr); }
+  .pillar-grid.c3 { grid-template-columns: repeat(3, 1fr); }
+  .pillar-card { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 6px 8px; border-top-width: 3px; }
+  .pillar-card.p-bl { border-top-color: var(--blue); } .pillar-card.p-gr { border-top-color: var(--green); }
+  .pillar-card.p-am { border-top-color: var(--amber); } .pillar-card.p-pu { border-top-color: var(--purple); }
+  .pillar-card.p-cy { border-top-color: var(--cyan); } .pillar-card.p-rd { border-top-color: var(--red); }
+  .pillar-name { font-weight: 700; font-size: 9px; margin-bottom: 3px; }
+  .pillar-name.bl{color:var(--blue);} .pillar-name.gr{color:var(--green);} .pillar-name.am{color:var(--amber);}
+  .pillar-name.pu{color:var(--purple);} .pillar-name.cy{color:var(--cyan);} .pillar-name.rd{color:var(--red);}
+  .pillar-def { font-size: 7.7px; color: var(--muted); line-height: 1.4; }
+  .pillar-example { font-size: 7.4px; color: var(--text); margin-top: 3px; border-top: 1px dashed var(--border); padding-top: 3px; }
+  .pillar-example b { color: var(--text-bright); }
+
+  /* ── PROBLEM / SCENARIO CARDS ─────────────────────────── */
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .problem-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; border-left: 3px solid var(--green); page-break-inside: avoid; }
+  .problem-title { font-size: 8.3px; font-weight: 700; color: var(--green); margin-bottom: 3px; }
+  .problem-body { font-size: 7.8px; color: var(--muted); line-height: 1.45; }
+  .problem-body b { color: var(--text); }
+
+  .code-block { font-size: 7.8px; color: var(--text); background: var(--bg); border-radius: 3px; padding: 4px 6px; white-space: pre; overflow: hidden; line-height: 1.45; border: 1px solid var(--border); }
+
+  /* ── REVISION SUMMARY ─────────────────────────────────── */
+  .revision-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
+  .revision-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px 14px; }
+  .revision-item { font-size: 8.3px; color: var(--text); display: flex; gap: 5px; }
+  .revision-item .chk { color: var(--green); font-weight: 700; }
+
+  /* ── ONE-LINER STRIP ───────────────────────────────────── */
+  .liner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .liner-grid.c2 { grid-template-columns: repeat(2, 1fr); }
+  .liner { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 4px 7px; font-size: 7.8px; }
+  .liner b { color: var(--cyan); }
+  .liner span.arr { color: var(--dim); margin: 0 3px; }
+
+  footer { text-align:center; color: var(--dim); font-size: 7.5px; margin-top: 14px; padding-top: 6px; border-top: 1px solid var(--border); }
+
+  @media print {
+    html, body { width: 210mm; }
+    .tree-panel, .table-panel, .flow-panel, .cmp-panel, .pillar-panel, .problem-card { page-break-inside: avoid; }
+    .navbar { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <span class="prompt">$</span>
+        <span class="title">Microservices — Interview Revision Master</span>
+      </div>
+      <div class="toc"><b>5–7 YOE Java / Spring Boot Engineer</b> — Fundamentals · Communication · Discovery/Gateway · Resilience · Distributed Tx/SAGA · Kafka/RabbitMQ · Observability</div>
+    </div>
+    <div class="subtitle">// Read top-to-bottom once before every interview — definitions, flows, diffs, lifecycles &amp; real scenarios in one page</div>
+  </div>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <a href="#fund">Fundamentals</a><a href="#decomp">Decomposition</a><a href="#dbps">DB Per Service</a><a href="#comm">Communication</a>
+    <a href="#discovery">Service Discovery</a><a href="#lb">Load Balancer</a><a href="#gateway">API Gateway</a><a href="#config">Config Server</a>
+    <a href="#resilience">Resilience</a><a href="#r4j">Resilience4j</a><a href="#distx">Distributed Tx</a><a href="#saga">SAGA</a>
+    <a href="#outbox">Outbox/CDC</a><a href="#event">Event-Driven</a><a href="#kafka">Kafka</a><a href="#rabbitmq">RabbitMQ</a>
+    <a href="#observability">Observability</a><a href="#tracing">Tracing</a><a href="#actuator">Actuator/Metrics</a><a href="#troubleshoot">Troubleshooting</a>
+    <a href="#antipatterns">Anti-Patterns</a><a href="#checklist">Prod Checklist</a><a href="#flow">Complete Flow</a><a href="#scenarios">Scenarios</a>
+    <a href="#summary">Final Revision</a>
+  </div>
+
+  <!-- QUICK REF -->
+  <div class="section-label first">Microservices Ecosystem Overview</div>
+  <div class="cards-grid c6">
+    <div class="card c-bl"><div class="card-name">Decomposition</div><div class="card-desc">Split by business capability — high cohesion + loose coupling</div></div>
+    <div class="card c-gr"><div class="card-name">Communication</div><div class="card-desc">Sync (REST/Feign/WebClient) or Async (Kafka/RabbitMQ)</div></div>
+    <div class="card c-am"><div class="card-name">Discovery/Gateway</div><div class="card-desc">Eureka + LoadBalancer + Spring Cloud Gateway</div></div>
+    <div class="card c-pu"><div class="card-name">Resilience</div><div class="card-desc">Timeout, Retry, Circuit Breaker, Bulkhead, Rate Limiter</div></div>
+    <div class="card c-cy"><div class="card-name">Distributed Data</div><div class="card-desc">SAGA + Outbox + Eventual Consistency</div></div>
+    <div class="card c-rd"><div class="card-name">Observability</div><div class="card-desc">Logs + Metrics + Traces — find &amp; fix production issues</div></div>
+  </div>
+
+  <!-- ═══════════════ FUNDAMENTALS ═══════════════ -->
+  <div class="section-label" id="fund">Microservices Fundamentals</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Microservices — Definition</div>
+      <div class="api-desc" style="font-size:8.3px; line-height:1.6;">
+        An <b style="color:var(--text-bright)">architectural style</b> where a large application is divided into <b style="color:var(--text-bright)">small, independent, loosely coupled services</b>. Each service handles one specific business capability, has its own logic, and can be developed, deployed, and scaled independently.
+      </div>
+      <div class="tree-title" style="margin-top:8px;">Example — E-Commerce</div>
+      <div class="flow-row"><div class="flow-box inter">User Svc</div><div class="flow-box inter">Product Svc</div><div class="flow-box inter">Order Svc</div><div class="flow-box inter">Payment Svc</div><div class="flow-box inter">Notification Svc</div></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Monolith — Definition</div>
+      <div class="api-desc" style="font-size:8.3px; line-height:1.6;">
+        Entire application built and deployed as a <b style="color:var(--text-bright)">single unit</b>.
+      </div>
+      <div class="flow-row vertical" style="margin-top:4px;">
+        <div class="flow-box source">Controller</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Service</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Repository</div><span class="flow-arrow">↓</span>
+        <div class="flow-box term">Single Database</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-panel">
+    <div class="tree-title">Microservices Architecture (Typical)</div>
+    <div class="flow-row">
+      <div class="flow-box source">Client</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">API Gateway</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">User Service</div><div class="flow-box inter">Order Service</div><div class="flow-box inter">Payment Service</div>
+    </div>
+    <div class="flow-row" style="margin-top:4px;">
+      <div class="flow-box term">User DB</div><div class="flow-box term">Order DB</div><div class="flow-box term">Payment DB</div>
+    </div>
+    <div class="flow-sub-title">Each Service = Independent Application + Its Own Database</div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">Core Characteristics</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">
+        ✓ Small &nbsp; ✓ Independent &nbsp; ✓ Loosely Coupled &nbsp; ✓ Highly Cohesive &nbsp; ✓ Independently Deployable/Scalable &nbsp; ✓ Business-Capability Focused &nbsp; ✓ Fault Isolated
+      </div>
+    </div>
+    <div class="cmp-panel">
+      <div class="tree-title">Monolith vs Microservices</div>
+      <table class="grid-table">
+        <tr><th>Aspect</th><th>Monolith</th><th>Microservices</th></tr>
+        <tr><td>Deployment</td><td>Single</td><td class="cell-hl">Independent per service</td></tr>
+        <tr><td>Database</td><td>Usually single</td><td class="cell-hl">Database per service</td></tr>
+        <tr><td>Scaling</td><td>Entire app</td><td class="cell-hl">Individual service</td></tr>
+        <tr><td>Coupling</td><td>Higher</td><td class="cell-hl">Loose</td></tr>
+        <tr><td>Debugging</td><td>Simple</td><td>Distributed / complex</td></tr>
+        <tr><td>Failure impact</td><td>Whole app affected</td><td class="cell-hl">Better isolation</td></tr>
+        <tr><td>DevOps complexity</td><td>Lower</td><td>Higher</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">When To Use Microservices?</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">
+        Application is large · multiple teams · modules need independent deployment · different scaling requirements · frequent releases · strong business boundaries.
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">When NOT To Use?</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">
+        Small app · small team · simple business logic · low traffic · limited DevOps infra. Reason: microservices can add <b style="color:var(--amber)">unnecessary complexity</b>.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DECOMPOSITION + DB PER SERVICE ═══════════════ -->
+  <div class="section-label" id="decomp">Service Decomposition, Loose Coupling &amp; High Cohesion</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Good vs Bad Decomposition</div>
+      <table class="api-table">
+        <tr><td class="api-code gr">Good</td><td class="api-desc">Split by <b>business capability</b> — User, Catalog, Order, Payment, Shipping, Notification Service.</td></tr>
+        <tr><td class="api-code rd">Bad</td><td class="api-desc">One service per table, or per tiny technical function (nano-services) — boundary should follow business capability, not schema.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel" id="dbps">
+      <div class="tree-title">Loose Coupling + High Cohesion</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Loose Coupling</td><td class="api-desc">Minimum dependency on the internal implementation of other services. E.g. Order Service calls Payment API, never Payment tables directly.</td></tr>
+        <tr><td class="api-code pu">High Cohesion</td><td class="api-desc">Related business functionality stays inside the <b>same</b> service (Payment creation + validation + status + refund all in Payment Service).</td></tr>
+        <tr><td class="api-code gr">Good Microservice</td><td class="api-desc">= High Cohesion + Loose Coupling.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">Database Per Service</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Each microservice owns its data. <b style="color:var(--red)">Important rule:</b> Service A must NOT directly access Service B's database — go through <b style="color:var(--text-bright)">API or Event</b> instead.
+      </div>
+      <div class="tree-title" style="margin-top:6px;">Why?</div>
+      <div class="api-desc" style="font-size:8.2px;">✓ Loose coupling ✓ Independent deployment ✓ Independent schema changes ✓ Better ownership ✓ Independent scaling</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Shared Database Problem</div>
+      <div class="flow-row"><div class="flow-box warn">Service A</div><div class="flow-box term">Shared DB</div><div class="flow-box warn">Service B</div></div>
+      <div class="api-desc" style="font-size:8.2px; margin-top:5px;">Problems → tight coupling · schema dependency · deployment dependency · reduced service autonomy.</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Independent Deployment &amp; Scaling</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Payment Service v1 → v2 upgraded without redeploying User/Order Service. Under heavy payment traffic, only Payment Service scales (2→10 instances) while others stay at 2.
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Stateless Services</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Instance doesn't depend on local session state — required context (e.g. JWT) travels with the request. Why? ✓ easy horizontal scaling ✓ easy load balancing ✓ instance replacement ✓ better fault tolerance.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ COMMUNICATION ═══════════════ -->
+  <div class="section-label" id="comm">Service Communication — Sync vs Async</div>
+  <div class="bottom-grid">
+    <div class="cmp-panel">
+      <div class="tree-title">Synchronous vs Asynchronous</div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name bl">Synchronous</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Flow</span><span class="cmp-val">Request → wait → response (REST/gRPC)</span></div>
+          <div class="cmp-row"><span class="cmp-key">Pros</span><span class="cmp-val green">Simple, immediate result</span></div>
+          <div class="cmp-row"><span class="cmp-key">Cons</span><span class="cmp-val">Runtime dependency, cascading failure, higher coupling</span></div>
+        </div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name pu">Asynchronous</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-key">Flow</span><span class="cmp-val">Publish event → broker → consumer (no wait)</span></div>
+          <div class="cmp-row"><span class="cmp-key">Pros</span><span class="cmp-val green">Loose coupling, resilience, scalability</span></div>
+          <div class="cmp-row"><span class="cmp-key">Cons</span><span class="cmp-val">Eventual consistency, harder debugging, ordering challenges</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">OpenFeign vs WebClient</div>
+      <table class="grid-table">
+        <tr><th>Feature</th><th>OpenFeign</th><th>WebClient</th></tr>
+        <tr><td>Style</td><td>Declarative interface</td><td class="cell-hl">Programmatic, reactive</td></tr>
+        <tr><td>Blocking?</td><td>Mostly synchronous</td><td class="cell-hl">Non-blocking</td></tr>
+        <tr><td>Best for</td><td>Simple service-to-service REST</td><td class="cell-hl">Streaming, high concurrency</td></tr>
+        <tr><td>Discovery/LB</td><td class="yes">Integrated</td><td>Manual/reactive setup</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="flow-panel">
+    <div class="tree-title">OpenFeign Flow (Service-to-Service)</div>
+    <div class="flow-row">
+      <div class="flow-box source">OrderService</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">@FeignClient("user-service")</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Service Discovery</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Load Balancer</div><span class="flow-arrow">→</span>
+      <div class="flow-box term">User Service Instance</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Response</div>
+    </div>
+    <div class="api-desc" style="font-size:8px; margin-top:5px;">Developer defines a Java interface with <code>@FeignClient(name="user-service")</code> — Spring generates the HTTP call, serialization &amp; deserialization.</div>
+  </div>
+
+  <!-- ═══════════════ SERVICE DISCOVERY ═══════════════ -->
+  <div class="section-label" id="discovery">Service Discovery — Eureka</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Why Service Discovery?</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Without it: IPs are hardcoded but can change, instances fail, new ones start. With Discovery: services look up peers by <b style="color:var(--text-bright)">service name</b> (e.g. <code>USER-SERVICE</code>) via a central <b>Service Registry</b> (Eureka), which stores name, IP, port, health.
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Registration &amp; Heartbeat</div>
+      <div class="flow-row"><div class="flow-box source">Service Starts</div><span class="flow-arrow">→</span><div class="flow-box inter">Registers with Eureka</div><span class="flow-arrow">→</span><div class="flow-box ok">Periodic Heartbeat</div></div>
+      <div class="api-desc" style="font-size:8px; margin-top:5px;">If heartbeat stops → instance eventually removed / marked unavailable.</div>
+    </div>
+  </div>
+  <div class="bottom-grid">
+    <div class="cmp-panel">
+      <div class="tree-title">Client-Side vs Server-Side Discovery</div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name bl">Client-Side</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Client queries registry, client-side LB selects instance. Example: Spring Cloud + LoadBalancer.</span></div></div>
+      </div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name am">Server-Side</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Gateway/LB selects instance — client stays simple, infra handles routing.</span></div></div>
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Service Discovery Flow</div>
+      <div class="flow-row vertical">
+        <div class="flow-box source">Order Service needs User Service</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Ask Registry for USER-SERVICE</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Get [10.0.0.11:8080, .12, .13]</div><span class="flow-arrow">↓</span>
+        <div class="flow-box ok">Load Balancer picks one → Call</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ LOAD BALANCER ═══════════════ -->
+  <div class="section-label" id="lb">Load Balancing</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Load Balancing Algorithms</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Round Robin</td><td class="api-desc">Requests distributed sequentially.</td></tr>
+        <tr><td class="api-code gr">Random</td><td class="api-desc">Random instance chosen.</td></tr>
+        <tr><td class="api-code am">Least Connections</td><td class="api-desc">Instance with fewest active connections.</td></tr>
+        <tr><td class="api-code pu">Weighted</td><td class="api-desc">More requests to higher-capacity instances.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Spring Cloud LoadBalancer vs Ribbon</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        <b style="color:var(--text-bright)">Ribbon</b> — legacy Netflix client-side LB (older interviews may ask). <b style="color:var(--green)">Spring Cloud LoadBalancer</b> — modern, preferred client-side load balancing, works with service names + discovery.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ API GATEWAY ═══════════════ -->
+  <div class="section-label" id="gateway">API Gateway — Spring Cloud Gateway</div>
+  <div class="flow-panel">
+    <div class="tree-title">Without vs With API Gateway</div>
+    <div class="flow-row"><div class="flow-box warn">Client → User Svc</div><div class="flow-box warn">Client → Order Svc</div><div class="flow-box warn">Client → Payment Svc</div></div>
+    <div class="flow-sub-title">Problem: client knows every service, complex routing, repeated security logic</div>
+    <div class="flow-row" style="margin-top:6px;">
+      <div class="flow-box source">Client</div><span class="flow-arrow">→</span><div class="flow-box ok">API Gateway</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">User</div><div class="flow-box inter">Order</div><div class="flow-box inter">Payment</div>
+    </div>
+    <div class="flow-sub-title">Client knows only the Gateway</div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">API Gateway Responsibilities</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">
+        ✓ Request Routing ✓ AuthN/AuthZ ✓ CORS ✓ Logging ✓ Rate Limiting ✓ Header Manipulation ✓ Request Filtering ✓ Load Balancing ✓ Monitoring
+      </div>
+      <div class="tree-title" style="margin-top:6px;">Pre-Filter vs Post-Filter</div>
+      <div class="api-desc" style="font-size:8.2px;">
+        <b style="color:var(--blue)">Pre</b> (before routing) → auth, JWT validation, logging, correlation ID, rate limiting. <b style="color:var(--amber)">Post</b> (after response) → response logging, headers, metrics, tracing.
+      </div>
+    </div>
+    <div class="cmp-panel">
+      <div class="tree-title">Gateway vs Load Balancer vs Service Discovery</div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name bl">API Gateway</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Application-level single entry point — routing, auth, filtering, rate limiting.</span></div></div></div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name gr">Load Balancer</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Distributes traffic across instances of the same service.</span></div></div></div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name am">Service Discovery</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Finds available service instances. All three solve different problems — Gateway can use LB + Discovery internally.</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="flow-panel">
+    <div class="tree-title">Complete Request Flow (Client → DB → Response)</div>
+    <div class="flow-row">
+      <div class="flow-box source">Client</div><span class="flow-arrow">→</span><div class="flow-box inter">API Gateway</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">JWT Validation</div><span class="flow-arrow">→</span><div class="flow-box inter">Route Matching</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Service Discovery</div><span class="flow-arrow">→</span><div class="flow-box inter">Load Balancer</div>
+    </div>
+    <div class="flow-row" style="margin-top:4px;">
+      <div class="flow-box inter">Microservice Instance</div><span class="flow-arrow">→</span><div class="flow-box inter">Controller → Service → Repository</div><span class="flow-arrow">→</span>
+      <div class="flow-box term">Database</div><span class="flow-arrow">→</span><div class="flow-box ok">Response → Gateway → Client</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CONFIG SERVER ═══════════════ -->
+  <div class="section-label" id="config">Centralized Configuration — Spring Cloud Config</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Config Server / Client / Repository</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Config Server</td><td class="api-desc">Central service providing configuration to microservices; backed by Git repo, filesystem, or other backend.</td></tr>
+        <tr><td class="api-code gr">Config Client</td><td class="api-desc">Microservice that retrieves its config from the Config Server at startup.</td></tr>
+        <tr><td class="api-code am">Config Repository</td><td class="api-desc">Where configs live — typically Git, versioned per environment.</td></tr>
+      </table>
+      <div class="tree-title" style="margin-top:6px;">Flow</div>
+      <div class="flow-row"><div class="flow-box source">Git Repo</div><span class="flow-arrow">→</span><div class="flow-box inter">Config Server</div><span class="flow-arrow">→</span><div class="flow-box inter">Microservice</div><span class="flow-arrow">→</span><div class="flow-box ok">Spring Environment</div></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Benefits &amp; Security Rule</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        ✓ Single location ✓ Environment management (dev/test/prod) ✓ Consistency ✓ Easier maintenance ✓ Config outside application.
+      </div>
+      <div class="api-desc" style="font-size:8.2px; margin-top:6px; color:var(--red);">
+        ⚠ NEVER store secrets (passwords, API keys, JWT secrets, private keys) in plain-text Git config. Prefer a Secret Manager / Vault / platform secret store.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ RESILIENCE ═══════════════ -->
+  <div class="section-label" id="resilience">Resilience — Preventing Cascading Failure</div>
+  <div class="flow-panel">
+    <div class="tree-title">Cascading Failure Example</div>
+    <div class="flow-row">
+      <div class="flow-box source">Client</div><span class="flow-arrow">→</span><div class="flow-box inter">Order Service</div><span class="flow-arrow">→</span><div class="flow-box warn">Payment Service DOWN</div>
+    </div>
+    <div class="flow-sub-title">Order requests keep waiting → threads/connections occupied → Order Service slow → Gateway slow → entire system affected</div>
+    <div class="api-desc" style="font-size:8.2px; margin-top:6px;">Prevented by → Timeout → Retry → Circuit Breaker → Fallback → Bulkhead → Rate Limiter</div>
+  </div>
+
+  <div class="pillar-panel">
+    <div class="tree-title">Resilience Building Blocks</div>
+    <div class="pillar-grid c5">
+      <div class="pillar-card p-bl"><div class="pillar-name bl">Timeout</div><div class="pillar-def">Max time a service waits for a dependency. Never wait indefinitely — always configure connection + read timeouts.</div></div>
+      <div class="pillar-card p-gr"><div class="pillar-name gr">Retry</div><div class="pillar-def">Auto-retry a failed op for transient failures. Dangerous if unlimited → "retry storm" on an already overloaded service.</div></div>
+      <div class="pillar-card p-am"><div class="pillar-name am">Circuit Breaker</div><div class="pillar-def">Stops repeated calls to a failing service for a period → prevents cascading failure, fails fast.</div></div>
+      <div class="pillar-card p-pu"><div class="pillar-name pu">Bulkhead</div><div class="pillar-def">Isolates resources (thread/connection pools) so one slow dependency doesn't consume all app resources.</div></div>
+      <div class="pillar-card p-cy"><div class="pillar-name cy">Rate Limiter</div><div class="pillar-def">Limits requests allowed in a time window (e.g. 100/min/user) → protects services, usually HTTP 429 on reject.</div></div>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">Circuit Breaker States</div>
+      <div class="flow-row vertical">
+        <div class="flow-box ok">CLOSED (normal, monitors failures)</div><span class="flow-arrow">↓ threshold exceeded</span>
+        <div class="flow-box warn">OPEN (calls blocked, fallback runs)</div><span class="flow-arrow">↓ after wait duration</span>
+        <div class="flow-box inter">HALF_OPEN (limited test requests)</div>
+      </div>
+      <div class="api-desc" style="font-size:8px; margin-top:4px;">Success in HALF_OPEN → CLOSED. Failure in HALF_OPEN → back to OPEN.</div>
+    </div>
+    <div class="cmp-panel">
+      <div class="tree-title">Timeout vs Retry vs Circuit Breaker</div>
+      <div class="cmp-card"><div class="cmp-row"><span class="cmp-key">Timeout</span><span class="cmp-val">"How long should I wait?"</span></div></div>
+      <div class="cmp-card"><div class="cmp-row"><span class="cmp-key">Retry</span><span class="cmp-val">"Should I try again?" — best for temporary failure</span></div></div>
+      <div class="cmp-card"><div class="cmp-row"><span class="cmp-key">Circuit Breaker</span><span class="cmp-val">"Should I stop calling this dependency?" — best for repeated/sustained failure</span></div></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Fallback vs Graceful Degradation</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Fallback</td><td class="api-desc">Alternative response/action when the main op fails (e.g. return default recommendations).</td></tr>
+        <tr><td class="api-code gr">Graceful Degradation</td><td class="api-desc">App continues with reduced functionality instead of failing completely (recommendation service down → purchase still works).</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Critical vs Non-Critical Dependency</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        <b style="color:var(--red)">Critical</b> (payment, auth, core data) → fail request / queue for later / compensate. <b style="color:var(--green)">Non-critical</b> (recommendations, analytics, notifications) → fallback or skip temporarily.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ RESILIENCE4J ═══════════════ -->
+  <div class="section-label" id="r4j">Resilience4j</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Components</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">CircuitBreaker</td><td class="api-desc">Stops calls to failing dependency; monitors success/fail/slow calls against sliding window.</td></tr>
+        <tr><td class="api-code gr">Retry</td><td class="api-desc">Max attempts, wait duration, retry/ignore exceptions — with exponential backoff + jitter.</td></tr>
+        <tr><td class="api-code am">RateLimiter</td><td class="api-desc">Limits request rate.</td></tr>
+        <tr><td class="api-code pu">Bulkhead</td><td class="api-desc">Resource isolation.</td></tr>
+        <tr><td class="api-code cy">TimeLimiter</td><td class="api-desc">Limits max duration of async operations.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Resilience Call Order (Order Matters!)</div>
+      <div class="flow-row vertical">
+        <div class="flow-box source">Request</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Rate Limiter</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Bulkhead</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Circuit Breaker</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Timeout / TimeLimiter</div><span class="flow-arrow">↓</span>
+        <div class="flow-box term">Remote Service</div>
+      </div>
+      <div class="api-desc" style="font-size:8px; margin-top:4px; color:var(--red);">Wrong combination/config → retry storms, excessive latency, resource exhaustion.</div>
+    </div>
+  </div>
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">Failure Threshold &amp; Sliding Window</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Example: 10 calls, 6 failed → 60% failure rate. Configured threshold 50% → circuit OPENs. Circuit Breaker can also track <b>slow calls</b>, not just failures. Sliding window types: <b style="color:var(--blue)">Count-Based</b> (last N calls) or <b style="color:var(--amber)">Time-Based</b> (last N seconds).
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Exponential Backoff + Jitter</div>
+      <div class="flow-row"><div class="flow-box inter">Retry 1: wait 1s</div><div class="flow-box inter">Retry 2: wait 2s</div><div class="flow-box inter">Retry 3: wait 4s</div></div>
+      <div class="api-desc" style="font-size:8px; margin-top:4px;">Jitter = random variation added to delay, so many clients don't retry at the exact same instant.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DISTRIBUTED TRANSACTIONS ═══════════════ -->
+  <div class="section-label" id="distx">Distributed Transactions &amp; Consistency</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Why @Transactional Fails Across Services</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        <code>@Transactional</code> manages a <b>local</b> transaction for one transaction manager + its DB. Order Service's <code>@Transactional</code> covers Order DB only — Payment Service's DB is not part of the same local transaction.
+      </div>
+      <div class="tree-title" style="margin-top:6px;">Example Problem</div>
+      <div class="flow-row"><div class="flow-box ok">Order DB: SUCCESS</div><div class="flow-box ok">Payment DB: SUCCESS</div><div class="flow-box warn">Inventory: FAILED</div></div>
+      <div class="api-desc" style="font-size:8px; margin-top:4px;">Result: system inconsistent — order exists, payment done, inventory not updated.</div>
+    </div>
+    <div class="cmp-panel">
+      <div class="tree-title">Local vs Distributed Transaction</div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name bl">Local</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">One service, one DB, @Transactional, ACID, simple rollback.</span></div></div></div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name am">Distributed</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Multiple services/DBs, independent transactions, complex rollback → needs SAGA-style pattern.</span></div></div></div>
+    </div>
+  </div>
+  <div class="bottom-grid">
+    <div class="cmp-panel">
+      <div class="tree-title">Strong vs Eventual Consistency</div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name bl">Strong</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">All systems see updated data immediately. ✓ Immediate consistency ✗ hard across microservices, lower availability, more coordination.</span></div></div></div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name gr">Eventual</span></div>
+        <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Services temporarily inconsistent, converge over time. Less coordination, better scalability — common in microservices.</span></div></div></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">SAGA vs 2-Phase Commit (2PC)</div>
+      <table class="grid-table">
+        <tr><th></th><th>2PC</th><th>SAGA</th></tr>
+        <tr><td>Model</td><td>Global tx, locks resources</td><td class="cell-hl">Local txs + compensation</td></tr>
+        <tr><td>Consistency</td><td>Strong</td><td class="cell-hl">Eventual</td></tr>
+        <tr><td>Coupling / Availability</td><td>Higher coupling, lower availability</td><td class="cell-hl">Better scalability</td></tr>
+        <tr><td>Usage</td><td>Rare in microservices</td><td class="cell-hl">Common microservice approach</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SAGA ═══════════════ -->
+  <div class="section-label" id="saga">SAGA Pattern</div>
+  <div class="tree-panel">
+    <div class="tree-title">SAGA — Definition &amp; Success Flow</div>
+    <div class="api-desc" style="font-size:8.2px; margin-bottom:6px;">Manages a distributed transaction as a <b style="color:var(--text-bright)">sequence of local transactions</b>; each service executes its local tx then publishes an event / triggers the next step. On failure → execute <b>compensating transactions</b>.</div>
+    <div class="flow-row">
+      <div class="flow-box source">Create Order</div><span class="flow-arrow">→</span><div class="flow-box inter">Process Payment</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Reserve Inventory</div><span class="flow-arrow">→</span><div class="flow-box ok">Confirm Order</div>
+    </div>
+    <div class="flow-sub-title">Failure Flow (Inventory fails)</div>
+    <div class="flow-row">
+      <div class="flow-box ok">Order ✓</div><div class="flow-box ok">Payment ✓</div><div class="flow-box warn">Inventory ✗</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Compensate Payment (REFUND)</div><span class="flow-arrow">→</span><div class="flow-box warn">Cancel Order</div>
+    </div>
+    <div class="api-desc" style="font-size:8px; margin-top:5px;"><b style="color:var(--amber)">Important:</b> compensation is NOT a database rollback across services — it's a new business transaction that logically reverses the previous action.</div>
+  </div>
+
+  <div class="cmp-panel">
+    <div class="tree-title">Choreography vs Orchestration</div>
+    <div class="two-col">
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name bl">Choreography</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-val">Services communicate via events, no central coordinator. Each service listens → performs tx → publishes next event.</span></div>
+          <div class="cmp-row"><span class="cmp-key">Flow</span><span class="cmp-val">OrderCreated → Kafka → Payment → PaymentCompleted → Kafka → Inventory → InventoryReserved → Order Confirmed</span></div>
+          <div class="cmp-row"><span class="cmp-key">✓</span><span class="cmp-val green">Loose coupling, no coordinator, good scalability</span></div>
+          <div class="cmp-row"><span class="cmp-key">✗</span><span class="cmp-val">Hard to understand/debug large sagas, growing event dependencies</span></div>
+        </div>
+      </div>
+      <div class="cmp-card">
+        <div class="cmp-header"><span class="cmp-name am">Orchestration</span></div>
+        <div class="cmp-rows">
+          <div class="cmp-row"><span class="cmp-val">Central Saga Orchestrator tells each service what action to perform.</span></div>
+          <div class="cmp-row"><span class="cmp-key">Flow</span><span class="cmp-val">Orchestrator → Create Order → Process Payment → Reserve Inventory → Confirm</span></div>
+          <div class="cmp-row"><span class="cmp-key">✓</span><span class="cmp-val green">Central workflow, easier to understand/monitor, good for complex flows</span></div>
+          <div class="cmp-row"><span class="cmp-key">✗</span><span class="cmp-val">Extra component, orchestrator complexity, risk of centralizing business logic</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Idempotency</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Processing the same request multiple times produces the <b>same</b> business result. Critical because message brokers may re-deliver, and clients may retry. Solution: <b style="color:var(--text-bright)">Idempotency Key</b> (e.g. <code>ORDER-1001-PAYMENT</code>) — check if already processed before executing.
+      </div>
+      <div class="api-desc" style="font-size:8px; margin-top:4px; color:var(--red);">Non-idempotent problem: timeout → client retries → payment charged twice.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">SAGA State &amp; Retry</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Track saga state (Payment: COMPLETED, Inventory: FAILED, Compensation: IN_PROGRESS, Order: CANCELLED) for monitoring/recovery/debugging. Retry in SAGA must be <b>limited + idempotent + backoff</b>; permanent failure → compensate or move to DLQ / manual handling.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ OUTBOX / CDC ═══════════════ -->
+  <div class="section-label" id="outbox">Transactional Outbox Pattern &amp; CDC</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">The Dual-Write Problem</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Service needs to update DB AND publish an event. If done as two separate steps, either can fail independently: <br>
+        • Save Order ✓ → Publish Event ✗ → DB updated but no event.<br>
+        • Publish Event ✓ → DB commit ✗ → event exists but DB update missing.
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Outbox Pattern — Solution</div>
+      <div class="flow-row vertical">
+        <div class="flow-box source">@Transactional</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Save Order + Save Outbox Event (same local tx)</div><span class="flow-arrow">↓</span>
+        <div class="flow-box ok">Single DB Commit</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Outbox Publisher</div><span class="flow-arrow">↓</span>
+        <div class="flow-box term">Kafka</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">Outbox Table (Typical Fields)</div>
+      <div class="code-block">event_id | aggregate_id | event_type | payload | created_at | status
+EVENT-101 | ORDER-1001 | ORDER_CREATED | {...} | ts | PENDING</div>
+      <div class="tree-title" style="margin-top:6px;">Publishing Approaches</div>
+      <div class="api-desc" style="font-size:8.2px;">
+        <b style="color:var(--blue)">Polling Publisher</b> — app periodically reads outbox &amp; publishes. <b style="color:var(--amber)">CDC</b> — DB change automatically detected &amp; published (near real-time, no constant polling).
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">CDC = Change Data Capture</div>
+      <div class="flow-row"><div class="flow-box source">App</div><span class="flow-arrow">→</span><div class="flow-box inter">DB</div><span class="flow-arrow">→</span><div class="flow-box inter">Outbox Table</div><span class="flow-arrow">→</span><div class="flow-box inter">CDC Tool</div><span class="flow-arrow">→</span><div class="flow-box term">Kafka</div></div>
+      <div class="api-desc" style="font-size:8.2px; margin-top:5px;">✓ Avoid constant app polling ✓ Near real-time ✓ Reliable change capture ✓ Pairs well with Outbox.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ EVENT-DRIVEN ═══════════════ -->
+  <div class="section-label" id="event">Event-Driven Architecture</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Event / Producer / Consumer / Broker</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Event</td><td class="api-desc">Represents something that already happened. E.g. OrderCreated, PaymentCompleted, ExamPassed. Prefer past tense naming.</td></tr>
+        <tr><td class="api-code gr">Producer</td><td class="api-desc">Publishes message/event to the broker.</td></tr>
+        <tr><td class="api-code am">Consumer</td><td class="api-desc">Receives and processes messages.</td></tr>
+        <tr><td class="api-code pu">Message Broker</td><td class="api-desc">Middleware that receives, stores/routes, delivers messages. E.g. Kafka, RabbitMQ.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Why Event-Driven / Challenges</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">✓ Loose coupling ✓ Async processing ✓ Better scalability &amp; resilience ✓ Multiple consumers ✓ Services work independently</div>
+      <div class="api-desc" style="font-size:8.2px; margin-top:4px; color:var(--red);">✗ Eventual consistency ✗ Duplicate messages ✗ Ordering ✗ Harder debugging ✗ Consumer failures ✗ Schema evolution ✗ More infra</div>
+    </div>
+  </div>
+
+  <div class="tree-panel">
+    <div class="tree-title">Event vs Command</div>
+    <table class="grid-table">
+      <tr><th></th><th>Event</th><th>Command</th></tr>
+      <tr><td>Meaning</td><td>Something already happened</td><td class="cell-hl">Request to perform something</td></tr>
+      <tr><td>Example</td><td>PaymentCompleted</td><td class="cell-hl">ProcessPayment</td></tr>
+      <tr><td>Naming</td><td>Past tense (OrderCreated)</td><td class="cell-hl">Imperative (avoid DoPayment as an "event")</td></tr>
+    </table>
+  </div>
+
+  <!-- ═══════════════ KAFKA ═══════════════ -->
+  <div class="section-label" id="kafka">Apache Kafka</div>
+  <div class="flow-panel">
+    <div class="tree-title">Kafka Architecture</div>
+    <div class="flow-row">
+      <div class="flow-box source">Producer</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Topic: orders → Partition 0 / 1 / 2</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Consumer Group</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Consumers (parallel)</div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Core Concepts</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Broker / Cluster</td><td class="api-desc">Kafka server storing/serving messages; cluster = multiple brokers → scalability, availability, fault tolerance.</td></tr>
+        <tr><td class="api-code gr">Topic</td><td class="api-desc">Logical category/stream where messages are published (e.g. order-created).</td></tr>
+        <tr><td class="api-code am">Partition</td><td class="api-desc">A topic is divided into partitions; each stores an ordered sequence. Enables parallel processing, higher throughput.</td></tr>
+        <tr><td class="api-code pu">Offset</td><td class="api-desc">Unique sequential position of a message inside a partition — <b>per-partition</b>, not global across the topic.</td></tr>
+        <tr><td class="api-code cy">Message Key</td><td class="api-desc">Determines the partition; same key → generally same partition → used for ordering (e.g. orderId).</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Consumer Group Rules</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Within one consumer group, each partition is assigned to exactly one consumer at a time. If Partitions=3, Consumers=5 → only 3 process, 2 idle. Max useful parallelism per group = partition count.
+      </div>
+      <div class="tree-title" style="margin-top:6px;">Multiple Consumer Groups</div>
+      <div class="api-desc" style="font-size:8.2px;">Different groups each get the <b>full</b> event stream independently (e.g. Certificate-Service group and Notification-Service group both consume ExamPassed).</div>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">Ordering &amp; Replication</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Kafka guarantees ordering <b>within a partition</b>, not across the whole topic. Same key (e.g. ORDER-1001) → same partition → events for that order stay ordered.<br><br>
+        <b style="color:var(--text-bright)">Replication:</b> partitions copied across brokers for fault tolerance. Leader handles reads/writes; Followers/Replicas hold copies and can be promoted if leader fails. Replication factor = 3 → 3 copies across brokers.
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Consumer Failure &amp; Rebalancing</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Consumer crashes → Kafka rebalances partitions among remaining consumers in the group. Rebalance triggers: consumer added/removed/crashed, partition count changes.
+      </div>
+    </div>
+  </div>
+
+  <div class="pillar-panel">
+    <div class="tree-title">Kafka Delivery Semantics</div>
+    <div class="pillar-grid c3">
+      <div class="pillar-card p-am"><div class="pillar-name am">At-Most-Once</div><div class="pillar-def">Processed zero or one time. Possible loss, no duplicates.</div></div>
+      <div class="pillar-card p-bl"><div class="pillar-name bl">At-Least-Once</div><div class="pillar-def">Processed one or more times. No intended loss, duplicates possible — very common in distributed systems.</div></div>
+      <div class="pillar-card p-gr"><div class="pillar-name gr">Exactly-Once</div><div class="pillar-def">Effect occurs exactly once — harder to achieve; Kafka supports it for certain workflows; app-level side effects still need careful design.</div></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Idempotent Consumer &amp; DLQ Flow</div>
+      <div class="flow-row vertical">
+        <div class="flow-box source">Receive Event ID</div><span class="flow-arrow">↓</span>
+        <div class="flow-box inter">Already Processed? </div><span class="flow-arrow">↓ No</span>
+        <div class="flow-box ok">Process + Store Event ID</div>
+      </div>
+      <div class="api-desc" style="font-size:8px; margin-top:5px;">Failure flow: Consumer fails → Retry → Retry → still fails → Dead Letter Topic (DLT) → alert → investigate/reprocess. A message that repeatedly fails = <b style="color:var(--red)">poison message</b> — don't retry forever.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Retention &amp; Replay</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Kafka retains messages even after consumers read them (configurable by time or size). Enables <b>event replay</b> — consumer resets offset and re-reads older events. Useful for recovery, reprocessing, new consumers, multiple consumer groups.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ RABBITMQ ═══════════════ -->
+  <div class="section-label" id="rabbitmq">RabbitMQ</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Architecture &amp; Concepts</div>
+      <div class="flow-row"><div class="flow-box source">Producer</div><span class="flow-arrow">→</span><div class="flow-box inter">Exchange</div><span class="flow-arrow">→</span><div class="flow-box inter">Binding</div><span class="flow-arrow">→</span><div class="flow-box inter">Queue</div><span class="flow-arrow">→</span><div class="flow-box ok">Consumer</div></div>
+      <table class="api-table" style="margin-top:6px;">
+        <tr><td class="api-code bl">Exchange</td><td class="api-desc">Receives messages from producer, routes them to queues.</td></tr>
+        <tr><td class="api-code gr">Queue</td><td class="api-desc">Stores messages until consumer processes them.</td></tr>
+        <tr><td class="api-code am">Binding</td><td class="api-desc">Connection between exchange and queue — defines how messages reach the queue.</td></tr>
+        <tr><td class="api-code pu">Routing Key</td><td class="api-desc">Key used by exchange to decide which queue receives the message.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Exchange Types</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">Direct</td><td class="api-desc">Exact routing-key match (e.g. payment.completed).</td></tr>
+        <tr><td class="api-code gr">Topic</td><td class="api-desc">Pattern-based routing (e.g. order.* matches order.created, order.cancelled).</td></tr>
+        <tr><td class="api-code am">Fanout</td><td class="api-desc">Broadcast to all bound queues.</td></tr>
+        <tr><td class="api-code pu">Headers</td><td class="api-desc">Route using message headers instead of routing key.</td></tr>
+      </table>
+      <div class="api-desc" style="font-size:8px; margin-top:5px;">Acknowledgement (ACK): consumer processes → ACK → broker removes message. If consumer fails before ACK → redelivered. Failed/rejected messages can route to a Dead Letter Exchange → Dead Letter Queue.</div>
+    </div>
+  </div>
+
+  <div class="cmp-panel">
+    <div class="tree-title">Kafka vs RabbitMQ</div>
+    <table class="grid-table">
+      <tr><th>Aspect</th><th>Kafka</th><th>RabbitMQ</th></tr>
+      <tr><td>Model</td><td class="cell-hl">Distributed event streaming, log-based</td><td>Traditional message broker, queue-based</td></tr>
+      <tr><td>Structure</td><td class="cell-hl">Topic + Partition</td><td>Exchange + Queue</td></tr>
+      <tr><td>Retention</td><td class="cell-hl">Retention-based, replay easy</td><td>Removed after ACK, replay less natural</td></tr>
+      <tr><td>Throughput</td><td class="cell-hl">Very high</td><td>Strong routing, moderate throughput</td></tr>
+      <tr><td>Ordering</td><td class="cell-hl">Per partition</td><td>Within queue context</td></tr>
+      <tr><td>Best for</td><td class="cell-hl">Event streams, high volume, replay, pipelines</td><td>Task queues, work distribution, complex routing, command messaging</td></tr>
+    </table>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Event Payload &amp; Schema Evolution</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Include only required business data. Common metadata: <code>eventId, eventType, timestamp, aggregateId, correlationId, version</code>. Maintain <b>backward compatibility</b>, version schemas, avoid suddenly removing required fields — old consumers may break otherwise.
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Kafka + Outbox Flow (End-to-End)</div>
+      <div class="flow-row"><div class="flow-box source">Local Tx</div><span class="flow-arrow">→</span><div class="flow-box inter">Business Table + Outbox Table</div><span class="flow-arrow">→</span><div class="flow-box inter">Commit</div><span class="flow-arrow">→</span><div class="flow-box inter">Publisher/CDC</div><span class="flow-arrow">→</span><div class="flow-box term">Kafka</div><span class="flow-arrow">→</span><div class="flow-box ok">Consumers</div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ OBSERVABILITY ═══════════════ -->
+  <div class="section-label" id="observability">Observability — Logs, Metrics, Traces</div>
+  <div class="pillar-panel">
+    <div class="tree-title">3 Pillars of Observability</div>
+    <div class="pillar-grid c3">
+      <div class="pillar-card p-bl"><div class="pillar-name bl">Logs</div><div class="pillar-def">"What happened?" — recorded application events &amp; runtime info.</div></div>
+      <div class="pillar-card p-gr"><div class="pillar-name gr">Metrics</div><div class="pillar-def">"How is the system performing?" — numeric measurements over time.</div></div>
+      <div class="pillar-card p-am"><div class="pillar-name am">Traces</div><div class="pillar-def">"Where did the request travel?" — request journey across services.</div></div>
+    </div>
+    <div class="api-desc" style="font-size:8.2px; margin-top:6px;">In a monolith, one app's logs are enough. In microservices a request crosses Gateway → Order → Payment → Notification → Kafka — you need <b style="color:var(--text-bright)">centralized logging + distributed tracing + metrics + monitoring</b>.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Centralized Logging — ELK / EFK</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        <b style="color:var(--blue)">ELK</b> = Elasticsearch (store/index/search) + Logstash (collect/transform/forward) + Kibana (search/visualize). <b style="color:var(--amber)">EFK</b> swaps Logstash for Fluentd/Fluent Bit — common in Kubernetes.
+      </div>
+      <div class="flow-row" style="margin-top:5px;"><div class="flow-box inter">Microservices</div><span class="flow-arrow">→</span><div class="flow-box inter">Logstash</div><span class="flow-arrow">→</span><div class="flow-box inter">Elasticsearch</div><span class="flow-arrow">→</span><div class="flow-box ok">Kibana</div></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Correlation ID</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        Unique ID connecting logs belonging to the same business request. Gateway generates <code>X-Correlation-ID</code> (e.g. CID-12345) → propagated through headers (HTTP) or message metadata (Kafka/RabbitMQ) → search one ID to see the complete request across all services.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TRACING ═══════════════ -->
+  <div class="section-label" id="tracing">Distributed Tracing</div>
+  <div class="bottom-grid">
+    <div class="cmp-panel">
+      <div class="tree-title">Trace vs Span vs Trace ID vs Span ID</div>
+      <div class="cmp-card"><div class="cmp-row"><span class="cmp-key">Trace</span><span class="cmp-val">Complete end-to-end request. One request = one trace.</span></div></div>
+      <div class="cmp-card"><div class="cmp-row"><span class="cmp-key">Span</span><span class="cmp-val">One operation within a trace (Gateway span, Order span, Payment span, DB span).</span></div></div>
+      <div class="cmp-card"><div class="cmp-row"><span class="cmp-key">Trace ID</span><span class="cmp-val">Unique ID for the entire distributed request — propagates across services.</span></div></div>
+      <div class="cmp-card"><div class="cmp-row"><span class="cmp-key">Span ID</span><span class="cmp-val">Unique ID for one operation inside a trace. Spans form a parent/child hierarchy.</span></div></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Correlation ID vs Trace ID</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.6;">
+        <b style="color:var(--blue)">Correlation ID</b> = application-level request correlation. <b style="color:var(--amber)">Trace ID</b> = distributed tracing identifier. Both help track requests — modern tracing systems often use Trace ID for log correlation too.
+      </div>
+      <div class="tree-title" style="margin-top:6px;">Example Trace</div>
+      <div class="code-block">Trace T-1001
+ ├─ Gateway        20 ms
+ ├─ Order Service  100 ms
+ ├─ Payment Service 2500 ms  ← bottleneck
+ └─ Database        50 ms</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">OpenTelemetry / Micrometer / Zipkin / Jaeger</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">OpenTelemetry</td><td class="api-desc">Vendor-neutral observability framework for generating/collecting/exporting traces, metrics, logs.</td></tr>
+        <tr><td class="api-code gr">Micrometer</td><td class="api-desc">Metrics facade for JVM/Spring Boot apps (JVM memory, CPU, HTTP counts/latency, DB pool, custom metrics).</td></tr>
+        <tr><td class="api-code am">Micrometer Tracing</td><td class="api-desc">Modern Spring Boot's tracing integration; works with OpenTelemetry-based instrumentation.</td></tr>
+        <tr><td class="api-code pu">Zipkin / Jaeger</td><td class="api-desc">Distributed tracing platforms — collect, store, visualize traces; latency &amp; dependency analysis.</td></tr>
+      </table>
+    </div>
+    <div class="tree-panel" id="actuator">
+      <div class="tree-title">Spring Boot Actuator</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">/actuator/health</td><td class="api-desc">Application health — UP/DOWN.</td></tr>
+        <tr><td class="api-code gr">/actuator/metrics</td><td class="api-desc">Application metrics.</td></tr>
+        <tr><td class="api-code am">/actuator/prometheus</td><td class="api-desc">Metrics in Prometheus format.</td></tr>
+        <tr><td class="api-code pu">/actuator/info</td><td class="api-desc">App info.</td></tr>
+        <tr><td class="api-code cy">/actuator/loggers</td><td class="api-desc">Logger configuration.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="cmp-panel">
+      <div class="tree-title">Liveness vs Readiness</div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name bl">Liveness</span></div><div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">"Is the process alive?" — if it fails, the platform may restart the app.</span></div></div></div>
+      <div class="cmp-divider"></div>
+      <div class="cmp-card"><div class="cmp-header"><span class="cmp-name gr">Readiness</span></div><div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">"Is the app ready to receive traffic?" — if it fails, traffic is stopped to this instance (e.g. DB temporarily down → app running but not ready).</span></div></div></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Golden Signals</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">
+        <b style="color:var(--blue)">Latency</b> — how long requests take (p50/p95/p99; p95=500ms → 95% finish within 500ms).<br>
+        <b style="color:var(--green)">Traffic</b> — demand (requests/sec, messages/sec).<br>
+        <b style="color:var(--amber)">Errors</b> — HTTP 5xx, failed Kafka processing, DB errors.<br>
+        <b style="color:var(--purple)">Saturation</b> — how close to capacity (CPU, memory, thread pool, connection pool).
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Prometheus vs Grafana</div>
+      <div class="flow-row"><div class="flow-box source">Spring Boot Actuator</div><span class="flow-arrow">→</span><div class="flow-box inter">/actuator/prometheus</div><span class="flow-arrow">→</span><div class="flow-box inter">Prometheus (collect &amp; store)</div><span class="flow-arrow">→</span><div class="flow-box ok">Grafana (visualize)</div></div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">SLI vs SLO vs SLA</div>
+      <table class="api-table">
+        <tr><td class="api-code bl">SLI</td><td class="api-desc">Service Level Indicator — actual measured performance (availability, latency, error rate).</td></tr>
+        <tr><td class="api-code gr">SLO</td><td class="api-desc">Service Level Objective — internal target (e.g. 99.9% availability).</td></tr>
+        <tr><td class="api-code am">SLA</td><td class="api-desc">Service Level Agreement — formal agreement with customer/business, may include consequences.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TROUBLESHOOTING ═══════════════ -->
+  <div class="section-label" id="troubleshoot">Production Troubleshooting Flow</div>
+  <div class="flow-panel">
+    <div class="flow-row">
+      <div class="flow-box source">Alert</div><span class="flow-arrow">→</span><div class="flow-box inter">Check Metrics (Grafana)</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Identify Affected Service</div><span class="flow-arrow">→</span><div class="flow-box inter">Check Distributed Trace</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Find Slow/Failed Span</div><span class="flow-arrow">→</span><div class="flow-box inter">Search Logs by Trace ID</div><span class="flow-arrow">→</span>
+      <div class="flow-box ok">Root Cause → Fix → Verify Metrics</div>
+    </div>
+  </div>
+  <div class="bottom-grid">
+    <div class="tree-panel">
+      <div class="tree-title">Kafka / DB Specific Checks</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">
+        <b style="color:var(--blue)">Kafka:</b> consumer lag → consumer health → processing time → error rate → retry/DLT → broker health.<br>
+        <b style="color:var(--amber)">Database:</b> connection pool → slow queries → connection count → query latency → locks → DB CPU.<br>
+        <b style="color:var(--purple)">HikariCP:</b> watch active/idle connections &amp; pending threads — rising pending threads = pool exhaustion.
+      </div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Dashboard Essentials</div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">
+        Request rate · Error rate · p95/p99 latency · CPU/Memory · JVM heap &amp; GC · Thread count · DB pool · Kafka consumer lag · Circuit breaker state.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ANTI-PATTERNS ═══════════════ -->
+  <div class="section-label" id="antipatterns">Design Principles &amp; Anti-Patterns</div>
+  <div class="two-col">
+    <div class="tree-panel">
+      <div class="tree-title">Good Microservice = </div>
+      <div class="api-desc" style="font-size:8.2px; line-height:1.7;">
+        High Cohesion + Loose Coupling + Clear Business Boundary + Owns Its Data + Independent Deployment + Independent Scaling + Failure Isolation.
+      </div>
+      <div class="tree-title" style="margin-top:6px;">Microservice Size</div>
+      <div class="api-desc" style="font-size:8.2px;">No fixed number of classes/LOC — boundary should be based on business capability &amp; ownership, not line count.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Common Anti-Patterns</div>
+      <table class="api-table">
+        <tr><td class="api-code rd">Distributed Monolith</td><td class="api-desc">Services exist but are tightly coupled — every deployment needs multiple services together.</td></tr>
+        <tr><td class="api-code rd">Shared Database</td><td class="api-desc">Multiple services directly access the same tables.</td></tr>
+        <tr><td class="api-code rd">Chattering Services</td><td class="api-desc">Too many small synchronous calls between services.</td></tr>
+        <tr><td class="api-code rd">Nano Services</td><td class="api-desc">Services too small, without a real business boundary.</td></tr>
+        <tr><td class="api-code rd">Long Sync Chains</td><td class="api-desc">A→B→C→D→E — high latency + cascading failure risk.</td></tr>
+        <tr><td class="api-code rd">Hardcoded URLs</td><td class="api-desc">No dynamic service discovery.</td></tr>
+        <tr><td class="api-code rd">Shared Domain Model</td><td class="api-desc">Services strongly coupled through common internal models.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════ PRODUCTION CHECKLIST ═══════════════ -->
+  <div class="section-label" id="checklist">Production Checklist</div>
+  <div class="revision-panel">
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">✓</span> Architecture: clear boundaries, high cohesion, loose coupling, DB per service, independent deployment</div>
+      <div class="revision-item"><span class="chk">✓</span> Communication: right sync/async choice, timeouts configured, avoid long call chains, version APIs</div>
+      <div class="revision-item"><span class="chk">✓</span> Resilience: timeout, limited retry, circuit breaker, bulkhead, rate limiting, graceful degradation</div>
+      <div class="revision-item"><span class="chk">✓</span> Messaging: idempotent consumers, message keys, retry strategy, DLT/DLQ, schema compatibility, monitor lag</div>
+      <div class="revision-item"><span class="chk">✓</span> Data: SAGA where required, transactional outbox, eventual consistency, clear data ownership</div>
+      <div class="revision-item"><span class="chk">✓</span> Security: authN/authZ, HTTPS, secrets management, least privilege</div>
+      <div class="revision-item"><span class="chk">✓</span> Observability: centralized logs, metrics, distributed tracing, trace ID, health checks, dashboards, alerts</div>
+      <div class="revision-item"><span class="chk">✓</span> Never retry permanent business errors forever — send to DLQ / manual handling</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCENARIOS ═══════════════ -->
+  <div class="section-label" id="scenarios">Scenario Interview Questions — Rapid Fire</div>
+  <div class="problem-grid">
+    <div class="problem-card"><div class="problem-title">Payment Service is down — should Order Service also fail?</div><div class="problem-body">Depends on business need. Design: <b>Timeout → Retry → Circuit Breaker → Fallback → Queue/Event → process later.</b> Goal: avoid cascading failure.</div></div>
+    <div class="problem-card"><div class="problem-title">3 instances of Payment Service — how does Order Service pick one?</div><div class="problem-body">Instances register with the <b>Service Registry</b>. Order Service resolves PAYMENT-SERVICE → Discovery returns instances → <b>Load Balancer</b> selects one → request sent.</div></div>
+    <div class="problem-card"><div class="problem-title">Order saved but Payment failed — what now?</div><div class="problem-body">Using SAGA: Payment failure event → Order Service marks order FAILED/CANCELLED. If earlier steps need reversal → execute <b>compensating transactions</b>.</div></div>
+    <div class="problem-card"><div class="problem-title">DB commit succeeded, Kafka publish failed?</div><div class="problem-body">Use the <b>Transactional Outbox Pattern</b> — save business data + outbox event in the same local transaction, then publish from the outbox.</div></div>
+    <div class="problem-card"><div class="problem-title">Kafka delivered the same event twice?</div><div class="problem-body">Make the consumer <b>idempotent</b> — use event ID / idempotency key, check if already processed before executing the operation.</div></div>
+    <div class="problem-card"><div class="problem-title">6 Kafka partitions, 3 consumers, same group?</div><div class="problem-body">Each consumer handles ~2 partitions — parallel processing across all 3. With 10 consumers instead, only 6 are active; 4 stay idle (limited by partition count).</div></div>
+    <div class="problem-card"><div class="problem-title">Payment API takes 30 seconds — what will you do?</div><div class="problem-body">Configure a short reasonable <b>timeout</b> → retry only if transient &amp; safe → circuit breaker for repeated failures → fallback or pending state → process later if business allows.</div></div>
+    <div class="problem-card"><div class="problem-title">Should every microservice validate JWT?</div><div class="problem-body">Gateway can do initial authentication, but sensitive services shouldn't blindly trust unvalidated traffic — depends on architecture &amp; trust boundary.</div></div>
+    <div class="problem-card"><div class="problem-title">One message keeps failing on every retry?</div><div class="problem-body">Don't retry forever — use limited retries + backoff → <b>Dead Letter Topic/Queue</b> → alert → investigate or reprocess.</div></div>
+    <div class="problem-card"><div class="problem-title">20 microservices, one request fails — how to find which?</div><div class="problem-body">Use <b>distributed tracing</b> → Trace ID → find the failed span → identify the service → search centralized logs by Trace ID → find root cause.</div></div>
+  </div>
+
+  <!-- ═══════════════ COMPLETE FLOW ═══════════════ -->
+  <div class="section-label" id="flow">Complete Real-Project Request Flow (Reference)</div>
+  <div class="flow-panel">
+    <div class="tree-title">Certification Platform Example</div>
+    <div class="flow-row">
+      <div class="flow-box source">React/Mobile App</div><span class="flow-arrow">→</span><div class="flow-box inter">API Gateway</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Auth Filter (JWT)</div><span class="flow-arrow">→</span><div class="flow-box inter">Service Discovery</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Load Balancer</div><span class="flow-arrow">→</span><div class="flow-box term">Candidate / Trainer / Course / Exam / Payment / Certificate Service</div>
+    </div>
+    <div class="flow-sub-title">Immediate need (sync) → OpenFeign, e.g. Exam Service → Candidate Service</div>
+    <div class="flow-row" style="margin-top:6px;">
+      <div class="flow-box source">Exam Service</div><span class="flow-arrow">→</span><div class="flow-box inter">ExamPassed Event</div><span class="flow-arrow">→</span><div class="flow-box term">Kafka</div><span class="flow-arrow">→</span>
+      <div class="flow-box inter">Certificate Service (generate cert)</div><div class="flow-box inter">Notification Service (send msg)</div>
+    </div>
+    <div class="flow-sub-title">Async fan-out via Kafka — for "already happened" business facts</div>
+  </div>
+
+  <!-- ═══════════════ FINAL REVISION ═══════════════ -->
+  <div class="section-label" id="summary">Final Revision — Interview One-Liners</div>
+  <div class="liner-grid">
+    <div class="liner"><b>Microservices</b><span class="arr">→</span>Small independent business services</div>
+    <div class="liner"><b>Monolith</b><span class="arr">→</span>Single deployable application</div>
+    <div class="liner"><b>Loose Coupling</b><span class="arr">→</span>Minimum service dependency</div>
+    <div class="liner"><b>High Cohesion</b><span class="arr">→</span>Related logic stays together</div>
+    <div class="liner"><b>DB Per Service</b><span class="arr">→</span>Service owns its data</div>
+    <div class="liner"><b>API Gateway</b><span class="arr">→</span>Single entry point</div>
+    <div class="liner"><b>Service Discovery</b><span class="arr">→</span>Dynamic instance lookup</div>
+    <div class="liner"><b>Eureka</b><span class="arr">→</span>Service registry</div>
+    <div class="liner"><b>Load Balancer</b><span class="arr">→</span>Distribute traffic</div>
+    <div class="liner"><b>OpenFeign</b><span class="arr">→</span>Declarative HTTP client</div>
+    <div class="liner"><b>WebClient</b><span class="arr">→</span>Reactive HTTP client</div>
+    <div class="liner"><b>Config Server</b><span class="arr">→</span>Central configuration</div>
+    <div class="liner"><b>Timeout</b><span class="arr">→</span>Maximum wait time</div>
+    <div class="liner"><b>Retry</b><span class="arr">→</span>Retry temporary failure</div>
+    <div class="liner"><b>Circuit Breaker</b><span class="arr">→</span>Stop calls to failing service</div>
+    <div class="liner"><b>Fallback</b><span class="arr">→</span>Alternative response</div>
+    <div class="liner"><b>Bulkhead</b><span class="arr">→</span>Resource isolation</div>
+    <div class="liner"><b>Rate Limiter</b><span class="arr">→</span>Limit traffic</div>
+    <div class="liner"><b>Resilience4j</b><span class="arr">→</span>Fault-tolerance library</div>
+    <div class="liner"><b>SAGA</b><span class="arr">→</span>Local transactions + compensation</div>
+    <div class="liner"><b>Choreography</b><span class="arr">→</span>Event-based SAGA</div>
+    <div class="liner"><b>Orchestration</b><span class="arr">→</span>Coordinator-based SAGA</div>
+    <div class="liner"><b>Compensation</b><span class="arr">→</span>Reverse previous business action</div>
+    <div class="liner"><b>Eventual Consistency</b><span class="arr">→</span>Consistent over time</div>
+    <div class="liner"><b>Outbox</b><span class="arr">→</span>Reliable DB + event publishing</div>
+    <div class="liner"><b>CDC</b><span class="arr">→</span>Change Data Capture</div>
+    <div class="liner"><b>Idempotency</b><span class="arr">→</span>Safe reprocessing</div>
+    <div class="liner"><b>Kafka</b><span class="arr">→</span>Event streaming platform</div>
+    <div class="liner"><b>Topic</b><span class="arr">→</span>Event stream</div>
+    <div class="liner"><b>Partition</b><span class="arr">→</span>Ordering + parallelism unit</div>
+    <div class="liner"><b>Offset</b><span class="arr">→</span>Position in partition</div>
+    <div class="liner"><b>Consumer Group</b><span class="arr">→</span>Parallel consumers</div>
+    <div class="liner"><b>Replication</b><span class="arr">→</span>Kafka fault tolerance</div>
+    <div class="liner"><b>DLT/DLQ</b><span class="arr">→</span>Failed message storage</div>
+    <div class="liner"><b>RabbitMQ</b><span class="arr">→</span>Queue-based message broker</div>
+    <div class="liner"><b>Exchange</b><span class="arr">→</span>Routes messages</div>
+    <div class="liner"><b>Queue</b><span class="arr">→</span>Stores messages</div>
+    <div class="liner"><b>Observability</b><span class="arr">→</span>Logs + Metrics + Traces</div>
+    <div class="liner"><b>Correlation ID</b><span class="arr">→</span>Correlate related logs</div>
+    <div class="liner"><b>Trace ID</b><span class="arr">→</span>Whole request</div>
+    <div class="liner"><b>Span ID</b><span class="arr">→</span>Single operation</div>
+    <div class="liner"><b>Actuator</b><span class="arr">→</span>Monitoring endpoints</div>
+    <div class="liner"><b>Micrometer</b><span class="arr">→</span>Metrics instrumentation</div>
+    <div class="liner"><b>Prometheus</b><span class="arr">→</span>Metrics collection</div>
+    <div class="liner"><b>Grafana</b><span class="arr">→</span>Metrics visualization</div>
+    <div class="liner"><b>Liveness</b><span class="arr">→</span>Is process alive?</div>
+    <div class="liner"><b>Readiness</b><span class="arr">→</span>Should receive traffic?</div>
+    <div class="liner"><b>SLI / SLO / SLA</b><span class="arr">→</span>Measurement / target / agreement</div>
+    <div class="liner"><b>Distributed Monolith</b><span class="arr">→</span>Services that must deploy together</div>
+  </div>
+
+  <div class="revision-panel" style="margin-top:8px;">
+    <div class="tree-title">10 Rules To Remember</div>
+    <div class="revision-grid">
+      <div class="revision-item"><span class="chk">1.</span> Microservice should represent a business capability</div>
+      <div class="revision-item"><span class="chk">2.</span> Each service should own its data</div>
+      <div class="revision-item"><span class="chk">3.</span> Never assume a network call will always succeed</div>
+      <div class="revision-item"><span class="chk">4.</span> Configure timeout before thinking about retry</div>
+      <div class="revision-item"><span class="chk">5.</span> Do not retry every error</div>
+      <div class="revision-item"><span class="chk">6.</span> Design message consumers to be idempotent</div>
+      <div class="revision-item"><span class="chk">7.</span> Distributed transactions usually need SAGA + eventual consistency</div>
+      <div class="revision-item"><span class="chk">8.</span> Use transactional outbox for reliable DB + event publishing</div>
+      <div class="revision-item"><span class="chk">9.</span> Logs alone aren't enough — need Logs + Metrics + Traces</div>
+      <div class="revision-item"><span class="chk">10.</span> Microservices aren't always better than monolith — justify the complexity</div>
+    </div>
+  </div>
+
+  <footer>Microservices Interview Revision Master — built from your uploaded cheat sheets · read once before every interview</footer>
+
+</div>
+</body>
+</html>

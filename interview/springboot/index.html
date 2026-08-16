@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Boot &mdash; TCS Interview Revision (Priority-Asked Q&amp;A)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Spring Boot &mdash; Priority-Asked Interview Q&amp;A</span>
+    </div>
+    <div class="subtitle">// Every question ever actually asked in an interview (Priority Count column) &mdash; consolidated from the master question bank, cross-referenced with the Spring Core / Boot / REST / JPA / Security cheat sheets in this folder</div>
+
+    <div class="context-panel">
+      <b>Target:</b> TCS Java Spring Boot Developer interview, 20 Aug 2026 &middot; <b>Level:</b> 5&ndash;8 years experience.<br>
+      This single document is meant to be sufficient for full revision &mdash; every question below has a Priority Count in the master sheet, meaning it has genuinely come up in a past interview. Questions marked <span class="badge badge-li" style="margin:0 2px;">💼 LinkedIn</span> were specifically reported as asked via a LinkedIn-sourced interview experience.
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><b>42</b>Total priority questions</div>
+      <div class="stat"><b>60</b>LinkedIn-sourced (💼)</div>
+      <div class="stat"><b>14</b>Topic sections</div>
+      <div class="stat"><b>17</b>Quick differences</div>
+    </div>
+
+    <div class="legend">
+      <span class="legend-label">Legend</span>
+      <div class="legend-items">
+        <span class="badge badge-li">💼 LinkedIn Asked &times;N</span>
+        <span class="badge badge-asked">&#10003; Asked in Interview &times;N</span>
+        <span class="badge badge-track">Tracked (not yet asked)</span>
+        <span class="badge badge-level">Level &middot; YoE band</span>
+      </div>
+    </div>
+
+    <div class="toc"><a href="#s1">Spring Boot Fundamentals, Startup &amp; Auto-Configuration</a><a href="#s2">IoC, Dependency Injection, Beans &amp; Core Annotations</a><a href="#s3">Configuration, Profiles &amp; Externalization</a><a href="#s4">Spring MVC &amp; REST API</a><a href="#s5">Validation &amp; Exception Handling</a><a href="#s6">Spring Data JPA, Hibernate, Transactions &amp; DB Access</a><a href="#s7">Spring Security &amp; JWT</a><a href="#s8">Caching, Async &amp; Scheduling</a><a href="#s9">Microservices &amp; Resilience</a><a href="#s10">Testing, Quality &amp; Tooling</a><a href="#s11">Performance, Monitoring, Actuator &amp; JVM</a><a href="#s12">Production Troubleshooting (Realtime Scenarios)</a><a href="#s13">Real-World / System Design Scenarios</a><a href="#s14">Architecture &amp; Design Patterns</a><a href="#diffs">Quick Differences</a><a href="#rapid">Rapid Revision</a></div>
+  </div>
+
+
+  <div class="section-label big" id="s1">Spring Boot Fundamentals, Startup &amp; Auto-Configuration <span class="section-count">(15 questions)</span></div>
+  <div class="bonus-panel">
+  <div class="bonus-title">Deep-Dive &mdash; Auto-Configuration Internals (not in the priority list but frequently probed)</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Mechanism</th><th>Detail</th></tr>
+      <tr><td class="cell-hl">Spring Boot 2.x</td><td><code>META-INF/spring.factories</code> lists all <code>EnableAutoConfiguration</code> candidate classes.</td></tr>
+      <tr><td class="cell-hl">Spring Boot 3.x</td><td><code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code> replaces <code>spring.factories</code> for auto-configuration (faster startup, no per-class instantiation to check conditions).</td></tr>
+      <tr><td class="cell-hl">@ConditionalOnClass</td><td>Bean is registered only if the given class is present on the classpath.</td></tr>
+      <tr><td class="cell-hl">@ConditionalOnMissingBean</td><td>Backs off if the developer already defined a bean of that type &mdash; this is exactly how you override an auto-configured bean.</td></tr>
+      <tr><td class="cell-hl">@ConditionalOnProperty</td><td>Bean created only if a property matches (e.g. <code>management.endpoint.health.enabled=true</code>).</td></tr>
+      <tr><td class="cell-hl">@AutoConfigureAfter/Before</td><td>Orders auto-configuration classes relative to each other.</td></tr>
+    </table>
+  </div>
+  <div class="note">DevTools starter (<code>spring-boot-devtools</code>) adds: automatic restart on classpath change, LiveReload browser refresh, and disables template caching &mdash; excluded automatically from production repackaged JARs.</div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Boot Fundamentals</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. What is the purpose of the <code>@SpringBootApplication</code> annotation?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>Without <code>@SpringBootApplication</code> annotation will it work ?</li><li>Which annotations are included within <code>@SpringBootApplication</code> ?</li></ul></div>
+  <div class="qa-a">
+<p>used on the main class to bootstrap and start a Spring Boot application, combining <code>@Configuration</code>, <code>@EnableAutoConfiguration</code>, and <code>@ComponentScan</code> into a single annotation.</p>
+<p>if No <code>@SpringBootApplication</code> → Application may not work properly if Add: <code>@Configuration</code>, <code>@EnableAutoConfiguration</code>, <code>@ComponentScan</code> → Works exactly the same</p>
+<ul>
+<li><code>@Configuration</code> → Marks the class as a source of Spring bean definitions.</li>
+<li><code>@EnableAutoConfiguration</code> → enables the Auto-Configuration mechanism &amp; Auto-configures the Spring Boot based on the dependencies/libraries available in the classpath.</li>
+<li><code>@ComponentScan</code> → Scans packages for Spring components (<code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, <code>@Controller</code>) and registers them as Spring beans.</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Basic Concepts</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. How do you run a Spring Boot application?</div>
+  
+  <div class="qa-a">
+<ul>
+<li>Using IDE (STS/IntelliJ/Eclipse) → Run the main class containing the main() method and SpringApplication.run().</li>
+<li>Using Maven → Use Maven commands to start the application directly without creating a JAR file.</li>
+<li>Using Gradle → Use Gradle commands to build and run the application.</li>
+<li>Using Executable JAR → Package the application as a JAR file and run it independently using Java.</li>
+<li>Using WAR Deployment → Package the application as a WAR file and deploy it to an external application server such as Tomcat, WebLogic, or JBoss.</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Boot Internals</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is the role of spring.factories?</div>
+  
+  <div class="qa-a">
+<p><b>Internal Flow:</b></p>
+<ul>
+<li>Application starts with <code>@SpringBootApplication</code>.</li>
+<li><code>@EnableAutoConfiguration</code> is triggered.</li>
+<li>Spring Boot reads the auto-configuration registrations. (spring.factories in older versions, AutoConfiguration.imports in Spring Boot 3.x).</li>
+<li>It finds the list of AutoConfiguration classes.</li>
+<li>Each AutoConfigurationclass is loaded.</li>
+<li>Spring checks conditions like:   - <code>@ConditionalOnClass</code>   - <code>@ConditionalOnMissingBean</code>   - <code>@ConditionalOnProperty</code></li>
+<li>If the conditions are satisfied, the required beans are created and registered in the ApplicationContext (IoC Container).</li>
+<li>Your application starts with those beansavailable for use.</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Boot Internals</span>
+    <div class="qa-badges"><span class="badge badge-track">Tracked (not yet asked)</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What happens during application startup?</div>
+  
+  <div class="qa-a">
+<p><b>Startup Flow:</b></p>
+<ul>
+<li>main() method executes and calls SpringApplication.run().</li>
+<li>Spring Container is created.</li>
+<li>Component Scanning scans and registers beans.</li>
+<li>Dependency Injection injects required dependencies.</li>
+<li>Auto-Configuration configures beans based on dependencies.</li>
+<li>ApplicationContext is initialized.</li>
+<li>Embedded Server (Tomcat) starts.</li>
+<li>Application becomes ready to accept requests.</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Boot Internals</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Senior · 5–7 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Explain the complete Spring Boot startup lifecycle.</div>
+  
+  <div class="qa-a">
+<div class="flowchart-panel"><div class="flowchart"><div class="flow-box">main()</div><div class="flow-arrow">↓ Entry Point</div><div class="flow-box">SpringApplication.run()</div><div class="flow-arrow">↓ Start Application</div><div class="flow-box">Create ApplicationContext</div><div class="flow-arrow">↓ Create IoC Container</div><div class="flow-box">Load Configuration</div><div class="flow-arrow">↓ Load Properties/YAML</div><div class="flow-box">Component Scanning</div><div class="flow-arrow">↓ Find Components</div><div class="flow-box">Create Beans</div><div class="flow-arrow">↓ Instantiate Beans</div><div class="flow-box">Dependency Injection</div><div class="flow-arrow">↓ Inject Dependencies</div><div class="flow-box">Auto Configuration</div><div class="flow-arrow">↓ Configure Beans Automatically</div><div class="flow-box">Bean Initialization</div><div class="flow-arrow">↓ Run Init Methods</div><div class="flow-box">Embedded Tomcat Starts</div><div class="flow-arrow">↓ Start Web Server</div><div class="flow-box">Application Ready</div></div></div>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Application Startup</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. CommandLineRunner vs ApplicationRunner</div>
+  
+  <div class="qa-a">
+<p>Both CommandLineRunner and ApplicationRunner execute code once after the Spring Boot application context is initialized. The difference is that : CommandLineRunner uses raw String... args, whereas ApplicationRunner uses the ApplicationArguments API for structured access to command-line arguments.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. How do you optimize Spring application startup time?</div>
+  
+  <div class="qa-a">
+<p>Reduce Spring Boot startup time by enabling lazy initialization (spring.main.lazy-initialization=true), minimizing component scanning scope, avoiding unnecessary auto-configurations, excluding unneeded starters, and considering AOT/native compilation (Spring Native/GraalVM) for the most significant improvement.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Advanced Spring Boot</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How can you exclude specific auto-configurations?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>disable specific auto-configuration?</li></ul></div>
+  <div class="qa-a">
+<p>Specific Auto-Configurations can be excluded using the exclude attribute of <code>@SpringBootApplication</code> or the spring.autoconfigure.exclude property in application.properties. This is commonly done when the default auto-configuration is not needed or a custom implementation is being used. <code>@SpringBootApplication</code>( exclude = {DataSourceAutoConfiguration.class} )</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Auto Configuration</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you override auto-configured beans in Spring Boot?</div>
+  
+  <div class="qa-a">
+<p>We can override an auto-configured bean by defining our own bean of the same type using <code>@Bean</code> method in a <code>@Configuration</code> class. Spring will use the custom bean instead of the auto-configured one (provided the auto-configuration is conditional).</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Dependency Management</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is the difference between Spring Boot Starter Dependencies and Manual Dependency Management?</div>
+  
+  <div class="qa-a">
+<p>Starter dependencies are predefined dependency packages that contains required libraries for a specific functionality : spring-boot-starter-web manual dependency management requires developers to add and maintain each dependency and its version individually. : jjwt-api</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Dependency Management</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. spring-boot-starter-parent</div>
+  
+  <div class="qa-a">
+<p>spring-boot-starter-parent is the parent POM provided by Spring Boot. It manages dependency versions, plugin configurations, and default build settings, so we don't have to specify compatible versions manually.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Boot Configuration</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you disable the default web server in Spring Boot?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>Can we create a non-web application in Spring Boot?</li></ul></div>
+  <div class="qa-a">
+<p>We can disable the embedded web server by configuring the application as non-web. Using application.properties: spring.main.web-application-type=none</p>
+<p>Yes. Spring Boot can be used to create a non-web application by disabling the web server using spring.main.web-application-type=none or WebApplicationType.NONE. This is commonly used for batch jobs, scheduled tasks, CLI applications, or Kafka consumers.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Embedded Server</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you override or replace the embedded Tomcat server in Spring Boot?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>What if you don't want to use any embedded server?</li></ul></div>
+  <div class="qa-a">
+<p>Spring Boot uses Tomcat as the default embedded server. To replace it, we exclude spring-boot-starter-tomcat and add another embedded server dependency such as spring-boot-starter-jetty or spring-boot-starter-undertow.</p>
+<p>If I don't want to use an embedded server, I can package the application as a WAR file, exclude the embedded Tomcat dependency, and deploy it to an external application server such as Apache Tomcat, JBoss/WildFly, or WebLogic.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Embedded Server</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Which servers does Spring Boot support?</div>
+  
+  <div class="qa-a">
+<p>Spring Boot supports multiple embedded servers. The default is Tomcat, and it also supports Jetty and Undertow. It can also be deployed as a WAR file to external application servers.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Packaging &amp; Deployment</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. JAR vs WAR</div>
+  
+  <div class="qa-a">
+<p>JAR (Java ARchive) is a standalone executable package that contains an embedded server like Tomcat. WAR (Web ARchive) is deployed to an external application server such as Tomcat, JBoss, or WebLogic.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s2">IoC, Dependency Injection, Beans &amp; Core Annotations <span class="section-count">(14 questions)</span></div>
+  
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Dependency Injection &amp; Beans</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. What is Dependency Injection?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How dependency injection work internally?</li></ul></div>
+  <div class="qa-a">
+<p>Dependency Injection (DI) is a design pattern where Spring creates and injects dependent objects (beans) into a class instead of the class creating them itself, reducing tight coupling and improving maintainability.</p>
+<p><b>Internally :</b></p>
+<ul>
+<li>Component Scanning → Spring uses <code>@ComponentScan</code> to scan classes annotated with <code>@Component</code>, <code>@Service</code>, <code>@Controller</code>, and <code>@Repository</code>.</li>
+<li>Bean Creation → Based on the scanning, Spring creates and registersbeans in the IoC Container.</li>
+<li>Dependency Resolution → When a beanrequiresanotherbean as a dependency, Springsearches the IoC Container for the corresponding bean and resolves the dependency.</li>
+<li>Dependency Injection → Spring injects the required bean automatically using <code>@Autowired</code> or Constructor Injection.</li>
+<li>Bean Ready for Use → The fully initialized bean is readyfor use.</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Dependency Injection &amp; Beans</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. What is the difference between <code>@Component</code>, <code>@Controller</code>, <code>@Service</code>, and <code>@Repository</code>?</div>
+  
+  <div class="qa-a">
+<ul>
+<li><code>@Component</code> → Generic bean. Create an bean of this class and manage its lifecycle in the Spring IoC Container.</li>
+<li><code>@Controller</code> → Handles HTTP requests in Spring MVC and returns a view (or works with <code>@ResponseBody</code>).</li>
+<li><code>@Service</code> → Business logic layer.</li>
+<li><code>@Repository</code> → Database layer and provides exception translation for persistence exceptions.</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Dependency Injection &amp; Beans</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. What is a Spring Bean?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How does Spring manage bean lifecycle?</li></ul></div>
+  <div class="qa-a">
+<p>A Spring Bean is an object that is created, managed, and maintained by the Spring IoC Container.</p>
+<ul>
+<li>Bean Creation → Based on the scanning, Spring creates and registers beans in the IoC Container.</li>
+<li>Dependency Injection → Spring injects the required bean automatically using<code>@Autowired</code> or Constructor Injection.</li>
+<li>Bean Initialization → Initialization methods are executed (<code>@PostConstruct</code>, init-method).</li>
+<li>Bean Ready for Use →  The fully initializedbean is ready for use.</li>
+<li>Bean Destruction → Before application shutdown, destruction methods are called (<code>@PreDestroy</code>, destroy-method).</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Dependency Injection &amp; Beans</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. What is the default scope of a Spring Bean?</div>
+  
+  <div class="qa-a">
+<p>singleton  → One object/bean for Spring container (Default) - ApplicationContext prototype  → New object/bean every request to Spring container - ApplicationContext request    → One object/bean per HTTP request session    → One object/bean per user session application→ One object/bean per web application - ServletContext websocket  → One object/bean per WebSocket session</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Dependency Injection &amp; Beans</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is <code>@Resource</code> Annotation?</div>
+  
+  <div class="qa-a">
+<p>• <code>@Resource</code> is a Jakarta dependency injection annotation used to inject beans into a Spring-managed class. It performs dependency injection by bean name first and falls back to type-based resolution if no matching bean name is found.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Bean Configuration</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Difference between <code>@Configuration</code> and <code>@Component</code>?</div>
+  
+  <div class="qa-a">
+<p>a <code>@Component</code> creates a Spring-managed bean a <code>@Configuration</code> is used to define and manage other beans through <code>@Bean</code> methods.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Container</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you get the list of all beans in a Spring Boot application?</div>
+  
+  <div class="qa-a">
+<p>Spring stores all managed beans in the ApplicationContext. We can retrieve all bean names using applicationContext.getBeanDefinitionNames() and the total number of beans using getBeanDefinitionCount(). For runtime inspection, Spring Boot Actuator also provides the /actuator/beans endpoint.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Core Annotations</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What are the basic Spring Core annotations?</div>
+  
+  <div class="qa-a">
+<ul>
+<li><code>@Component</code> -&gt; Generic Spring bean</li>
+<li><code>@Service</code> -&gt; Business logic layer</li>
+<li><code>@Repository</code> -&gt; Data access layer</li>
+<li><code>@Controller</code> -&gt; MVC controller</li>
+<li><code>@RestController</code> -&gt; REST API controller (<code>@Controller</code> + <code>@ResponseBody</code> )</li>
+<li><code>@Autowired</code> -&gt; Inject dependency</li>
+<li><code>@Qualifier</code> -&gt; Select a specific bean when multiple exists</li>
+<li><code>@Primary</code> -&gt; Default bean among multiple candidates</li>
+<li><code>@Bean</code> -&gt; Creates a bean manually</li>
+<li><code>@Configuration</code> -&gt; Configuration class containing <code>@Bean</code> methods</li>
+<li><code>@ComponentScan</code> -&gt; Scans packages for Spring components</li>
+<li><code>@Value</code> -&gt; Inject property values</li>
+<li><code>@Scope</code> -&gt; Defines bean scope (Singleton, Prototype, etc.)</li>
+<li><code>@PostConstruct</code> -&gt; Executes after bean initialization</li>
+<li><code>@PreDestroy</code> -&gt; Executes before bean destruction</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Core Annotations</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. What happens when we don't use stereotypes annotations in our spring boot application.</div>
+  
+  <div class="qa-a">
+<p>Without stereotype annotations (<code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, <code>@Controller</code>), Spring's component scanning won't detect the class as a bean, so it won't be registered in the application context, and any attempt to <code>@Autowire</code> it elsewhere will fail with a NoSuchBeanDefinitionException.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Core Annotations</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. Spring Boot annotations</div>
+  
+  <div class="qa-a">
+<p>Common Spring Boot annotations include <code>@SpringBootApplication</code> (entry point), <code>@RestController</code>/<code>@Controller</code>, <code>@Service</code>, <code>@Repository</code>, <code>@Component</code>, <code>@Autowired</code>, <code>@RequestMapping</code>/<code>@GetMapping</code>/<code>@PostMapping</code>, <code>@Transactional</code>, and <code>@Configuration</code>/<code>@Bean</code> - each marks a class's role or wires behavior for Spring to manage automatically.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Core Annotations</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. Why we use those annotations</div>
+  
+  <div class="qa-a">
+<p>These annotations let Spring auto-detect, instantiate, and wire components without manual configuration - they declare intent (this is a service, this is a REST endpoint) so Spring's component scanning and dependency injection can manage the object lifecycle and relationships automatically, reducing boilerplate.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. What is the Spring IoC Container?</div>
+  
+  <div class="qa-a">
+<p>The IoC Container is the core of Spring that manages the lifecycle and configuration of application objects (beans) - it creates, wires (injects dependencies into), and manages beans based on configuration (XML, annotations, or Java config), implemented via BeanFactory (basic) or ApplicationContext (advanced, most commonly used).</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. What are bean scopes in Spring?</div>
+  
+  <div class="qa-a">
+<p>Spring bean scopes control how many instances of a bean are created: singleton (one instance per container, default), prototype (new instance every time it's requested), and web-aware scopes like request, session, and application for web applications.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. What are circular dependencies in Spring?</div>
+  
+  <div class="qa-a">
+<p>A circular dependency occurs when two or more beans depend on each other (directly or through a chain). Spring can usually resolve this for singleton beans via setter injection (partially constructed beans exposed early), but constructor injection circular dependencies fail at startup - resolved by refactoring the design, using <code>@Lazy</code>, or switching to setter injection.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s3">Configuration, Profiles &amp; Externalization <span class="section-count">(3 questions)</span></div>
+  <div class="bonus-panel">
+  <div class="bonus-title">Deep-Dive &mdash; Property Source Precedence (highest wins)</div>
+  <div class="revision-panel">
+    <div class="revision-grid cols-1">
+      <div class="revision-item"><span class="chk">1</span>Command-line arguments (<code>--server.port=8081</code>)</div>
+      <div class="revision-item"><span class="chk">2</span><code>SPRING_APPLICATION_JSON</code> / JNDI attributes</div>
+      <div class="revision-item"><span class="chk">3</span>OS environment variables</div>
+      <div class="revision-item"><span class="chk">4</span><code>application-{profile}.properties</code> / <code>.yml</code> (profile-specific, outside jar &gt; inside jar)</div>
+      <div class="revision-item"><span class="chk">5</span><code>application.properties</code> / <code>.yml</code> (outside jar &gt; inside jar)</div>
+      <div class="revision-item"><span class="chk">6</span><code>@PropertySource</code> on <code>@Configuration</code> classes</div>
+      <div class="revision-item"><span class="chk">7</span>Default properties set via <code>SpringApplication.setDefaultProperties</code></div>
+    </div>
+  </div>
+  <div class="note">This is exactly why "I changed application.properties but nothing changed in production" (see Troubleshooting section) is so common &mdash; an env var or CLI flag higher in this order silently wins.</div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Configuration &amp; Properties</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. How do you read a property using <code>@Value</code>?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>how to fetch value from application.properties or application.yml file?</li></ul></div>
+  <div class="qa-a">
+<p>Values from application.properties or application.yml can be accessed using <code>@Value</code>, <code>@ConfigurationProperties</code>, or the Environment interface. Single Property         → <code>@Value</code>("${app.name}") Multiple Properties → <code>@ConfigurationProperties</code>(prefix = "app") Dynamic Access       → Environment (String appName = environment.getProperty("app.name"); )</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Configuration &amp; Properties</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;3</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. How can you define environment-specific configurations?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>What are Spring Profiles?</li><li>How do you activate a specific profile?</li><li>How do you manage configurations across environments?</li><li>What is the purpose of application-dev.properties?</li></ul></div>
+  <div class="qa-a">
+<p>Spring Profiles are used to manage environment-specific configurations and beans for different environments such as Development, Testing, STQA, and Production. Example : application-dev.properties, application-stqa.properties, and application-prod.properties Activate a profile: spring.profiles.active=dev</p>
+<p>A specific Spring Profile can be activated using the spring.profiles.active property, which tells Spring Boot which environment configuration to load.</p>
+<p>application-dev.properties is used to store environment-specific configuration settings for the Development environment.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Configuration &amp; Profiles</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is Externalization in Java?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How do you externalize configuration?</li><li>How does Spring Boot handle externalized configuration?</li></ul></div>
+  <div class="qa-a">
+<ul>
+<li>Externalization is the practice of keeping configuration values outside the application code.</li>
+<li>Configuration is externalized by storing configuration values outside the application code using properties files, YAML files, environment variables, or command-line arguments.</li>
+<li>Spring Boot handles externalized configuration by loading configuration values from properties files, YAML files, environment variables, command-line arguments, and Spring Profiles.</li>
+</ul>
+  </div>
+</div>
+
+  <div class="section-label big" id="s4">Spring MVC &amp; REST API <span class="section-count">(10 questions)</span></div>
+  
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">REST API Basics</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. What is REST?</div>
+  
+  <div class="qa-a">
+<p>REST (REpresentational State Transfer) is an architectural style for web services that enables communication between client and server using HTTP methods such as GET, POST, PUT, and DELETE. GET    → Retrieve data POST   → Create data PUT    → Update entire resource PATCH  → Partial update DELETE → Delete data</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">REST API Basics</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. What is <code>@RequestParam</code>?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How do you receive query parameters in Spring Boot?</li></ul></div>
+  <div class="qa-a">
+<p>• <code>@RequestParam</code> is used to extract query parameter values from the request URL path and bind them to method parameters. eg: /employee?id=101 UseCase: filter, search, sort, paginate, or pass optional data</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">REST APIs</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is pagination in Spring Data JPA ?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How do you implement pagination in REST APIs?</li><li>What is pagination and sorting in Spring Data JPA?</li></ul></div>
+  <div class="qa-a">
+<p>Pagination is a technique used to retrieve data in smaller chunks (pages) instead of loading all records at once, improving performance and reducing memory consumption. Pagination is implemented using Spring Data JPA's Pageable interface and Page&lt;T&gt; response.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">REST APIs</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is sorting in Spring Data JPA ?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How do you implement sorting in Spring Data JPA?</li><li>What is pagination and sorting in Spring Data JPA?</li></ul></div>
+  <div class="qa-a">
+<p>Sorting is the process of retrieving data in a specific order based on one or more fields, such as ascending or descending order. Sorting is implemented using Spring Data JPA's Sort class OR by combining Pageable with sorting parameters.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring MVC &amp; REST</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. MVC vs REST API</div>
+  
+  <div class="qa-a">
+<p>Spring MVC is a web framework that follows the Model-View-Controller pattern to build server-side web applications by returning views like JSP or Thymeleaf. REST is an architectural style used to build stateless web services that return data, typically in JSON or XML format.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">REST &amp; JSON</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How does JSON conversion happen in Spring Boot?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>HttpMessageConverter?</li></ul></div>
+  <div class="qa-a">
+<p>In Spring Boot, JSON conversion is handled automatically by HttpMessageConverter. By default, Spring Boot uses the Jackson library to convertJava objects to JSON and JSON to Java objects.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">REST &amp; JSON</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How REST calls work</div>
+  
+  <div class="qa-a">
+<ul>
+<li>Client sends request.</li>
+<li>Spring's DispatcherServlet receives it.</li>
+<li>Request is mapped to the appropriate Controller method.</li>
+<li>Controller calls Service.</li>
+<li>Service calls Repository.</li>
+<li>Repository fetches data from DB.</li>
+<li>Data travels back to Controller.</li>
+<li>Spring converts Java Object to JSON using Jackson.</li>
+<li>Response is returned to the client</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. how to create post api in spring boot?</div>
+  
+  <div class="qa-a">
+<p>A POST API is created using the <code>@PostMapping</code> annotation. It is typically used to create new resources in the database. The request data is typically received using <code>@RequestBody</code>, processed in the Service layer, saved through the Repository layer, and a response is returned to the client.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">REST APIs</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. How to make external API call from service class.</div>
+  
+  <div class="qa-a">
+<p>Inject a RestTemplate or WebClient bean into the service class and use it to make the HTTP call (e.g., restTemplate.getForObject(url, ResponseType.class)), keeping the call encapsulated within the service layer rather than the controller so business logic and external integration stay separated.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. What is HandlerInterceptor?</div>
+  
+  <div class="qa-a">
+<p>HandlerInterceptor is a Spring MVC interface used to intercept HTTP requests before, after, or once a controller handler completes (preHandle, postHandle, afterCompletion) - commonly used for cross-cutting concerns like logging, authentication checks, or request timing without modifying controller code.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s5">Validation &amp; Exception Handling <span class="section-count">(4 questions)</span></div>
+  
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Exception Handling</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you implement global exception handling?</div>
+  
+  <div class="qa-a">
+<p>Global exception handling is implemented using <code>@ControllerAdvice</code> and <code>@ExceptionHandler</code>. It centralizes exception handling across the application and returns consistent error responses to clients.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Exception Handling</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;3</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is <code>@ControllerAdvice</code>?</div>
+  
+  <div class="qa-a">
+<p>• <code>@ControllerAdvice</code> → Handles exceptions globally across all controllers. It works with <code>@ExceptionHandler</code> to catch exceptions from all controllers and return a common error response.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Validation</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. what is a <code>@Valid</code> vs <code>@Validated</code></div>
+  
+  <div class="qa-a">
+<p>a <code>@Valid</code> is used for basic bean validation a <code>@Validated</code> extends it by supporting validation groups and method-level validation.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Exception</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. how to handle custom exception in spring?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>how to handle exception using annotation in spring application?</li></ul></div>
+  <div class="qa-a">
+<p>Custom exceptions are handled by creating a custom exception class that extends RuntimeException and implementing global exception handling using <code>@ControllerAdvice</code> and <code>@ExceptionHandler</code>, which returncustomerrorresponses.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s6">Spring Data JPA, Hibernate, Transactions &amp; DB Access <span class="section-count">(13 questions)</span></div>
+  <div class="bonus-panel">
+  <div class="bonus-title">Deep-Dive &mdash; Propagation, Isolation, Locking &amp; Entity Lifecycle</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Propagation</th><th>Behavior</th></tr>
+      <tr><td class="cell-hl">REQUIRED &#11088;</td><td>Join existing transaction, or create a new one if none exists (default).</td></tr>
+      <tr><td class="cell-hl">REQUIRES_NEW</td><td>Always suspends the current transaction and starts a brand-new one &mdash; used for audit-logging that must persist even if the outer transaction rolls back.</td></tr>
+      <tr><td class="cell-hl">SUPPORTS</td><td>Joins if a transaction exists, otherwise runs non-transactionally.</td></tr>
+      <tr><td class="cell-hl">MANDATORY</td><td>Must run inside an existing transaction, else throws an exception.</td></tr>
+      <tr><td class="cell-hl">NOT_SUPPORTED</td><td>Suspends any existing transaction and runs non-transactionally.</td></tr>
+      <tr><td class="cell-hl">NEVER</td><td>Throws an exception if a transaction already exists.</td></tr>
+      <tr><td class="cell-hl">NESTED</td><td>Runs within a savepoint of the outer transaction &mdash; a failure here can roll back to the savepoint without rolling back the whole outer transaction.</td></tr>
+    </table>
+  </div>
+  <div class="table-panel" style="margin-top:10px;">
+    <table>
+      <tr><th>Isolation Level</th><th>Prevents</th></tr>
+      <tr><td class="cell-hl">READ_UNCOMMITTED</td><td>Nothing &mdash; allows dirty reads.</td></tr>
+      <tr><td class="cell-hl">READ_COMMITTED &#11088;</td><td>Dirty reads (DB default for most engines, incl. PostgreSQL/Oracle).</td></tr>
+      <tr><td class="cell-hl">REPEATABLE_READ</td><td>Dirty reads + non-repeatable reads (MySQL InnoDB default).</td></tr>
+      <tr><td class="cell-hl">SERIALIZABLE</td><td>Dirty, non-repeatable &amp; phantom reads &mdash; safest, slowest, transactions effectively run one at a time.</td></tr>
+    </table>
+  </div>
+  <div class="two-col" style="margin-top:10px;">
+    <div class="tree-panel">
+      <div class="tree-title">Optimistic Locking (<code>@Version</code>)</div>
+      <div class="tree-body">Detects conflicts at update time by comparing a version column. Admin A reads v1, Admin B reads v1, A saves &rarr; v2. B tries to save with v1 &rarr; Hibernate throws <code>OptimisticLockException</code>. Best for low-contention, high-read scenarios (no DB lock held).</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Pessimistic Locking (<code>SELECT ... FOR UPDATE</code>)</div>
+      <div class="tree-body">Locks the row for the duration of the transaction so nobody else can read/write it. Best for high-contention scenarios like account-balance withdrawals where lost updates are unacceptable.</div>
+    </div>
+  </div>
+  <div class="section-label" style="margin-top:18px;">Entity Lifecycle &amp; Dirty Checking</div>
+  <div class="flowchart-panel">
+    <div class="flowchart">
+      <div class="flow-box">Transient <span class="flow-sub">new Entity(), not attached to any session</span></div>
+      <div class="flow-arrow">&darr; persist()</div>
+      <div class="flow-box">Persistent / Managed <span class="flow-sub">tracked by the Persistence Context</span></div>
+      <div class="flow-arrow">&darr; session / EntityManager closes</div>
+      <div class="flow-box">Detached <span class="flow-sub">still has an ID, no longer tracked</span></div>
+      <div class="flow-arrow">&darr; remove()</div>
+      <div class="flow-box">Removed</div>
+    </div>
+  </div>
+  <div class="note"><b>Dirty Checking</b>: for a managed entity, Hibernate compares its current state to a snapshot taken at load time; any changed field is automatically included in the <code>UPDATE</code> at flush time &mdash; no explicit <code>save()</code> call needed inside a transaction. <b>Flush vs Commit</b>: flush synchronizes the persistence context with the DB (sends SQL) but doesn't end the transaction; commit ends the transaction (making changes durable) and triggers a flush first. <code>save()</code> just schedules the entity for persistence at next flush; <code>saveAndFlush()</code> forces an immediate flush &mdash; useful when you need the DB-generated ID or a trigger-computed value right away.</div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Data JPA</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is the difference between CrudRepository and JpaRepository?</div>
+  
+  <div class="qa-a">
+<p>CrudRepository provides basic CRUD operations JpaRepository provides CRUD operations along with advanced JPA features such as pagination and sorting.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Data JPA</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is the purpose of the <code>@Query</code> annotation?</div>
+  
+  <div class="qa-a">
+<p>• <code>@Query</code> is used to write custom JPQL or native SQL queries in a repository when derived query methods are not sufficient.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Spring Data JPA</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is the difference between JPQL and SQL?</div>
+  
+  <div class="qa-a">
+<p>JPQL is an object-oriented query language that works with JPA entities and their fields. SQL works directly with database tables and columns.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">JPA &amp; Database Optimization</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is the N+1 query problem?</div>
+  
+  <div class="qa-a">
+<p>The N+1 query problem occurs when Hibernate executes one query to fetch the parent entities and then executes one additional query for each parent entity to fetch its related child entities, resulting in a total of N+1 queries. causes performance issues due to excessive database calls.</p>
+<p>Example: Suppose we have a Department entity, and each department has multiple Employee entities. When we fetch all departments, Hibernate executes one query to fetch the departments and then one additionalquery for the employees of eachdepartment. If there are N departments, a total of N+1 queries are executed. This performance issue is called the N+1 Query Problem.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">JPA &amp; Database Optimization</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do transactions work in Spring Boot?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How does <code>@Transactional</code> work internally?</li><li>Why <code>@Transaction</code> needed?.</li></ul></div>
+  <div class="qa-a">
+<p>• <code>@Transactional</code> is used to ensure data consistency by treating multiple database operations as a single unit of work. If alloperations succeed, the transaction is committed; if anyoperation fails, all changes are rolled back.</p>
+<p>Internally, Spring uses AOP to create a proxy for methods annotated with <code>@Transactional</code>. Every call first goes to the proxy, which starts the transaction, executes the business method, and then commits the transaction if everything succeeds or rolls it back if an exception occurs.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Transaction Management</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Senior · 5–7 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Why does self-invocation break transactions?</div>
+  
+  <div class="qa-a">
+<p>Spring's <code>@Transactional</code> (and <code>@Async</code>, <code>@Cacheable</code>, etc.) works via proxies - when a method calls another method on 'this' within the same class, the call bypasses the proxy entirely and goes directly to the target object, so the transactional advice never gets applied. Fix by calling through a self-injected proxy, or moving the method to a separate bean.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Transaction Management</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. <code>@Transactional</code> is present but rollback did not happen. Why?</div>
+  
+  <div class="qa-a">
+<p>If <code>@Transactional</code> doesn't roll back, I check the exception type(it should be unchecked exception), ensure the exception isn't swallowed, verify proxy-based transaction behavior (such as self-invocation), and configure rollbackFor when handling checked exceptions.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">JPA &amp; Hibernate</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Lazy loading causes an exception in production but not locally. Why?</div>
+  
+  <div class="qa-a">
+<p>This is usually caused by a LazyInitializationException. It happens when a lazily loaded entity is accessed after the Hibernate session has been closed. It may work locally because of different configurations (such as Open Session in View enabled), but fail in production where the session is closed before the lazy association is accessed.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. JPA vs Hibernate</div>
+  
+  <div class="qa-a">
+<p>JPA is a specification that defines standards for ORM in Java, while Hibernate is the most popular implementation of JPA. In Spring Boot, we usually write code using JPA APIs, and Hibernateperforms the actual database operationsbehind the scenes.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you get data from the database?</div>
+  
+  <div class="qa-a">
+<p>Data is retrieved from the database using the Repository layer. The Controller calls the Service layer, the Service calls the Repository, and the Repository fetches the data from the database using JPA/Hibernate.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. how to do database connection through spring</div>
+  
+  <div class="qa-a">
+<p>Database connectivity in Spring Boot is configured using datasource properties. During startup, Spring Boot reads these properties, creates a DataSource bean, configures a connection pool (HikariCP by default), and provides databaseconnections to JPA or JDBC components.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. How can multiple data sources be configured?</div>
+  
+  <div class="qa-a">
+<p>In Spring Boot, multiple data sources are configured by defining separate DataSource beans for each database and, when using JPA, separate EntityManagerFactory and transaction manager configurations. <code>@Primary</code> defines the default data source and <code>@Qualifier</code> allows explicit selection. Each repository package can then be associated with the appropriate EntityManager. Common use cases include multiple databases, read/write separation, legacy database integration, and reporting databases. In microservices, however, the preferred approach is usually database-per-service rather than having one service directly access multiple service-owned databases.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. How does Spring integrate with JDBC?</div>
+  
+  <div class="qa-a">
+<p>Spring integrates with JDBC through JdbcTemplate, which handles boilerplate like opening/closing connections, exception translation into Spring's DataAccessException hierarchy, and resource cleanup, letting you focus on writing SQL and mapping results via RowMapper instead of manual JDBC plumbing.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s7">Spring Security &amp; JWT <span class="section-count">(6 questions)</span></div>
+  <div class="bonus-panel">
+  <div class="bonus-title">Deep-Dive &mdash; JWT Structure, OAuth2/OIDC, CSRF &amp; Method Security</div>
+  <div class="tree-panel">
+    <div class="tree-title">JWT = Header.Payload.Signature</div>
+    <div class="tree-body">Header &rarr; token type + signing algorithm (HS256/RS256). Payload &rarr; claims: sub, roles, iat, exp. Signature &rarr; HMAC/RSA over encoded header+payload using a secret/private key, so the server can detect tampering without a DB lookup (stateless).</div>
+  </div>
+  <div class="two-col" style="margin-top:10px;">
+    <div class="tree-panel">
+      <div class="tree-title">OAuth2 vs OpenID Connect</div>
+      <div class="tree-body"><span class="i bl">OAuth2</span> &rarr; Authorization framework; grants an app an Access Token to call an API on the user's behalf (e.g. "Sign in with Google" reading your calendar).
+<span class="i gr">OIDC</span> &rarr; Authentication layer built on top of OAuth2; adds an ID Token (JWT) that proves who the user is.</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">CSRF</div>
+      <div class="tree-body">Attack where a malicious site tricks an authenticated browser into firing a state-changing request using the victim's session cookie. Spring Security issues a per-session CSRF token validated on every POST/PUT/PATCH/DELETE. Enabled by default for cookie/session auth; typically <b>disabled</b> for stateless JWT APIs since there's no session cookie to ride on.</div>
+    </div>
+  </div>
+  <div class="section-label" style="margin-top:18px;">RBAC &amp; Method Security</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Mechanism</th><th>Use</th></tr>
+      <tr><td class="cell-hl">hasRole() / hasAuthority()</td><td>URL-level authorization inside <code>SecurityFilterChain</code> config.</td></tr>
+      <tr><td class="cell-hl">@PreAuthorize</td><td>Method-level, evaluated before invocation &mdash; supports SpEL, e.g. <code>@PreAuthorize("hasRole('ADMIN')")</code>.</td></tr>
+      <tr><td class="cell-hl">@PostAuthorize</td><td>Evaluated after method execution &mdash; can inspect the return value.</td></tr>
+      <tr><td class="cell-hl">@Secured</td><td>Simpler, legacy role-based method security (no SpEL).</td></tr>
+      <tr><td class="cell-hl">@EnableMethodSecurity</td><td>Enables method-level annotations (Spring Security 6+).</td></tr>
+    </table>
+  </div>
+  <div class="note">Refresh tokens: short-lived access token (minutes) + longer-lived refresh token stored securely (HttpOnly cookie or DB-tracked) to mint new access tokens without re-login; rotate the refresh token on every use and blacklist old ones to limit replay if stolen.</div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Security</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is Spring Security?</div>
+  
+  <div class="qa-a">
+<p>Spring Security is a framework that provides authentication, authorization, and protection against common security vulnerabilities for Spring applications.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Security</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is Authentication?</div>
+  
+  <div class="qa-a">
+<p>Authentication is the process of verifying the identity of a user before granting access to an application, ensuring that the user is who they claim to be. User enters username and password -&gt; System validates the credentials -&gt; If valid, the user is authenticated.</p>
+<p>For example, in the Candidate Registration Portal, when a candidate enters a username and password, the Authentication Service verifies the credentials. If they are valid, the user is authenticated and allowed to access the portal.</p>
+<p><b>Authentications Different Methods:</b></p>
+<ul>
+<li>Session-Based Authentication</li>
+<li>JWT Authentication</li>
+<li>OAuth2 Authentication</li>
+<li>LDAP(Lightweight Directory Access Protocol) Authentication</li>
+<li>Basic Authentication</li>
+<li>OTP Authentication</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Security</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Junior to Mid-Level · 1–3 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is Authorization?</div>
+  
+  <div class="qa-a">
+<p>Authorization is the process of determining what resources or actions an authenticated user is allowed to access/perform.</p>
+<p>For example, in the Candidate Registration Portal, after a user logs in, the system checks their role. An Admin can manage users, while a Candidate can only register for exams and view certificates. If a Candidate tries to access an Admin-only feature, the system denies access.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Security</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is JWT?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How does JWT authentication work?</li><li>How do you implement JWT in Spring Boot?</li></ul></div>
+  <div class="qa-a">
+<p>In JWT authentication, a user logs in with valid credentials, and the server generates a signed JWT token. The client sends this token in the Authorization header with each request. Spring Security validates the token, extracts user details and roles, and authenticates the request withoutmaintaining server-side sessions.</p>
+<p>User Login → Validate Credentials → Generate Signed JWT → Client sends "Authorization: Bearer &lt;JWT&gt;" → Validates Token → Extract User &amp; Roles → Authorize Request</p>
+<p>To implement JWT in Spring Boot, I authenticate the user using Spring Security, generate a JWT token upon successful login, create a JWT filter to validate tokens for incoming requests, and configure Spring Security to use stateless authentication with JWT tokens instead of sessions.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Security</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How does Spring Security filter chain work?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How does the SecurityFilterChain work internally?</li></ul></div>
+  <div class="qa-a">
+<p>Spring Security intercepts every request through the SecurityFilterChainbefore it reaches the Controller. The request passes through multiple filters that perform authentication, authorization, token validation, session management, and exception handling. If authentication and authorization succeed, the request proceeds to the Controller; otherwise, an error response is returned.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Security</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How to store custom sensitive data like account information in DB?</div>
+  
+  <div class="qa-a">
+<p>I store sensitive data in encrypted form using algorithms like AES-256, keep encryption keys in a secure key management system, and decrypt the data only when it is required.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s8">Caching, Async &amp; Scheduling <span class="section-count">(3 questions)</span></div>
+  
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Caching</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is caching?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How does Cache work?</li><li>How do you enable caching in Spring Boot?</li></ul></div>
+  <div class="qa-a">
+<p>Caching is a technique used to store frequently accessed data in memory to reduce database calls and improve application performance. On the first request, data is fetched from the database and stored in the cache. Subsequentrequests are served directly from the cache until the cache is updated or invalidated.</p>
+<ul>
+<li>Caching is enabled in Spring Boot using the <code>@EnableCaching</code> annotation. After enabling caching, below annotations used to manage cached data.</li>
+<li><code>@EnableCaching</code> → Enablescaching in the Spring Boot application.</li>
+<li><code>@Cacheable</code> → Reads from cache; on Cache Miss, executes the method and stores the result in the cache.</li>
+<li><code>@CachePut</code>      → Always executes the method and updates the cache.</li>
+<li><code>@CacheEvict</code>    →Removes specific cache data or clears the entire cache.</li>
+<li><code>@Caching</code>       → Combines multiple cache operations on a single method.</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Multithreading</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. what is <code>@Async</code> annotation?</div>
+  
+  <div class="qa-a">
+<p>• <code>@Async</code> is used to execute methods asynchronously in a separate thread. It is commonly used for long-running tasks such as sending emails, file processing, and external API calls to improve application responsiveness. Save User in DB → Return Response → Send Email in Background</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Scheduling</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. Full view of Schedular Mechanism.</div>
+  
+  <div class="qa-a">
+<p>Spring's scheduling is enabled via <code>@EnableScheduling</code> on a configuration class, then methods annotated with <code>@Scheduled</code> (using fixedRate, fixedDelay, or a cron expression) run automatically on a background thread pool at the specified interval, useful for periodic tasks like cleanup jobs or batch processing.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s9">Microservices &amp; Resilience <span class="section-count">(3 questions)</span></div>
+  <div class="bonus-panel">
+  <div class="bonus-title">Deep-Dive &mdash; Resilience4j Patterns &amp; Inter-Service Communication</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Pattern</th><th>Purpose</th></tr>
+      <tr><td class="cell-hl">Circuit Breaker</td><td>Stops calling a repeatedly failing downstream service for a cool-down period, failing fast instead of piling up threads.</td></tr>
+      <tr><td class="cell-hl">Retry</td><td>Re-attempts a failed call a bounded number of times, usually with backoff, for transient failures.</td></tr>
+      <tr><td class="cell-hl">Bulkhead</td><td>Caps concurrent calls to a dependency so one slow downstream can't exhaust the whole thread pool.</td></tr>
+      <tr><td class="cell-hl">Rate Limiter</td><td>Restricts number of calls in a time window.</td></tr>
+      <tr><td class="cell-hl">Time Limiter</td><td>Bounds how long a call is allowed to take before it's treated as a failure.</td></tr>
+      <tr><td class="cell-hl">Fallback</td><td>Alternate response/logic executed when the primary call ultimately fails.</td></tr>
+    </table>
+  </div>
+  <div class="cmp-panel" style="margin-top:10px;">
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name am">RestTemplate</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Synchronous, blocking. Legacy &mdash; in maintenance mode since Spring 5.</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name bl">WebClient</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Reactive, non-blocking. Preferred for new code, especially high-concurrency/streaming.</span></div></div>
+    </div>
+    <div class="cmp-divider"></div>
+    <div class="cmp-card">
+      <div class="cmp-header"><span class="cmp-name gr">OpenFeign &#11088;</span></div>
+      <div class="cmp-rows"><div class="cmp-row"><span class="cmp-val">Declarative interface-based HTTP client, integrates directly with Eureka/load-balancer and Resilience4j &mdash; most common choice inside a microservices stack.</span></div></div>
+    </div>
+  </div>
+  <div class="note">Kafka basics: Producer publishes to a Topic (partitioned) &rarr; Consumer(s) in a Consumer Group read from partitions (each partition consumed by only one member of a group, giving horizontal scalability); offset tracks each consumer's read position, enabling replay. <code>@KafkaListener</code> subscribes a method to a topic.</div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Scalability &amp; Reliability</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Senior · 5–7 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How would you implement rate limiting?</div>
+  
+  <div class="qa-a">
+<p>Implement rate limiting using a token-bucket or sliding-window algorithm, either in application code (e.g., Bucket4j) or at the gateway/infrastructure level (API Gateway, Nginx, Redis-backed distributed limiter for multi-instance deployments) - track request counts per client/API key within a time window and reject or throttle once the limit is exceeded.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Scalability &amp; Reliability</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Senior · 5–7 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How does Resilience4j work?</div>
+  
+  <div class="qa-a">
+<p>Resilience4j works by decorating application calls with fault-tolerance mechanisms. For example, when Booking Service calls Payment Service, Resilience4j can apply a timeout to prevent indefinite waiting, retry temporary failures, use a circuit breaker to stop calls after repeated failures, limit concurrent calls using a bulkhead, restrict request rates with a rate limiter, and execute a fallback when the call ultimately fails. These mechanisms prevent cascading failures and improve the resilience and availability of microservices.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Microservices</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you call a different service in Spring Boot?</div>
+  
+  <div class="qa-a">
+<p>A different service can be called using HTTP clients such as RestTemplate, WebClient, or Feign Client. RestTemplate is typically used in legacy applications. WebClient is preferred for new applications because it supports non-blocking communication. Feign Client is commonly used In microservices architectures, because it simplifiesservice-to-service communication and reduces boilerplate code.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s10">Testing, Quality &amp; Tooling <span class="section-count">(3 questions)</span></div>
+  <div class="bonus-panel">
+  <div class="bonus-title">Deep-Dive &mdash; Test Slices &amp; TestContainers</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Annotation</th><th>Loads</th></tr>
+      <tr><td class="cell-hl">@WebMvcTest</td><td>Only the web/MVC layer (controllers, filters, converters) &mdash; services/repos mocked with <code>@MockBean</code>.</td></tr>
+      <tr><td class="cell-hl">@DataJpaTest &#11088;</td><td>Only the JPA layer against an in-memory H2 DB by default; each test runs in a transaction that's rolled back afterward.</td></tr>
+      <tr><td class="cell-hl">@SpringBootTest</td><td>Full application context &mdash; real end-to-end integration test, slower.</td></tr>
+      <tr><td class="cell-hl">@Mock / @InjectMocks</td><td>Pure Mockito unit tests with no Spring context at all &mdash; fastest, ideal for service-layer logic.</td></tr>
+      <tr><td class="cell-hl">MockMvc</td><td>Tests controllers/REST endpoints without starting a real HTTP server.</td></tr>
+    </table>
+  </div>
+  <div class="note"><b>TestContainers</b>: spins up real Docker containers (MySQL, PostgreSQL, Redis, Kafka) for integration tests, avoiding the "works on H2, breaks on real MySQL" class of bugs caused by dialect/behavior differences.</div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Testing &amp; Quality</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you test service-layer logic?</div>
+  
+  <div class="qa-a">
+<p>Service-layer logic is tested using JUnit and Mockito. Dependencies such as repositories and external services are mocked, allowing the test to focus only on business logic, validations, calculations, and exception handling within the service layer.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Junit</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. How does JUnit help improve code quality?</div>
+  
+  <div class="qa-a">
+<p>JUnit improves code quality by catching bugs early through automated regression testing, encouraging modular/testable design, enabling safe refactoring (tests confirm behavior didn't break), and serving as executable documentation of expected behavior.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Build / Tooling</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span></div>
+  </div>
+  <div class="qa-q">Q. SonarQube: class exceeds line-limit rule — how to resolve (specific scenario)</div>
+  
+  <div class="qa-a">
+<p>If SonarQube reports that a class exceeds the line limit, I would first analyze the class and identify different responsibilities inside it. Instead of simply increasing or suppressing the SonarQube limit, I would refactor the class into smaller, focused classes following Single Responsibility Principle. For example, if a service class handles validation, payment processing, notification, reporting, and database operations, I would extract those responsibilities into separate services or components.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s11">Performance, Monitoring, Actuator &amp; JVM <span class="section-count">(7 questions)</span></div>
+  <div class="bonus-panel">
+  <div class="bonus-title">Deep-Dive &mdash; HikariCP Tuning &amp; Actuator Endpoints</div>
+  <div class="table-panel">
+    <table>
+      <tr><th>Property</th><th>Meaning</th></tr>
+      <tr><td class="cell-hl">maximum-pool-size</td><td>Hard cap on total connections &mdash; size it to <code>((core_count * 2) + effective_spindle_count)</code> as a starting heuristic, then load-test; bigger isn't always faster because of DB-side contention.</td></tr>
+      <tr><td class="cell-hl">minimum-idle</td><td>Connections kept ready even when idle.</td></tr>
+      <tr><td class="cell-hl">connection-timeout</td><td>Max wait for a connection from the pool before throwing an exception.</td></tr>
+      <tr><td class="cell-hl">idle-timeout</td><td>How long a connection can sit idle before being retired.</td></tr>
+      <tr><td class="cell-hl">max-lifetime</td><td>Max connection age before it's recycled (should be a few minutes less than any DB/firewall imposed connection timeout).</td></tr>
+      <tr><td class="cell-hl">leak-detection-threshold</td><td>Logs a warning if a connection is checked out longer than this, which usually points to a leak (not returned to the pool).</td></tr>
+    </table>
+  </div>
+  <div class="table-panel" style="margin-top:10px;">
+    <table>
+      <tr><th>Endpoint</th><th>Shows</th></tr>
+      <tr><td class="cell-hl">/actuator/health</td><td>Liveness/readiness, DB &amp; downstream health indicators.</td></tr>
+      <tr><td class="cell-hl">/actuator/metrics</td><td>JVM, HTTP, DataSource metrics (usually scraped by Prometheus).</td></tr>
+      <tr><td class="cell-hl">/actuator/env</td><td>Resolved environment properties (sensitive values sanitized).</td></tr>
+      <tr><td class="cell-hl">/actuator/beans</td><td>All beans in the ApplicationContext.</td></tr>
+      <tr><td class="cell-hl">/actuator/loggers</td><td>View/change log levels at runtime without a redeploy.</td></tr>
+      <tr><td class="cell-hl">/actuator/threaddump &amp; /heapdump</td><td>Live diagnostics for stuck threads / memory investigations.</td></tr>
+    </table>
+  </div>
+  <div class="note">Custom endpoint: annotate a bean with <code>@Endpoint(id="myendpoint")</code> and expose read operations with <code>@ReadOperation</code>. JVM triage checklist for "memory keeps growing": capture a heap dump, compare object histograms across two snapshots, check for unbounded caches/static collections/unclosed streams, and watch GC logs for rising old-gen occupancy after full GCs (a real leak, vs. sawtooth pattern which is normal).</div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Basic Concepts</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Fresher · 0–1 Year</span></div>
+  </div>
+  <div class="qa-q">Q. What is Spring Boot Actuator?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>What are Actuator endpoints?</li><li>What are health endpoints?</li><li>How do you monitor application health?</li><li>How do you expose custom Actuator endpoints?</li></ul></div>
+  <div class="qa-a">
+<p>Actuator endpoints are production-ready REST endpoints provided by Spring Boot Actuator for monitoring and managing application health, metrics, and runtime status/actuator/health → Shows application health status. /actuator/info → Displays application information. /actuator/metrics → Provides application metrics. /actuator/env → Shows environment properties. /actuator/beans → Lists all Spring beans.</p>
+<p>Spring Boot Actuators provides the health endpoint to check the health &amp; availability status of an application and its dependentservices.</p>
+<p>Custom Actuator endpoints can be exposed by creating a class annotated with <code>@Endpoint</code> and exposing it through Spring Boot Actuator.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Performance &amp; Monitoring</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What metrics should be monitored in production?</div>
+  
+  <div class="qa-a">
+<p>In production, I monitor application, JVM, database, infrastructure, and businessmetrics to ensure system health, performance, and availability.</p>
+<ul>
+<li>Application Metrics:  API Response Time, Request Count (TPS/RPS), Error Rate (4xx/5xx), Throughput, API Latency</li>
+<li>JVM Metrics: Heap Memory, Non-Heap Memory, Garbage Collection (GC), Thread Count, CPU Usage</li>
+<li>Database Metrics: Query Execution Time, Slow Queries, Active Connections, HikariCP Connection Pool Usage, Database Response Time, Deadlocks</li>
+<li>Infrastructure Metrics: CPU Utilization, Memory Usage, Disk Usage, Network Traffic, Container/VM Health</li>
+<li>Business Metrics: Successful Payments, Failed Payments, Seat Bookings, Admit Card Downloads, Certificate Generation</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Logging &amp; Debugging</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How do you enable debugging logs in Spring Boot?</div>
+  
+  <div class="qa-a">
+<p>We can enable debugging logs by setting debug=true or configuring the logging level in application.properties. DEBUG is mainly used during development to troubleshoot issues. In production, we usually enable DEBUG only for specific packages.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">JVM Performance</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Application memory usage keeps increasing over time. What would you do?</div>
+  
+  <div class="qa-a">
+<p>If the application's memory usage keeps increasing, I would first determine whether it's a memory leak or normal memory growth. I would monitor JVM heap usage, analyze GC logs, capture a heap dump, and identify objects consuming memory. Then I would fix issues such as memory leaks, unclosed resources, large caches, or excessive object creation.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Performance Tuning</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. REST API returns data but response time is inconsistent. Why?</div>
+  
+  <div class="qa-a">
+<p>If a REST API returns data but the response time is inconsistent, I would investigate whether the latency is caused by slow database queries, external API calls, thread or connection pool contention,garbage collection pauses, network latency, or varying server load. I would use application logs, APM tools, SQL execution plans, and JVM metrics to identify the bottleneck.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Performance &amp; Async Processing</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Background jobs are affecting API response time. How do you isolate them?</div>
+  
+  <div class="qa-a">
+<p>I isolate background jobs by moving them to dedicated thread pools, asynchronous workers, or message queues so they do not compete with REST APIs for CPU, threads, or database connections.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How to Optimize the Rest API?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>API is fast locally but slow in production. How do you debug?</li></ul></div>
+  <div class="qa-a">
+<p>APIs can be optimized by optimizing database queries, using pagination and caching, returning DTOs, tuning connection pools, optimizing external API calls, using asynchronous processing, and continuously monitoring application performance.</p>
+<ul>
+<li>Optimize Database Queries: Add indexes, avoid full table scans, optimize joins, fix N+1 query issues, and use Fetch Join or Entity Graph.</li>
+<li>UsePagination: Instead of loading all records at the same time, fetch data in smaller pages.</li>
+<li>ImplementCaching: Cache frequently accessed data to reduce database calls.</li>
+<li>Return DTOs: Instead of returning entire entities, return DTOs containing only the required fields.</li>
+<li>OptimizeExternal API Calls: Configure timeouts, use retries carefully, and use <code>@Async</code> processing when appropriate.</li>
+<li>Connection Pool Tuning: Configure and tune the connection pool (e.g., HikariCP) to efficiently manage database connections and avoid connection exhaustion.</li>
+<li>Asynchronous Processing: Use <code>@Async</code>, Kafka, or message queues for long-running operations such as email sending, notifications, and report generation.</li>
+<li>Monitor : Use Spring Boot Actuator and monitoring tools such as Grafana and Prometheus to identify performance bottlenecks.</li>
+</ul>
+  </div>
+</div>
+
+  <div class="section-label big" id="s12">Production Troubleshooting (Realtime Scenarios) <span class="section-count">(11 questions)</span></div>
+  
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Realtime</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Spring Boot works locally but fails in deployment/production.</div>
+  
+  <div class="qa-a">
+<p>If a Spring Boot application works locally but fails in production, I start by checking the logs, then verify the environment configuration, database connectivity, dependencies, external services, and server resources to identify and resolve the root cause.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Realtime</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. You changed application.properties but nothing changed in production. Why?</div>
+  
+  <div class="qa-a">
+<p>If changes to application.properties are not reflected in production, I would check whether the application was restarted, whether the correct configuration file is being used, if environment variables are overriding the properties, whether the correct Spring profile is active, and if the latest build was actually deployed.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Realtime</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Under high traffic, your service crashed even though CPU usage is low. Why?</div>
+  
+  <div class="qa-a">
+<p>Low CPU usage doesn't necessarily mean the application is healthy. The service may crash due to database connection pool exhaustion, thread pool exhaustion, memory issues, blocked threads, external API delays, or resource limits. I would analyze logs, thread dumps, heap usage, connection pools, and external dependencies to identify the bottleneck.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Realtime</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Multiple beans of the same type exist and the application fails to start. How do you fix it?</div>
+  
+  <div class="qa-a">
+<p>When multiple beans of the same type exist, Spring cannot determine which bean to inject and throws a NoUniqueBeanDefinitionException. I can resolve this by using <code>@Qualifier</code>, marking one bean as <code>@Primary</code>, or injecting a specific bean by its name.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Realtime</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. API is randomly returning 401/403. What should you check?</div>
+  
+  <div class="qa-a">
+<p>I would first determine whether it's a 401 (Authentication) or 403 (Authorization) issue. Then I would verify the JWT token, user roles/permissions, Spring Security configuration, token expiration, request Authorization headers, and application logs to identify the root cause.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Realtime</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Database connection pool is suddenly exhausted. How do you identify and fix it?</div>
+  
+  <div class="qa-a">
+<p>I would first check the application logs and monitor the connection pool metrics to confirm that all database connections are in use. Then I would identify the root cause, such as connection leaks, slow SQL queries, long-running transactions, or increased traffic. Finally, I would optimize queries, ensure connections are properly released, tune the HikariCP pool configuration, and scale the application if necessary.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Deployment</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Users still see old behavior after a new deployment. What went wrong?</div>
+  
+  <div class="qa-a">
+<p>If users still see the old behavior after deployment, I would verify that the new version was actually deployed, the application was restarted successfully, caches were refreshed, the correct configuration/profile is beingused, and the load balancer or reverse proxy is routing traffic to the updatedinstances.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Logging &amp; Monitoring</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Logs are missing in production. What should you check?</div>
+  
+  <div class="qa-a">
+<p>If logs are missing in production, I would verify the logging configuration, log level, log file path, application permissions, active Spring profile, log rotation settings, and whether logs are being forwarded correctly to the centralized logging system.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Deployment</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What is Zero Downtime Deployment? How do you achieve it?</div>
+  
+  <div class="qa-a">
+<p>Zero Downtime Deployment is a deployment strategy where a new application version is released without interrupting service or causing downtime for users. This is achieved by deploying the new version alongside the existing one and switching user traffic only after the new version is verified to be healthy.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Docker &amp; Deployment</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Application behaves differently in Docker than locally. Why?</div>
+  
+  <div class="qa-a">
+<p>If an application behaves differently in Docker than locally, I compare the runtime environments. Common causes include different environment variables, Spring profiles, Java versions, Docker networking, mounted volumes, file paths, resource limits, or missing dependencies. I verify the container configuration, inspect logs, and compare both environments to identify the difference.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Production Best Practices</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. What are the most common Spring Boot mistakes that break production?</div>
+  
+  <div class="qa-a">
+<p>Most production issues are caused by configuration mistakes, inefficient database access, poor exception handling, resource leaks, security misconfigurations, and inadequate monitoring. Preventing these issues requires proper testing, monitoring, logging, and following Spring Boot best practices.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s13">Real-World / System Design Scenarios <span class="section-count">(7 questions)</span></div>
+  <div class="bonus-panel">
+  <div class="bonus-title">Deep-Dive &mdash; Idempotency, Soft Delete, Audit Logging &amp; Zero-Downtime Deploys</div>
+  <div class="revision-panel">
+    <div class="revision-grid cols-1">
+      <div class="revision-item"><span class="chk">&#8226;</span><b>Idempotency</b> &mdash; executing the same request N times has the same effect as executing it once; implemented via a client-supplied <code>Idempotency-Key</code> header checked against a DB unique constraint before processing.</div>
+      <div class="revision-item"><span class="chk">&#8226;</span><b>Soft Delete</b> &mdash; add a <code>deleted</code>/<code>is_active</code> flag instead of a physical <code>DELETE</code>; Hibernate's <code>@SQLDelete</code> rewrites the delete into an update, and <code>@Where</code> transparently filters deleted rows out of every query.</div>
+      <div class="revision-item"><span class="chk">&#8226;</span><b>Audit Logging</b> &mdash; capture who/what/when/where for sensitive actions (login, create, update, delete); can be done declaratively with Spring Data JPA Auditing (<code>@CreatedBy</code>/<code>@LastModifiedBy</code>/<code>@CreatedDate</code>), an AOP aspect around service methods, or a dedicated audit-event table/service.</div>
+      <div class="revision-item"><span class="chk">&#8226;</span><b>Blue-Green Deployment</b> &mdash; two identical environments; deploy to the idle one, validate, then flip the router/load-balancer &mdash; instant rollback by flipping back.</div>
+      <div class="revision-item"><span class="chk">&#8226;</span><b>Canary Deployment</b> &mdash; route a small % of live traffic to the new version first, watch error rates/latency, then ramp up.</div>
+      <div class="revision-item"><span class="chk">&#8226;</span><b>Rolling / Kubernetes Rolling Update</b> &mdash; replace instances/pods a few at a time while keeping enough healthy replicas to serve traffic throughout.</div>
+    </div>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Real-World Scenarios</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How would you handle duplicate API requests?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>How would you handle duplicate payments?</li></ul></div>
+  <div class="qa-a">
+<p>I would handle duplicate API requests using idempotency keys, unique database constraints, and validation checks. Beforeprocessing a request, the system verifies whether the request has already been processed. If it has, the previouslystored response is returned instead of executing the operation again.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Real-World Scenarios</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;2</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How would you troubleshoot slow API responses?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>suppose api taking time how to do analysis and resolve.</li><li>why the application is getting slow?.</li></ul></div>
+  <div class="qa-a">
+<p>I would start by identifying whether the delay is coming from the database, application code, external services, or infrastructure. I would analyze logs, SQL queries, CPU and memory usage, connectionpools, and downstream servicecalls. Once the bottleneck is identified, I would optimize the relevant component and measure the improvement.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">System Design &amp; Scalability</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Q. How do you generate unique IDs for uploading thousands of images on cloud/database? each time have to generate uniqueid so how to achive.</div>
+  
+  <div class="qa-a">
+<p>DB Sequernce I would use UUIDs because they are globally unique and avoid collisions, even when thousands or millions of images are uploaded concurrently across multiple servers. (Universally Unique IDentifier)</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Encryption</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How to Encrypt Data?</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>What is Symmetric Encryption &amp; Asymmetric Encryption?</li></ul></div>
+  <div class="qa-a">
+<p>Data can be encrypted using encryption algorithms that convertplain text into ciphertext, ensuring that only authorized users can read the data. Symmetric Encryption → Same key for encryption and decryption. (AES , DES , 3DES) Asymmetric Encryption → Different keys for encryption and decryption. (RSA, ECC) (Encrypt -&gt; Public Key)    (Decrypt -&gt; Private Key)</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">System Design / Integration</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. How to implement a payment gateway?</div>
+  
+  <div class="qa-a">
+<p>In our Candidate Registration Portal:</p>
+<ul>
+<li>First, we integrate the payment gatewayAPIs/SDK (e.g., SBI ePay, ICICI Eazypay, Razorpay, Stripe, or PayU).</li>
+<li>When the candidate clicksProceed, a payment record is created in the database with the status PENDING.</li>
+<li>The candidate is then redirected to the payment gateway page to complete the payment.</li>
+<li>After the payment is completed, the payment gateway sends a callback/webhook to our application.</li>
+<li>We verify the digital signature, validate the response, and update the payment status and transactiondetails in the database.</li>
+<li>If the payment is successful, we display a success message, send email/SMS notifications, and allow the candidate to proceed to the next step.</li>
+<li>If the payment fails, we display a failure message and allow the candidate to retry the payment by creating a new payment attempt.</li>
+<li>If the payment is completed but the callback is not received (e.g., due to a network issue), a scheduled reconciliation job runs every 30 minutes, checks all PENDING transactions using the payment gateway's Transaction Status API, and updates their final status in the database.</li>
+</ul>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Real-World Scenarios</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. handle large dataset in app ?</div>
+  
+  <div class="qa-a">
+<p>To handle large datasets, I use pagination, query optimization, indexing, DTO projections, streaming, batch processing, caching, and asynchronous processing. The goal is to avoid loading all data into memory and minimize database and network overhead.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Real-World Scenarios</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Tell me about a critical production issue you handled.</div>
+  <div class="qa-also"><span class="qa-also-label">Also asked as:</span><ul><li>suggest some critical production issue?.</li></ul></div>
+  <div class="qa-a">
+<p>Issue: Candidates reported that payment and seat booking were successful, but admit cards were not being generated. Investigation: Traced the flow of Payment Success → Seat Confirmation → Admit Card Generation. Found that the admit card generation service was failingdue to a missing configuration. Fix:Fixed the configuration and regenerated pending admit cards through a batch job. Result: All affected candidates received their admit cards successfully.</p>
+<p>Issue: Admin reports were loading very slowly. Investigation: Analyzed SQL queries and found missingindexes and unnecessary joins. Fix: Added indexes, optimized queries, and implemented pagination. Result: Response time reduced from 30 seconds to 2 seconds.</p>
+<p>Issue: Admins complained that the candidate approval screens were slow. Investigation: Enabled Hibernate SQL logs and found an N+1 query issue while loading candidate documents. Fix: Used Join Fetch/ Entity Graph and optimized data retrieval. Result: The approval screen became significantly faster.</p>
+<p>Issue: Candidates complained that the payment was deducted, but the seat was not booked. Investigation: Checked the transaction flow. The payment service succeeded, but the seat booking servicefailed due to a timeout. Fix: Added a retry mechanism, implemented a reconciliation job, and added compensation handling. Result: Payment and seat booking remained synchronized.</p>
+<p>Issue: The exam center showed available seats even though all seats were booked. Investigation: Checked the booking and seat allocation tables. Found that concurrent bookings were updating seat counts incorrectly. Fix: Added transaction management and implemented optimistic locking. Result: Seat counts remained consistent.</p>
+  </div>
+</div>
+
+  <div class="section-label big" id="s14">Architecture &amp; Design Patterns <span class="section-count">(3 questions)</span></div>
+  
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Design Pattern</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span><span class="badge badge-level">Mid-Level · 3–5 Years</span></div>
+  </div>
+  <div class="qa-q">Q. Design Pattern in SpringBoot</div>
+  
+  <div class="qa-a">
+<p>Spring Boot internally uses several design patterns such as Singleton, Factory, Dependency Injection (IoC), Proxy, Template, Observer, and MVC patterns to provide loose coupling, maintainability, and scalability.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">Architecture Layers</span>
+    <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. Spring DAO and DTO.</div>
+  
+  <div class="qa-a">
+<p>DAO (Data Access Object) encapsulates database access logic (queries, persistence) behind a clean interface, isolating the rest of the app from persistence details. DTO (Data Transfer Object) is a simple object used to carry data between layers (e.g., API request/response) without exposing internal entity structure.</p>
+  </div>
+</div>
+<div class="qa-card">
+  <div class="qa-head">
+    <span class="topic-chip">General</span>
+    <div class="qa-badges"><span class="badge badge-asked">&#10003; Asked in Interview &times;1</span></div>
+  </div>
+  <div class="qa-q">Q. Design Patterns in Spring</div>
+  
+  <div class="qa-a">
+<p>Spring itself is built on several design patterns - Singleton (default bean scope), Factory (BeanFactory creates beans), Proxy (AOP and transactional/security proxies), Template Method (JdbcTemplate, RestTemplate), Observer (ApplicationEvent/ApplicationListener), and Dependency Injection/Inversion of Control as its foundational pattern.</p>
+  </div>
+</div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="diffs">Quick-Fire Differences <span class="section-count">(the pairs interviewers love)</span></div>
+  <div class="diff-panel"><div class="diff-row"><div class="diff-name">JPA vs Hibernate vs Spring Data JPA</div><div class="diff-body">JPA is a specification (interfaces/rules). Hibernate is the most-used implementation of that spec, doing the actual SQL generation. Spring Data JPA sits above both, generating repository implementations from interface method names so you rarely write boilerplate DAO code.</div></div><div class="diff-row"><div class="diff-name">CrudRepository vs JpaRepository</div><div class="diff-body">CrudRepository gives basic save/find/delete CRUD. JpaRepository extends PagingAndSortingRepository (which extends CrudRepository), adding pagination, sorting and batch operations like flush/deleteInBatch.</div></div><div class="diff-row"><div class="diff-name">GET vs POST vs PUT vs PATCH vs DELETE</div><div class="diff-body">GET retrieves (safe, idempotent, cacheable). POST creates (not idempotent). PUT replaces an entire resource (idempotent). PATCH partially updates a resource (not guaranteed idempotent). DELETE removes a resource (idempotent).</div></div><div class="diff-row"><div class="diff-name">PUT vs PATCH</div><div class="diff-body">PUT sends the full resource representation and replaces it wholesale &mdash; calling it twice with the same body leaves the same end state (idempotent). PATCH sends only the fields to change, which may or may not be idempotent depending on the operation (e.g. increment counter is not).</div></div><div class="diff-row"><div class="diff-name">Authentication vs Authorization</div><div class="diff-body">Authentication answers who are you (verifying identity via credentials/token). Authorization answers what are you allowed to do (checking permissions/roles for an already-authenticated user).</div></div><div class="diff-row"><div class="diff-name">JWT vs OAuth2 vs OpenID Connect</div><div class="diff-body">JWT is just a token format (signed, self-contained claims). OAuth2 is an authorization framework describing how tokens are issued/exchanged. OpenID Connect is an authentication layer built on top of OAuth2 that standardizes an ID Token (usually a JWT) to prove user identity.</div></div><div class="diff-row"><div class="diff-name">RestTemplate vs WebClient vs OpenFeign</div><div class="diff-body">RestTemplate: synchronous/blocking, legacy. WebClient: reactive/non-blocking, modern general-purpose client. OpenFeign: declarative interface-style client, best fit inside a microservices stack with service discovery/load-balancing.</div></div><div class="diff-row"><div class="diff-name">Optimistic vs Pessimistic Locking</div><div class="diff-body">Optimistic assumes conflicts are rare &mdash; detects them at commit time via a @Version column, no DB lock held (better throughput). Pessimistic assumes conflicts are likely &mdash; locks the row up front with SELECT ... FOR UPDATE, blocking other transactions until release (safer under high contention, costs concurrency).</div></div><div class="diff-row"><div class="diff-name">Eager vs Lazy Loading</div><div class="diff-body">EAGER loads the association immediately with the parent (simpler but risks over-fetching and slower queries). LAZY loads on first access, keeps the initial query cheap but requires the session/transaction to still be open when accessed, otherwise LazyInitializationException.</div></div><div class="diff-row"><div class="diff-name">@Component vs @Configuration</div><div class="diff-body">@Component marks a class itself as a Spring-managed bean (via component scanning). @Configuration marks a class as a source of bean definitions, whose @Bean methods are proxied by CGLIB so calling one @Bean method from another still returns the same singleton instance.</div></div><div class="diff-row"><div class="diff-name">@Autowired vs @Resource</div><div class="diff-body">@Autowired resolves by type first, then @Qualifier/name to break ties. @Resource (JSR-250/Jakarta) resolves by name first, falling back to type if no name match is found.</div></div><div class="diff-row"><div class="diff-name">@Valid vs @Validated</div><div class="diff-body">@Valid (Jakarta Bean Validation) triggers basic validation on a request body/bean, including nested objects. @Validated (Spring's own) adds support for validation groups and enables method-level validation on non-@RequestBody parameters.</div></div><div class="diff-row"><div class="diff-name">@Cacheable vs @CachePut vs @CacheEvict</div><div class="diff-body">@Cacheable skips the method on a cache hit and returns the cached value (reads). @CachePut always runs the method and updates the cache with the result (writes-through). @CacheEvict removes one or all entries from a cache.</div></div><div class="diff-row"><div class="diff-name">Singleton vs Prototype scope</div><div class="diff-body">Singleton: exactly one shared instance per Spring container (default). Prototype: a brand-new instance is created every time the bean is requested/injected &mdash; Spring does not manage its full lifecycle (no destroy callback) after creation.</div></div><div class="diff-row"><div class="diff-name">Monolith vs Microservices</div><div class="diff-body">Monolith: single deployable unit, one codebase/database, simpler to develop and test but scales and deploys as one block. Microservices: independently deployable services (often database-per-service), scale/deploy/fail independently, at the cost of distributed-systems complexity (network calls, eventual consistency, observability).</div></div><div class="diff-row"><div class="diff-name">Fetch Join vs @EntityGraph</div><div class="diff-body">Fetch Join is written explicitly in JPQL (JOIN FETCH) inside a custom @Query &mdash; very controllable but couples the query to one specific graph. @EntityGraph is declared at the repository-method level to specify which associations to eagerly fetch without hand-writing JPQL, keeping the repository cleaner and reusable across queries.</div></div><div class="diff-row"><div class="diff-name">BeanFactory vs ApplicationContext</div><div class="diff-body">BeanFactory is the basic IoC container (lazy bean instantiation). ApplicationContext extends it with eager singleton instantiation, event publishing, internationalization, AOP integration and more &mdash; effectively always the one used in real applications.</div></div></div>
+
+  <!-- =========================================================== -->
+  <div class="section-label big" id="rapid">Night-Before / 15-Minute Rapid Revision</div>
+  
+<div class="rapid-panel">
+  <div class="rapid-col">
+    <div class="rapid-title">Startup &amp; Core</div>
+    <div class="rapid-line">main() &rarr; SpringApplication.run() &rarr; ApplicationContext &rarr; load config &rarr; component scan &rarr; create beans &rarr; DI &rarr; auto-configuration &rarr; bean init (@PostConstruct) &rarr; embedded Tomcat starts &rarr; app ready</div>
+    <div class="rapid-line"><code>@SpringBootApplication</code> = <code>@Configuration</code> + <code>@EnableAutoConfiguration</code> + <code>@ComponentScan</code></div>
+    <div class="rapid-line">Auto-config reads <code>AutoConfiguration.imports</code> (Boot 3) / <code>spring.factories</code> (Boot 2) &rarr; filters via <code>@Conditional*</code> &rarr; registers beans</div>
+  </div>
+  <div class="rapid-col">
+    <div class="rapid-title">REST &amp; Data</div>
+    <div class="rapid-line">Request &rarr; DispatcherServlet &rarr; Controller &rarr; Service &rarr; Repository &rarr; DB &rarr; Jackson serializes response</div>
+    <div class="rapid-line">N+1 fix: Fetch Join / @EntityGraph / DTO projection. Always paginate large result sets (Pageable + Page&lt;T&gt;).</div>
+    <div class="rapid-line">@Transactional works via a CGLIB/JDK proxy &mdash; self-invocation (this.method()) bypasses the proxy, so the advice never runs.</div>
+  </div>
+  <div class="rapid-col">
+    <div class="rapid-title">Security</div>
+    <div class="rapid-line">Request &rarr; SecurityFilterChain (auth filters &rarr; JWT filter &rarr; authorization filter) &rarr; Controller</div>
+    <div class="rapid-line">401 = who are you (authentication failed) &middot; 403 = you can't do that (authorization failed)</div>
+    <div class="rapid-line">RBAC: hasRole() at URL level, @PreAuthorize at method level; BCrypt for password hashing.</div>
+  </div>
+  <div class="rapid-col">
+    <div class="rapid-title">Production Reflexes</div>
+    <div class="rapid-line">Slow API &rarr; check DB (slow query/missing index), then pool exhaustion, then external calls, then GC pauses.</div>
+    <div class="rapid-line">Config not applied &rarr; check restart happened, right profile active, env var not overriding, latest build actually deployed.</div>
+    <div class="rapid-line">Memory growth &rarr; heap dump + GC logs &rarr; look for unbounded caches / unclosed resources / static collections.</div>
+  </div>
+</div>
+<div class="section-label" style="margin-top:22px;">What TCS (5&ndash;8 YoE) Will Actually Probe</div>
+<div class="revision-panel">
+  <div class="revision-grid">
+    <div class="revision-item"><span class="chk">&#10003;</span>Explain internals, not just definitions &mdash; how auto-configuration/DI/transactions work, not just what they are.</div>
+    <div class="revision-item"><span class="chk">&#10003;</span>Real production incidents you personally debugged, with the investigation steps and the actual fix.</div>
+    <div class="revision-item"><span class="chk">&#10003;</span>Performance trade-offs: N+1, indexing, pagination, caching, connection pool sizing.</div>
+    <div class="revision-item"><span class="chk">&#10003;</span>Transaction correctness: propagation, isolation, why a rollback silently didn't happen.</div>
+    <div class="revision-item"><span class="chk">&#10003;</span>Security end-to-end: JWT flow, filter chain order, RBAC, why an API randomly 401/403s.</div>
+    <div class="revision-item"><span class="chk">&#10003;</span>Comfort naming design patterns Spring itself uses (Singleton, Factory, Proxy, Template, Observer).</div>
+  </div>
+</div>
+
+
+</div><!-- /page -->
+</body>
+</html>

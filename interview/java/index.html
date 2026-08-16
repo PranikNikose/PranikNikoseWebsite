@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Java — TCS Interview Master Revision (3–8 YoE)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Core Java & OOP — TCS Interview Master Revision</span>
+    </div>
+    <div class="subtitle">// Consolidated from All_Study_and_Interview_Questions_Answers_List (CoreJava sheet) + core-java.html + multithreading.html + multithreading1.html + oops.html — every interview-asked question, fully explained with code.</div>
+  </div>
+
+  <div class="examinfo">
+    <div class="ei"><span class="ei-label">Target Role</span><span class="ei-val">Java Spring Boot Developer</span></div>
+    <div class="ei"><span class="ei-label">Company</span><span class="ei-val">TCS</span></div>
+    <div class="ei"><span class="ei-label">Interview Date</span><span class="ei-val">20 Aug 2026</span></div>
+    <div class="ei"><span class="ei-label">Target Experience</span><span class="ei-val">3–8 Years</span></div>
+    <div class="ei"><span class="ei-label">Scope</span><span class="ei-val">Core Java / Fundamentals — Fresher → Senior depth</span></div>
+  </div>
+
+  <div class="legend-bar">
+    <span class="lg-title">Legend</span>
+    <span class="badge badge-li">💼 LinkedIn Asked</span>
+    <span class="badge badge-count">✓ Asked ×N times</span>
+    <span class="badge badge-asked">✓ Interview Asked</span>
+    <span style="color:var(--muted);font-size:11.5px;">— every question below carries a non-blank <b style="color:var(--text)">Priority Count</b> from the source sheet, meaning it has genuinely come up in a past interview.</span>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <a href="#s1">1. Java Platform & Fundamentals</a>
+    <a href="#s2">2. OOP Concepts & Design</a>
+    <a href="#s3">3. Constructors & Keywords</a>
+    <a href="#s4">4. String, Memory & Immutability</a>
+    <a href="#s5">5. Exception Handling</a>
+    <a href="#s6">6. Collections Framework</a>
+    <a href="#s7">7. Memory Management & JVM</a>
+    <a href="#s8">8. Multithreading Basics</a>
+    <a href="#s9">9. Concurrency Toolkit (Executor/Locks/CF)</a>
+    <a href="#s10">10. Java 8+ Features (Lambda/Streams)</a>
+    <a href="#s11">11. I/O & Serialization</a>
+    <a href="#s12">12. Design Patterns & Best Practices</a>
+    <a href="#s13">13. Real-World Scenarios</a>
+    <a href="#s14">14. Rapid-Fire Revision (30-Second Recall)</a>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 1 -->
+  <div class="sec" id="s1">
+    <div class="sec-h"><span class="sec-num">1</span><span class="sec-title">Java Platform & Fundamentals</span></div>
+
+    <div class="ref-grid">
+      <div class="ref-panel">
+        <div class="ref-title">JDK vs JRE vs JVM</div>
+        <table class="rt">
+          <tr><th>Component</th><th>Contains</th></tr>
+          <tr><td class="hl">JDK</td><td>JRE + Compiler (javac) + Debugger + Dev Tools — for building apps</td></tr>
+          <tr><td class="hl">JRE</td><td>JVM + Core Libraries — for running apps</td></tr>
+          <tr><td class="hl">JVM</td><td>Loads classes, verifies & executes bytecode, manages memory/GC</td></tr>
+        </table>
+      </div>
+      <div class="ref-panel">
+        <div class="ref-title">Execution Flow</div>
+        <div class="flow" style="margin:0;">
+          <div class="fb a">.java</div><span class="fa">→javac→</span>
+          <div class="fb b">.class (bytecode)</div><span class="fa">→</span>
+          <div class="fb c">JVM loads+verifies</div><span class="fa">→</span>
+          <div class="fb d">main()→JIT→machine code</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q1. What is Java and what are its main features? Why do we choose Java?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Java is a high-level, object-oriented, platform-independent language. It follows <b>WORA</b> (Write Once, Run Anywhere) through the JVM. Main features: <b>Platform Independent</b> (bytecode + JVM), <b>Object-Oriented</b>, <b>Secure</b> (no explicit pointers, class loader/bytecode verifier/security manager), <b>Robust</b> (strong exception handling + type checking), <b>Portable</b>, <b>Multithreaded</b>, <b>High Performance</b> (JIT compiler), <b>Automatic Garbage Collection</b>, <b>Distributed</b> and <b>Dynamic</b>.
+For a Spring Boot role, mention: strong ecosystem (Spring/Hibernate), mature concurrency model, and huge enterprise adoption for backend/microservices.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q2. Why is Java called platform independent?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Source code compiles to <b>bytecode</b> (.class), not native machine code. Bytecode runs on the JVM rather than directly on the OS. Since a JVM implementation exists for every major OS, the same bytecode runs anywhere without recompilation — the WORA principle. (Note: the JVM itself is platform-<b>dependent</b>; it's the bytecode that's portable.)</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Data Types, Wrappers & Casting (Fundamentals Reference)</div>
+    <div class="ref-grid">
+      <div class="ref-panel">
+        <div class="ref-title">8 Primitives</div>
+        <table class="rt">
+          <tr><td>byte</td><td>1B</td><td>short</td><td>2B</td></tr>
+          <tr><td>int</td><td>4B</td><td>long</td><td>8B</td></tr>
+          <tr><td>float</td><td>4B</td><td>double</td><td>8B</td></tr>
+          <tr><td>char</td><td>2B</td><td>boolean</td><td>true/false</td></tr>
+        </table>
+      </div>
+      <div class="ref-panel">
+        <div class="ref-title">Primitive vs Wrapper</div>
+        <table class="rt">
+          <tr><th></th><th>Primitive</th><th>Wrapper</th></tr>
+          <tr><td>Storage</td><td>Stack, direct</td><td>Heap, reference</td></tr>
+          <tr><td>Null</td><td class="no">No</td><td class="yes">Yes</td></tr>
+          <tr><td>Why needed</td><td colspan="2">Collections/Generics require Objects; wrappers add utility methods, allow null</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note"><b>Integer Cache Trap (frequently asked as trivia):</b> <code>Integer a=100,b=100; a==b → true</code> (both point to the same cached object, range -128..127). <code>Integer a=200,b=200; a==b → false</code> (new heap objects outside cache range). <b>Always use <code>.equals()</code></b> to compare wrapper values, never <code>==</code>.
+<pre class="code" style="margin:8px 0 0;"><span class="kw">Integer</span> a = 127, b = 127;
+System.out.println(a == b);      <span class="cm">// true  → cached</span>
+<span class="kw">Integer</span> x = 128, y = 128;
+System.out.println(x == y);      <span class="cm">// false → new objects, outside -128..127 cache</span></pre>
+    </div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q3. Integer caching — why does <code>Integer a=128,b=128</code> give <code>a==b → false</code>?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Integer values between -128 and 127 are cached by the JVM (<code>Integer.valueOf()</code> reuses instances from the internal <code>IntegerCache</code>), so <code>a==b</code> is <b>true</b> in that range because both references point to the same cached object. Outside that range, autoboxing creates <b>new</b> Integer objects, so <code>==</code> compares references and returns <b>false</b>. Always use <code>.equals()</code> to compare Integer values.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q4. Explain time/space complexity (Big-O) in general terms.</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Big-O describes how an algorithm's time or space requirement grows as input size (n) grows. Time complexity = how execution work scales; space complexity = how extra memory usage scales. Examples: <code>ArrayList.get(i)</code> is <b>O(1)</b> (array index), linear search is <b>O(n)</b>, binary search is <b>O(log n)</b>, <code>HashMap</code> get/put is amortized <b>O(1)</b>, <code>TreeMap</code> get/put is <b>O(log n)</b> (Red-Black Tree).</div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q5. List all the key Java 8 features (single consolidated question).</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Lambda Expressions · Stream API · Functional Interfaces (Predicate, Function, Supplier, Consumer) · Method References · New Date/Time API (<code>java.time</code>) · Default & Static methods in interfaces · <code>Optional</code> for safe null-handling. (See §10 for full depth with code.)</div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q6. What are the features of Java 17?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Java 17 (LTS) introduced: <b>Sealed Classes</b> (restrict which classes can extend/implement), <b>Pattern Matching for switch</b> (preview), enhanced pseudo-random number generators, a new macOS rendering pipeline, removal of the deprecated Applet API, and strong encapsulation of JDK internals by default.</div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q7. What are the feature plans in the Java roadmap?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Java follows a <b>6-month release cadence</b> with periodic LTS versions (17, 21, 25...). Ongoing efforts: <b>Project Loom</b> (virtual threads — delivered in Java 21), <b>Project Panama</b> (foreign function/memory API), <b>Project Valhalla</b> (value types), and continued pattern-matching/record enhancements.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q8. What is the latest Java version?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Latest Java version → Java 26. Latest LTS version → Java 25. (For a TCS interview, knowing your project's actual JDK version, e.g. Java 17/21 LTS, matters more than trivia — be ready to say which LTS you use in production and why.)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 2 -->
+  <div class="sec" id="s2">
+    <div class="sec-h"><span class="sec-num">2</span><span class="sec-title">OOP Concepts & Design</span></div>
+
+    <div class="cards c4">
+      <div class="mini-card bl"><div class="mc-t">Encapsulation</div><div class="mc-d">Wraps data + methods, private fields + public getters/setters</div></div>
+      <div class="mini-card gr"><div class="mc-t">Inheritance</div><div class="mc-d">IS-A, code reuse — child extends parent</div></div>
+      <div class="mini-card am"><div class="mc-t">Polymorphism</div><div class="mc-d">One interface, many forms — overload/override</div></div>
+      <div class="mini-card pu"><div class="mc-t">Abstraction</div><div class="mc-d">Hides implementation, exposes only essentials</div></div>
+    </div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q9. What are the four pillars of OOP?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Encapsulation provides data hiding by keeping variables private and exposing them via getters/setters. Inheritance promotes code reusability — child class inherits parent's properties/behavior. Polymorphism provides flexibility — the same method behaves differently depending on the object. Abstraction hides implementation details, exposing only required functionality.
+<b>Sample interview line:</b> "I used encapsulation in POJOs, inheritance for reusability, polymorphism through interfaces, and abstraction through interface-implementation design."
+<pre class="code"><span class="kw">public class</span> <span class="cl">Account</span> {                       <span class="cm">// Encapsulation</span>
+  <span class="kw">private double</span> balance;                  <span class="cm">// private field</span>
+  <span class="kw">public double</span> getBalance() { <span class="kw">return</span> balance; }
+}
+<span class="kw">class</span> <span class="cl">SavingsAccount</span> <span class="kw">extends</span> <span class="cl">Account</span> {}  <span class="cm">// Inheritance (IS-A)</span>
+<span class="kw">interface</span> <span class="cl">Shape</span> { <span class="kw">double</span> area(); }             <span class="cm">// Abstraction</span>
+<span class="kw">class</span> <span class="cl">Circle</span> <span class="kw">implements</span> <span class="cl">Shape</span> {
+  <span class="kw">public double</span> area() { <span class="kw">return</span> ...; }         <span class="cm">// Polymorphism (override)</span>
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q10. What is encapsulation?</div>
+          <div class="qa-badges"><span class="badge badge-asked">✓ Interview Asked</span></div></div>
+        <div class="qa-a">Encapsulation is the process of wrapping data and methods into a single unit called a class, and providing data hiding by controlling access to that data through methods. Achieved by declaring fields <code>private</code> and exposing controlled access via getter/setter methods.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q11. What is inheritance?</div>
+          <div class="qa-badges"><span class="badge badge-asked">✓ Interview Asked</span></div></div>
+        <div class="qa-a">Inheritance is the mechanism by which a child class inherits the properties and behavior of a parent class — promotes code reusability. Java supports Single, Multilevel, and Hierarchical inheritance through classes; Multiple Inheritance is achieved only via interfaces.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q12. What is polymorphism?</div>
+          <div class="qa-badges"><span class="badge badge-asked">✓ Interview Asked</span></div></div>
+        <div class="qa-a">Polymorphism means one object can behave in different forms depending on context — e.g. a man can act as a father, employee, or patient in different situations. Achieved via <b>Compile-time Polymorphism</b> (Method Overloading) and <b>Runtime Polymorphism</b> (Method Overriding, via Dynamic Method Dispatch).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q13. What is abstraction?</div>
+          <div class="qa-badges"><span class="badge badge-asked">✓ Interview Asked</span></div></div>
+        <div class="qa-a">Data Abstraction is hiding implementation details and showing only necessary details to the user. Achieved using Abstract Classes and Interfaces.</div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q14. Why does Java not support multiple inheritance through classes?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">To avoid ambiguity and the <b>Diamond Problem</b> — if a child class inherits the same method from two parent classes, it's unclear which implementation should execute when called via the child object. Java sidesteps this by disallowing multiple class inheritance and instead allowing multiple <b>interface</b> implementation; if two interfaces have conflicting default methods, the implementing class is forced to explicitly override and resolve it.
+<pre class="code"><span class="kw">interface</span> <span class="cl">A</span> { <span class="kw">default void</span> greet(){ System.out.println(<span class="st">"A"</span>); } }
+<span class="kw">interface</span> <span class="cl">B</span> { <span class="kw">default void</span> greet(){ System.out.println(<span class="st">"B"</span>); } }
+<span class="kw">class</span> <span class="cl">C</span> <span class="kw">implements</span> <span class="cl">A</span>, <span class="cl">B</span> {
+  <span class="kw">public void</span> greet() {          <span class="cm">// must override — compile error otherwise</span>
+    <span class="cl">A</span>.<span class="kw">super</span>.greet();       <span class="cm">// explicitly pick one, or write custom logic</span>
+  }
+}</pre></div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q15. If two interfaces have the same default method, how do you resolve it when a class implements both?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Java forces the implementing class to override that method explicitly (diamond conflict) — otherwise it won't compile. Inside the override, call a specific interface's version using <code>InterfaceName.super.methodName()</code> (see code sample above, Q14).</div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q16. What is composition, how is it different from inheritance, and when do you prefer it?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Composition is a <b>HAS-A</b> relationship where a class contains another class as a member — e.g. Car HAS-A Engine. Inheritance is an <b>IS-A</b> relationship — e.g. Dog IS-A Animal. Prefer composition when there's a HAS-A relationship rather than a true IS-A relationship — it provides better flexibility, looser coupling, and easier maintenance ("<b>favor composition over inheritance</b>" is a widely-cited design principle).
+<pre class="code"><span class="kw">class</span> <span class="cl">Engine</span> { <span class="kw">void</span> start(){} }
+<span class="kw">class</span> <span class="cl">Car</span> {
+  <span class="kw">private final</span> <span class="cl">Engine</span> engine;      <span class="cm">// Composition — Car HAS-A Engine</span>
+  <span class="cl">Car</span>(<span class="cl">Engine</span> engine) { <span class="kw">this</span>.engine = engine; }
+  <span class="kw">void</span> start() { engine.start(); }   <span class="cm">// delegates, not inherits</span>
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q17. Interface vs Abstract Class</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">
+        <table class="rt" style="margin-top:4px;"><tr><th>Feature</th><th>Abstract Class</th><th>Interface</th></tr>
+        <tr><td>Purpose</td><td>Partial impl. ("What + How")</td><td>Contract ("What to do")</td></tr>
+        <tr><td>Variables</td><td>Instance/static/final — any type</td><td class="hl">public static final only</td></tr>
+        <tr><td>Methods</td><td>Abstract + concrete</td><td>Abstract, default, static (private since Java 9)</td></tr>
+        <tr><td>Constructor</td><td class="yes">Yes</td><td class="no">No</td></tr>
+        <tr><td>Inheritance</td><td>Single (<code>extends</code>)</td><td>Multiple (<code>implements</code>)</td></tr>
+        <tr><td>State</td><td class="yes">Yes</td><td class="no">No</td></tr>
+        </table>
+        <div style="margin-top:6px;">Use Abstract Class for shared implementation among closely related classes; use Interface for a contract + loose coupling + multiple inheritance.</div></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q18. What is a constructor? Can a constructor be final or static?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">A constructor is a special member used to initialize an object's state. It has the same name as the class, no return type, and is auto-invoked on <code>new</code>. Access modifiers are allowed on a constructor, but non-access modifiers (<code>final</code>, <code>static</code>, <code>abstract</code>) are <b>not</b> allowed — a constructor isn't inherited or overridden, so "final"/"static" have no meaning for it.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q19. What is a Generic Enum? Can Enums be generic?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Enum = special data type used to define a fixed set of constants; type-safe; introduced in Java 5; can have fields, methods, constructors; extends <code>java.lang.Enum</code>; cannot be instantiated with <code>new</code>. <b>Enums cannot be generic</b> (an enum's constants are its own fixed type parameter), but they <b>can contain generic methods</b>.
+<pre class="code"><span class="kw">enum</span> <span class="cl">Status</span> {
+  ACTIVE, INACTIVE;
+  <span class="kw">public static</span> &lt;T&gt; T describe(T value) { <span class="kw">return</span> value; } <span class="cm">// generic method OK</span>
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q20. What are Generics and why were they introduced?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">Generics let classes, interfaces, and methods work with different data types while providing <b>compile-time type safety</b>. Introduced to avoid explicit casting and <code>ClassCastException</code> at runtime.
+<pre class="code"><span class="cl">List</span>&lt;String&gt; list = <span class="kw">new</span> <span class="cl">ArrayList</span>&lt;&gt;();  <span class="cm">// compile-time checked, no cast needed on get()</span>
+<span class="kw">String</span> s = list.get(0);                    <span class="cm">// vs raw List → Object → needs (String) cast</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q21. Difference between Cloneable and Runnable?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>Cloneable</code> is a <b>marker interface</b> (no methods) indicating an object can be cloned via <code>Object.clone()</code> — without it, <code>clone()</code> throws <code>CloneNotSupportedException</code>. <code>Runnable</code> is a <b>functional interface</b> (<code>run()</code>) defining a task that can be executed by a thread.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q22. How does getter/setter participate in immutability?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">A getter is allowed because it only <b>reads</b> data (doesn't change state); a setter is <b>not</b> allowed in an immutable class because it would change the state after construction. Immutable classes expose only getters.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q23. Shallow Copy vs Deep Copy</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>Shallow copy</b> copies references — nested/mutable objects are shared between original and copy (mutating one affects the other). <b>Deep copy</b> creates independent copies of nested objects — fully isolated.
+<pre class="code"><span class="cm">// Shallow: default Object.clone() copies field references as-is</span>
+<span class="cm">// Deep: manually clone nested mutable fields too</span>
+<span class="kw">class</span> <span class="cl">Employee</span> <span class="kw">implements</span> <span class="cl">Cloneable</span> {
+  <span class="cl">Address</span> address;
+  <span class="kw">protected</span> <span class="cl">Employee</span> clone() <span class="kw">throws</span> <span class="cl">CloneNotSupportedException</span> {
+    <span class="cl">Employee</span> copy = (<span class="cl">Employee</span>) <span class="kw">super</span>.clone();
+    copy.address = <span class="kw">new</span> <span class="cl">Address</span>(<span class="kw">this</span>.address);  <span class="cm">// deep-copy the mutable field</span>
+    <span class="kw">return</span> copy;
+  }
+}</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 3 -->
+  <div class="sec" id="s3">
+    <div class="sec-h"><span class="sec-num">3</span><span class="sec-title">Constructors, this/super, static/final Keywords</span></div>
+
+    <div class="ref-grid">
+      <div class="ref-panel">
+        <div class="ref-title">this vs super</div>
+        <table class="rt">
+          <tr><th></th><th>this</th><th>super</th></tr>
+          <tr><td>Refers to</td><td>Current object</td><td>Immediate parent class</td></tr>
+          <tr><td>Used for</td><td>Resolve field/param clash; chain constructors via <code>this()</code></td><td>Access parent field/method; call parent constructor via <code>super()</code></td></tr>
+          <tr><td>Rule</td><td colspan="2">Must be the <b>first statement</b> in a constructor</td></tr>
+        </table>
+      </div>
+      <div class="ref-panel">
+        <div class="ref-title">static vs final</div>
+        <table class="rt">
+          <tr><td class="hl">static var</td><td>One copy shared by all objects</td></tr>
+          <tr><td class="hl">static method</td><td>Can access only static members, no <code>this</code>/<code>super</code></td></tr>
+          <tr><td class="hl">static block</td><td>Runs once when class loads, for static init</td></tr>
+          <tr><td class="hl">final var</td><td>Cannot reassign (constant)</td></tr>
+          <tr><td class="hl">final method</td><td>Cannot be overridden</td></tr>
+          <tr><td class="hl">final class</td><td>Cannot be extended</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q24. Difference between final, finally, and finalize()?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>final</code> → keyword; restricts modification (variable/method/class). <code>finally</code> → block; always executes regardless of whether an exception occurred (cleanup). <code>finalize()</code> → deprecated method; historically called by GC before object collection — don't rely on it in modern code (use try-with-resources / <code>AutoCloseable</code> instead).</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Overloading vs Overriding (Reference)</div>
+    <div class="ref-grid">
+      <div class="ref-panel">
+        <div class="ref-title">Overloading (Compile-Time)</div>
+        <table class="rt">
+          <tr><td>Rule</td><td>Same name, different signature (number/type/order of params)</td></tr>
+          <tr><td>Scope</td><td>Same class</td></tr>
+        </table>
+      </div>
+      <div class="ref-panel">
+        <div class="ref-title">Overriding (Runtime)</div>
+        <table class="rt">
+          <tr><td>Rule</td><td>Same signature, same/covariant return type, <code>@Override</code></td></tr>
+          <tr><td>Scope</td><td>Parent → Child, via Dynamic Method Dispatch</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 4 -->
+  <div class="sec" id="s4">
+    <div class="sec-h"><span class="sec-num">4</span><span class="sec-title">String, Memory & Immutability</span></div>
+
+    <div class="qa-grid">
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q25. Why are Strings immutable? Why immutable from a security perspective?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Once a String object is created, its value cannot change. Immutability provides: <b>Security</b> — sensitive data (file paths, URLs, DB connection strings) stored as Strings can't be maliciously/accidentally altered after creation; <b>Thread Safety</b> — safely shared across threads without synchronization; <b>String Pool reuse</b> — safe to share the same object for equal literals, saving memory; <b>Performance</b> — hashCode is cached, making Strings fast as HashMap keys.
+<pre class="code"><span class="kw">String</span> s1 = <span class="st">"Java"</span>;                 <span class="cm">// String Constant Pool — reused if value exists</span>
+<span class="kw">String</span> s2 = <span class="kw">new</span> <span class="kw">String</span>(<span class="st">"Java"</span>);      <span class="cm">// forces a NEW heap object, separate from pool</span>
+System.out.println(s1 == s2);      <span class="cm">// false — different references</span>
+System.out.println(s1.equals(s2)); <span class="cm">// true  — same content</span>
+System.out.println(s2.intern() == s1); <span class="cm">// true — intern() returns the pooled reference</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q26. How would you create an immutable object / class?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span> <span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Make the class <code>final</code>, declare all fields <code>private final</code>, initialize only via the constructor, provide no setters, and use <b>defensive copies</b> for mutable fields (collections, dates, etc.) both on the way in and the way out. Once created, the object's state cannot change.
+<pre class="code"><span class="kw">public final class</span> <span class="cl">Employee</span> {
+  <span class="kw">private final</span> <span class="cl">String</span> name;
+  <span class="kw">private final</span> <span class="cl">List</span>&lt;<span class="cl">String</span>&gt; skills;
+
+  <span class="kw">public</span> <span class="cl">Employee</span>(<span class="cl">String</span> name, <span class="cl">List</span>&lt;<span class="cl">String</span>&gt; skills) {
+    <span class="kw">this</span>.name = name;
+    <span class="kw">this</span>.skills = <span class="kw">new</span> <span class="cl">ArrayList</span>&lt;&gt;(skills);      <span class="cm">// defensive copy IN</span>
+  }
+  <span class="kw">public</span> <span class="cl">List</span>&lt;<span class="cl">String</span>&gt; getSkills() {
+    <span class="kw">return</span> <span class="cl">Collections</span>.unmodifiableList(skills); <span class="cm">// defensive copy/view OUT</span>
+  }
+  <span class="cm">// no setters — String/wrapper fields, records, and Java built-in immutables follow this pattern</span>
+}</pre>
+        Benefits: thread-safe, simple, secure, cache-friendly, reliable. Examples: <code>String</code>, wrapper classes, <code>record</code> (Java 16+, auto-generates ctor/getters/equals/hashCode/toString).</div>
+      </div>
+    </div>
+
+    <div class="ref-grid">
+      <div class="ref-panel full">
+        <div class="ref-title">String vs StringBuilder vs StringBuffer</div>
+        <table class="rt">
+          <tr><th></th><th>String</th><th>StringBuilder</th><th>StringBuffer</th></tr>
+          <tr><td>Mutability</td><td>Immutable — new object each modification</td><td>Mutable, same object</td><td>Mutable, same object</td></tr>
+          <tr><td>Thread-safe</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes (synchronized)</td></tr>
+          <tr><td>Speed</td><td>Slow on modification</td><td class="hl">Fastest</td><td>Slower than SB (sync overhead)</td></tr>
+          <tr><td>Use when</td><td>Rarely-changed text</td><td>Single-threaded loops/concatenation</td><td>Multi-threaded shared buffer</td></tr>
+        </table>
+        <div class="note trap" style="margin:10px 0 0;"><b>Trap:</b> <code>+</code> concatenation in a loop silently creates a new String each iteration (internally uses StringBuilder per statement) — O(n²) cost across a loop. Always use an explicit <code>StringBuilder</code> inside loops.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 5 -->
+  <div class="sec" id="s5">
+    <div class="sec-h"><span class="sec-num">5</span><span class="sec-title">Exception Handling</span></div>
+
+    <div class="ref-grid">
+      <div class="ref-panel full">
+        <div class="ref-title">Throwable Hierarchy</div>
+        <pre class="code" style="margin:0;">Object
+ └── Throwable (message + cause + stack trace)
+      ├── Error         — serious JVM problems, usually unrecoverable (OutOfMemoryError, StackOverflowError)
+      └── Exception      — application can handle/recover
+           ├── Checked Exception    — checked at compile time (IOException, SQLException)
+           └── RuntimeException     — Unchecked, checked at runtime (NullPointerException, ArithmeticException)</pre>
+      </div>
+    </div>
+
+    <div class="qa-grid">
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q27. What are checked exceptions? When should they be used?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Checked exceptions are checked by the compiler at compile time and must be handled (try-catch) or declared (<code>throws</code>). Examples: <code>IOException</code>, <code>SQLException</code>. Use them when the caller can realistically recover and take corrective action — commonly file handling, database access, or network operations.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q28. Difference between throw and throws?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>throw</code> explicitly throws an exception instance from within a method body. <code>throws</code> declares in a method signature that it might throw an exception — doesn't itself throw anything.
+<pre class="code"><span class="kw">void</span> readFile() <span class="kw">throws</span> <span class="cl">IOException</span> {   <span class="cm">// throws — declares</span>
+  <span class="kw">if</span> (file == <span class="kw">null</span>)
+    <span class="kw">throw new</span> <span class="cl">IllegalArgumentException</span>(<span class="st">"file is null"</span>); <span class="cm">// throw — actually throws</span>
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q29. If both the try and finally blocks return/throw, which wins?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">The <code>finally</code> block <b>always</b> executes, and its return value or exception <b>overrides</b> the one from <code>try</code>. This is a common trap — avoid returning from <code>finally</code> in real code as it silently swallows the try block's outcome.
+<pre class="code"><span class="kw">static int</span> test() {
+  <span class="kw">try</span> { <span class="kw">return</span> 1; }
+  <span class="kw">finally</span> { <span class="kw">return</span> 2; }   <span class="cm">// this wins → method returns 2, the try's "return 1" is discarded</span>
+}</pre>
+        Also: <code>Throwable</code> can technically be caught (parent of Exception & Error) but <b>avoid it</b> — it also swallows serious JVM Errors that app code shouldn't handle. Never silently swallow exceptions.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q30. Try-With-Resources — how does close() work internally, and which interface must a resource implement?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×3</span></div></div>
+        <div class="qa-a">Try-With-Resources (Java 7+) automatically closes resources after execution. Works with classes implementing <code>AutoCloseable</code> (or its stricter subtype <code>Closeable</code>). Internally, the compiler generates an implicit <code>finally</code> block that calls <code>close()</code> on each declared resource, in reverse order of declaration — even if an exception is thrown from the try body.
+<pre class="code"><span class="kw">try</span> (<span class="cl">BufferedReader</span> br = <span class="kw">new</span> <span class="cl">BufferedReader</span>(<span class="kw">new</span> <span class="cl">FileReader</span>(<span class="st">"file.txt"</span>))) {
+  <span class="kw">return</span> br.readLine();
+}  <span class="cm">// br.close() auto-invoked, no explicit finally needed</span></pre>
+        If the resource's <code>close()</code> throws while an exception is already propagating from the try body, the close() exception is attached as a <b>suppressed exception</b> on the primary one (retrievable via <code>getSuppressed()</code>).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q31. How would you create custom exceptions and design an exception hierarchy for an app?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Extend <code>Exception</code> (checked) or <code>RuntimeException</code> (unchecked) for business-specific errors — in Spring Boot, <code>RuntimeException</code> subclasses are the standard since they don't force callers to handle them everywhere. Build a common base exception → categorize into Validation / Business / System subclasses; handle centrally via <code>@RestControllerAdvice</code> + <code>@ExceptionHandler</code>.
+<pre class="code"><span class="kw">public class</span> <span class="cl">BusinessException</span> <span class="kw">extends</span> <span class="cl">RuntimeException</span> {
+  <span class="kw">public</span> <span class="cl">BusinessException</span>(<span class="cl">String</span> msg) { <span class="kw">super</span>(msg); }
+}
+<span class="kw">public class</span> <span class="cl">UserNotFoundException</span> <span class="kw">extends</span> <span class="cl">BusinessException</span> {
+  <span class="kw">public</span> <span class="cl">UserNotFoundException</span>(<span class="cl">Long</span> id) { <span class="kw">super</span>(<span class="st">"User not found: "</span> + id); }
+}
+
+<span class="kw">@RestControllerAdvice</span>
+<span class="kw">public class</span> <span class="cl">GlobalExceptionHandler</span> {
+  <span class="kw">@ExceptionHandler</span>(<span class="cl">UserNotFoundException</span>.<span class="kw">class</span>)
+  <span class="kw">public</span> <span class="cl">ResponseEntity</span>&lt;<span class="cl">ErrorResponse</span>&gt; handle(<span class="cl">UserNotFoundException</span> ex) {
+    <span class="kw">return</span> <span class="cl">ResponseEntity</span>.status(<span class="cl">HttpStatus</span>.NOT_FOUND).body(<span class="kw">new</span> <span class="cl">ErrorResponse</span>(ex.getMessage()));
+  }
+}</pre></div>
+      </div>
+    </div>
+
+    <div class="sub-h">Spring Boot Exception Handling (Interviewer expects this at 3–8 YoE, Spring Boot role)</div>
+    <div class="flow">
+      <div class="fb a">Client Request</div><span class="fa">→</span><div class="fb b">Controller</div><span class="fa">→</span><div class="fb b">Service</div><span class="fa">→</span><div class="fb b">Repository</div><span class="fa">→exception→</span><div class="fb c">@RestControllerAdvice</div><span class="fa">→</span><div class="fb d">JSON Error Response</div>
+    </div>
+    <div class="ref-grid">
+      <div class="ref-panel">
+        <div class="ref-title">@ExceptionHandler → HTTP Status Mapping</div>
+        <table class="rt">
+          <tr><td>UserNotFoundException</td><td class="hl">404</td></tr>
+          <tr><td>DuplicateUserException</td><td class="hl">409</td></tr>
+          <tr><td>Validation / IllegalArgumentException</td><td class="hl">400</td></tr>
+          <tr><td>AccessDeniedException</td><td class="hl">403</td></tr>
+          <tr><td>AuthenticationException</td><td class="hl">401</td></tr>
+          <tr><td>Unhandled Exception</td><td class="hl">500</td></tr>
+        </table>
+      </div>
+      <div class="ref-panel">
+        <div class="ref-title">@ControllerAdvice vs @RestControllerAdvice</div>
+        <table class="rt">
+          <tr><td>@ControllerAdvice</td><td>MVC + REST, needs <code>@ResponseBody</code> for JSON</td></tr>
+          <tr><td>@RestControllerAdvice</td><td>= @ControllerAdvice + @ResponseBody, returns JSON automatically — preferred for REST APIs</td></tr>
+          <tr><td>ProblemDetail (Spring Boot 3 / RFC 9457)</td><td>Standard error format: type · title · status · detail · instance</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">Best practices: catch specific exceptions first (specific → generic), never catch <code>Throwable</code>, log once & handle once, preserve root cause via exception chaining (<code>new ServiceException("msg", cause)</code>), never expose internal stack traces to clients, include a correlation/trace ID in error responses.</div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 6 -->
+  <div class="sec" id="s6">
+    <div class="sec-h"><span class="sec-num">6</span><span class="sec-title">Collections Framework</span></div>
+
+    <div class="qa-grid">
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q32. What is the Collection Framework?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">A set of interfaces and classes used to store and manage a group of objects as a single entity. Provides data structures like List, Set, Queue, and Map, plus algorithms (sorting, searching) over them.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q33. Difference between List and Set?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>List:</b> allows duplicates, preserves insertion order, supports index-based access. <b>Set:</b> unique elements only; order depends on implementation (HashSet = none, LinkedHashSet = insertion order, TreeSet = sorted order).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q34. Difference between ArrayList and LinkedList?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span> <span class="badge badge-count">✓ Asked ×2 (internals)</span></div></div>
+        <div class="qa-a"><b>ArrayList:</b> dynamic array structure; grows ~50% when full and copies elements; random access is <b>O(1)</b>; insert/delete in the middle is slow (must shift elements); not thread-safe. <b>LinkedList:</b> doubly linked list; random access is slow (must traverse — O(n)); insert/delete in the middle is fast (just pointer changes, O(1) once positioned).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q35. Array vs ArrayList</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>Array:</b> fixed size, stores primitives and objects, index-based. <b>ArrayList:</b> dynamic size, stores objects only (autoboxing for primitives), index-based, rich built-in API (add/remove/search).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q36. What is HashMap? How does HashMap work internally? (High-Frequency Question)</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×7</span></div></div>
+        <div class="qa-a">HashMap is an implementation of the <code>Map</code> interface that stores data as key-value pairs, internally backed by an <b>array of buckets</b>.
+<b>put(key, value):</b> calculate <code>hashCode(key)</code> → determine bucket index (<code>hash & (capacity-1)</code>) → if the bucket is empty, store directly → if occupied (collision), entries chain into a <b>LinkedList</b>; from Java 8, if a bucket's node count exceeds <b>8</b>, the LinkedList converts to a <b>Red-Black Tree</b> for O(log n) worst case instead of O(n).
+<b>get(key):</b> uses <code>hashCode()</code> to locate the bucket, then <code>equals()</code> to find the exact matching key/entry.
+<b>Resizing/rehashing:</b> when entries exceed <code>capacity × loadFactor</code> (default load factor 0.75), HashMap <b>doubles</b> its internal array size and rehashes every existing entry into the new buckets (since bucket index depends on capacity).
+<pre class="code"><span class="cl">HashMap</span>&lt;<span class="cl">String</span>, <span class="cl">Integer</span>&gt; map = <span class="kw">new</span> <span class="cl">HashMap</span>&lt;&gt;();
+map.put(<span class="st">"a"</span>, 1);       <span class="cm">// hash("a") → bucket index → store</span>
+map.get(<span class="st">"a"</span>);          <span class="cm">// hash("a") → bucket → equals() scan → return 1</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q37. Difference between HashMap and Hashtable?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×3</span></div></div>
+        <div class="qa-a"><b>HashMap:</b> not thread-safe, allows 1 null key + multiple null values, faster (no sync overhead). <b>Hashtable:</b> synchronized & thread-safe, doesn't allow null keys/values, slower (whole-map lock), legacy class.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q38. What is ConcurrentHashMap? Internal working? Why does it not allow a null key?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×4</span></div></div>
+        <div class="qa-a">A thread-safe Map allowing multiple threads to read & update concurrently. Uses <b>bucket/node-level locking</b> plus <b>CAS</b> (Compare-And-Swap) instead of a single whole-map lock, giving much better concurrency than <code>Hashtable</code>/<code>Collections.synchronizedMap</code>. It disallows null keys/values because if <code>get()</code> returns null, in a concurrent context you can't distinguish "the key is missing" from "the key maps to null" — that ambiguity is unsafe under concurrent mutation.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q39. HashMap vs ConcurrentHashMap</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">HashMap: not thread-safe, not synchronized, 1 null key allowed, fastest in single-threaded apps. ConcurrentHashMap: thread-safe (bucket/node-level locks + CAS), no null key/value allowed, best throughput in multi-threaded apps.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q40. HashMap vs TreeMap</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">HashMap: key-value, no ordering guarantee, 1 null key allowed, not thread-safe, O(1) average ops. TreeMap: key-value, keys <b>sorted</b> (Red-Black Tree, natural order or supplied Comparator), no null key allowed, not thread-safe, O(log n) ops.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q41. What is Hashtable?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Key-value pair map, synchronized & thread-safe, no null key/value allowed, legacy (pre-Collections Framework), whole map locked on every operation — largely superseded by <code>ConcurrentHashMap</code> in modern code.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q42. Why is LinkedHashMap needed?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">LinkedHashMap gives HashMap's fast average O(1) performance while also maintaining <b>predictable insertion order</b> (or optionally access order, useful for building an LRU cache via <code>removeEldestEntry</code>).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q43. ArrayList Internal Working</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">ArrayList internally uses a dynamic array. When full, it grows by ~50% (<code>newCapacity = oldCapacity + (oldCapacity >> 1)</code>) and copies existing elements into the new array. Provides fast O(1) index-based retrieval.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q44. What is HashSet? If made synchronized, does it become fail-safe?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">HashSet is a Set implementation storing unique elements with no insertion-order guarantee (internally backed by a HashMap — element = key, a shared dummy constant = value). <b>No</b> — wrapping a HashSet with <code>Collections.synchronizedSet()</code> does <b>not</b> make its iterator fail-safe; it's still <b>fail-fast</b> and throws <code>ConcurrentModificationException</code> if structurally modified during iteration by another thread. Synchronization only serializes access, it doesn't change iterator semantics.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q45. What is Fail-Fast vs Fail-Safe Iterator?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×4</span></div></div>
+        <div class="qa-a"><b>Fail-Fast:</b> throws <code>ConcurrentModificationException</code> if the collection is structurally modified while iterating (ArrayList, HashMap, HashSet — detected via an internal <code>modCount</code> check). <b>Fail-Safe:</b> does not throw, because it iterates over a <b>copy/snapshot</b> of the collection — e.g. <code>CopyOnWriteArrayList</code>, <code>CopyOnWriteArraySet</code>, <code>ConcurrentHashMap</code> (any concurrent collection).
+<pre class="code"><span class="cl">List</span>&lt;<span class="cl">Integer</span>&gt; list = <span class="kw">new</span> <span class="cl">ArrayList</span>&lt;&gt;(List.of(1,2,3));
+<span class="kw">for</span> (<span class="kw">int</span> x : list) {
+  <span class="kw">if</span> (x == 2) list.remove(<span class="cl">Integer</span>.valueOf(2)); <span class="cm">// throws ConcurrentModificationException</span>
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q46. What is ConcurrentModificationException?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">A runtime exception thrown when a collection is structurally modified (add/remove) while being iterated, other than through the iterator's own <code>remove()</code>. Fix: use <code>Iterator.remove()</code>, or iterate over a copy, or use a concurrent/fail-safe collection.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q47. Significance of hashCode() and equals()?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a"><code>hashCode()</code> → locates the bucket. <code>equals()</code> → finds the exact matching object within that bucket. Both must be overridden together for hash-based collections (HashMap/HashSet) to behave correctly.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q48. If two objects are equal, do they always have the same hashCode? If they have the same hashCode, are they always equal?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Equal objects (per <code>equals()</code>) <b>must</b> have the same hashCode (contract requirement). But objects with the same hashCode are <b>not necessarily</b> equal — a hash collision can put two unequal objects in the same bucket, and only <code>equals()</code> disambiguates.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q49. How to correctly override equals()/hashCode() — full walkthrough</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Override <code>equals()</code> to check type and compare all significant fields (using <code>Objects.equals()</code> for null-safety). Override <code>hashCode()</code> using <code>Objects.hash()</code> on those same fields, so equal objects always produce the same hash code.
+<pre class="code"><span class="kw">public class</span> <span class="cl">Employee</span> {
+  <span class="kw">private final</span> <span class="cl">Long</span> id;
+  <span class="kw">private final</span> <span class="cl">String</span> email;
+
+  <span class="kw">@Override public boolean</span> equals(<span class="cl">Object</span> o) {
+    <span class="kw">if</span> (<span class="kw">this</span> == o) <span class="kw">return true</span>;
+    <span class="kw">if</span> (!(o <span class="kw">instanceof</span> <span class="cl">Employee</span>)) <span class="kw">return false</span>;
+    <span class="cl">Employee</span> e = (<span class="cl">Employee</span>) o;
+    <span class="kw">return</span> <span class="cl">Objects</span>.equals(id, e.id) &amp;&amp; <span class="cl">Objects</span>.equals(email, e.email);
+  }
+  <span class="kw">@Override public int</span> hashCode() {
+    <span class="kw">return</span> <span class="cl">Objects</span>.hash(id, email);
+  }
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q50. Can we use a custom class as a HashMap key?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Yes, provided <code>equals()</code> and <code>hashCode()</code> are correctly overridden. Fields used for key comparison should ideally be <b>immutable</b> — if a key's hash-relevant fields mutate after insertion, the entry becomes unreachable at its original bucket (a very common production bug source).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q51. Why can HashSet fail to detect duplicates if equals()/hashCode() are badly implemented?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">If <code>equals()</code> and <code>hashCode()</code> are inconsistent (e.g. <code>hashCode()</code> always returns a constant while <code>equals()</code> only sometimes returns true, or vice versa) — HashSet can fail to detect true duplicates, or waste time treating unequal objects as potential duplicates in the same bucket. Violating the contract breaks Set's uniqueness guarantee entirely.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q52. How do you avoid hash collisions in a HashMap?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Use a well-distributed <code>hashCode()</code> implementation (e.g. via <code>Objects.hash()</code> combining multiple fields, rather than a constant or narrow-range value), choose an appropriately-sized initial capacity to reduce bucket crowding, and avoid mutable fields in the hashCode computation.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q53. Why are Set elements unique, and how do heterogeneous/custom objects sort in a TreeSet?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Set enforces uniqueness via <code>equals()</code>/<code>hashCode()</code> (HashSet) or <code>compareTo()</code>/Comparator (TreeSet) — elements are treated as duplicates if these return 0/true. For heterogeneous or custom objects in a TreeSet, you must supply a <code>Comparator</code> or implement <code>Comparable</code>, since TreeSet relies purely on <b>ordering</b>, not <code>equals()</code>, to detect duplicates (two elements comparing as 0 are considered the same).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q54. Difference between Comparable and Comparator?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a"><b>Comparable:</b> natural sort order, implements <code>compareTo()</code>, single sort logic, defined <b>inside</b> the class (e.g. sort Employee by ID). <b>Comparator:</b> custom sort order, implements <code>compare()</code>, supports multiple sort strategies, defined <b>outside</b> the class or as a lambda (e.g. sort by Salary, then Age).
+<pre class="code"><span class="kw">class</span> <span class="cl">Employee</span> <span class="kw">implements</span> <span class="cl">Comparable</span>&lt;<span class="cl">Employee</span>&gt; {
+  <span class="kw">int</span> id;
+  <span class="kw">public int</span> compareTo(<span class="cl">Employee</span> o) { <span class="kw">return</span> <span class="cl">Integer</span>.compare(<span class="kw">this</span>.id, o.id); } <span class="cm">// natural order</span>
+}
+<span class="cl">Comparator</span>&lt;<span class="cl">Employee</span>&gt; bySalary = <span class="cl">Comparator</span>.comparing(<span class="cl">Employee</span>::getSalary);
+employees.sort(bySalary.thenComparing(<span class="cl">Employee</span>::getAge)); <span class="cm">// custom, chainable</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q55. How do you find max/min from a List, Set, or Queue?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>Collections.max(collection)</code> / <code>Collections.min(collection)</code> — using natural order or an optional Comparator argument. Stream equivalent: <code>list.stream().max(Comparator.naturalOrder())</code>.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q56. Difference between Iterable and Iterator?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a"><code>Iterable</code> provides the <code>iterator()</code> method to obtain an <code>Iterator</code> (enables the for-each loop). <code>Iterator</code> actually traverses elements one by one using <code>hasNext()</code>/<code>next()</code> (and optionally <code>remove()</code>).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q57. Can we modify a List/Map obtained via Collections utility methods?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">A normal List/Map is fully mutable. Collections created via <code>Collections.unmodifiableList()</code> / <code>unmodifiableMap()</code> return a <b>read-only view</b> — any mutation attempt throws <code>UnsupportedOperationException</code>. (Also note <code>List.of()</code>/<code>Map.of()</code>, Java 9+, are immutable by construction.)</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q58. Methods in the Collections utility class?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>sort()</code>, <code>reverse()</code>, <code>max()</code>, <code>min()</code>, <code>unmodifiableX()</code>, <code>synchronizedX()</code>, <code>emptyList()</code>, <code>singletonList()</code>, <code>shuffle()</code>, <code>frequency()</code>.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q59. How would you design a custom List, Set, or Map?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Custom List → backed by a dynamic (resizable) array. Custom Set → backed internally by a Map, storing elements as keys against a shared dummy value (exactly how <code>HashSet</code> is built on <code>HashMap</code>). Custom Map → hash table + array of buckets + linked key-value nodes, with a hashing function to compute bucket index.</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Collection & Map Hierarchy (Reference for Full-Picture Recall)</div>
+    <div class="ref-grid">
+      <div class="ref-panel full">
+        <pre class="code" style="margin:0;">Collection (I)
+ ├── List (I): duplicates allowed, insertion order, index-based
+ │    ├── ArrayList (C): dynamic array, fast random access, slow mid insert/delete
+ │    ├── LinkedList (C): doubly linked list, fast mid insert/delete, slow random access
+ │    └── Vector (C): like ArrayList, synchronized, legacy
+ │         └── Stack (C): LIFO
+ ├── Set (I): unique elements
+ │    ├── HashSet (C): no order guarantee
+ │    │    └── LinkedHashSet (C): insertion order
+ │    └── SortedSet (I) → NavigableSet (I) → TreeSet (C): sorted, Red-Black Tree
+ └── Queue (I): FIFO
+      ├── PriorityQueue (C): priority order (default ascending)
+      ├── Deque (I) → ArrayDeque (C), LinkedList (C)
+      └── BlockingQueue (I): for multithreading → LinkedBlockingQueue, ArrayBlockingQueue, PriorityBlockingQueue
+
+Map (I): key-value, unique keys
+ ├── HashMap (C): no order, 1 null key
+ │    └── LinkedHashMap (C): insertion order, 1 null key
+ ├── WeakHashMap (C): GC can remove entries with no strong key reference
+ ├── IdentityHashMap (C): uses == instead of equals()
+ ├── Hashtable (C): synchronized, no null key/value, legacy
+ ├── ConcurrentHashMap (C): thread-safe, bucket/node-level locks + CAS
+ └── SortedMap (I) → NavigableMap (I) → TreeMap (C): sorted by key, Red-Black Tree</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 7 -->
+  <div class="sec" id="s7">
+    <div class="sec-h"><span class="sec-num">7</span><span class="sec-title">Memory Management & JVM</span></div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q60. Explain Stack and Heap memory.</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a"><b>Stack:</b> stores method calls, local variables, method parameters, object references — per-thread, thread-safe, auto-cleared on method return. <b>Heap:</b> stores objects, arrays, instance variables — shared across threads, not thread-safe by default, managed by the GC. <b>Method Area (Metaspace since Java 8):</b> stores class metadata & static variables.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q61. What are strong and weak references?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>Strong Reference:</b> a normal reference (<code>Object o = new Object();</code>) — GC will never collect the object while this reference is reachable. <b>Weak Reference</b> (<code>WeakReference&lt;T&gt;</code>): does not prevent GC — the referent can be collected as soon as no strong references remain (used in <code>WeakHashMap</code>, caching). There's also <b>Soft Reference</b> (collected only under memory pressure) and <b>Phantom Reference</b> (post-mortem cleanup, rare in interviews).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q62. What are ClassLoader types? How does class loading work?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">Java has three main ClassLoaders: <b>Bootstrap</b> (loads core Java classes, e.g. <code>java.lang.*</code>), <b>Platform/Extension</b> (loads Java platform libraries), and <b>Application</b> (loads application/classpath classes). Java loads classes via the <b>Parent Delegation Model</b>: a class-load request first goes to Bootstrap → Platform → Application (each parent gets first chance), followed by <b>Loading → Linking (verify, prepare, resolve) → Initialization</b>. This model prevents core classes from being overridden/spoofed by application code.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q63. What is Metaspace?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Metaspace is the Java 8+ implementation of the Method Area — stores class metadata and static members. It replaced <b>PermGen</b> (which had a fixed size and was a common cause of <code>OutOfMemoryError: PermGen space</code>); Metaspace grows dynamically using native (off-heap) memory, bounded by available system memory unless <code>-XX:MaxMetaspaceSize</code> is set.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q64. What is a Stop-The-World event?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">A JVM pause during which <b>all</b> application threads are temporarily suspended, usually to let Garbage Collection run safely (so object graphs don't change mid-scan). Modern low-pause collectors (G1, ZGC, Shenandoah) minimize but don't eliminate STW pauses.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q65. How would you analyze memory leaks?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Take a <b>Heap Dump</b> and analyze with tools like <b>Eclipse MAT</b> (Memory Analyzer Tool) or <b>VisualVM</b>, looking for objects that remain reachable ("retained objects") but are logically no longer needed. Workflow: Heap Dump → GC Analysis → Eclipse MAT → find dominator tree / retained-size hotspots → trace back the GC-root reference chain keeping the leaked objects alive.</div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q66. How can a Java app leak memory despite having Garbage Collection?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">GC only reclaims <b>unreachable</b> objects. A Java app leaks memory when objects remain reachable but are logically no longer needed — common causes: <b>unbounded caches</b>, <b>static collections</b> that keep growing, <b>unclosed resources</b> (streams/connections), <b>listeners/callbacks never deregistered</b>, or <code>ThreadLocal</code> values not cleared in pooled threads. Since these objects are still referenced, GC never collects them.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q67. Can two objects have the same memory address in Java?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">No. Two different live objects can never share the same memory address at the same time — every object created via <code>new</code> gets its own heap location (the JVM/GC may relocate objects during compaction, but never two live objects to the same address simultaneously).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q68. Drawbacks of Garbage Collection?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>Stop-The-World pauses</b> — app threads paused during GC. <b>CPU overhead</b> — GC consumes CPU to identify/remove unused objects. <b>Memory overhead</b> — bookkeeping structures cost memory. <b>Unpredictable execution</b> — GC can trigger at any time, causing latency spikes. <b>Performance impact</b> — frequent or Full GC cycles slow the app under load.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q69b. What is JIT compilation?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">The <b>JIT (Just-In-Time) Compiler</b> is part of the JVM that converts frequently-executed ("hot") bytecode into native machine code <b>at runtime</b>, improving performance on repeated execution paths — instead of the interpreter re-interpreting the same bytecode every time.
+<pre class="code">.class (Bytecode) → JVM Interpreter → [hot path detected] → JIT Compiler → Native Machine Code (cached & reused)</pre>
+        Senior-level add-on: HotSpot JIT uses <b>tiered compilation</b> (C1 for fast warm-up, C2 for aggressive optimization), plus techniques like <b>escape analysis</b> (stack-allocate objects that don't escape a method), <b>lock elision/coarsening</b>, and <b>deoptimization</b> (falls back to interpreted mode if an assumption made during optimization turns out wrong).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q69c. What algorithms does the JVM use for garbage collection?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>Mark-Sweep:</b> mark live objects → remove unused ones (leaves fragmentation). <b>Mark-Compact:</b> mark live → remove garbage → compact remaining memory (removes fragmentation, costs more CPU). <b>Generational Copying:</b> copy/move live objects from one memory region (Young Gen survivor spaces) to another — cheap because most objects die young ("weak generational hypothesis"). Modern collectors: <b>G1</b> (region-based, balanced default since Java 9), <b>ZGC</b> & <b>Shenandoah</b> (ultra-low-pause, mostly concurrent).</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Additional JVM/GC Reference (not directly asked but essential background)</div>
+    <div class="ref-grid">
+      <div class="ref-panel full">
+        <table class="rt">
+          <tr><td class="hl">Young → Old Generation</td><td>New objects start in Young Gen; if they survive multiple GC cycles, they're promoted to Old Gen.</td></tr>
+          <tr><td class="hl">Minor GC vs Major/Full GC</td><td>Minor GC cleans Young Gen — fast. Major/Full GC cleans Old Gen — slower, more expensive.</td></tr>
+          <tr><td class="hl">OutOfMemoryError</td><td>Heap is full AND GC cannot free memory (leak, oversized objects, unbounded growth).</td></tr>
+          <tr><td class="hl">StackOverflowError</td><td>Deep or infinite recursion exhausts the (bounded, per-thread) Stack.</td></tr>
+          <tr><td class="hl">GC eligibility</td><td>Reference set to null · out of scope · anonymous object · reassigned reference · island of isolation (mutually-referencing objects with no external reachable root).</td></tr>
+          <tr><td class="hl">GC Roots</td><td>Starting points for reachability analysis — local vars on stacks, static fields, active thread objects, JNI references. Anything reachable from a root is "alive"; everything else is eligible for GC.</td></tr>
+          <tr><td class="hl"><code>System.gc()</code></td><td>Only a <b>request</b>, not a guarantee, that GC runs.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="sub-h">Handling Large Data Without OutOfMemoryError (common practical scenario)</div>
+    <div class="qa-grid">
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q70. How would you process a 5 GB CSV file without running into an OutOfMemoryError?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Read and process the file <b>line-by-line</b> using a buffered stream (e.g. <code>Files.lines()</code> or <code>BufferedReader</code>) rather than loading the whole file into memory, processing each record and writing/aggregating results incrementally so memory usage stays roughly constant regardless of file size.
+<pre class="code"><span class="kw">try</span> (<span class="cl">Stream</span>&lt;<span class="cl">String</span>&gt; lines = <span class="cl">Files</span>.lines(Path.of(<span class="st">"data.csv"</span>))) {
+  lines.skip(1)                              <span class="cm">// skip header</span>
+       .map(<span class="kw">this</span>::parseRecord)
+       .forEach(recordProcessor::process);   <span class="cm">// process & discard, one line at a time</span>
+}</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 8 -->
+  <div class="sec" id="s8">
+    <div class="sec-h"><span class="sec-num">8</span><span class="sec-title">Multithreading Basics</span></div>
+
+    <div class="ref-grid">
+      <div class="ref-panel full">
+        <div class="ref-title">Thread Lifecycle</div>
+        <div class="flow" style="margin:0;">
+          <div class="fb a">NEW</div><span class="fa">→start()→</span><div class="fb b">RUNNABLE</div><span class="fa">→</span><div class="fb c">RUNNING</div><span class="fa">→</span><div class="fb warn">BLOCKED / WAITING / TIMED_WAITING</div><span class="fa">→</span><div class="fb d">TERMINATED</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q71. Runnable vs Callable.</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>Runnable</code> executes a task without returning a result — <code>run()</code> → no return, no checked exceptions. <code>Callable&lt;V&gt;</code> executes a task and returns a result — <code>call()</code> → returns V, can throw checked exceptions. Callable is used with <code>ExecutorService.submit()</code>, returning a <code>Future&lt;V&gt;</code>.
+<pre class="code"><span class="cl">Runnable</span> r = () -&gt; System.out.println(<span class="st">"no result"</span>);
+<span class="cl">Callable</span>&lt;<span class="cl">String</span>&gt; c = () -&gt; <span class="st">"result"</span>;
+<span class="cl">Future</span>&lt;<span class="cl">String</span>&gt; f = executor.submit(c);
+<span class="kw">String</span> result = f.get(); <span class="cm">// blocks until done</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q72. What is a race condition, and how do you avoid it?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">A race condition occurs when multiple threads try to access/modify the same shared resource simultaneously, resulting in inconsistent data (a "read-modify-write" that isn't atomic). Avoided using <b>synchronization</b>, <b>locks</b> (ReentrantLock), <b>atomic classes</b> (AtomicInteger), or <b>concurrent collections</b> (ConcurrentHashMap).
+<pre class="code"><span class="cm">// Unsafe: count++ is actually 3 steps (read, add, write) — not atomic</span>
+<span class="kw">private int</span> count = 0;
+<span class="kw">void</span> increment() { count++; }        <span class="cm">// RACE if called from multiple threads</span>
+
+<span class="cm">// Fix 1: synchronized</span>
+<span class="kw">synchronized void</span> incrementSafe() { count++; }
+
+<span class="cm">// Fix 2: AtomicInteger (lock-free, CAS-based)</span>
+<span class="cl">AtomicInteger</span> safeCount = <span class="kw">new</span> <span class="cl">AtomicInteger</span>(0);
+safeCount.incrementAndGet();</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q73. What is a deadlock? How do you solve/prevent it?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">A deadlock is when two or more threads wait for each other's locks indefinitely (circular wait), so none can proceed. Prevented by maintaining a <b>consistent lock acquisition order</b> across all threads, using <code>tryLock()</code> with a timeout instead of blocking indefinitely, and avoiding nested locks where possible.
+<pre class="code"><span class="cm">// Thread-1: lock(A); lock(B);
+// Thread-2: lock(B); lock(A);   ← reverse order = classic deadlock</span>
+
+<span class="cl">Lock</span> lock = <span class="kw">new</span> <span class="cl">ReentrantLock</span>();
+<span class="kw">if</span> (lock.tryLock(5, TimeUnit.SECONDS)) {   <span class="cm">// avoids indefinite block</span>
+  <span class="kw">try</span> { <span class="cm">/* critical section */</span> }
+  <span class="kw">finally</span> { lock.unlock(); }
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q74. What is volatile?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×3</span></div></div>
+        <div class="qa-a">When one thread changes a <code>volatile</code> variable's value, other threads <b>immediately</b> see the updated value (visibility guarantee — no thread-local caching of the variable). However, <code>volatile</code> does <b>not</b> provide atomicity — <code>volatile int count; count++;</code> is still an unsafe read-modify-write across threads.
+<pre class="code"><span class="kw">private volatile boolean</span> running = <span class="kw">true</span>;   <span class="cm">// status flag — safe with volatile alone</span>
+<span class="cm">// running = false; from another thread — visible immediately to the loop thread</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q75. Difference between volatile and synchronized?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>volatile</code> provides <b>visibility only</b> — used for status flags. <code>synchronized</code> provides <b>both visibility and atomicity</b> through locking — used for increment/decrement and other compound modifications.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q76. What is ThreadLocal?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Each thread gets its own independent copy of the variable, so changes made by one thread are invisible to others — used for per-thread context like user session, correlation/request ID, or MDC logging fields.
+<pre class="code"><span class="cl">ThreadLocal</span>&lt;<span class="cl">String</span>&gt; userContext = <span class="kw">new</span> <span class="cl">ThreadLocal</span>&lt;&gt;();
+userContext.set(<span class="st">"pranik"</span>);
+userContext.get();
+userContext.remove();   <span class="cm">// IMPORTANT in pooled threads — else stale data/leaks across reused threads</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q77. What is concurrency vs concurrent?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>Concurrency</b> = the ability of a system to handle multiple tasks by making progress in overlapping time (not necessarily the exact same instant) — the concept of managing multiple tasks/threads together. <b>Concurrent</b> = the actual execution/progress of multiple tasks together. <b>Parallelism</b> (related) = tasks running truly simultaneously on multiple CPU cores.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q78. How does multithreading work, and how many types of locks are there?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">Multithreading creates multiple threads within a single process; the JVM creates the threads and the <b>OS scheduler</b> schedules/executes them on CPU cores. Threads <b>share heap memory</b> but have separate stacks. Lock types: <b>1) Intrinsic Lock (synchronized)</b> — simple, automatic acquire/release. <b>2) ReentrantLock</b> — manual lock, <code>tryLock()</code>, timeouts, more control. <b>3) ReadWriteLock</b> — multiple concurrent readers, single exclusive writer. <b>4) StampedLock</b> (Java 8) — adds optimistic read mode for better throughput.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q79. Types of locks / difference between ReentrantLock, ReadWriteLock, synchronized?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>synchronized (Intrinsic Lock):</b> simple built-in JVM-managed locking, auto-release, no tryLock(). <b>ReentrantLock:</b> explicit lock offering <code>tryLock()</code> (non-blocking attempt), timeouts, and fairness. <b>ReadWriteLock:</b> improves performance by allowing multiple concurrent readers but only one writer at a time — ideal for read-heavy caches.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q80. What is "how many types of lock" and what is double-checked locking?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a"><b>Double-Checked Locking</b> = two null checks + a synchronized block, used to create a thread-safe Singleton <b>efficiently</b> (avoids synchronizing on every call, only on first creation). Requires the instance field to be <code>volatile</code> to be truly correct — otherwise a thread could see a partially-constructed object due to instruction reordering.
+<pre class="code"><span class="kw">public class</span> <span class="cl">Singleton</span> {
+  <span class="kw">private static volatile</span> <span class="cl">Singleton</span> instance;   <span class="cm">// volatile is essential here</span>
+  <span class="kw">private</span> <span class="cl">Singleton</span>() {}
+  <span class="kw">public static</span> <span class="cl">Singleton</span> getInstance() {
+    <span class="kw">if</span> (instance == <span class="kw">null</span>) {                        <span class="cm">// 1st check — avoids locking every call</span>
+      <span class="kw">synchronized</span> (<span class="cl">Singleton</span>.<span class="kw">class</span>) {
+        <span class="kw">if</span> (instance == <span class="kw">null</span>) {                    <span class="cm">// 2nd check — avoids race during construction</span>
+          instance = <span class="kw">new</span> <span class="cl">Singleton</span>();
+        }
+      }
+    }
+    <span class="kw">return</span> instance;
+  }
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q81. Thread-Safe Singleton.</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×3</span></div></div>
+        <div class="qa-a">A thread-safe Singleton ensures only one instance is created even under concurrent access. Approaches (from simplest to most idiomatic): <b>1) Eager initialization</b> (static final field, JVM guarantees thread safety, but instance created even if unused). <b>2) Double-Checked Locking</b> (lazy + efficient, see Q80). <b>3) Static Inner Holder Class</b> (lazy, thread-safe via class-loading guarantees, no explicit locking needed — the cleanest classic approach). <b>4) Enum Singleton</b> (simplest, inherently thread-safe and serialization-safe).
+<pre class="code"><span class="kw">public class</span> <span class="cl">Singleton</span> {
+  <span class="kw">private</span> <span class="cl">Singleton</span>() {}
+  <span class="kw">private static class</span> <span class="cl">Holder</span> { <span class="kw">static final</span> <span class="cl">Singleton</span> INSTANCE = <span class="kw">new</span> <span class="cl">Singleton</span>(); }
+  <span class="kw">public static</span> <span class="cl">Singleton</span> getInstance() { <span class="kw">return</span> Holder.INSTANCE; } <span class="cm">// lazy, thread-safe, no locks</span>
+}</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 9 -->
+  <div class="sec" id="s9">
+    <div class="sec-h"><span class="sec-num">9</span><span class="sec-title">Concurrency Toolkit — Executor, Locks, CompletableFuture, Sync Utilities</span></div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q82. Explain the Executor Framework. Why is it preferred over manual thread creation?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">The Executor Framework automatically manages and executes tasks using a <b>thread pool</b> instead of creating threads manually. It reuses existing threads, improving performance and reducing resource overhead. Manual <code>new Thread()</code> per task risks resource exhaustion in production — no pooling/reuse, no lifecycle management, no backpressure/queueing.
+<pre class="code"><span class="cl">ExecutorService</span> ex = Executors.newFixedThreadPool(10);
+ex.submit(task);
+ex.shutdown();      <span class="cm">// graceful — finishes queued tasks, rejects new ones</span>
+ex.shutdownNow();   <span class="cm">// force — attempts to stop actively-running tasks too</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q83. Difference between execute() and submit()?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>execute(Runnable)</code> → runs a task, returns <code>void</code> (no way to get result/exception back). <code>submit(...)</code> → runs a task and returns a <code>Future</code> object, so you can retrieve the result, check status, or handle exceptions via <code>get()</code>.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q84. What is ExecutorService, and its lifecycle? Commonly used methods?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">An interface in the Executor Framework that manages a pool of reusable threads, executes tasks, and controls their lifecycle. <b>Lifecycle:</b> Create → Submit → Execute → shutdown()/shutdownNow() → Terminate. <b>Methods:</b> <code>execute()</code> → run task; <code>submit()</code> → run task + return Future; <code>shutdown()</code> → graceful stop; <code>shutdownNow()</code> → force stop.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q85. What is Future?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>Future&lt;V&gt;</code> represents the result of an asynchronous computation. Returned by <code>ExecutorService.submit()</code>; used to retrieve the result (<code>get()</code>, blocking), check task status (<code>isDone()</code>), or cancel the task (<code>cancel()</code>).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q86. What is CompletableFuture?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">An advanced <code>Future</code> that supports <b>asynchronous, non-blocking</b> execution and <b>task chaining</b> — you can compose pipelines of async steps, combine multiple futures, and handle errors declaratively, unlike plain <code>Future</code> which only offers a blocking <code>get()</code>.
+<pre class="code"><span class="cl">CompletableFuture</span>&lt;<span class="cl">User</span>&gt; u = <span class="cl">CompletableFuture</span>.supplyAsync(() -&gt; userService.getUser());
+<span class="cl">CompletableFuture</span>&lt;<span class="cl">Order</span>&gt; o = <span class="cl">CompletableFuture</span>.supplyAsync(() -&gt; orderService.getOrders());
+<span class="cl">CompletableFuture</span>.allOf(u, o).join();     <span class="cm">// run both API calls in parallel, wait for both</span>
+
+<span class="cl">CompletableFuture</span>.supplyAsync(<span class="kw">this</span>::callService)
+  .thenApply(<span class="kw">this</span>::process)
+  .exceptionally(ex -&gt; <span class="st">"Fallback"</span>);          <span class="cm">// supplyAsync → thenApply → thenCombine → exceptionally</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q87. What is the Fork/Join Framework?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">A Java 7+ concurrency framework that recursively divides a large task into smaller subtasks (fork), executes them in parallel, then combines the results (join). Uses a <code>ForkJoinPool</code> with <b>work-stealing</b> — idle worker threads "steal" tasks from busy threads' queues to keep all cores utilized. Powers <code>parallelStream()</code> internally.</div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q88. ForkJoinPool vs ExecutorService — when to use each?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a"><code>ForkJoinPool</code> is designed for divide-and-conquer, recursively-splittable tasks using work-stealing — efficient for CPU-bound parallel computation (e.g. parallel sort, parallel streams). A regular <code>ExecutorService</code> just runs submitted tasks from a shared queue with a fixed/cached pool — better suited for independent, non-recursive tasks like I/O-bound work (DB calls, REST calls).</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q89. What is the significance of Comparable/Comparator in Collections and how to design custom Collections — see §6.</div>
+          <div class="qa-badges"><span class="badge badge-asked">✓ Interview Asked</span></div></div>
+        <div class="qa-a">(Cross-referenced in §6 — kept there to avoid duplication; this entry exists to preserve topic continuity for Collections vs Concurrency separation used by the source sheet.)</div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q90. What happens if an exception is thrown inside a thread?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">If a <code>Runnable</code> running inside a <code>Thread</code> throws an uncaught exception, that thread terminates and the exception is passed to the thread's <code>UncaughtExceptionHandler</code> (the default one just prints the stack trace). It does <b>not</b> propagate to the calling thread and does <b>not</b> crash the JVM — so exceptions inside threads/executor tasks must be handled explicitly (e.g. wrap task logic in try-catch, or inspect <code>Future.get()</code> which re-throws as <code>ExecutionException</code>).
+<pre class="code"><span class="cl">Thread</span> t = <span class="kw">new</span> <span class="cl">Thread</span>(() -&gt; { <span class="kw">throw new</span> <span class="cl">RuntimeException</span>(<span class="st">"boom"</span>); });
+t.setUncaughtExceptionHandler((thread, ex) -&gt; log.error(<span class="st">"Thread died: "</span> + thread.getName(), ex));
+t.start();  <span class="cm">// main thread is unaffected; only this thread dies</span></pre></div>
+      </div>
+    </div>
+
+    <div class="sub-h">Coordination Primitives (Reference)</div>
+    <div class="ref-grid">
+      <div class="ref-panel">
+        <div class="ref-title">wait/notify vs sleep</div>
+        <table class="rt">
+          <tr><td class="hl">sleep()</td><td>Pauses thread, <b>keeps</b> the lock (Thread class)</td></tr>
+          <tr><td class="hl">wait()</td><td>Releases the lock, waits for notify()/notifyAll() (Object class, needs synchronized)</td></tr>
+          <tr><td class="hl">notify()</td><td>Wakes ONE waiting thread (unspecified)</td></tr>
+          <tr><td class="hl">notifyAll()</td><td>Wakes ALL waiting threads</td></tr>
+        </table>
+      </div>
+      <div class="ref-panel">
+        <div class="ref-title">Synchronization Utilities</div>
+        <table class="rt">
+          <tr><td class="hl">CountDownLatch</td><td>One-time — main thread awaits N workers (not reusable)</td></tr>
+          <tr><td class="hl">CyclicBarrier</td><td>Reusable — all threads wait for each other at a checkpoint</td></tr>
+          <tr><td class="hl">Semaphore</td><td>Limits N concurrent threads — DB pool, rate limiting</td></tr>
+          <tr><td class="hl">Phaser</td><td>Advanced reusable barrier, dynamic party registration</td></tr>
+          <tr><td class="hl">Exchanger</td><td>Two threads swap data at a sync point</td></tr>
+        </table>
+      </div>
+    </div>
+    <pre class="code"><span class="cl">CountDownLatch</span> latch = <span class="kw">new</span> <span class="cl">CountDownLatch</span>(3);
+latch.countDown();          <span class="cm">// called once per worker thread when done</span>
+latch.await();               <span class="cm">// main thread blocks until count reaches 0</span>
+
+<span class="cl">Semaphore</span> sem = <span class="kw">new</span> <span class="cl">Semaphore</span>(5);   <span class="cm">// e.g. limit concurrent DB connections to 5</span>
+sem.acquire();
+<span class="kw">try</span> { <span class="cm">/* limited resource */</span> } <span class="kw">finally</span> { sem.release(); }
+
+<span class="cl">BlockingQueue</span>&lt;<span class="cl">Integer</span>&gt; q = <span class="kw">new</span> <span class="cl">ArrayBlockingQueue</span>&lt;&gt;(10);  <span class="cm">// Producer-Consumer</span>
+q.put(1);   <span class="cm">// producer — blocks if full</span>
+q.take();   <span class="cm">// consumer — blocks if empty</span></pre>
+
+    <div class="sub-h">Thread Pool Sizing & Spring Boot @Async (Practical, Frequently Probed)</div>
+    <div class="ref-grid">
+      <div class="ref-panel">
+        <div class="ref-title">Pool Sizing Formulas</div>
+        <table class="rt">
+          <tr><td class="hl">CPU-Bound</td><td>Threads = CPU Cores + 1 (e.g. encryption, image processing)</td></tr>
+          <tr><td class="hl">I/O-Bound</td><td>Threads = Cores × (1 + Wait/Compute) (e.g. DB calls, REST calls)</td></tr>
+        </table>
+      </div>
+      <div class="ref-panel">
+        <div class="ref-title">@Async Self-Invocation Trap</div>
+        <div style="font-size:12px;">Calling an <code>@Async</code> method from <b>within the same class</b> (self-invocation) does <b>NOT</b> run asynchronously — Spring's AOP proxy is bypassed on self-calls. The method must be invoked through the Spring-managed bean (i.e. from a different, injected component).</div>
+      </div>
+    </div>
+    <pre class="code"><span class="kw">@Bean</span>
+<span class="cl">Executor</span> taskExecutor() {
+  <span class="cl">ThreadPoolTaskExecutor</span> ex = <span class="kw">new</span> <span class="cl">ThreadPoolTaskExecutor</span>();
+  ex.setCorePoolSize(10); ex.setMaxPoolSize(20); ex.setQueueCapacity(100);
+  ex.initialize();
+  <span class="kw">return</span> ex;
+}
+
+<span class="kw">@EnableAsync</span>
+<span class="kw">@Async</span>
+<span class="kw">public</span> <span class="cl">CompletableFuture</span>&lt;<span class="cl">String</span>&gt; process() {
+  <span class="kw">return</span> <span class="cl">CompletableFuture</span>.completedFuture(<span class="st">"Done"</span>);
+}</pre>
+    <div class="note">Kafka Consumer Concurrency: partitions must be ≥ consumers within a group — one partition is consumed by exactly one consumer; extra consumers beyond the partition count sit idle. E.g. 6 partitions, <code>concurrency="3"</code> → each consumer handles 2 partitions.</div>
+
+    <div class="sub-h">Concurrent Collections Reference</div>
+    <div class="ref-grid">
+      <div class="ref-panel full">
+        <table class="rt">
+          <tr><td class="hl">ConcurrentHashMap</td><td>Bucket/node-level locking + CAS — thread-safe map, no full-map lock</td></tr>
+          <tr><td class="hl">CopyOnWriteArrayList</td><td>Copies the whole array on every write — best when reads ≫ writes; fail-safe iteration</td></tr>
+          <tr><td class="hl">ConcurrentLinkedQueue</td><td>Lock-free, non-blocking FIFO queue</td></tr>
+          <tr><td class="hl">BlockingQueue</td><td>Blocks on put()/take() when full/empty — Producer-Consumer pattern</td></tr>
+          <tr><td class="hl">ConcurrentSkipListMap</td><td>Thread-safe sorted map — concurrent version of TreeMap</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 10 -->
+  <div class="sec" id="s10">
+    <div class="sec-h"><span class="sec-num">10</span><span class="sec-title">Java 8+ Features — Lambdas, Streams, Functional Interfaces</span></div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q91. What is a Functional Interface? Its purpose? Can it have a default method?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a">A Functional Interface has exactly <b>one abstract method</b>. It can have any number of <code>default</code>, <code>static</code>, and inherited <code>Object</code>-class methods, and is commonly used with Lambda Expressions. Purpose: allows lambdas, makes code more concise/readable. <code>@FunctionalInterface</code> is an optional compiler check, not mandatory — but always add it anyway.
+<pre class="code"><span class="kw">@FunctionalInterface</span>
+<span class="kw">interface</span> <span class="cl">Calculator</span> {
+  <span class="kw">int</span> calculate(<span class="kw">int</span> a, <span class="kw">int</span> b);         <span class="cm">// the one abstract method</span>
+  <span class="kw">default</span> <span class="kw">int</span> triple(<span class="kw">int</span> x) { <span class="kw">return</span> x * 3; } <span class="cm">// default methods allowed</span>
+}
+<span class="cl">Calculator</span> add = (a, b) -&gt; a + b;   <span class="cm">// lambda implements the abstract method</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q92. What are Lambda Expressions? Why introduced?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Lambdas implement Functional Interfaces concisely, reducing boilerplate compared to anonymous inner classes. Introduced in Java 8 to reduce boilerplate, improve readability, and enable functional-style programming.
+<pre class="code"><span class="cm">// Before Java 8:</span>
+<span class="kw">new</span> <span class="cl">Thread</span>(<span class="kw">new</span> <span class="cl">Runnable</span>() { <span class="kw">public void</span> run() { System.out.println(<span class="st">"run"</span>); } }).start();
+<span class="cm">// Java 8+:</span>
+<span class="kw">new</span> <span class="cl">Thread</span>(() -&gt; System.out.println(<span class="st">"run"</span>)).start();</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q93. What are Streams? Can you pass a method reference in a lambda while using a Stream? How do method references work?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Streams process collection data declaratively using <code>filter</code>, <code>map</code>, <code>collect</code>, etc. Yes — method references are a shorter form of a lambda that just calls an existing method.
+<pre class="code">list.stream().map(<span class="cl">String</span>::toUpperCase).forEach(System.out::println);
+<span class="cm">// String::toUpperCase  is shorthand for  s -> s.toUpperCase()
+// System.out::println  is shorthand for  s -> System.out.println(s)</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q94. Difference between map() and flatMap()? Real use case?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>map()</code> transforms each element into another element, 1-to-1 (e.g. <code>List&lt;Employee&gt; → List&lt;List&lt;Skill&gt;&gt;</code>). <code>flatMap()</code> transforms elements <b>and flattens</b> nested collections into a single stream (e.g. <code>List&lt;Employee&gt; → List&lt;Skill&gt;</code>, merging every employee's skill list into one flat stream).
+<pre class="code"><span class="cl">List</span>&lt;<span class="cl">Skill</span>&gt; allSkills = employees.stream()
+  .flatMap(e -&gt; e.getSkills().stream())   <span class="cm">// flattens List<List<Skill>> into Stream<Skill></span>
+  .distinct()
+  .collect(Collectors.toList());</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q95. What is Optional? Why is it not recommended as a class field?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a"><code>Optional&lt;T&gt;</code> represents an optional value and avoids <code>NullPointerException</code>. Best used as a <b>method return type</b>, not as a class field or method parameter — using it as a field adds serialization complications and doesn't play well with frameworks/JPA entities; it was specifically designed for the "return type that may be absent" use case.
+<pre class="code"><span class="kw">public</span> <span class="cl">Optional</span>&lt;<span class="cl">User</span>&gt; findById(<span class="cl">Long</span> id) {
+  <span class="kw">return</span> repository.findById(id);       <span class="cm">// Optional as return type — good practice</span>
+}
+findById(5L).map(<span class="cl">User</span>::getName).orElse(<span class="st">"Unknown"</span>);</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q96. What are default methods and static methods in interfaces?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×2</span></div></div>
+        <div class="qa-a"><b>Default methods:</b> inherited by implementing classes, called using an instance, and can be overridden. <b>Static methods:</b> belong to the interface itself, called using the interface name, and cannot be overridden.
+<pre class="code"><span class="kw">interface</span> <span class="cl">Vehicle</span> {
+  <span class="kw">default void</span> honk() { System.out.println(<span class="st">"Beep"</span>); }  <span class="cm">// instance.honk()</span>
+  <span class="kw">static</span> <span class="cl">Vehicle</span> createDefault() { <span class="kw">return</span> <span class="kw">new</span> <span class="cl">Car</span>(); }  <span class="cm">// Vehicle.createDefault()</span>
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q97. What is the Supplier interface?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>Supplier&lt;T&gt;</code> takes no input and returns a value via <code>get()</code>. Core Functional Interfaces summary:
+<table class="rt" style="margin-top:6px;"><tr><th>Interface</th><th>Signature</th><th>Purpose</th></tr>
+<tr><td class="hl">Consumer&lt;T&gt;</td><td><code>accept(T)→void</code></td><td>Takes input, no output</td></tr>
+<tr><td class="hl">Supplier&lt;T&gt;</td><td><code>get()→T</code></td><td>No input, returns output</td></tr>
+<tr><td class="hl">Function&lt;T,R&gt;</td><td><code>apply(T)→R</code></td><td>Takes input, returns output</td></tr>
+<tr><td class="hl">Predicate&lt;T&gt;</td><td><code>test(T)→boolean</code></td><td>Takes input, returns boolean</td></tr>
+</table></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q98. Explain the Stream pipeline. Difference between source, intermediate, and terminal operations?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">A Stream Pipeline = Source → Intermediate Operations → Terminal Operation. <b>Source</b> provides data (a collection, array, generator). <b>Intermediate ops</b> (<code>filter</code>, <code>map</code>, <code>sorted</code>) prepare/transform data and are <b>lazy</b> — nothing executes until a terminal op is invoked. <b>Terminal ops</b> (<code>collect</code>, <code>forEach</code>, <code>reduce</code>) execute the whole pipeline and produce the final result.
+<pre class="code">list.stream()                         <span class="cm">// source</span>
+    .filter(x -&gt; x &gt; 10)              <span class="cm">// intermediate — lazy</span>
+    .map(x -&gt; x * 2)                  <span class="cm">// intermediate — lazy</span>
+    .collect(Collectors.toList());    <span class="cm">// terminal — triggers execution</span></pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q99. What are Collectors, and what do they do internally?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Collectors are utility classes used to collect/transform processed stream elements into a final result — List, Set, Map, String, or grouped data. Internally: they create a result container (via a <code>Supplier</code>), accumulate stream elements into it (via a <code>BiConsumer</code>), and return the final combined result (via a <code>Function</code>/<code>BinaryOperator</code> for parallel merges).
+<pre class="code"><span class="cl">Map</span>&lt;<span class="cl">String</span>, <span class="cl">List</span>&lt;<span class="cl">Employee</span>&gt;&gt; byDept =
+  employees.stream().collect(Collectors.groupingBy(<span class="cl">Employee</span>::getDept));
+<span class="kw">double</span> avgSalary = employees.stream().collect(Collectors.averagingDouble(<span class="cl">Employee</span>::getSalary));</pre></div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q100. Why would you use parallel streams over a normal (sequential) stream?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Parallel streams split the data across multiple threads (using the common <code>ForkJoinPool</code>) to process elements concurrently, improving throughput for <b>large datasets with CPU-intensive operations</b>. For small collections, or I/O-bound/order-sensitive operations, the overhead of thread coordination can make parallel streams <b>slower</b> than sequential — always measure before switching, don't default to parallel for "performance."
+<pre class="code">list.parallelStream().map(<span class="kw">this</span>::heavyComputation).collect(Collectors.toList());
+<span class="cm">// AVOID parallelStream() for: DB calls, external API calls, small collections</span></pre></div>
+      </div>
+
+      <div class="qa-card linkedin">
+        <div class="qa-top"><div class="qa-q">Q101. Streams vs traditional loops — when would you prefer one over the other?</div>
+          <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked</span></div></div>
+        <div class="qa-a">Streams favor <b>declarative, functional-style</b> code (filter/map/collect) that's often more concise and easily parallelizable, but traditional loops give <b>finer control</b>, can be more performant for simple iteration, and are easier to debug step-by-step (breakpoints inside a lambda chain are awkward). Prefer streams for data transformation pipelines; prefer loops for simple iteration or complex branching control flow.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 11 -->
+  <div class="sec" id="s11">
+    <div class="sec-h"><span class="sec-num">11</span><span class="sec-title">I/O & Serialization</span></div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q102. What is Serialization? What is Deserialization?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><b>Serialization</b> = converting an object into a byte stream for storage or transfer. <b>Deserialization</b> = converting a byte stream back into an object.
+<pre class="code"><span class="kw">class</span> <span class="cl">User</span> <span class="kw">implements</span> <span class="cl">Serializable</span> {
+  <span class="kw">private static final long</span> serialVersionUID = 1L;   <span class="cm">// class-version compatibility check</span>
+  <span class="kw">private</span> <span class="cl">String</span> name;
+  <span class="kw">private transient</span> <span class="cl">String</span> password;             <span class="cm">// skipped during serialization</span>
+}
+<span class="kw">try</span> (<span class="cl">ObjectOutputStream</span> oos = <span class="kw">new</span> <span class="cl">ObjectOutputStream</span>(<span class="kw">new</span> <span class="cl">FileOutputStream</span>(<span class="st">"user.ser"</span>))) {
+  oos.writeObject(user);
+}</pre></div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q103. What is the transient keyword?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Used to prevent a field from being serialized — the field is skipped (reset to default value on deserialize). Also note: <code>static</code> fields are never serialized regardless of <code>transient</code>, because serialization captures object <b>instance</b> state, not class-level state.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q104. Difference between Serializable and Externalizable?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a"><code>Serializable</code> = marker interface, uses <b>default</b> JVM serialization (reflection-based). <code>Externalizable</code> = gives full <b>custom control</b> via <code>writeExternal()</code>/<code>readExternal()</code>, useful when you need a specific wire format or performance optimization.</div>
+      </div>
+    </div>
+    <div class="note">Reflection: inspects/modifies/invokes classes at runtime (<code>obj.getClass()</code>, <code>Employee.class</code>, <code>Class.forName()</code>). Used by Spring, Hibernate, JUnit, DI, ORM frameworks under the hood. Disadvantages: slower, breaks encapsulation, security risk if misused. Large file reads: use <code>BufferedReader</code>/buffered streams — chunked, not loaded fully into memory (see §7 for the 5GB CSV pattern).</div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 12 -->
+  <div class="sec" id="s12">
+    <div class="sec-h"><span class="sec-num">12</span><span class="sec-title">Design Patterns & Best Practices</span></div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q105. What design patterns have you used? (10–12 patterns overview)</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Design Patterns are reusable solutions to common software design problems, categorized into <b>Creational</b> (create objects), <b>Structural</b> (connect objects), and <b>Behavioral</b> (communicate between objects).
+<b>Creational:</b> Singleton, Factory, Builder — used for object creation.
+<b>Structural:</b> Adapter, Decorator, Facade, Proxy — used to connect/compose objects.
+<b>Behavioral:</b> Strategy, Observer, Template Method, Chain of Responsibility — used for object communication.
+In Spring Boot specifically, patterns like <b>Proxy</b> (AOP/@Transactional), <b>Factory</b> (BeanFactory), <b>Singleton</b> (default bean scope), <b>Template Method</b> (JdbcTemplate, RestTemplate), and <b>Strategy</b> are commonly encountered through the framework itself.
+<pre class="code"><span class="cm">// Builder pattern — common for DTOs/complex object construction</span>
+<span class="cl">Employee</span> e = <span class="cl">Employee</span>.builder().name(<span class="st">"Pranik"</span>).dept(<span class="st">"Engineering"</span>).build();
+
+<span class="cm">// Strategy pattern — swap algorithm at runtime</span>
+<span class="kw">interface</span> <span class="cl">DiscountStrategy</span> { <span class="kw">double</span> apply(<span class="kw">double</span> price); }
+<span class="kw">class</span> <span class="cl">FestiveDiscount</span> <span class="kw">implements</span> <span class="cl">DiscountStrategy</span> {
+  <span class="kw">public double</span> apply(<span class="kw">double</span> price) { <span class="kw">return</span> price * 0.9; }
+}</pre></div>
+      </div>
+    </div>
+
+    <div class="sub-h">SOLID Principles (Reference)</div>
+    <div class="cards c4">
+      <div class="mini-card bl"><div class="mc-t">S — SRP</div><div class="mc-d">Single Responsibility — one class, one reason to change</div></div>
+      <div class="mini-card gr"><div class="mc-t">O — OCP</div><div class="mc-d">Open for extension, closed for modification</div></div>
+      <div class="mini-card am"><div class="mc-t">L — LSP</div><div class="mc-d">Child must replace parent without breaking behavior</div></div>
+      <div class="mini-card pu"><div class="mc-t">I — ISP</div><div class="mc-d">Many small interfaces &gt; one large interface</div></div>
+    </div>
+    <div class="mini-card cy" style="max-width:340px;"><div class="mc-t">D — DIP</div><div class="mc-d">Depend on abstraction, not a concrete class (e.g. inject an interface, not an impl)</div></div>
+
+    <div class="sub-h" style="margin-top:20px;">Design & Best-Practices Checklist</div>
+    <div class="revision-panel">
+      <div class="revision-grid">
+        <div class="revision-item"><span class="chk">✓</span>Prefer Composition over Inheritance</div>
+        <div class="revision-item"><span class="chk">✓</span>Constructor Injection over Setter Injection (Spring)</div>
+        <div class="revision-item"><span class="chk">✓</span>Mark constants as static final</div>
+        <div class="revision-item"><span class="chk">✓</span>Keep fields private, program to interfaces</div>
+        <div class="revision-item"><span class="chk">✓</span>Follow SOLID Principles</div>
+        <div class="revision-item"><span class="chk">✓</span>Avoid deep inheritance hierarchies</div>
+        <div class="revision-item"><span class="chk">✓</span>Always override toString()</div>
+        <div class="revision-item"><span class="chk">✓</span>Override equals() and hashCode() together</div>
+        <div class="revision-item"><span class="chk">✓</span>Never use == for String/wrapper comparison</div>
+        <div class="revision-item"><span class="chk">✓</span>Use StringBuilder inside loops</div>
+        <div class="revision-item"><span class="chk">✓</span>Prefer Record for DTOs (Java 17+)</div>
+        <div class="revision-item"><span class="chk">✓</span>Use Enum instead of String constants</div>
+        <div class="revision-item"><span class="chk">✓</span>Avoid clone() in modern Java — prefer copy constructor/Builder</div>
+        <div class="revision-item"><span class="chk">✓</span>Make domain objects immutable where possible</div>
+        <div class="revision-item"><span class="chk">✓</span>Close resources via try-with-resources</div>
+        <div class="revision-item"><span class="chk">✓</span>Use Optional as return type, not field/param</div>
+        <div class="revision-item"><span class="chk">✓</span>Follow DRY, KISS, YAGNI</div>
+        <div class="revision-item"><span class="chk">✓</span>Keep methods small, one responsibility per class</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 13 -->
+  <div class="sec" id="s13">
+    <div class="sec-h"><span class="sec-num">13</span><span class="sec-title">Real-World Scenarios</span></div>
+
+    <div class="qa-grid">
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q106. How does Agile work? Who assigns tasks in Jira?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">Requirement → Product Backlog → Sprint Planning → Task Development → Daily Standup → Testing → Sprint Review → Sprint Retrospective → Next Sprint. In practice: the Product Owner creates user stories in Jira; during Sprint Planning, tasks are discussed and developers either pick tasks themselves or the Tech Lead assigns them based on priority and expertise.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q107. How do you debug a production issue?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">1. Understand the issue → 2. Check logs → 3. Reproduce if possible → 4. Identify root cause → 5. Check recent changes (deployment/code/config) → 6. Verify DB/external APIs → 7. Check JVM & infrastructure (CPU, memory, threads — thread dump/heap dump) → 8. Apply fix → 9. Test in lower environment → 10. Deploy & monitor.</div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-top"><div class="qa-q">Q108. How do you improve the performance of existing code?</div>
+          <div class="qa-badges"><span class="badge badge-count">✓ Asked ×1</span></div></div>
+        <div class="qa-a">1. Identify the bottleneck → 2. Profile the application (VisualVM/JProfiler/JFR) → 3. Optimize the code → 4. Optimize database queries/indexing → 5. Reduce external API calls → 6. Introduce caching → 7. Improve concurrency (if needed) → 8. Measure before & after. Data-driven, not guesswork.</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Common Interview Problem-Solving Patterns (Practical Reference)</div>
+    <div class="cards c2">
+      <div class="mini-card cy"><div class="mc-t">Thread-safe Cache</div><div class="mc-d"><code>ConcurrentHashMap</code> + <code>computeIfAbsent()</code> to avoid duplicate loads; add TTL/LRU eviction or use Caffeine/Ehcache/Redis in production.</div></div>
+      <div class="mini-card bl"><div class="mc-t">Remove Duplicates from a List</div><div class="mc-d"><code>new HashSet&lt;&gt;(list)</code> (order lost) · <code>new LinkedHashSet&lt;&gt;(list)</code> (order kept) · <code>list.stream().distinct().collect(...)</code> (Java 8 way)</div></div>
+      <div class="mini-card gr"><div class="mc-t">Top-N Frequent Elements</div><div class="mc-d">Count via <code>HashMap&lt;T,Integer&gt;</code> → push into a <code>PriorityQueue</code> (max-heap) by frequency → poll top N</div></div>
+      <div class="mini-card am"><div class="mc-t">Processing Millions of Records</div><div class="mc-d">Pagination/streaming/batch processing, bulk DB ops + parallel processing where safe — avoids OutOfMemoryError, minimizes memory footprint</div></div>
+    </div>
+  </div>
+
+  <!-- =========================================================================================== -->
+  <!-- SECTION 14 : RAPID FIRE -->
+  <div class="sec" id="s14">
+    <div class="sec-h"><span class="sec-num">14</span><span class="sec-title">Rapid-Fire Revision — 30-Second Recall</span></div>
+    <div class="sec-sub">Everything below is a compressed one-liner pass — read this section last, right before walking into the interview.</div>
+
+    <div class="sub-h">Core Java / OOP / Collections</div>
+    <div class="revision-panel">
+      <div class="revision-grid">
+        <div class="revision-item"><span class="chk">✓</span>JDK = JRE + Dev Tools · JRE = JVM + Libraries · JVM = executes bytecode</div>
+        <div class="revision-item"><span class="chk">✓</span>== compares reference/value; .equals() compares content</div>
+        <div class="revision-item"><span class="chk">✓</span>Integer cache: -128..127 cached → == true in range, false outside</div>
+        <div class="revision-item"><span class="chk">✓</span>Encapsulation/Abstraction → Data Hiding / Hide Implementation</div>
+        <div class="revision-item"><span class="chk">✓</span>Overloading = compile-time (same class, diff signature); Overriding = runtime (parent→child, @Override)</div>
+        <div class="revision-item"><span class="chk">✓</span>No multiple class inheritance → avoids Diamond Problem; interfaces allow it</div>
+        <div class="revision-item"><span class="chk">✓</span>Abstract class: partial impl, single inheritance. Interface: contract, multiple inheritance</div>
+        <div class="revision-item"><span class="chk">✓</span>Constructors cannot be static/final — only access modifiers allowed</div>
+        <div class="revision-item"><span class="chk">✓</span>String immutable → security, thread-safety, pool reuse, cached hashCode</div>
+        <div class="revision-item"><span class="chk">✓</span>StringBuilder (fast, not thread-safe) vs StringBuffer (sync, thread-safe)</div>
+        <div class="revision-item"><span class="chk">✓</span>ArrayList: fast random access, slow mid insert/delete. LinkedList: reverse</div>
+        <div class="revision-item"><span class="chk">✓</span>HashMap: hashCode()→bucket, equals()→exact entry; Java8 treeifies buckets &gt;8 nodes</div>
+        <div class="revision-item"><span class="chk">✓</span>HashMap resize: entries &gt; capacity×0.75 → doubles array, full rehash</div>
+        <div class="revision-item"><span class="chk">✓</span>ConcurrentHashMap: bucket/node locks + CAS, no null key (ambiguity risk)</div>
+        <div class="revision-item"><span class="chk">✓</span>Fail-Fast (ArrayList/HashMap) throws CME; Fail-Safe (COW/ConcurrentHashMap) iterates a snapshot</div>
+        <div class="revision-item"><span class="chk">✓</span>Equal objects → same hashCode (required). Same hashCode → not necessarily equal</div>
+        <div class="revision-item"><span class="chk">✓</span>Custom HashMap key → override equals()+hashCode(); keep fields immutable</div>
+        <div class="revision-item"><span class="chk">✓</span>Collections.unmodifiableList/Map() → read-only view; source list still mutable directly</div>
+        <div class="revision-item"><span class="chk">✓</span>Cloneable is a marker interface (no methods)</div>
+        <div class="revision-item"><span class="chk">✓</span>Comparable = natural order, inside class. Comparator = custom order, outside/lambda</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Memory / JVM</div>
+    <div class="revision-panel">
+      <div class="revision-grid">
+        <div class="revision-item"><span class="chk">✓</span>Stack: method calls/locals, thread-safe. Heap: objects, shared, GC-managed</div>
+        <div class="revision-item"><span class="chk">✓</span>Metaspace (Java 8+) replaced PermGen — grows dynamically, off-heap</div>
+        <div class="revision-item"><span class="chk">✓</span>ClassLoading: Bootstrap → Platform → Application (Parent Delegation)</div>
+        <div class="revision-item"><span class="chk">✓</span>Two live objects never share a memory address</div>
+        <div class="revision-item"><span class="chk">✓</span>Strong ref → GC can't collect. Weak ref → GC can collect anytime</div>
+        <div class="revision-item"><span class="chk">✓</span>Memory leak = still-referenced but logically-dead objects (caches, listeners, static collections, ThreadLocal)</div>
+        <div class="revision-item"><span class="chk">✓</span>Minor GC = Young Gen, fast. Major/Full GC = Old Gen, slow</div>
+        <div class="revision-item"><span class="chk">✓</span>Stop-The-World = all app threads paused during GC</div>
+        <div class="revision-item"><span class="chk">✓</span>System.gc() only requests, never guarantees, collection</div>
+        <div class="revision-item"><span class="chk">✓</span>GC algorithms: Mark-Sweep, Mark-Compact, Generational Copying; modern: G1/ZGC/Shenandoah</div>
+        <div class="revision-item"><span class="chk">✓</span>Analyze leaks: Heap Dump + Eclipse MAT/VisualVM → retained objects</div>
+        <div class="revision-item"><span class="chk">✓</span>Large files: stream line-by-line (Files.lines/BufferedReader), never load whole file</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Multithreading / Concurrency</div>
+    <div class="revision-panel">
+      <div class="revision-grid">
+        <div class="revision-item"><span class="chk">✓</span>Concurrency ≠ Parallelism (overlap vs simultaneous)</div>
+        <div class="revision-item"><span class="chk">✓</span>Thread: NEW→RUNNABLE→RUNNING→(BLOCKED/WAITING/TIMED_WAITING)→TERMINATED</div>
+        <div class="revision-item"><span class="chk">✓</span>Prefer Runnable/Callable over extending Thread</div>
+        <div class="revision-item"><span class="chk">✓</span>Race Condition = unsynchronized shared-state read-modify-write</div>
+        <div class="revision-item"><span class="chk">✓</span>volatile = visibility only, NOT atomicity</div>
+        <div class="revision-item"><span class="chk">✓</span>Atomic classes use CAS — lock-free thread safety</div>
+        <div class="revision-item"><span class="chk">✓</span>ReentrantLock &gt; synchronized: tryLock(), fairness, interruptible</div>
+        <div class="revision-item"><span class="chk">✓</span>Deadlock = circular wait on locks → prevent via consistent lock ordering</div>
+        <div class="revision-item"><span class="chk">✓</span>wait() releases lock (needs synchronized); sleep() keeps lock</div>
+        <div class="revision-item"><span class="chk">✓</span>Avoid new Thread() in enterprise code — use ExecutorService/ThreadPoolTaskExecutor</div>
+        <div class="revision-item"><span class="chk">✓</span>CPU-bound pool size = cores+1; I/O-bound = cores×(1+wait/compute)</div>
+        <div class="revision-item"><span class="chk">✓</span>parallelStream() uses common ForkJoinPool — avoid for I/O-bound work</div>
+        <div class="revision-item"><span class="chk">✓</span>CompletableFuture &gt; Future: non-blocking, chainable, combinable</div>
+        <div class="revision-item"><span class="chk">✓</span>CountDownLatch = one-time; CyclicBarrier = reusable</div>
+        <div class="revision-item"><span class="chk">✓</span>Semaphore = limit N concurrent threads (DB pool, rate limiting)</div>
+        <div class="revision-item"><span class="chk">✓</span>ThreadLocal = per-thread isolated data; always .remove() in pooled threads</div>
+        <div class="revision-item"><span class="chk">✓</span>@Async fails on self-invocation — Spring AOP proxy bypassed</div>
+        <div class="revision-item"><span class="chk">✓</span>Uncaught exception in a thread → UncaughtExceptionHandler, doesn't crash JVM or propagate to caller</div>
+        <div class="revision-item"><span class="chk">✓</span>Kafka: partitions ≥ consumers; extra consumers idle</div>
+        <div class="revision-item"><span class="chk">✓</span>Troubleshooting: thread dump for deadlock/blocking, heap dump for memory</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Java 8+ / Exceptions</div>
+    <div class="revision-panel">
+      <div class="revision-grid">
+        <div class="revision-item"><span class="chk">✓</span>Functional interface = exactly 1 abstract method (+ default/static allowed)</div>
+        <div class="revision-item"><span class="chk">✓</span>Stream: Source → Intermediate (lazy) → Terminal (triggers execution)</div>
+        <div class="revision-item"><span class="chk">✓</span>map() = 1:1 transform; flatMap() = transform + flatten</div>
+        <div class="revision-item"><span class="chk">✓</span>Optional → best as return type, not field/param</div>
+        <div class="revision-item"><span class="chk">✓</span>Parallel streams: good for CPU-heavy large data; risky/slower for small/I-O-bound</div>
+        <div class="revision-item"><span class="chk">✓</span>Checked exceptions → compile-time, recoverable (IOException, SQLException)</div>
+        <div class="revision-item"><span class="chk">✓</span>Unchecked exceptions → runtime, programming errors (NPE, ArithmeticException)</div>
+        <div class="revision-item"><span class="chk">✓</span>finally always runs; return/throw in finally overrides try's outcome</div>
+        <div class="revision-item"><span class="chk">✓</span>Never catch Throwable; never swallow exceptions silently</div>
+        <div class="revision-item"><span class="chk">✓</span>Try-with-resources needs AutoCloseable; compiler auto-generates the finally/close()</div>
+        <div class="revision-item"><span class="chk">✓</span>Custom exceptions extend RuntimeException for Spring Boot business errors</div>
+        <div class="revision-item"><span class="chk">✓</span>@RestControllerAdvice + @ExceptionHandler = centralized JSON error handling</div>
+        <div class="revision-item"><span class="chk">✓</span>DRY / KISS / YAGNI → Don't Repeat / Keep Simple / Build Only What's Needed</div>
+      </div>
+    </div>
+
+    <div class="sub-h">Full Revision Flow (Day-Of Order)</div>
+    <div class="flow">
+      <div class="fb a">Platform (JDK→JRE→JVM)</div><span class="fa">↓</span>
+      <div class="fb b">OOP (4 Pillars) → SOLID → Constructors</div><span class="fa">↓</span>
+      <div class="fb b">String/Memory → Exceptions</div><span class="fa">↓</span>
+      <div class="fb c">Collections → HashMap Internals</div><span class="fa">↓</span>
+      <div class="fb c">Multithreading → Concurrency Toolkit</div><span class="fa">↓</span>
+      <div class="fb d">Java 8+ Streams/Lambdas</div><span class="fa">↓</span>
+      <div class="fb d">JVM/GC → Design Patterns → Real-World Scenarios</div>
+    </div>
+
+    <div class="note trap"><b>What TCS interviewers at 3–8 YoE typically probe beyond rote definitions:</b> internal working (not just "what is X" but "how does X work under the hood"), JVM/memory reasoning, why-one-approach-is-better-than-another, and real project examples tying every concept back to something you actually built. Be ready with one concrete story per major topic (a HashMap bug you fixed, a deadlock you debugged, a slow endpoint you optimized, an exception hierarchy you designed).</div>
+  </div>
+
+  <div class="footer-note">Sources merged: All_Study_and_Interview_Questions_Answers_List_0-10YoE.xlsx (CoreJava sheet, 110 priority-flagged rows) · core-java.html · multithreading.html · multithreading1.html · oops.html — cross-referenced, deduplicated, and enriched with runnable code examples.</div>
+
+</div>
+</body>
+</html>

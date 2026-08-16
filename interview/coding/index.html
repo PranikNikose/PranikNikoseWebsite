@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding &amp; DSA — Interview Prep (TCS Java/Spring Boot)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <span class="prompt">$</span>
+      <span class="title">Coding &amp; DSA — Interview Prep</span>
+    </div>
+    <div class="subtitle">// Consolidated from "Coding" sheet — questions actually asked in interviews (Priority Count populated)</div>
+    <div class="context-bar">
+      <span class="context-chip">🎯 Target: <b>TCS — Java / Spring Boot Developer</b></span>
+      <span class="context-chip">📅 Interview: <b>20 Aug 2026</b></span>
+      <span class="context-chip">📊 Experience band: <b>3–8 YoE</b></span>
+      <span class="context-chip">☕ Code language: <b>Java</b></span>
+      <span class="context-chip">📌 32 questions curated</span>
+    </div>
+  </div>
+
+  <div class="note-box">
+    <b>How this document was built:</b> Every row in the <span class="inline-code">Coding</span> sheet of
+    <span class="inline-code">All_Study_and_Interview_Questions_Answers_List_0-10YoE.xlsx</span> was reviewed. Only rows where
+    <b>Priority Count</b> was not blank are included below — meaning each one has actually been asked in a real interview at some point.
+    Where the sheet's answer was missing, incomplete, or inefficient, a complete, interview-ready Java solution has been written from scratch
+    (approach, working code, and time/space complexity). Rows sourced via LinkedIn (<span class="inline-code">linkedin-1</span>,
+    <span class="inline-code">linkedin-2</span>, …) are flagged with the 🔗 badge below. This is meant to be a single, self-sufficient
+    revision document — no need to go back to the spreadsheet.
+  </div>
+
+  <div class="legend-box">
+    <span class="legend-label">Legend</span>
+    <span class="legend-item"><span class="badge badge-asked">✅ Asked</span> confirmed asked in a real interview (Priority Count set)</span>
+    <span class="legend-item"><span class="badge badge-linkedin">🔗 LinkedIn</span> sourced from a LinkedIn interview-experience post</span>
+    <span class="legend-item"><span class="badge badge-pattern">Pattern</span> the underlying DSA pattern to recognize</span>
+    <span class="legend-item"><span class="badge badge-level">Level</span> difficulty for a 3–8 YoE bar</span>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Table of Contents — 32 Questions across 5 Categories</div>
+    <div class="toc-grid">
+      <div class="toc-cat">
+        <div class="toc-cat-title">1. Core Java Basics &amp; Strings <span class="n">(7)</span></div>
+        <ol>
+          <li><a href="#q1">1. Swap two variables without a third variable 🔗</a></li>
+          <li><a href="#q2">2. Palindrome check</a></li>
+          <li><a href="#q3">3. Character frequency count</a></li>
+          <li><a href="#q4">4. Longest substring without repeating characters</a></li>
+          <li><a href="#q5">5. Longest Common Prefix</a></li>
+          <li><a href="#q6">6. Chocolate Distribution Problem</a></li>
+          <li><a href="#q7">7. Maximum subarray (sum &amp; length variants)</a></li>
+        </ol>
+      </div>
+      <div class="toc-cat">
+        <div class="toc-cat-title">2. Classic DSA / Algorithms <span class="n">(6)</span></div>
+        <ol>
+          <li><a href="#q8">8. Two Sum 🔗</a></li>
+          <li><a href="#q9">9. Valid Parentheses</a></li>
+          <li><a href="#q10">10. Find prime number</a></li>
+          <li><a href="#q11">11. Fibonacci series + test cases</a></li>
+          <li><a href="#q12">12. Search in a rotated sorted array</a></li>
+          <li><a href="#q13">13. Longest SLA-compliant time window (out-of-order events)</a></li>
+        </ol>
+      </div>
+      <div class="toc-cat">
+        <div class="toc-cat-title">3. Java 8 Stream API <span class="n">(10)</span></div>
+        <ol>
+          <li><a href="#q14">14. Second highest salary</a></li>
+          <li><a href="#q15">15. Highest paid employee per department 🔗</a></li>
+          <li><a href="#q16">16. Find duplicate employee names 🔗</a></li>
+          <li><a href="#q17">17. Salary &gt; 20000 and gender = male</a></li>
+          <li><a href="#q18">18. Group by department, sum salary</a></li>
+          <li><a href="#q19">19. First non-repeating character 🔗</a></li>
+          <li><a href="#q20">20. Filter names starting with "C", uppercase</a></li>
+          <li><a href="#q21">21. Remove duplicates from a list</a></li>
+          <li><a href="#q22">22. Max number in an array (Streams)</a></li>
+          <li><a href="#q23">23. Count employees per department (nested object)</a></li>
+        </ol>
+      </div>
+      <div class="toc-cat">
+        <div class="toc-cat-title">4. SQL Queries <span class="n">(4)</span></div>
+        <ol>
+          <li><a href="#q24">24. Find duplicate records</a></li>
+          <li><a href="#q25">25. Employee count by department</a></li>
+          <li><a href="#q26">26. Top 5 highest paid employees</a></li>
+          <li><a href="#q27">27. Employees per department (incl. zero-employee depts)</a></li>
+        </ol>
+      </div>
+      <div class="toc-cat">
+        <div class="toc-cat-title">5. Design Patterns, Concurrency &amp; Debugging <span class="n">(5)</span></div>
+        <ol>
+          <li><a href="#q28">28. Thread-safe Singleton</a></li>
+          <li><a href="#q29">29. Simple in-memory cache</a></li>
+          <li><a href="#q30">30. Overriding equals() and hashCode()</a></li>
+          <li><a href="#q31">31. Set behavior without equals()/hashCode()</a></li>
+          <li><a href="#q32">32. Toll-booth log parser bug fix</a></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- CATEGORY 1: CORE JAVA BASICS & STRINGS               -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="category" id="cat1">
+    <div class="category-heading">
+      <span class="category-icon">☕</span>
+      <h2>1. Core Java Basics &amp; Strings <span class="count">— 7 questions</span></h2>
+    </div>
+
+    <!-- Q1 -->
+    <div class="qcard pattern-string" id="q1">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q1</span>
+          <span class="qtitle">Swap two variables without using a third variable</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-linkedin">🔗 LinkedIn-1</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Core Java Basics · Pattern: Arithmetic / Bitwise trick</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Given two variables <code class="inline-code">a</code> and <code class="inline-code">b</code>, swap their values without introducing a third (temp) variable.</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Two classic no-temp tricks: arithmetic (add/subtract) and bitwise (XOR).</li>
+        <li>Arithmetic trick works for numeric types but can silently overflow if <code class="inline-code">a + b</code> exceeds the type's range.</li>
+        <li>XOR trick avoids overflow entirely and is the safer answer to lead with in an interview — but only works for integer types, not floating point.</li>
+        <li>In production code, just use a temp variable (or <code class="inline-code">Collections.swap</code> / tuple destructuring) — this trick is purely an interview exercise, and it's worth saying so.</li>
+      </ul>
+
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>// Using arithmetic:
+a = a + b;
+b = a - b;
+a = a - b;
+
+// Or using XOR:
+a = a ^ b;
+b = a ^ b;
+a = a ^ b;
+
+// XOR is safer for integers since it avoids potential overflow with large sums.</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(1)</b></span>
+        <span class="complexity-pill">Space: <b>O(1)</b></span>
+      </div>
+      <div class="tip-box"><b>Follow-up to expect:</b> "Why not just use a temp variable?" — good answer: readability &gt; cleverness in real code; this is testing bitwise/arithmetic reasoning, not advocating a coding style.</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="qcard pattern-string" id="q2">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q2</span>
+          <span class="qtitle">Palindrome check</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Java · Pattern: Two Pointer</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">A string or number that reads the same forward and backward is a palindrome. Example: <code class="inline-code">madam</code> → palindrome, <code class="inline-code">121</code> → palindrome.</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Reverse the string and compare it with the original — if they match, it's a palindrome.</li>
+        <li>Works the same way for numeric palindromes like <code class="inline-code">121</code> by comparing against the string form.</li>
+      </ul>
+
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>String str = "madam";
+
+String rev = new StringBuilder(str).reverse().toString();
+
+boolean res = str.equals(rev);</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+      <div class="tip-box"><b>Optional follow-up:</b> if asked for an O(1)-extra-space version, use a two-pointer scan from both ends instead of building a reversed copy — <code class="inline-code">left++/right--</code> comparing <code class="inline-code">charAt(left) == charAt(right)</code> until they meet.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="qcard pattern-string" id="q3">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q3</span>
+          <span class="qtitle">Count the frequency of each character in a string</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Java · Pattern: HashMap frequency counting</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Given <code class="inline-code">"apple"</code>, produce the frequency of each character: a=1, p=2, l=1, e=1.</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>For each character, count how many times it occurs across the string and store it in a <code class="inline-code">Map&lt;Character, Integer&gt;</code>.</li>
+      </ul>
+
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>String str = "apple"; // a-1, p-2, l-1, e-1
+
+Map&lt;Character, Integer&gt; freqMap = new HashMap&lt;&gt;();
+
+for (char c : str.toCharArray()) {
+    int count = 0;
+
+    for (int i = 0; i < str.length(); i++) {
+        if (c == str.charAt(i)) {
+            count++;
+        }
+    }
+
+    freqMap.put(c, count);
+}
+
+System.out.println(freqMap);</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n²)</b> — inner loop rescans the string for every character</span>
+        <span class="complexity-pill">Space: <b>O(k)</b> — k = distinct characters</span>
+      </div>
+      <div class="tip-box"><b>Optional follow-up:</b> if asked to optimize, do it in a single O(n) pass instead — <code class="inline-code">freqMap.merge(c, 1, Integer::sum)</code> inside one loop, no inner scan needed.</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="qcard pattern-string" id="q4">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q4</span>
+          <span class="qtitle">Longest substring without repeating characters</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-pattern">Pattern: Sliding Window</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Java · No answer was recorded in the sheet — full solution below</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Find the length of the longest substring without repeating characters, e.g. for <code class="inline-code">"aabcabc"</code>.</div>
+
+      <div class="block-label">Approach — Sliding Window + HashMap</div>
+      <ul class="approach-list">
+        <li>Maintain a window <code class="inline-code">[start, i]</code> that never contains a duplicate character.</li>
+        <li>Use a <code class="inline-code">HashMap&lt;Character, Integer&gt;</code> mapping each character to the last index it was seen at.</li>
+        <li>For each character at index <code class="inline-code">i</code>: if it was seen before <em>and</em> that occurrence is inside the current window (<code class="inline-code">lastSeen &gt;= start</code>), move <code class="inline-code">start</code> to <code class="inline-code">lastSeen + 1</code> — this shrinks the window just enough to drop the duplicate.</li>
+        <li>Update the map and track <code class="inline-code">maxLen = max(maxLen, i - start + 1)</code> at every step.</li>
+        <li>Brute force would check every substring — O(n³) or O(n²) — sliding window does it in a single O(n) pass.</li>
+      </ul>
+
+      <div class="block-label">Code</div>
+      <pre class="code-block"><code>public int lengthOfLongestSubstring(String s) {
+    Map&lt;Character, Integer&gt; lastSeen = new HashMap&lt;&gt;();
+    int start = 0, maxLen = 0;
+
+    for (int i = 0; i < s.length(); i++) {
+        char c = s.charAt(i);
+        if (lastSeen.containsKey(c) && lastSeen.get(c) >= start) {
+            start = lastSeen.get(c) + 1;      // shrink window past the duplicate
+        }
+        lastSeen.put(c, i);
+        maxLen = Math.max(maxLen, i - start + 1);
+    }
+    return maxLen;
+}</code></pre>
+
+      <div class="block-label">Trace: "aabcabc"</div>
+      <div class="prose">i=0 'a' → window "a" (len 1)
+i=1 'a' repeats inside window → start=1 → window "a" (len 1)
+i=2 'b' → window "ab" (len 2)
+i=3 'c' → window "abc" (len 3)
+i=4 'a' repeats (last seen 1, inside window) → start=2 → window "bca" (len 3)
+i=5 'b' repeats (last seen 2, inside window) → start=3 → window "cab" (len 3)
+i=6 'c' repeats (last seen 3, inside window) → start=4 → window "abc" (len 3)
+Answer: <b>3</b></div>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(min(n, charset size))</b></span>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="qcard pattern-string" id="q5">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q5</span>
+          <span class="qtitle">Longest Common Prefix</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Java · Pattern: Vertical scanning</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Test case 1: <code class="inline-code">{"flower","flow","flight"}</code> → output <code class="inline-code">"fl"</code>
+Test case 2: <code class="inline-code">{"Payroll","Paypal","Play"}</code> → output <code class="inline-code">"P"</code></div>
+
+      <div class="block-label">Approach — Vertical scanning</div>
+      <ul class="approach-list">
+        <li>Take the first word as a reference. Walk its characters index by index (<code class="inline-code">i = 0, 1, 2, ...</code>).</li>
+        <li>At each index, compare that character against the same index in every other word.</li>
+        <li>The moment a word is too short for that index, or has a different character there, stop and return what's been built so far.</li>
+        <li>Alternative (horizontal scanning): repeatedly shrink a running prefix using <code class="inline-code">String.startsWith()</code> against each word in turn — same complexity, sometimes more readable.</li>
+      </ul>
+
+      <div class="block-label">Code — Vertical scanning</div>
+      <pre class="code-block"><code>public String getPrefix(String[] words) {
+
+    String first = words[0];
+    String result = "";
+
+    for (int i = 0; i < first.length(); i++) {
+
+        char ch = first.charAt(i);
+
+        for (int j = 1; j < words.length; j++) {
+
+            if (i >= words[j].length() || words[j].charAt(i) != ch) {
+                return result;
+            }
+        }
+
+        result += ch;
+    }
+
+    return result;
+}</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(S)</b> — S = sum of all characters in all words (worst case)</span>
+        <span class="complexity-pill">Space: <b>O(1)</b> extra (excluding output)</span>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="qcard pattern-string" id="q6">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q6</span>
+          <span class="qtitle">Chocolate Distribution Problem</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-pattern">Pattern: Factor pairs / Math</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Java · No answer was recorded in the sheet — full solution below</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Given N chocolates, decide whether they can be fairly distributed among some number of children such that:
+— you choose the number of children,
+— each child gets at least 2 chocolates,
+— no single child gets all the chocolates,
+— all chocolates are split equally with no remainder.
+
+Example 1: N=10 → "Yes" (5 children × 2 chocolates each).
+Example 2: N=2 → "No" (can't have ≥2 children each getting ≥2 chocolates from only 2).</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Reframe the problem mathematically: we need to split N into <code class="inline-code">children × chocolatesPerChild = N</code> where <b>both</b> <code class="inline-code">children ≥ 2</code> and <code class="inline-code">chocolatesPerChild ≥ 2</code>.</li>
+        <li><code class="inline-code">children ≥ 2</code> automatically satisfies "no single child gets all the chocolates".</li>
+        <li>So the real question becomes: <em>does N have a factor pair (d, N/d) where both factors are ≥ 2?</em> This is true for any composite number ≥ 4, and false for 0, 1, and every prime number.</li>
+        <li>Only need to check divisors up to <code class="inline-code">√N</code> — if <code class="inline-code">d</code> divides N and <code class="inline-code">N/d ≥ 2</code>, we have a valid split.</li>
+      </ul>
+
+      <div class="block-label">Code</div>
+      <pre class="code-block"><code>public String canDistributeFairly(int n) {
+    if (n < 4) return "No";   // smallest possible valid split is 2 children x 2 chocolates = 4
+
+    for (int children = 2; children * children <= n; children++) {
+        if (n % children == 0) {
+            int perChild = n / children;
+            if (perChild >= 2) {
+                return "Yes";
+            }
+        }
+    }
+    return "No";
+}
+
+// canDistributeFairly(10) -> "Yes"  (5 children x 2 each, or 2 children x 5 each)
+// canDistributeFairly(2)  -> "No"
+// canDistributeFairly(7)  -> "No"   (7 is prime)
+// canDistributeFairly(4)  -> "Yes"  (2 children x 2 each)</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(√N)</b></span>
+        <span class="complexity-pill">Space: <b>O(1)</b></span>
+      </div>
+      <div class="tip-box"><b>Note:</b> this reduces to "is N composite (and ≥ 4)?" — the same primality-check skill from Q10 applies here.</div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="qcard pattern-array" id="q7">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q7</span>
+          <span class="qtitle">Maximum subarray — sum &amp; length variants</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-pattern">Pattern: Kadane's / Sliding Window</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Java · Sheet's phrasing: "return max Sublength of array" is ambiguous, and the recorded answer was a placeholder — shown as-is below, followed by the two likely-intended classics.</div>
+
+      <div class="block-label">Code — as answered (placeholder, not a real solution)</div>
+      <pre class="code-block"><code>int[] arr = {1, 2, 3, 4, 5};
+
+int maxSubLength = arr.length;
+
+System.out.println(maxSubLength);</code></pre>
+      <div class="warn-box"><b>Why this isn't enough:</b> this just prints the array's own length — it doesn't solve any actual subarray problem. Clarify the real question with the interviewer first; the two most likely intents are below.</div>
+
+      <div class="block-label">Variant A — Maximum Subarray Sum (Kadane's Algorithm)</div>
+      <div class="prose">The single most commonly asked "subarray" question at this level: given an integer array, find the contiguous subarray with the largest sum.</div>
+      <ul class="approach-list">
+        <li>Track <code class="inline-code">currentSum</code> ending at the current index and the overall <code class="inline-code">maxSum</code> seen so far.</li>
+        <li>At each element, decide: extend the previous subarray, or start fresh from the current element — whichever gives a larger sum (<code class="inline-code">currentSum = max(num, currentSum + num)</code>).</li>
+      </ul>
+      <pre class="code-block"><code>public int maxSubArraySum(int[] arr) {
+    int currentSum = arr[0];
+    int maxSum = arr[0];
+
+    for (int i = 1; i < arr.length; i++) {
+        currentSum = Math.max(arr[i], currentSum + arr[i]);
+        maxSum = Math.max(maxSum, currentSum);
+    }
+    return maxSum;
+}
+// {-2,1,-3,4,-1,2,1,-5,4} -> maxSum = 6  (subarray [4,-1,2,1])</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(1)</b></span>
+      </div>
+
+      <div class="block-label">Variant B — Longest subarray with sum ≤ K (matches "max sub-<i>length</i>" wording)</div>
+      <div class="prose">If the intent was really about <i>length</i> rather than sum — e.g. "find the length of the longest subarray whose sum doesn't exceed K" — this is a sliding-window problem (works cleanly when all elements are non-negative):</div>
+      <pre class="code-block"><code>public int longestSubarrayWithSumAtMostK(int[] arr, int k) {
+    int start = 0, sum = 0, maxLen = 0;
+
+    for (int end = 0; end < arr.length; end++) {
+        sum += arr[end];
+        while (sum > k && start <= end) {
+            sum -= arr[start];
+            start++;
+        }
+        maxLen = Math.max(maxLen, end - start + 1);
+    }
+    return maxLen;
+}</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(1)</b></span>
+      </div>
+      <div class="tip-box"><b>Interview tip:</b> if the question is read out loud and is ambiguous like this one, always clarify with the interviewer first — "are we maximizing sum, or maximizing length under a constraint?" — before coding.</div>
+    </div>
+
+  </div>
+
+  <a class="back-to-top" href="#top">↑ back to top</a>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- CATEGORY 2: CLASSIC DSA / ALGORITHMS                 -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="category" id="cat2">
+    <div class="category-heading">
+      <span class="category-icon">🧩</span>
+      <h2>2. Classic DSA / Algorithms <span class="count">— 6 questions</span></h2>
+    </div>
+
+    <!-- Q8 -->
+    <div class="qcard pattern-algo" id="q8">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q8</span>
+          <span class="qtitle">Two Sum</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-linkedin">🔗 LinkedIn-1</span>
+          <span class="badge badge-pattern">Pattern: HashMap</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Algorithms · The single most-asked coding question across all levels</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Given an array of integers and a target, return the indices of the two numbers that add up to the target.</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Brute force checks every pair — O(n²).</li>
+        <li>Optimal: single pass with a <code class="inline-code">HashMap&lt;value, index&gt;</code>. For each number, check if <code class="inline-code">target - number</code> is already in the map — if so, we've found the pair; otherwise store the current number and move on.</li>
+        <li>Works in one O(n) pass because we only need to look backward at numbers already seen.</li>
+      </ul>
+
+      <div class="block-label">Code</div>
+      <pre class="code-block"><code>public int[] twoSum(int[] nums, int target) {
+    Map&lt;Integer, Integer&gt; seen = new HashMap&lt;&gt;();   // value -> index
+
+    for (int i = 0; i < nums.length; i++) {
+        int complement = target - nums[i];
+        if (seen.containsKey(complement)) {
+            return new int[]{seen.get(complement), i};
+        }
+        seen.put(nums[i], i);
+    }
+    throw new IllegalArgumentException("No two sum solution");
+}
+// nums = [2,7,11,15], target = 9 -> [0,1]  (2+7=9)</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="qcard pattern-algo" id="q9">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q9</span>
+          <span class="qtitle">Valid Parentheses</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-pattern">Pattern: Stack</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Algorithms · No answer was recorded in the sheet — full solution below</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Given a string containing just <code class="inline-code">( ) [ ] { }</code>, determine if the brackets are validly matched and nested, e.g. <code class="inline-code">"{[()]}"</code> is valid, <code class="inline-code">"([)]"</code> is not.</div>
+
+      <div class="block-label">Approach — Stack</div>
+      <ul class="approach-list">
+        <li>Push opening brackets onto a stack as they're encountered.</li>
+        <li>On a closing bracket, pop the stack and check that it matches the expected opening bracket. If the stack is empty or it doesn't match — invalid.</li>
+        <li>At the end, the string is valid only if the stack is empty (every opener was closed).</li>
+      </ul>
+
+      <div class="block-label">Code</div>
+      <pre class="code-block"><code>public boolean isValid(String s) {
+    Deque&lt;Character&gt; stack = new ArrayDeque&lt;&gt;();
+    Map&lt;Character, Character&gt; pairs = Map.of(')', '(', ']', '[', '}', '{');
+
+    for (char c : s.toCharArray()) {
+        if (c == '(' || c == '[' || c == '{') {
+            stack.push(c);
+        } else {
+            if (stack.isEmpty() || stack.pop() != pairs.get(c)) {
+                return false;
+            }
+        }
+    }
+    return stack.isEmpty();
+}
+// "{[()]}"  -> true
+// "([)]"    -> false
+// "(("      -> false</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="qcard pattern-algo" id="q10">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q10</span>
+          <span class="qtitle">Find prime number(s)</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Algorithms · Prime-check logic / first prime number</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Determine if a number is prime, and/or find the first prime number satisfying some condition.</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>A number is prime if it's greater than 1 and has no divisors other than 1 and itself.</li>
+        <li>Only need to check divisibility up to <code class="inline-code">√n</code> — any factor larger than the square root would pair with a smaller factor already checked.</li>
+        <li>Skip even numbers after checking 2, to roughly halve the work.</li>
+      </ul>
+
+      <div class="block-label">Code</div>
+      <pre class="code-block"><code>public boolean isPrime(int n) {
+    if (n <= 1) return false;
+    if (n <= 3) return true;
+    if (n % 2 == 0 || n % 3 == 0) return false;
+
+    for (int i = 5; (long) i * i <= n; i += 6) {
+        if (n % i == 0 || n % (i + 2) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+public int firstPrimeAfter(int n) {
+    int candidate = n + 1;
+    while (!isPrime(candidate)) {
+        candidate++;
+    }
+    return candidate;
+}</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(√n)</b> per check</span>
+        <span class="complexity-pill">Space: <b>O(1)</b></span>
+      </div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="qcard pattern-algo" id="q11">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q11</span>
+          <span class="qtitle">Fibonacci series — with test cases</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Algorithms · Includes JUnit test cases (explicitly requested in the sheet)</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Generate the Fibonacci series and write test cases for it.</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Naive recursion recomputes the same sub-values repeatedly — exponential O(2ⁿ) time.</li>
+        <li>Iterative approach (two running variables <code class="inline-code">a</code>, <code class="inline-code">b</code>, each step <code class="inline-code">next = a + b</code>) avoids that entirely — O(n) time, O(1) space.</li>
+        <li>Test cases should cover the base cases (n=0, n=1) plus a general case verifying the first several terms.</li>
+      </ul>
+
+      <div class="block-label">Code — Iterative</div>
+      <pre class="code-block"><code>public int fibonacci(int n) {
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+
+    int a = 0, b = 1;
+    for (int i = 2; i <= n; i++) {
+        int next = a + b;
+        a = b;
+        b = next;
+    }
+    return b;
+}</code></pre>
+
+      <div class="block-label">JUnit test cases</div>
+      <pre class="code-block"><code>@Test
+void fibonacci_baseCase_zero() {
+    assertEquals(0, fib.fibonacci(0));
+}
+
+@Test
+void fibonacci_baseCase_one() {
+    assertEquals(1, fib.fibonacci(1));
+}
+
+@Test
+void fibonacci_generalCase() {
+    int[] expected = {0, 1, 1, 2, 3, 5, 8, 13};
+    for (int n = 0; n < expected.length; n++) {
+        assertEquals(expected[n], fib.fibonacci(n));
+    }
+}</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(1)</b></span>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="qcard pattern-algo" id="q12">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q12</span>
+          <span class="qtitle">Search in a rotated sorted array</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-pattern">Pattern: Modified Binary Search</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Algorithms · Optimize brute force O(n) → O(log n)</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Given a sorted array that has been rotated at some unknown pivot (e.g. <code class="inline-code">[4,5,6,7,0,1,2]</code>), find the index of a target value.</div>
+
+      <div class="block-label">Approach — Modified Binary Search</div>
+      <ul class="approach-list">
+        <li>At each step, one half of the array (left of mid, or right of mid) is always properly sorted — figure out which one.</li>
+        <li>Check if the target falls within that sorted half's value range. If yes, search there; if no, search the other half.</li>
+        <li>Repeat until found or the search space is exhausted — still O(log n) because each step halves the range.</li>
+      </ul>
+
+      <div class="block-label">Code</div>
+      <pre class="code-block"><code>public int search(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] == target) return mid;
+
+        if (nums[left] <= nums[mid]) {              // left half is sorted
+            if (nums[left] <= target && target < nums[mid]) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        } else {                                      // right half is sorted
+            if (nums[mid] < target && target <= nums[right]) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+    }
+    return -1;
+}
+// nums = [4,5,6,7,0,1,2], target = 0 -> index 4</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(log n)</b></span>
+        <span class="complexity-pill">Space: <b>O(1)</b></span>
+      </div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="qcard pattern-algo" id="q13">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q13</span>
+          <span class="qtitle">Longest SLA-compliant time window (out-of-order events)</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-pattern">Pattern: Sort + Sliding Window</span>
+          <span class="badge badge-level">Level: Medium–Hard</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Algorithms · Real-world / practical scenario question — good fit for a backend role</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">Given a stream of request latencies (each with a timestamp), find the longest continuous time window where the SLA (latency &lt; X ms) was continuously maintained. Events can arrive out of order.</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Because events can arrive out of order, first sort them by timestamp (or insert into a structure that keeps them sorted as they arrive, e.g. a <code class="inline-code">TreeMap&lt;timestamp, latency&gt;</code>).</li>
+        <li>Once sorted, this becomes a straightforward sliding-window scan: track the start timestamp of the current "good" run.</li>
+        <li>While latency stays under the threshold, keep extending the window and update the max window length seen so far (<code class="inline-code">currentTimestamp - windowStart</code>).</li>
+        <li>The moment an SLA violation is hit, the current run ends; the next window starts from the following event's timestamp.</li>
+      </ul>
+
+      <div class="block-label">Code</div>
+      <pre class="code-block"><code>public class LatencyEvent {
+    long timestamp;
+    long latencyMs;
+
+    public LatencyEvent(long timestamp, long latencyMs) {
+        this.timestamp = timestamp;
+        this.latencyMs = latencyMs;
+    }
+}
+
+public long longestSlaWindow(List&lt;LatencyEvent&gt; events, long slaThresholdMs) {
+    events.sort(Comparator.comparingLong(e -> e.timestamp));   // handle out-of-order arrival
+
+    long maxWindow = 0;
+    long windowStart = -1;
+    long lastTimestamp = -1;
+
+    for (LatencyEvent event : events) {
+        if (event.latencyMs < slaThresholdMs) {
+            if (windowStart == -1) {
+                windowStart = event.timestamp;      // start a new compliant window
+            }
+            maxWindow = Math.max(maxWindow, event.timestamp - windowStart);
+            lastTimestamp = event.timestamp;
+        } else {
+            windowStart = -1;                       // SLA violated -> window resets
+        }
+    }
+    return maxWindow;
+}</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n log n)</b> — dominated by the sort</span>
+        <span class="complexity-pill">Space: <b>O(n)</b> or <b>O(1)</b> if sorted in place</span>
+      </div>
+      <div class="tip-box"><b>Follow-up to expect:</b> "What if events arrive as a live stream, not a fixed list?" — mention using a <code class="inline-code">TreeMap&lt;Long, Long&gt;</code> (timestamp → latency) so insertion keeps things sorted at O(log n) per event, and re-run the same window scan.</div>
+    </div>
+
+  </div>
+
+  <a class="back-to-top" href="#top">↑ back to top</a>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- CATEGORY 3: JAVA 8 STREAM API                        -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="category" id="cat3">
+    <div class="category-heading">
+      <span class="category-icon">🌊</span>
+      <h2>3. Java 8 Stream API <span class="count">— 10 questions</span></h2>
+    </div>
+
+    <div class="shared-model">
+      <div class="block-label" style="margin-top:0;">Shared model used across this section</div>
+      <pre class="code-block"><code>class Employee {
+    String name;
+    String department;
+    String gender;
+    double salary;
+
+    // constructor + getters (getName, getDepartment, getGender, getSalary) assumed
+}
+List&lt;Employee&gt; employees = ...; // source list used by every snippet below</code></pre>
+    </div>
+
+    <!-- Q14 -->
+    <div class="qcard pattern-stream" id="q14">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q14</span>
+          <span class="qtitle">Employee with the second highest salary</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Sort descending by salary, skip the first (highest), take the next one.</li>
+      </ul>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>employees.stream()
+.sorted(Comparator.comparing(Employee::getSalary).reversed())
+.skip(1)
+.findFirst()</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n log n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="qcard pattern-stream" id="q15">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q15</span>
+          <span class="qtitle">Highest paid employee in each department</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-linkedin">🔗 LinkedIn-1</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Group by department, then within each group collect the max by salary using a downstream collector (<code class="inline-code">Collectors.maxBy</code>).</li>
+      </ul>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>Map&lt;String, Optional&lt;Emp&gt;&gt; highestPaidByDept = employees.stream()
+.collect(Collectors.groupingBy(Employee::getDepartment, Collectors.maxBy(Comparator.comparing(Employee::getSalary))));</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="qcard pattern-stream" id="q16">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q16</span>
+          <span class="qtitle">Find duplicate employee names</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-linkedin">🔗 LinkedIn-1</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Group employees by name and count occurrences, then filter groups with count &gt; 1.</li>
+      </ul>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>Set&lt;String&gt; duplicateNames = employees.stream()
+.collect(Collectors.groupingBy(Employee::getName, Collectors.counting()))
+.entrySet().stream()
+.filter(entry -> entry.getValue() > 1)
+.map(e -> e.getKey())
+.collect(Collectors.toSet());</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="qcard pattern-stream" id="q17">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q17</span>
+          <span class="qtitle">Employees with salary &gt; 20000 and gender = male</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Chain two <code class="inline-code">filter()</code> calls (readable, and the JIT/stream pipeline short-circuits per element anyway) — equivalent to combining both conditions with <code class="inline-code">&amp;&amp;</code> in one filter.</li>
+      </ul>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>List&lt;Emp&gt; salGreaterGenderMale =
+elist.stream()
+.filter(e -> e.getSal() > 20000.00)
+.filter(k -> k.getGender().equalsIgnoreCase("Male"))
+.collect(Collectors.toList());</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="qcard pattern-stream" id="q18">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q18</span>
+          <span class="qtitle">Group employees by department and sum salary department-wise</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>Map&lt;String, Double&gt; sumOfEmployeeSalByDeptWise =
+elist.stream()
+.collect(Collectors.groupingBy(Emp::getDeptName, Collectors.summingDouble(Emp::getSal)));</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="qcard pattern-stream" id="q19">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q19</span>
+          <span class="qtitle">First non-repeating character in a string, using streams</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-linkedin">🔗 LinkedIn-1</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="block-label">Problem</div>
+      <div class="prose">Example: <code class="inline-code">"swiss"</code> → character counts are s=3, w=1, i=1 → first one with count 1 in original order is <code class="inline-code">'w'</code>.</div>
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Build a frequency map that preserves insertion order (<code class="inline-code">LinkedHashMap</code>), then stream its entries and find the first one with count == 1.</li>
+      </ul>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>Character ch =
+str.chars().mapToObj(c -> (char) c)
+.collect(Collectors.groupingBy(c -> c, LinkedHashMap::new, Collectors.counting()))
+.entrySet().stream()
+.filter(e -> e.getValue() == 1)
+.map(e -> e.getKey())
+.findFirst()
+.orElse(null);
+// -> 'w'</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(k)</b> — k = distinct characters</span>
+      </div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="qcard pattern-stream" id="q20">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q20</span>
+          <span class="qtitle">Filter names that start with "C" and convert to uppercase</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>List&lt;String&gt; namesUpper =
+names.stream()
+.filter(a -> a.startsWith("C"))
+.map(String::toUpperCase)
+.collect(Collectors.toList());</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q21 -->
+    <div class="qcard pattern-stream" id="q21">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q21</span>
+          <span class="qtitle">Remove duplicate elements from a list of integers</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Example: <code class="inline-code">[1,2,2,3,4]</code> → <code class="inline-code">[1,2,3,4]</code></div>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>List&lt;Integer&gt; uniqueList = list.stream()
+                               .distinct()
+                               .toList();</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+    </div>
+
+    <!-- Q22 -->
+    <div class="qcard pattern-stream" id="q22">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q22</span>
+          <span class="qtitle">Find the max number in an array using Java 8</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Example: <code class="inline-code">int[] arr = {1,3,5,6,7}</code></div>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>int max = Arrays.stream(arr).max().getAsInt();</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(1)</b></span>
+      </div>
+    </div>
+
+    <!-- Q23 -->
+    <div class="qcard pattern-stream" id="q23">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q23</span>
+          <span class="qtitle">Count employees in each department (nested object)</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="qmeta">Variant where department is a nested object: <code class="inline-code">Employee -&gt; {id, name, dept}</code>, <code class="inline-code">Department -&gt; {id, name}</code></div>
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>Map&lt;String, Long&gt; result = employees.stream()
+    .collect(Collectors.groupingBy(emp -> emp.getDept().getName(),Collectors.counting()));</code></pre>
+      <div class="complexity-row">
+        <span class="complexity-pill">Time: <b>O(n)</b></span>
+        <span class="complexity-pill">Space: <b>O(n)</b></span>
+      </div>
+      <div class="tip-box"><b>Note:</b> this is functionally the same pattern as <a href="#q18">Q18</a>, just reached through a nested field (<code class="inline-code">emp.getDept().getName()</code>) instead of a flat one.</div>
+    </div>
+
+  </div>
+
+  <a class="back-to-top" href="#top">↑ back to top</a>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- CATEGORY 4: SQL QUERIES                              -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="category" id="cat4">
+    <div class="category-heading">
+      <span class="category-icon">🗄️</span>
+      <h2>4. SQL Queries <span class="count">— 4 questions</span></h2>
+    </div>
+
+    <!-- Q24 -->
+    <div class="qcard pattern-sql" id="q24">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q24</span>
+          <span class="qtitle">Find duplicate records</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li><code class="inline-code">GROUP BY</code> the column(s) that define a "duplicate", then keep only groups with more than one row via <code class="inline-code">HAVING COUNT(*) &gt; 1</code>.</li>
+      </ul>
+      <pre class="code-block"><code>SELECT name, COUNT(*)
+FROM employee
+GROUP BY name
+HAVING COUNT(*) > 1;</code></pre>
+    </div>
+
+    <!-- Q25 -->
+    <div class="qcard pattern-sql" id="q25">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q25</span>
+          <span class="qtitle">Employee count by department</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <pre class="code-block"><code>SELECT dept, COUNT(*) AS emp_count
+FROM employee
+GROUP BY dept;</code></pre>
+    </div>
+
+    <!-- Q26 -->
+    <div class="qcard pattern-sql" id="q26">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q26</span>
+          <span class="qtitle">Top 5 highest paid employees</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Easy</span>
+        </div>
+      </div>
+      <pre class="code-block"><code>SELECT *
+FROM employee
+ORDER BY salary DESC
+LIMIT 5;</code></pre>
+      <div class="tip-box"><b>Follow-up to expect:</b> "What if there are ties at the 5th position?" — use <code class="inline-code">FETCH FIRST 5 ROWS WITH TIES</code> (SQL Server/Oracle) or a window function with <code class="inline-code">DENSE_RANK()</code> to include all tied rows instead of arbitrarily cutting at 5.</div>
+    </div>
+
+    <!-- Q27 -->
+    <div class="qcard pattern-sql" id="q27">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q27</span>
+          <span class="qtitle">Number of employees in each department (including departments with zero employees)</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>An <code class="inline-code">INNER JOIN</code> would silently drop departments that currently have zero employees.</li>
+        <li>Use a <code class="inline-code">LEFT JOIN</code> from <code class="inline-code">dept</code> to <code class="inline-code">employee</code> so every department is kept, and <code class="inline-code">COUNT(e.id)</code> (not <code class="inline-code">COUNT(*)</code>) correctly counts 0 for departments with no matching rows — <code class="inline-code">COUNT(*)</code> would incorrectly count 1 for the NULL row produced by the outer join.</li>
+      </ul>
+      <pre class="code-block"><code>SELECT d.name AS dept_name, COUNT(e.id) AS emp_count
+FROM dept d
+LEFT JOIN employee e ON e.dept_id = d.id
+GROUP BY d.name;</code></pre>
+      <div class="warn-box"><b>Common mistake:</b> using <code class="inline-code">COUNT(*)</code> instead of <code class="inline-code">COUNT(e.id)</code> here — with a LEFT JOIN, a department with no employees still produces one row (all NULLs from the employee side), so <code class="inline-code">COUNT(*)</code> would wrongly report 1 instead of 0.</div>
+    </div>
+
+  </div>
+
+  <a class="back-to-top" href="#top">↑ back to top</a>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- CATEGORY 5: DESIGN PATTERNS, CONCURRENCY & DEBUGGING -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="category" id="cat5">
+    <div class="category-heading">
+      <span class="category-icon">🏗️</span>
+      <h2>5. Design Patterns, Concurrency &amp; Debugging <span class="count">— 5 questions</span></h2>
+    </div>
+
+    <!-- Q28 -->
+    <div class="qcard pattern-design" id="q28">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q28</span>
+          <span class="qtitle">Design a thread-safe Singleton</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked ×2</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Design Pattern</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li><b>Double-checked locking:</b> check <code class="inline-code">instance == null</code> before synchronizing (avoids the cost of locking on every call), then check again inside the synchronized block (guards against a race where two threads both passed the first check). The field must be <code class="inline-code">volatile</code> — otherwise, due to instruction reordering, another thread could see a non-null but only partially-constructed object.</li>
+      </ul>
+
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>public class Singleton {
+    private static volatile Singleton instance;
+    private Singleton() {}
+    public static Singleton getInstance() {
+        if (instance == null) {
+            synchronized (Singleton.class) {
+                if (instance == null) {
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}</code></pre>
+      <div class="tip-box"><b>Follow-up to expect:</b> "Why volatile?" — without it, the JIT/CPU can reorder the write to <code class="inline-code">instance</code> so that other threads observe a reference to an object whose constructor hasn't fully run yet. Also be ready to name alternatives if asked: the Bill Pugh static-holder idiom, or an enum-based singleton.</div>
+    </div>
+
+    <!-- Q29 -->
+    <div class="qcard pattern-design" id="q29">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q29</span>
+          <span class="qtitle">Implement a simple in-memory cache</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Caching · "Your application frequently retrieves data from a slow external service — improve performance by caching."</div>
+
+      <div class="block-label">Approach</div>
+      <ul class="approach-list">
+        <li>Use a <code class="inline-code">ConcurrentHashMap</code> (not a plain HashMap) so the cache is safe under concurrent access from multiple request threads.</li>
+        <li><code class="inline-code">computeIfAbsent()</code> atomically checks-then-populates on a miss, calling the slow service only when the key isn't already cached.</li>
+        <li>In a real Spring Boot app, this same idea is what <code class="inline-code">@Cacheable</code> does under the hood — worth mentioning that Spring's caching abstraction (backed by Caffeine/Redis/etc.) is the production-grade version of this pattern, and this hand-rolled version omits eviction/TTL.</li>
+      </ul>
+
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>Map&lt;String, String&gt; cache = new ConcurrentHashMap&lt;&gt;();
+
+public String getData(String key) {
+    return cache.computeIfAbsent(key, k -> callSlowExternalService(k));
+}</code></pre>
+
+      <div class="complexity-row">
+        <span class="complexity-pill">Cache hit — Time: <b>O(1)</b></span>
+        <span class="complexity-pill">Cache miss — Time: <b>O(external call)</b></span>
+      </div>
+      <div class="tip-box"><b>Follow-up to expect:</b> "How would you add expiry?" — mention storing a timestamp alongside the value, or reaching for Caffeine's <code class="inline-code">expireAfterWrite</code> in a real project instead of hand-rolling TTL logic.</div>
+    </div>
+
+    <!-- Q30 -->
+    <div class="qcard pattern-design" id="q30">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q30</span>
+          <span class="qtitle">How to correctly override equals() and hashCode()</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Core Java Basics</div>
+
+      <div class="block-label">The contract (must know cold)</div>
+      <ul class="approach-list">
+        <li><b>Reflexive:</b> <code class="inline-code">x.equals(x)</code> must be true.</li>
+        <li><b>Symmetric:</b> <code class="inline-code">x.equals(y)</code> iff <code class="inline-code">y.equals(x)</code>.</li>
+        <li><b>Transitive:</b> if <code class="inline-code">x.equals(y)</code> and <code class="inline-code">y.equals(z)</code>, then <code class="inline-code">x.equals(z)</code>.</li>
+        <li><b>Consistent:</b> repeated calls return the same result as long as the object isn't mutated.</li>
+        <li><b>hashCode consistency:</b> equal objects <i>must</i> produce equal hash codes (the reverse isn't required — unequal objects can share a hash code, that's just a collision). Breaking this silently corrupts <code class="inline-code">HashMap</code>/<code class="inline-code">HashSet</code> behavior — see <a href="#q31">Q31</a>.</li>
+      </ul>
+
+      <div class="block-label">Code — as answered</div>
+      <pre class="code-block"><code>class Employee {
+    String name;
+    int id;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Employee)) return false;
+        Employee e = (Employee) o;
+        return id == e.id && Objects.equals(name, e.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, id);
+    }
+}</code></pre>
+      <div class="tip-box"><b>Practical rule of thumb:</b> use the exact same set of fields in both methods, and lean on <code class="inline-code">Objects.equals()</code> / <code class="inline-code">Objects.hash()</code> instead of writing null checks by hand — or better, let your IDE / Lombok's <code class="inline-code">@EqualsAndHashCode</code> generate them consistently.</div>
+    </div>
+
+    <!-- Q31 -->
+    <div class="qcard pattern-design" id="q31">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q31</span>
+          <span class="qtitle">Does a Set reject a "duplicate" custom object if equals()/hashCode() aren't overridden?</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Collections</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose"><code class="inline-code">Set&lt;Employee&gt; set = new LinkedHashSet&lt;&gt;();
+set.add(new Employee("abc", 1));
+set.add(new Employee("abc", 1));  // same id, different instance — does this get added?</code></div>
+
+      <div class="block-label">Answer</div>
+      <div class="prose">It depends entirely on whether <code class="inline-code">equals()</code>/<code class="inline-code">hashCode()</code> are overridden:
+— <b>Without</b> overriding them, <code class="inline-code">Set</code> falls back to <code class="inline-code">Object</code>'s default identity-based implementation. Two different instances — even with identical field values — are <i>not</i> considered equal, so <b>both get added</b>.
+— <b>With</b> them overridden to compare by <code class="inline-code">id</code> (and/or <code class="inline-code">name</code>, as in <a href="#q30">Q30</a>), the second object is correctly recognized as a duplicate and rejected.</div>
+
+      <div class="block-label">Code — demonstrating both cases</div>
+      <pre class="code-block"><code>// Without equals()/hashCode() overridden:
+Set&lt;Employee&gt; set = new LinkedHashSet&lt;&gt;();
+set.add(new Employee("abc", 1));
+set.add(new Employee("abc", 1));
+System.out.println(set.size());   // 2 -> both added (identity comparison)
+
+// With equals()/hashCode() overridden (see Q30):
+Set&lt;EmployeeWithEquals&gt; set2 = new LinkedHashSet&lt;&gt;();
+set2.add(new EmployeeWithEquals("abc", 1));
+set2.add(new EmployeeWithEquals("abc", 1));
+System.out.println(set2.size());  // 1 -> second one rejected as a duplicate</code></pre>
+      <div class="warn-box"><b>Why this matters in real code:</b> forgetting to override <code class="inline-code">equals()</code>/<code class="inline-code">hashCode()</code> on entity/DTO classes used in Sets or as Map keys is one of the most common real-world bugs — it silently allows duplicates or makes lookups fail even when "the same" object is queried.</div>
+    </div>
+
+    <!-- Q32 -->
+    <div class="qcard pattern-design" id="q32">
+      <div class="qcard-head">
+        <div class="qtitle-wrap">
+          <span class="qnum">Q32</span>
+          <span class="qtitle">Toll-booth log parser bug fix</span>
+        </div>
+        <div class="badges">
+          <span class="badge badge-asked">✅ Asked</span>
+          <span class="badge badge-level">Level: Medium</span>
+        </div>
+      </div>
+      <div class="qmeta">Topic: Real-World Debugging — live debugging exercise, common at 3-8 YoE for practical/production-code rounds</div>
+
+      <div class="block-label">Problem</div>
+      <div class="prose">A toll-booth log parser has a bug. <code class="inline-code">LogEntry(String logLine)</code> parses lines like
+<code class="inline-code">34400.409 SXY288 210E ENTRY</code> (timestamp, license plate, location+direction, booth type) by splitting on a single space:
+<code class="inline-code">logLine.split(" ")</code>. The provided JUnit tests fail. Find and fix the bug.</div>
+
+      <div class="block-label">Root cause</div>
+      <div class="prose">The bug is in the split logic, not the field indices. <code class="inline-code">logLine.split(" ")</code> breaks the moment a log line has irregular or multiple whitespace between tokens (or leading/trailing whitespace) — it produces empty-string tokens that shift every subsequent index, which then throws <code class="inline-code">NumberFormatException</code> or <code class="inline-code">ArrayIndexOutOfBoundsException</code> downstream.</div>
+
+      <div class="block-label">Fix</div>
+      <ul class="approach-list">
+        <li>Trim the line first, then split on <i>one or more</i> whitespace characters using the regex <code class="inline-code">\s+</code> instead of a literal single space.</li>
+        <li>This reliably collapses any run of spaces/tabs between fields so <code class="inline-code">tokens[0..3]</code> always map correctly to timestamp, license plate, location+direction, and booth type — regardless of how many spaces separate them in the source log.</li>
+      </ul>
+
+      <div class="block-label">Code</div>
+      <pre class="code-block"><code>public class LogEntry {
+    double timestamp;
+    String licensePlate;
+    String locationDirection;
+    String boothType;
+
+    public LogEntry(String logLine) {
+        // BUG: logLine.split(" ") breaks on irregular/multiple whitespace
+        // FIX: strip the line and split on one-or-more whitespace characters
+        String[] tokens = logLine.strip().split("\\s+");
+
+        this.timestamp = Double.parseDouble(tokens[0]);
+        this.licensePlate = tokens[1];
+        this.locationDirection = tokens[2];
+        this.boothType = tokens[3];
+    }
+}
+// "34400.409  SXY288   210E ENTRY"  (irregular spacing) now parses correctly</code></pre>
+      <div class="tip-box"><b>Interview signal:</b> this kind of question tests whether you actually read the failing test output and reason about <i>why</i> it fails, rather than guessing at index changes. Always reproduce the failure first, then fix the root cause.</div>
+    </div>
+
+  </div>
+
+  <a class="back-to-top" href="#top">↑ back to top</a>
+
+  <footer>
+    Compiled from All_Study_and_Interview_Questions_Answers_List_0-10YoE.xlsx — "Coding" sheet · Priority Count entries only · 32/66 rows qualified · Built for TCS Java/Spring Boot interview prep, 20 Aug 2026
+  </footer>
+
+</div><!-- /page -->
+</body>
+</html>

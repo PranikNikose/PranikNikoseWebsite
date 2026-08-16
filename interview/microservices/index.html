@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microservices — Priority Interview Q&amp;A</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <span class="prompt">$</span>
+        <span class="title">Microservices — Priority Interview Q&amp;A</span>
+      </div>
+    </div>
+    <div class="subtitle">// Every question below has actually been asked in a real interview (Priority Count column) — sourced from personal interview history &amp; LinkedIn-shared questions. Revise this file end-to-end and you've covered every microservices question that has come up so far.</div>
+    <div class="exam-strip">🎯 <b>Target:</b> TCS — Java / Spring Boot Developer Interview, <b>20 Aug 2026</b> &nbsp;|&nbsp; <b>Experience band:</b> 3–8 YoE &nbsp;|&nbsp; Depth calibrated for mid-to-senior microservices discussions: service discovery, API gateway, inter-service communication, resilience patterns, distributed transactions, Kafka, Kubernetes &amp; cloud.</div>
+  </div>
+
+  <div class="navbar"><a href="#fund">Microservices Fundamentals</a><a href="#comm">Inter-Service Communication</a><a href="#disc">Service Discovery, API Gateway & Config</a><a href="#res">Resilience & Fault Tolerance</a><a href="#tx">Distributed Transactions & Data Consistency</a><a href="#sec">Security</a><a href="#kafka">Kafka & Event-Driven Architecture</a><a href="#k8s">Kubernetes & Docker</a><a href="#cloud">Cloud, AWS & DevOps</a><a href="#scale">Scalability & Production Troubleshooting</a><a href="#design">Design Patterns & Project Architecture</a></div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="num">74</div><div class="lbl">Total Priority Questions</div></div>
+    <div class="stat-card s2"><div class="num">40</div><div class="lbl">💼 LinkedIn-Sourced</div></div>
+    <div class="stat-card s3"><div class="num">11</div><div class="lbl">Topic Sections</div></div>
+    <div class="stat-card s4"><div class="num">34</div><div class="lbl">From Interview History</div></div>
+  </div>
+
+  <div class="legend-panel">
+    <b>How to read this page:</b> Only questions whose <b>Priority Count</b> was non-blank in the source spreadsheet are included here — meaning each one was <b>actually asked in a real interview</b>. A <b>💼 LinkedIn Asked ×N</b> badge marks questions sourced from / reported via LinkedIn (e.g. <code>linkedin-1</code>, <code>linkedin-2</code>); a <b>🎯 Asked in Interview ×N</b> badge marks questions from direct interview experience, where N is the number of times it recurred. Answers are reproduced in full — nothing truncated.
+  </div>
+
+
+  <div class="section-label" id="fund">Microservices Fundamentals <span class="section-count">(4 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#01</span></div>
+      <div class="qa-q">How does a microservice differ from a monolithic application?</div><div class="qa-alt">Also asked as: Difference between microservices and monolithic application?</div>
+      <div class="qa-answer"><p>A monolithic application is built as a single, tightly coupled application where all modules share the same codebase and are deployed together. <br>A microservices architecture divides the application into small, independent services, each service is responsible for a specific business capability and capable of being developed, deployed, maintained and scaled independently.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#02</span></div>
+      <div class="qa-q">How do microservices communicate with each other?</div>
+      <div class="qa-answer"><p>Microservices communicate with each other mainly in two ways:<br>1. Synchronous communication using REST APIs or gRPC (Google Remote Procedure Call), where One service sends a request and waits for a response.<br>2. Asynchronous communication using message brokers like Kafka or RabbitMQ, where One service sends a message or event, and the other processes it later.<br>The choice depends on the business requirement.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#07</span></div>
+      <div class="qa-q">Can all microservices share the same database?</div>
+      <div class="qa-answer"><p>Ideally, No. <br>Each microservice should have its own database so that it can be developed, deployed, and scaled independently. <br>If one service needs data from another service, it should communicate through APIs or events instead of directly accessing another service's database. <br>For example, in the Candidate Registration Portal, the Payment Service has its own database, and the Booking Service has a separate database.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#08</span></div>
+      <div class="qa-q">What is data consistency?</div><div class="qa-alt">Also asked as: Maintaining data consistency in microservices?</div>
+      <div class="qa-answer"><p>Data consistency means ensuring that related data across multiple microservices remains accurate and synchronized. </p>
+<p>For example, in the Candidate Registration Portal, if the Payment Service marks a payment as successful, the Booking Service should confirm the booking, and the Notification Service should send a success message. <br>All services should reflect the correct business state.</p>
+<p>Since each microservice has its own database, maintaining data consistency requires coordination between services. <br>This is typically achieved using asynchronous events, the Saga Pattern, retries, and compensation (rollback) actions instead of traditional distributed transactions.</p>
+<p>S – Saga Pattern<br>E – Event-Driven Communication<br>R – Retry<br>C – Compensation</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="comm">Inter-Service Communication <span class="section-count">(8 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#03</span></div>
+      <div class="qa-q">What is synchronous communication in microservices?</div><div class="qa-alt">Also asked as: What is request-response communication?</div>
+      <div class="qa-answer"><p>Synchronous communication is a communication pattern where one microservice sends a request to another microservice and waits for an immediate response before continuing. </p>
+<p>Request-response communication is a communication pattern where one application or microservice sends a request to another service and waits for a response. </p>
+<p>It is commonly implemented using REST APIs or gRPC. </p>
+<p>For example, in the Candidate Registration Portal, the Payment Service calls the Booking Service to book a seat and waits for the booking confirmation before completing the process.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#04</span></div>
+      <div class="qa-q">What is asynchronous communication in microservices?</div>
+      <div class="qa-answer"><p>Asynchronous communication is a communication pattern where one microservice sends a message or event to another microservice without waiting for an immediate response.</p>
+<p>For example, in the Candidate Registration Portal, after a successful payment, the Payment Service publishes a PaymentCompleted event. The Notification Service receives the event and sends the confirmation email and SMS in the background, while the Payment Service immediately returns a success response to the user.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×2</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#05</span></div>
+      <div class="qa-q">What is API versioning?</div><div class="qa-alt">Also asked as: How would you handle API versioning?</div>
+      <div class="qa-answer"><p>API versioning is the practice of maintaining multiple versions of an API so that existing clients continue to work while new features or changes are introduced. <br>It helps ensure backward compatibility and allows applications to upgrade gradually.</p>
+<p>Common API Versioning Strategies : <br>1. URL Versioning: /api/v1/candidates , /api/v2/candidates<br>2. Header Versioning: API-Version: 1 , API-Version: 2<br>3. Query Parameter Versioning: /api/candidates?version=1 , /api/candidates?version=2</p>
+<p>I would handle API versioning by creating a new version of the API instead of modifying the existing one. <br>This allows existing clients to continue using the old version while new clients use the updated version. The most common approach is URL versioning, such as /api/v1 and /api/v2.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#12</span></div>
+      <div class="qa-q">When would you prefer asynchronous communication over synchronous communication?</div>
+      <div class="qa-answer"><p>I prefer asynchronous communication when an immediate response is not required. <br>It is suitable for background tasks such as sending notifications, generating reports, processing files, and handling business events. </p>
+<p>For example, in the Candidate Registration Portal, after a successful payment, the Payment Service publishes a "Payment Completed" event. The Booking, Notification, and Audit services process the event independently without blocking the Payment Service. This improves scalability, fault tolerance, and loose coupling.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#13</span></div>
+      <div class="qa-q">What is RabbitMQ used for?</div>
+      <div class="qa-answer"><p>RabbitMQ is a distributed message broker used for asynchronous communication between microservices. <br>It is commonly used to send, receive, and route messages between applications or microservices. </p>
+<p>For example, after a candidate completes payment, the Payment Service sends a "Payment Completed" message to RabbitMQ, and the Booking, Notification, Audit, and Reporting services process the message independently. <br>This improves scalability, fault tolerance, and loose coupling.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#14</span></div>
+      <div class="qa-q">What is idempotency in APIs?</div>
+      <div class="qa-answer"><p>Idempotency means that sending the same API request multiple times produces the same result as sending it once.  (One request or repeated requests → Same final result)<br>It is commonly used in payment and booking systems to prevent duplicate processing caused by retries, network failures, or multiple clicks.</p>
+<p>For example, if a candidate retries a payment request due to a network issue, an idempotent API ensures only one payment is created by using an Idempotency Key, preventing duplicate transactions.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#30</span></div>
+      <div class="qa-q">Your team is planning to release a new version of an API in a microservices architecture.</div><div class="qa-alt">Also asked as: The new version includes breaking changes that could impact existing clients. How would you manage API versioning to ensure a smooth transition?</div>
+      <div class="qa-answer"><p>For breaking changes, I would introduce a new API version, such as /api/v2, while keeping /api/v1 backward compatible. I would document v2, notify consumers, support both versions during a migration period, monitor V1 usage, and deprecate and eventually remove v1 after clients have migrated.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#38</span></div>
+      <div class="qa-q">Making a call to 4 external API, how can I aggregate the response into one .</div>
+      <div class="qa-answer"><p>I would use the Aggregator Pattern. (CompletableFuture, WebClient, RestClient) <br>I would call the four external APIs, preferably in parallel to reduce latency, collect their responses, and combine them into a single response DTO. I would also use timeouts and fallback handling for APIs that fail or respond slowly.</p>
+<p>4 APIs → Parallel calls → Aggregate → 1 response</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="disc">Service Discovery, API Gateway &amp; Config <span class="section-count">(6 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#06</span></div>
+      <div class="qa-q">What is service discovery?</div><div class="qa-alt">Also asked as: Service Discovery – why is it needed? &nbsp;|&nbsp; Why is service discovery required in microservices? &nbsp;|&nbsp; What is the role of a service registry?</div>
+      <div class="qa-answer"><p>Service Discovery is a mechanism that helps microservices find and communicate with each other automatically. <br>Instead of using hardcoded IPs, services register themselves in a registry, and other services find them from the registry when needed.</p>
+<p>For example, in the Candidate Registration Portal, the Payment Service can find the Booking Service through Service Discovery even if the Booking Service's IP address changes after scaling or redeployment.</p>
+<p>Service Discovery is needed because, in a microservices environment, service instances are frequently created, removed, or restarted. Their IP addresses can change, so hardcoding service locations is not practical. Service Discovery allows services to find each other dynamically, making the system more scalable and reliable.</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#15</span></div>
+      <div class="qa-q">What is an API Gateway?</div><div class="qa-alt">Also asked as: What is API Gateway and its responsibilities? &nbsp;|&nbsp; What problems does an API Gateway solve? &nbsp;|&nbsp; What are the advantages of API Gateway over direct service access?</div>
+      <div class="qa-answer"><p>An API Gateway is a single entry point for all client requests in a microservices architecture.<br>It receives requests from clients, performs responsibilities such as authentication, authorization, routing, rate limiting, logging, monitoring, and load balancing, and then forwards the requests to the appropriate microservice.<br>This improves security, scalability, and simplifies communication between clients and microservices.</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#16</span></div>
+      <div class="qa-q">What is dynamic service discovery?</div>
+      <div class="qa-answer"><p>Dynamic Service Discovery is the process where microservices automatically discover the current IP address and port of other services through a Service Registry like Eureka.</p>
+<p>For example, the Booking Service asks the Service Registry for the Payment Service's location, and the registry returns the latest IP address and port. <br>This eliminates hardcoded URLs and supports scalability and fault tolerance.</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×2</span><span class="qa-num">#31</span></div>
+      <div class="qa-q">what is Config Server / config pattern ? Why we use it ? Which problem it solves ? Example?</div><div class="qa-alt">Also asked as: Spring Cloud Config Server &nbsp;|&nbsp; How do you keep one common configuration for all your microservices?</div>
+      <div class="qa-answer"><p>Config Server is a centralized configuration management service used in microservices to store and provide configuration properties for multiple services.<br>I use a centralized Config Server, such as Spring Cloud Config, backed by a Git repository. Config Server is a separate Spring Boot application. </p>
+<p>For example, in a Candidate Registration Portal, Payment, Booking, and Notification services act as Config Clients and fetch their common and environment-specific configuration, such as database URLs, service URLs, timeouts, and feature settings.</p>
+<p>This avoids duplicate configuration and provides centralized management and version control. Sensitive credentials are stored in a dedicated secrets-management system.</p>
+<p>Git → stores configuration<br>Config Server → provides configuration<br>Microservices → consume configuration</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#56</span></div>
+      <div class="qa-q">What is Heartbeat &amp; Self-Preservation mode in Eureka?</div>
+      <div class="qa-answer"><p>Eureka clients periodically send heartbeat renewals to the Eureka Server to indicate that they are alive. <br>If Eureka detects a significant drop in renewals, it enters self-preservation mode and temporarily avoids evicting service instances, because the missing heartbeats could be caused by a network partition rather than actual service failures.</p>
+<p>Heartbeat = I am alive.<br>Self-Preservation = Don't remove everyone just because heartbeats suddenly stopped.</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#72</span></div>
+      <div class="qa-q">What is Eureka?</div>
+      <div class="qa-answer"><p>Eureka is a service registry used for service discovery in Spring Cloud microservices. <br>When a service starts, it registers its name, host, port, and availability information with Eureka. <br>Other services can then discover available instances dynamically instead of using hardcoded IP addresses. <br>This is useful because microservice instances can scale, restart, or change their network locations. <br>In Kubernetes-based environments, however, Kubernetes Service and DNS are commonly used instead of Eureka.</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="res">Resilience &amp; Fault Tolerance <span class="section-count">(7 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#18</span></div>
+      <div class="qa-q">What is the Circuit Breaker pattern?</div>
+      <div class="qa-answer"><p>The Circuit Breaker is a fault tolerance pattern that prevents a microservice from repeatedly calling another service that is failing or unavailable. <br>When the number of failures exceeds a predefined threshold, the circuit breaker opens and temporarily blocks further requests. This prevents cascading failures, improves system stability, and allows the failing service time to recover.</p>
+<p>For example, in a Candidate Registration Portal, if the Booking Service repeatedly fails to contact the Payment Service, the circuit breaker opens and temporarily blocks further requests. <br>Instead of waiting for repeated timeouts, it immediately returns an error or fallback response. <br>After a configured wait time, it enters the Half-Open state to test whether the Payment Service has recovered. <br>This prevents cascading failures and improves system stability.</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#19</span></div>
+      <div class="qa-q">How can cascading failures occur?</div>
+      <div class="qa-answer"><p>A cascading failure occurs when the failure of one microservice spreads to other dependent services. <br>For example, if the Payment Service becomes unavailable, the Booking Service may keep waiting or retrying requests, consuming threads and resources. <br>This can cause the Booking Service and other dependent services to slow down or fail. <br>We can prevent cascading failures using timeouts, controlled retries, circuit breakers, fallbacks, and bulkhead isolation.</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Mid (3-5 YoE)</span><span class="qa-num">#23</span></div>
+      <div class="qa-q">One dependent microservice is down and your service also fails. What approach would you use?</div>
+      <div class="qa-answer"><p>I would use Resilience4j patterns such as Timeout, Circuit Breaker, Retry, and Fallback. <br>I would first set a timeout so my service doesn't wait indefinitely. <br>For temporary failures, I would retry a limited number of times. <br>If the Payment Service continues failing, the Circuit Breaker would open and stop further calls temporarily. <br>I would then use a fallback response or handle the operation asynchronously, depending on the business requirement.</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#39</span></div>
+      <div class="qa-q">Where would you store an idempotency key, and how would you handle concurrent requests?</div>
+      <div class="qa-answer"><p>I would store the client-generated idempotency key, such as a UUID, in Redis or a database along with the request status and result. <br>On a retry, I check the key first and return the existing result instead of processing again. <br>For concurrent requests, I use an atomic operation or unique database constraint so only the first request is processed.</p>
+<p>Idempotency Key → Redis/DB → Atomic check → Process once → Return same result</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#40</span></div>
+      <div class="qa-q">Redis goes down. Should your application fail as well? How would you design a fallback?</div>
+      <div class="qa-answer"><p>No, the application should not necessarily fail when Redis is down. <br>I would use a fallback based on the use case—for example, if Redis is used as a cache, the application can bypass Redis and fetch data directly from the database. <br>I would also use a timeout and Circuit Breaker to prevent repeated Redis calls from affecting the application.</p>
+<p>Redis down → Timeout/Circuit Breaker → Fallback → DB / alternative source</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#73</span></div>
+      <div class="qa-q">Time limiter (Resilience4j TimeLimiter)</div>
+      <div class="qa-answer"><p>Resilience4j TimeLimiter is used to limit the execution time of an asynchronous operation. <br>For example, if my Payment Service calls the Booking Service and I configure a 3-second timeout, if the Booking Service doesn't respond within 3 seconds, the operation is timed out, and I can handle it using a fallback or other resilience mechanisms.</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×3</span><span class="qa-num">#74</span></div>
+      <div class="qa-q">What is Resilience4j?</div><div class="qa-alt">Also asked as: When would you use Circuit Breaker, Retry, Timeout, and Bulkhead patterns? &nbsp;|&nbsp; Implementing fault tolerance in microservices.</div>
+      <div class="qa-answer"><p>Resilience4j is a lightweight Java library used to make microservices more resilient when other services fail or become slow.<br>It provides patterns like:<br>Circuit Breaker → Stops calling a failing service.<br>Retry → Try another request.<br>Rate Limiter → Limits the number of requests.<br>Time Limiter → Stops waiting after a timeout.<br>Bulkhead → Limits concurrent calls to prevent resource exhaustion.<br>Fallback → Return an alternative response when the call cannot succeed.</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="tx">Distributed Transactions &amp; Data Consistency <span class="section-count">(4 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#17</span></div>
+      <div class="qa-q">What is the Saga pattern? Pros? cons ?</div>
+      <div class="qa-answer"><p>The Saga Pattern is a design pattern used to manage distributed transactions in a microservices architecture. <br>Saga: Each service commits its local transaction; if something fails, compensating transactions undo previous steps →  maintain business consistency , Better scalability, eventual consistency.</p>
+<p>For example, in a Candidate Registration Portal, if the Payment Service fails after the Booking Service has reserved a seat, the Booking Service cancels the seat reservation. <br>This avoids using a global transaction while maintaining eventual consistency.</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Senior (5-7 YoE)</span><span class="qa-num">#26</span></div>
+      <div class="qa-q">How would you handle distributed transactions?</div>
+      <div class="qa-answer"><p>In a microservices architecture, I would avoid a distributed database transaction. <br>I would use the Saga pattern, where a business transaction is divided into local transactions in each service. <br>If one step fails, compensating actions are triggered to maintain business consistency.</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#35</span></div>
+      <div class="qa-q">Saga vs 2PC (direct comparison)</div>
+      <div class="qa-answer"><p>2PC: All services commit together or all roll back → Strong consistency, higher overhead.</p>
+<p>Saga: Each service commits its local transaction; if something fails, compensating transactions undo previous steps → Better scalability, eventual consistency.</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#36</span></div>
+      <div class="qa-q">Transactional outbox pattern</div>
+      <div class="qa-answer"><p>Transactional Outbox Pattern ensures reliable database updates and event publishing. <br>Instead of directly publishing an event to Kafka in the same business flow, I save the business data and the event in an Outbox table within the same database transaction. A separate publisher then reads the Outbox and publishes the event to Kafka. <br>If Kafka is temporarily unavailable, the event remains in the Outbox and can be retried.</p>
+<p>Save Payment + Save Event → Same transaction → Later publish Event to Kafka.</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="sec">Security <span class="section-count">(6 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-rd">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×2</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#09</span></div>
+      <div class="qa-q">What is authentication?</div>
+      <div class="qa-answer"><p>Authentication is the process of verifying the identity of a user before granting access to an application, ensuring that the user is who they claim to be.<br>User enters username and password -&gt; System validates the credentials -&gt; If valid, the user is authenticated.</p>
+<p>For example, in the Candidate Registration Portal, when a candidate enters a username and password, the Authentication Service verifies the credentials. If they are valid, the user is authenticated and allowed to access the portal.</p>
+<p>Authentications Different Methods:<br>1. Session-Based Authentication<br>2. JWT Authentication<br>3. OAuth2 Authentication<br>4. LDAP Authentication<br>5. Basic Authentication<br>6. OTP Authentication</p></div>
+    </div><div class="qa-card qc-rd">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×2</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#10</span></div>
+      <div class="qa-q">What is authorization?</div>
+      <div class="qa-answer"><p>Authorization is the process of determining what resources or actions an authenticated user is allowed to access/perform.</p>
+<p>For example, in the Candidate Registration Portal, after a user logs in, the system checks their role. An Admin can manage users, while a Candidate can only register for exams and view certificates. If a Candidate tries to access an Admin-only feature, the system denies access.</p></div>
+    </div><div class="qa-card qc-rd">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×2</span><span class="badge badge-lvl">Fresher (0-1 YoE)</span><span class="qa-num">#11</span></div>
+      <div class="qa-q">What is JWT?</div><div class="qa-alt">Also asked as: How does JWT authentication work? &nbsp;|&nbsp; How do you implement JWT in Spring Boot?</div>
+      <div class="qa-answer"><p>In JWT (JSON Web Token) authentication, a user logs in with valid credentials, and the server generates a signed JWT token. The client sends this token in the Authorization header with each request. Spring Security validates the token, extracts user details and roles, and authenticates the request without maintaining server-side sessions.</p>
+<p>User Login → Validate Credentials → Generate Signed JWT → Client sends "Authorization: Bearer &lt;JWT&gt;" → Validates Token → Extract User &amp; Roles → Authorize Request</p>
+<p>To implement JWT in Spring Boot, I authenticate the user using Spring Security, generate a JWT token upon successful login, create a JWT filter to validate tokens for incoming requests, and configure Spring Security to use stateless authentication with JWT tokens instead of sessions.</p></div>
+    </div><div class="qa-card qc-rd">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×2</span><span class="badge badge-lvl">Mid (3-5 YoE)</span><span class="qa-num">#21</span></div>
+      <div class="qa-q">What is rate limiting?</div>
+      <div class="qa-answer"><p>Rate limiting is a mechanism that restricts the number of requests a client can make to an API within a specific time period. <br>For example, an API Gateway may allow 100 requests per minute per client and reject additional requests with HTTP 429. (Too Many Requests)<br>It protects microservices from overload, abuse, and excessive traffic, improving system availability and stability.</p></div>
+    </div><div class="qa-card qc-rd">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Mid (3-5 YoE)</span><span class="qa-num">#22</span></div>
+      <div class="qa-q">How do you secure microservice communication?</div><div class="qa-alt">Also asked as: Consider a microservices architecture where each service has its own database. Services need to communicate securely with each other and with external clients. What strategies and technologies would you implement to ensure security in this architecture?</div>
+      <div class="qa-answer"><p>To secure communication between microservices and external clients, I would implement authentication, authorization, encrypted communication, secure API access, and centralized security controls.</p>
+<p>Security layers:<br>OAuth2/OIDC + JWT → Client authentication<br>API Gateway → Central security controls<br>mTLS → Secure service-to-service communication<br>RBAC → Authorization<br>HTTPS/TLS → Encryption in transit<br>Secrets Manager → Protect credentials/secrets<br>Database isolation + least privilege → Protect service data<br>Audit logging → Track security-sensitive actions</p></div>
+    </div><div class="qa-card qc-rd">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#71</span></div>
+      <div class="qa-q">Security design pattern (named)</div>
+      <div class="qa-answer"><p>Authentication → OAuth2 / OIDC / JWT<br>Authorization → RBAC<br>API Gateway → Central security<br>Services → Defense in Depth<br>Service-to-Service → mTLS<br>Principles → Zero Trust + Least Privilege</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="kafka">Kafka &amp; Event-Driven Architecture <span class="section-count">(12 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="badge badge-lvl">Senior (5-7 YoE)</span><span class="qa-num">#24</span></div>
+      <div class="qa-q">How do you ensure exactly-once processing?</div>
+      <div class="qa-answer"><p>Exactly-once processing is difficult in distributed systems. <br>I use a unique event ID and idempotent processing. Before processing a message, I check whether the ID was already processed. If yes, I skip it; otherwise, I process it and save the ID. <br>For Kafka-to-Kafka communication, Kafka transactions can provide exactly-once semantics.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#32</span></div>
+      <div class="qa-q">Kafka partition mechanics works?</div>
+      <div class="qa-answer"><p>A Kafka topic is divided into partitions, and each partition is an ordered sequence of messages identified by offsets. <br>The producer determines the partition, typically using the message key. <br>Consumers in a consumer group are assigned partitions, allowing messages from different partitions to be processed in parallel while maintaining order within each partition.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#33</span></div>
+      <div class="qa-q">Kafka message ordering guarantees</div>
+      <div class="qa-answer"><p>Kafka guarantees message ordering only within a partition. If ordering is required for a particular customer, I use Customer ID as the message key so all events for that customer go to the same partition. <br>Kafka does not guarantee ordering across different partitions.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#34</span></div>
+      <div class="qa-q">Dead Letter Queue (RabbitMQ / AWS SQS)</div><div class="qa-alt">Also asked as: Dead Letter Topic (Kafka)</div>
+      <div class="qa-answer"><p>A DLQ/DLT stores messages that repeatedly fail after configured retries. <br>It prevents infinite retries and allows messages to be investigated or reprocessed later. <br>In Kafka, this is commonly implemented as a Dead Letter Topic (DLT).</p>
+<p>Retry → Still fails →DLT/DLQ → Investigate → Fix → Reprocess</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#42</span></div>
+      <div class="qa-q">What happens if a Kafka consumer processes a message but crashes before committing the offset?</div>
+      <div class="qa-answer"><p>If a Kafka consumer processes the message successfully but crashes before committing the offset, Kafka considers the message uncommitted and can deliver it again when the consumer restarts. This can cause duplicate processing, so we use idempotent consumer logic to safely handle duplicate messages.</p>
+<p>Process → Crash before commit → Redelivery → Possible duplicate → Idempotency</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×2</span><span class="qa-num">#47</span></div>
+      <div class="qa-q">How is Kafka utilized in handling multiple orders from multiple customers?</div><div class="qa-alt">Also asked as: How do you manage a scenario where one customer has multiple orders (one-to-many relationship in Kafka)?</div>
+      <div class="qa-answer"><p>Kafka handles multiple customers and orders by publishing each order as a separate event. </p>
+<p>Use Customer ID as the Kafka message key. All orders for the same customer go to the same partition, maintaining their order, while orders from different customers can be processed in parallel across different partitions.</p>
+<p>Order = Event<br>Customer ID = Key<br>Key → Partition<br>Different partitions → Parallel processing</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#48</span></div>
+      <div class="qa-q">What happens when a Kafka consumer throws an exception, and how is it handled?</div>
+      <div class="qa-answer"><p>When a Kafka consumer throws an exception, the configured error handler handles it. <br>In Spring Kafka, we can retry the message a configured number of times, and if processing still fails, send the message to a Dead Letter Topic. Offset management depends on the configured acknowledgment and error-handling strategy.</p>
+<p>Exception → Retry → Still fails → DLT (Dead Letter Topic)</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#57</span></div>
+      <div class="qa-q">How have you used Kafka in your project?</div>
+      <div class="qa-answer"><p>In my microservices project, I used Kafka for asynchronous communication between services. <br>For example, when the Payment Service successfully completes a payment, it publishes a PaymentCompleted event to a Kafka topic. The Booking, Notification, Audit, and Reporting Services consume this event independently. We use consumer groups for parallel processing and offsets to track message consumption. <br>For reliability, the consumer commits the offset only after successful processing, and we use idempotent handling to avoid duplicate processing.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#58</span></div>
+      <div class="qa-q">If the producer sends a message successfully but fails afterward, how does the consumer ensure reliable consumption?</div><div class="qa-alt">Also asked as: Consumer crashes mid-batch (scenario)</div>
+      <div class="qa-answer"><p>Reliable consumption is ensured by having the consumer process the message and only commit its offset after successful processing (manual offset commit, not auto-commit), so if the consumer crashes mid-processing, the message is redelivered rather than lost;<br>Idempotent processing handles the resulting possible duplicates.</p>
+<p>Kafka stores the message → Consumer processes it → Success → Commit offset.<br>Consumer crashes → Offset not committed → Kafka redelivers message<br>Message is processed again → Duplicate possible → Use idempotent consumer using eventId</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#65</span></div>
+      <div class="qa-q">Explain Kafka architecture</div>
+      <div class="qa-answer"><p>Kafka is a distributed event-streaming platform. Kafka consists mainly of producers, topics, partitions, brokers, consumers, and consumer groups. <br>Producers publish events to topics. <br>Topics are divided into partitions for scalability and parallel processing. <br>Partitions are stored on Kafka brokers. <br>Consumers read events from topics.<br>Consumer groups allow multiple consumer instances to process partitions in parallel. <br>Kafka uses offsets (Message's position inside a partition) to track message positions and replication to provide fault tolerance.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#66</span></div>
+      <div class="qa-q">Hands-on experience with Kafka</div>
+      <div class="qa-answer"><p>I have hands-on experience with Kafka for asynchronous communication between microservices. <br>I have worked with producers, consumers, topics, partitions, consumer groups, and offsets. <br>For example, in a Candidate Registration Portal, when an application is submitted, the Application Service publishes an ApplicationSubmitted event to Kafka, and services like Notification and Audit consume that event asynchronously. <br>I have also worked with concepts like retries, idempotency, and handling consumer failures.</p></div>
+    </div><div class="qa-card qc-bl">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#67</span></div>
+      <div class="qa-q">Design a near real-time data pipeline with sub-second freshness (Kafka -&gt; Stream processing -&gt; Time-series DB -&gt; Grafana)</div>
+      <div class="qa-answer"><p>For sub-second freshness, I would build a Kafka-based streaming pipeline where services publish events to Kafka, Kafka Streams or Flink processes them continuously, and the results are written to a time-series database such as TimescaleDB or InfluxDB. Grafana reads the latest metrics for visualization. <br>I would use Kafka partitions for scalability, monitor consumer lag, keep processing windows small, and use idempotent processing for reliability.</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="k8s">Kubernetes &amp; Docker <span class="section-count">(6 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#37</span></div>
+      <div class="qa-q">What is a Kubernetes Pod?</div>
+      <div class="qa-answer"><p>A Pod is the smallest deployable unit in Kubernetes. <br>It wraps one or more tightly coupled containers (usually just one) that share the same network namespace (IP address and port space) and storage volumes, and are always scheduled together on the same node. <br>Containers within a Pod can communicate with each other via localhost, and the Pod as a whole is what gets deployed, scaled, and replicated.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#43</span></div>
+      <div class="qa-q">Your Kubernetes pod keeps restarting, but the logs show no obvious errors. How would you debug it?</div>
+      <div class="qa-answer"><p>I check the Pod’s exit code and events using kubectl describe pod to identify issues like OOMKilled or failed liveness/readiness probes. <br>I also check the Pod’s resource requests/limits and probe configuration, as these can cause restarts without clear application errors in the logs.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#45</span></div>
+      <div class="qa-q">What happens to in-flight requests during Kubernetes pod termination, and how do you implement graceful shutdown?</div>
+      <div class="qa-answer"><p>During Kubernetes Pod termination, the Pod receives SIGTERM and is removed from receiving new traffic, while existing in-flight requests are given time to complete. In Spring Boot, I enable graceful shutdown and configure a shutdown timeout. Kubernetes also provides a termination grace period. If the application doesn't stop within that period, Kubernetes sends SIGKILL.</p>
+<p>SIGTERM → Stop new requests → Finish in-flight requests → Grace period → Stop</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#50</span></div>
+      <div class="qa-q">How do you containerize your microservices?</div>
+      <div class="qa-answer"><p>I containerize each microservice as a separate Docker image using its own Dockerfile. I build the Spring Boot application as a JAR, create a lightweight image, and push it to a container registry. For local development, I use Docker Compose, and in production, I deploy the images on Kubernetes, where each service can be deployed and scaled independently.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#52</span></div>
+      <div class="qa-q">Pod-to-Pod communication in Kubernetes.</div>
+      <div class="qa-answer"><p>In Kubernetes, Pods can communicate directly using Pod IPs, but since Pod IPs are temporary, we normally use a Kubernetes Service. The calling Pod uses the Service's stable DNS name, and Kubernetes routes the request to one of the destination Pods.</p></div>
+    </div><div class="qa-card qc-gr">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#53</span></div>
+      <div class="qa-q">Kubernetes architecture and overall cluster structure.</div>
+      <div class="qa-answer"><p>Kubernetes Cluster<br>│<br>├── 1. Control Plane → Manages the cluster<br>│   ├── API Server          → Entry point<br>│   ├── Scheduler           → Chooses worker node<br>│   ├── Controller Manager  → Maintains desired state<br>│   └── etcd                → Stores cluster data<br>│<br>└── 2. Worker Nodes → Run applications<br>    ├── kubelet             → Node agent<br>    ├── Container Runtime   → Runs containers<br>    ├── kube-proxy          → Networking<br>    └── Pods                → Run applications</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="cloud">Cloud, AWS &amp; DevOps <span class="section-count">(6 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#54</span></div>
+      <div class="qa-q">Basic Terraform concepts.</div>
+      <div class="qa-answer"><p>Terraform is an Infrastructure-as-Code tool that lets you define cloud resources (servers, networks, databases) declaratively in configuration files (HCL). <br>It plans changes by comparing desired state to current state, then applies only the necessary changes, and tracks resource state to manage infrastructure lifecycle consistently.</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#55</span></div>
+      <div class="qa-q">A few AWS services and their use cases.</div>
+      <div class="qa-answer"><p>Common AWS services used in backend/microservices architectures include EC2 (compute), S3 (object storage), RDS (managed relational DB), ECR/ECS/EKS (container registry/orchestration), Lambda (serverless), SQS/SNS (messaging), and CloudWatch (monitoring/logging).</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#59</span></div>
+      <div class="qa-q">What is ECR?</div>
+      <div class="qa-answer"><p>ECR (Elastic Container Registry) is AWS's managed Docker container registry - it stores, manages, and lets you pull/push container images, integrating directly with ECS/EKS for deploying containerized applications on AWS.</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#60</span></div>
+      <div class="qa-q">How to connect Ec2 with RDS?</div>
+      <div class="qa-answer"><p>Connect EC2 to RDS by ensuring both are in the same VPC (or peered VPCs), configuring the RDS security group to allow inbound traffic from the EC2 instance's security group on the database port, then connecting from the application using the RDS endpoint, port, and credentials via a standard JDBC connection string.</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#61</span></div>
+      <div class="qa-q">How do you connect your spring boot application to AWS?</div>
+      <div class="qa-answer"><p>Connect a Spring Boot application to AWS by configuring the AWS SDK (or Spring Cloud AWS) with credentials (IAM roles preferred over hardcoded keys), setting the appropriate region, and using service-specific clients (e.g., S3Client, RDS via JDBC URL, SQS/SNS clients) configured through application.properties or environment variables.</p></div>
+    </div><div class="qa-card qc-am">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#68</span></div>
+      <div class="qa-q">How do Jenkins and Docker work together</div>
+      <div class="qa-answer"><p>Jenkins and Docker complement each other in CI/CD. <br>Jenkins automates the build, test, Docker image creation, image publishing, and deployment process, while Docker packages the application and its dependencies into a consistent container. <br>For example, when a developer pushes a Spring Boot application to Git, Jenkins checks out the code, runs Maven build and tests, creates a Docker image, pushes it to Docker Hub or Amazon ECR, and deploys that image to the target environment.</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="scale">Scalability &amp; Production Troubleshooting <span class="section-count">(7 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#25</span></div>
+      <div class="qa-q">how we ensure our application handle traffic as much as and it will not break?</div>
+      <div class="qa-answer"><p>To ensure an application can handle high traffic, we use horizontal scaling, load balancing, auto scaling, caching, rate limiting, asynchronous processing, and database optimization. <br>For resilience, we use timeouts, retries, circuit breakers, bulkhead isolation, and graceful degradation. <br>This allows the system to handle traffic spikes, scale according to demand, and prevent failures from cascading across the application.</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×2</span><span class="qa-num">#27</span></div>
+      <div class="qa-q">How would you scale a microservice to handle millions of requests per minute while maintaining consistency?</div><div class="qa-alt">Also asked as: Handling 1 million transactions/day (scale scenario)</div>
+      <div class="qa-answer"><p>To handle millions of requests per minute, I would horizontally scale the microservice by running multiple instances behind a load balancer/API Gateway. <br>I would keep the services stateless, use caching for read-heavy data, database read replicas and proper indexing, asynchronous processing using Kafka/RabbitMQ for non-critical operations, and use rate limiting and circuit breakers for protection. <br>For consistency, I would use database transactions for local operations, optimistic/pessimistic locking where required, idempotency for operations like payment, and Saga for distributed transactions across services.</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#41</span></div>
+      <div class="qa-q">Your API works well with 100 users but fails with 10,000 concurrent users. What would you check first?</div>
+      <div class="qa-answer"><p>First, I would check where the bottleneck is using metrics and monitoring—CPU, memory, thread pools, database connection pool, database performance, and downstream services. I would also check API response time, error rate, and load-test results. <br>Then I would identify whether the bottleneck is in the application, database, network, or infrastructure and scale or optimize accordingly.</p>
+<p>10K users → Find bottleneck → App / DB / Network / Infrastructure → Optimize or Scale</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#44</span></div>
+      <div class="qa-q">CPU usage looks normal, but API latency is very high. What could be happening?</div><div class="qa-alt">Also asked as: Normal CPU + High Latency = Check what the application is WAITING for.</div>
+      <div class="qa-answer"><p>If CPU is normal but latency is high, I check thread pool exhaustion, slow database or downstream API calls, connection pool issues, lock contention, and GC pauses. <br>These can make requests wait without significantly increasing CPU usage.</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#46</span></div>
+      <div class="qa-q">A production issue occurs only under heavy traffic and can’t be reproduced locally. What would be your debugging approach?</div>
+      <div class="qa-answer"><p>Reproduce it by load testing in a staging environment that mirrors production scale (JMeter/Gatling), and check for race conditions, connection pool exhaustion, or resource limits that only manifest under concurrent load - issues like this often stem from shared mutable state or insufficient pool/thread sizing.</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#49</span></div>
+      <div class="qa-q">If multiple microservices are failing in your project, how do you identify the root cause and debug interconnected services?</div>
+      <div class="qa-answer"><p>I first check centralized logs and metrics to identify which service failed first. Then I use the correlation ID or trace ID to trace the request across interconnected services. I check service health, API responses, network connectivity, database, Kafka, and recent deployments/configuration changes. I start from the first failure and trace its impact on downstream services to identify the root cause.</p>
+<p>Multiple services failing<br>          ↓<br>Centralized Logs / Metrics<br>          ↓<br>Correlation ID / Trace ID<br>          ↓<br>Find first failing service<br>          ↓<br>Check DB / API / Kafka / Network<br>          ↓<br>Check recent deployments/configuration changes<br>          ↓<br>Root Cause</p></div>
+    </div><div class="qa-card qc-pu">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#64</span></div>
+      <div class="qa-q">UI submits a job; backend processes billions of records - design approach</div>
+      <div class="qa-answer"><p>If the UI submits a job that needs to process billions of records, I would not process it synchronously in the API request. <br>I would use an asynchronous job-processing architecture. The API would accept the request, create a job ID, and put the job into a queue. Background workers would process the records in batches, and the UI could check the job status using the job ID.<br>Don't make the UI wait. Create a job → Queue it → Process in batches with workers → Track status</p></div>
+    </div>
+  </div>
+
+
+  <div class="section-label" id="design">Design Patterns &amp; Project Architecture <span class="section-count">(8 questions)</span></div>
+  <div class="qa-grid">
+    <div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="badge badge-lvl">Junior-Mid (1-3 YoE)</span><span class="qa-num">#20</span></div>
+      <div class="qa-q">SOLID principle</div>
+      <div class="qa-answer"><p>S — SRP — Single Responsibility Principle — one class, one responsibility, one reason to change<br>O — OCP — Open/Closed Principle — Open for Extension, Closed for Modification<br>L — LSP — Liskov Substitution Principle — Child must replace Parent without breaking behavior<br>I — ISP — Interface Segregation Principle — Many small interfaces &gt; one large interface<br>D — DIP — Dependency Inversion Principle — Depend on Abstraction, not Concrete class</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#28</span></div>
+      <div class="qa-q">Proxy pattern in Microservices</div>
+      <div class="qa-answer"><p>A Proxy acts as a middleman between the client and the actual service. <br>In microservices, an API Gateway commonly acts as a proxy and can handle authentication, authorization, routing, rate limiting, load balancing, and other cross-cutting concerns.</p>
+<p>Client → Proxy/API Gateway → Microservice</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#29</span></div>
+      <div class="qa-q">You’re working on a payroll microservice in a distributed HR system. You’re given a map(Input) where each key is an employeeId (Integer) and the value is an Employee domain object. Each Employee has fields like id, name, department, salary, and currency.</div><div class="qa-alt">Also asked as: The service needs to return a map where each key is a department name and the value is the total salary of all employees in that department.</div>
+      <div class="qa-answer"><p>Use Java 8 Streams' Collectors.groupingBy - </p>
+<p>Map&lt;String, Double&gt; salData = employees.stream()<br>.collect(Collectors.groupingBy(Employee::getDepartment, Collectors.summingDouble(Employee::getSalary))) </p>
+<p>- to group the map's values by department and sum salaries in one pass, returning a Map&lt;String, Double&gt; of department to total salary.</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-li">💼 LinkedIn Asked ×1</span><span class="qa-num">#51</span></div>
+      <div class="qa-q">Explain the flow of your project architecture end-to-end.</div>
+      <div class="qa-answer"><p>In my project, the request starts from the frontend and reaches the API Gateway, where authentication and security checks are applied. <br>The gateway routes the request to the required microservice using service discovery. <br>Inside the service, the request goes through the controller, service layer, and repository to access its own database. <br>For communication between services, we use synchronous REST or asynchronous Kafka events depending on the requirement. <br>For resilience, we use Circuit Breaker, Retry, Timeout, and Bulkhead. <br>For distributed transactions, we use Saga, and each service follows Database per Service.</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#62</span></div>
+      <div class="qa-q">Observer pattern and event-driven systems</div>
+      <div class="qa-answer"><p>Observer Pattern is a design pattern where one object notifies other interested objects when its state changes.</p>
+<p>In a microservices architecture, a similar concept is used in event-driven systems, where a service publishes an event and other interested services consume that event. </p>
+<p>Observer = Direct notification<br>Event-Driven = Publish event → Consumers independently consume</p>
+<p>For example, when a payment is completed, the Payment Service publishes a PaymentCompleted event. The Booking, Notification, Audit, and Reporting Services can consume this event independently.</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#63</span></div>
+      <div class="qa-q">Adapter pattern - real-world example in microservices</div>
+      <div class="qa-answer"><p>Adapter Pattern is used when two systems have different interfaces. <br>The adapter acts as a bridge and converts one interface into another so they can communicate.<br>For example, in a Candidate Registration Portal, if our Payment Service and external payment gateway have different APIs, we use an Adapter to convert our request into the format expected by the payment gateway.</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×1</span><span class="qa-num">#69</span></div>
+      <div class="qa-q">How to develop a microservice</div>
+      <div class="qa-answer"><p>To develop a microservice, I first identify a clear business capability and define the service boundary. <br>Then I design its APIs and establish data ownership, usually following the Database per Service principle. <br>I implement the service using Spring Boot with controller, service, repository, DTO, validation, exception handling, and security layers. <br>I then add REST/gRPC or asynchronous Kafka communication as required, along with resilience patterns such as timeout, retry, and circuit breaker. <br>Finally, I add testing, logging, monitoring, Docker containerization, CI/CD through Jenkins, and deploy the service independently.</p></div>
+    </div><div class="qa-card qc-cy">
+      <div class="qa-badges"><span class="badge badge-pc">🎯 Asked in Interview ×2</span><span class="qa-num">#70</span></div>
+      <div class="qa-q">Design pattern used in your microservice?</div><div class="qa-alt">Also asked as: Design Patterns in Microservices?</div>
+      <div class="qa-answer"><p>in my microservices architecture, I use patterns based on specific requirements. <br>For client communication, I use the API Gateway pattern. <br>For service-to-service communication, I use the Service Discovery<br>For data ownership, I use Database per Service. <br>For distributed transactions, I use the Saga pattern. <br>For resilience, I use Circuit Breaker, Retry, Timeout, Fallback, and Bulkhead patterns. <br>For reliable event publishing, I use the Transactional Outbox pattern, and for high read/write workload separation, I use CQRS. <br>Within individual services, I commonly use layered architecture, Repository, DTO, and Factory patterns where appropriate.</p></div>
+    </div>
+  </div>
+
+
+  <footer>Generated from All_Study_and_Interview_Questions_Answers_List_0-10YoE.xlsx (Microservices sheet) — 74 priority-flagged questions across 11 sections.</footer>
+
+</div>
+</body>
+</html>
