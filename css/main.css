@@ -39,25 +39,12 @@
         right: 0;
         z-index: 100;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         padding: 1.2rem 5vw;
         background: rgba(10, 15, 30, 0.88);
         backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--border);
-      }
-
-      .nav-logo {
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 700;
-        font-size: 1.1rem;
-        color: var(--text);
-        text-decoration: none;
-        letter-spacing: -0.02em;
-      }
-
-      .nav-logo span {
-        color: var(--accent);
       }
 
       .nav-links {
