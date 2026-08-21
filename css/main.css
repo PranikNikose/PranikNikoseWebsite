@@ -1,5 +1,4 @@
- <style>
-      *,
+*,
       *::before,
       *::after {
         box-sizing: border-box;
@@ -1101,5 +1100,4 @@
           animation: none;
         }
       }
-    </style>
   
