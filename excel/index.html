@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Question Bank</title>
+<script>
+  // Applied before first paint to avoid a light/dark flash on load.
+  (function(){
+    try{
+      var saved = localStorage.getItem('theme');
+      var theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+    }catch(e){
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
+<style>
+  :root{
+    --bg-grad-1:#0f172a;
+    --bg-grad-2:#111827;
+    --card:#1e293b;
+    --card-2:#273549;
+    --card-3:#2f3d54;
+    --text:#e2e8f0;
+    --muted:#94a3b8;
+    --accent:#6366f1;
+    --accent-2:#818cf8;
+    --border:#334155;
+    --danger:#ef4444;
+  }
+  :root[data-theme="light"]{
+    --bg-grad-1:#f1f5f9;
+    --bg-grad-2:#e2e8f0;
+    --card:#ffffff;
+    --card-2:#f1f5f9;
+    --card-3:#e2e8f0;
+    --text:#1e293b;
+    --muted:#64748b;
+    --accent:#6366f1;
+    --accent-2:#4f46e5;
+    --border:#e2e8f0;
+    --danger:#dc2626;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(180deg,var(--bg-grad-1),var(--bg-grad-2));
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:16px;
+    transition:background .2s ease, color .2s ease;
+  }
+  .app{
+    width:100%;
+    max-width:1100px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:8px 0 0;
+    position:relative;
+  }
+  header .header-text{text-align:center;}
+  header h1{margin:0; font-size:1.6rem; letter-spacing:.5px;}
+  header p{margin:4px 0 0; color:var(--muted); font-size:.9rem;}
+  #themeToggle{
+    position:absolute;
+    right:0;
+    top:4px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--card-2);
+    color:var(--text);
+    font-size:1.1rem;
+    cursor:pointer;
+    line-height:1;
+  }
+  #themeToggle:hover{border-color:var(--accent-2);}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px;
+  }
+
+  /* ---------- toolbar / filters ---------- */
+  .toolbar{display:flex; flex-direction:column; gap:12px;}
+  .search-row label{display:block; font-size:.75rem; color:var(--muted); margin-bottom:4px;}
+  .search-row input{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--card-2);
+    color:var(--text);
+    font-size:.95rem;
+  }
+  .search-row input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+
+  .filter-buttons{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+  .filter-group{position:relative;}
+  .filter-btn{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:8px 12px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--card-2);
+    color:var(--text);
+    font-size:.85rem;
+    cursor:pointer;
+  }
+  .filter-btn:hover{border-color:var(--accent-2);}
+  .filter-btn.active{border-color:var(--accent); color:var(--accent-2);}
+  .filter-btn .count{
+    background:var(--accent);
+    color:#fff;
+    border-radius:999px;
+    font-size:.68rem;
+    padding:1px 6px;
+  }
+
+  .filter-popover{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    z-index:30;
+    width:220px;
+    max-width:80vw;
+    max-height:260px;
+    overflow-y:auto;
+    background:var(--card-3);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px;
+    box-shadow:0 12px 32px rgba(0,0,0,.5);
+  }
+  .filter-popover.open{display:block;}
+  .filter-popover .fp-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:5px 4px;
+    font-size:.85rem;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .filter-popover .fp-item:hover{background:var(--card-2);}
+  .filter-popover .fp-item.select-all{
+    border-bottom:1px solid var(--border);
+    margin-bottom:4px;
+    padding-bottom:8px;
+    font-weight:600;
+  }
+  .filter-popover input[type="checkbox"]{accent-color:var(--accent);}
+  .filter-popover .fp-actions{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px solid var(--border);
+  }
+  .filter-popover .fp-actions button{flex:1;}
+
+  button.btn{
+    padding:9px 16px;
+    border-radius:8px;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    font-size:.85rem;
+    cursor:pointer;
+  }
+  button.btn:hover{background:var(--accent-2);}
+  button.btn.ghost{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+  }
+  button.btn.ghost:hover{border-color:var(--accent-2); color:var(--accent-2);}
+  button.btn.small{padding:6px 10px; font-size:.78rem;}
+
+  .status-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:.85rem;
+    color:var(--muted);
+  }
+
+  .empty,.note{
+    text-align:center;
+    color:var(--muted);
+    font-size:.9rem;
+    padding:20px 8px;
+  }
+  .note.error{color:var(--danger);}
+
+  footer{text-align:center; color:var(--muted); font-size:.75rem; padding:6px 0 20px;}
+
+  /* ---------- desktop: excel-style table ---------- */
+  #tableView{display:none;}
+  .table-wrap{overflow-x:auto; border-radius:10px; border:1px solid var(--border);}
+  table{width:100%; border-collapse:collapse; min-width:760px;}
+  thead th{
+    position:sticky; top:0;
+    background:var(--card-2);
+    text-align:left;
+    font-size:.78rem;
+    letter-spacing:.3px;
+    text-transform:uppercase;
+    color:var(--muted);
+    padding:10px 12px;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:12px;
+    border-bottom:1px solid var(--border);
+    font-size:.88rem;
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:rgba(255,255,255,.02);}
+  td.col-srno{width:64px; color:var(--muted);}
+  td.col-category, td.col-priority{white-space:nowrap;}
+  td.col-answer{max-width:420px; white-space:pre-wrap; line-height:1.5;}
+  .answer-preview{
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .tag{
+    font-size:.72rem;
+    padding:3px 9px;
+    border-radius:999px;
+    background:var(--card-2);
+    border:1px solid var(--border);
+    color:var(--muted);
+    white-space:nowrap;
+  }
+
+  /* ---------- mobile: one record at a time ---------- */
+  #singleView{display:none; flex-direction:column; gap:12px;}
+  .field-row{display:flex; flex-direction:column; gap:2px;}
+  .field-row .field-label{font-size:.7rem; text-transform:uppercase; letter-spacing:.4px; color:var(--muted);}
+  .field-row .field-value{font-size:.95rem;}
+  .field-row.q .field-value{font-weight:600; font-size:1.05rem; line-height:1.5;}
+  .field-row.a .field-value{white-space:pre-wrap; line-height:1.6; background:var(--card-2); border:1px solid var(--border); border-radius:10px; padding:12px; font-size:.9rem;}
+  .field-inline{display:flex; gap:8px; flex-wrap:wrap;}
+  .pager{display:flex; justify-content:space-between; gap:10px;}
+  .pager .btn{flex:1;}
+
+  @media (min-width:768px){
+    #tableView{display:block;}
+    #singleView{display:none !important;}
+  }
+  @media (max-width:767.98px){
+    #tableView{display:none !important;}
+    #singleView{display:flex;}
+  }
+  @media (max-width:480px){
+    header h1{font-size:1.35rem;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="header-text">
+      <h1>Question Bank</h1>
+      <p>Loaded from <code>que.txt</code></p>
+    </div>
+    <button id="themeToggle" type="button" aria-label="Toggle dark / light mode" title="Toggle dark / light mode">🌙</button>
+  </header>
+
+  <div class="card toolbar">
+    <div class="search-row">
+      <label for="search">Search question / answer</label>
+      <input id="search" type="text" placeholder="Type to search...">
+    </div>
+    <div class="filter-buttons" id="filterButtons"></div>
+  </div>
+
+  <div class="card status-row">
+    <span id="statusText">0 questions</span>
+    <button class="btn ghost small" id="clearFiltersBtn">Clear Filters</button>
+  </div>
+
+  <!-- Desktop: excel-style table, all matching rows -->
+  <div class="card" id="tableView">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Sr. No.</th>
+            <th>Question</th>
+            <th>Category</th>
+            <th>Level</th>
+            <th>Answer</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mobile: one record at a time, all fields, with pagination -->
+  <div class="card" id="singleView">
+    <div class="field-inline">
+      <span class="tag" id="mSrNo">Sr. No.</span>
+      <span class="tag" id="mCategory">Category</span>
+      <span class="tag" id="mLevel">Level</span>
+      <span class="tag" id="mPriority">Priority</span>
+    </div>
+    <div class="field-row q">
+      <span class="field-label">Question</span>
+      <span class="field-value" id="mQuestion"></span>
+    </div>
+    <div class="field-row a" id="mAnswerRow" style="display:none;">
+      <span class="field-label">Answer</span>
+      <span class="field-value" id="mAnswer"></span>
+    </div>
+    <button class="btn" id="showAnswerBtn" type="button">Show Answer</button>
+    <div class="pager">
+      <button class="btn ghost" id="prevBtn" type="button">Previous</button>
+      <button class="btn" id="nextBtn" type="button">Next</button>
+    </div>
+  </div>
+
+  <div class="card empty" id="emptyState" style="display:none;">No questions match the current filters.</div>
+  <div class="card note" id="loadingNote">Loading questions...</div>
+
+  <footer>Data source: que.txt (Sr. No. / level / Years / Topic / Questions / Answers / Priority Count blocks separated by "|" lines). Only 1 test question is loaded while the UI is being finalized.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var FALLBACK_TEXT = 'Sr. No.\tlevel\tYears of Experince\tTopic\tQuestions\tAnswers\tPriority Count\r\n' +
+    '1\t\r\n|\r\nFresher\t0-1 Year\r\n|\r\nSpring Boot Fundamentals\r\n|\r\n' +
+    '"What is Spring Boot?"\r\n|\r\n' +
+    '"Spring Boot is an opinionated framework built on top of Spring Framework that simplifies application development by providing:\r\n' +
+    '- Auto Configuration\r\n- Embedded Server\r\n- Starter Dependencies\r\n- Production Ready Features\r\n' +
+    'Without XML and extensive configuration."\t\r\n|';
+
+  var FILTER_COLUMNS = [
+    { key: 'category', label: 'Category' },
+    { key: 'level', label: 'Level' },
+    { key: 'priority', label: 'Priority' }
+  ];
+
+  var allQuestions = [];
+  var filteredQuestions = [];
+  var currentIndex = 0;
+  var answerShown = false;
+
+  // null = no restriction (all values shown); Set = only these values shown
+  var columnFilters = { category: null, level: null, priority: null };
+  var openPopoverCol = null;
+
+  var els = {
+    search: document.getElementById('search'),
+    filterButtons: document.getElementById('filterButtons'),
+    statusText: document.getElementById('statusText'),
+    clearFiltersBtn: document.getElementById('clearFiltersBtn'),
+    tableView: document.getElementById('tableView'),
+    tableBody: document.getElementById('tableBody'),
+    singleView: document.getElementById('singleView'),
+    mSrNo: document.getElementById('mSrNo'),
+    mCategory: document.getElementById('mCategory'),
+    mLevel: document.getElementById('mLevel'),
+    mPriority: document.getElementById('mPriority'),
+    mQuestion: document.getElementById('mQuestion'),
+    mAnswerRow: document.getElementById('mAnswerRow'),
+    mAnswer: document.getElementById('mAnswer'),
+    showAnswerBtn: document.getElementById('showAnswerBtn'),
+    prevBtn: document.getElementById('prevBtn'),
+    nextBtn: document.getElementById('nextBtn'),
+    emptyState: document.getElementById('emptyState'),
+    loadingNote: document.getElementById('loadingNote')
+  };
+
+  function escapeHtml(str){
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function stripQuotes(str){
+    var s = str.trim();
+    if(s.charAt(0) === '"') s = s.slice(1);
+    if(s.charAt(s.length - 1) === '"') s = s.slice(0, -1);
+    return s.replace(/[\t\s]+$/,'').trim();
+  }
+
+  // que.txt is a tab-separated export where each cell of a record is
+  // rendered on its own line(s) and records/fields are separated by
+  // lines that are exactly "|". Columns per record:
+  // [SrNo, "level<TAB>years", Topic, "Question1\nQuestion2...", "Answer text", (optional Priority)]
+  function parseQuestions(text){
+    var norm = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    var lines = norm.split('\n');
+
+    var chunks = [];
+    var current = [];
+    var started = false;
+
+    lines.forEach(function(line){
+      if(/^sr\.?\s*no\.?/i.test(line.trim())) return; // header row
+      if(line.trim() === '|'){
+        if(started){ chunks.push(current.join('\n')); }
+        current = [];
+        return;
+      }
+      if(!started){
+        if(line.trim() === '') return; // skip leading blank lines
+        started = true;
+      }
+      current.push(line);
+    });
+    if(started && current.some(function(l){return l.trim() !== '';})){
+      chunks.push(current.join('\n'));
+    }
+
+    var records = [];
+    for(var i = 0; i + 4 < chunks.length; i += 5){
+      records.push({
+        srNo: chunks[i].trim(),
+        levelYears: chunks[i+1],
+        topic: chunks[i+2].trim(),
+        questionsRaw: chunks[i+3],
+        answersRaw: chunks[i+4]
+      });
+    }
+
+    var out = [];
+    records.forEach(function(rec){
+      var levelParts = rec.levelYears.split('\t').map(function(s){return s.trim();}).filter(Boolean);
+      var level = levelParts[0] || 'General';
+      var years = levelParts[1] || '';
+      var topic = rec.topic || 'General';
+      var answer = stripQuotes(rec.answersRaw);
+      var questionsBlock = stripQuotes(rec.questionsRaw);
+      // Priority Count isn't populated in que.txt yet, so it's blank
+      // until the source data adds it as its own "|"-delimited chunk.
+      var priority = '';
+
+      questionsBlock.split('\n')
+        .map(function(q){return q.trim();})
+        .filter(Boolean)
+        .forEach(function(q){
+          out.push({
+            srNo: rec.srNo,
+            question: q,
+            answer: answer,
+            category: topic,
+            level: level + (years ? ' (' + years + ')' : ''),
+            priority: priority
+          });
+        });
+    });
+
+    return out;
+  }
+
+  function uniqueValues(key){
+    var vals = allQuestions.map(function(q){ return q[key] || '(blank)'; });
+    return Array.from(new Set(vals)).sort();
+  }
+
+  // ---------- filter toolbar (Excel-style column filters) ----------
+
+  function buildFilterButtons(){
+    els.filterButtons.innerHTML = '';
+    FILTER_COLUMNS.forEach(function(col){
+      var group = document.createElement('div');
+      group.className = 'filter-group';
+
+      var btn = document.createElement('button');
+      btn.className = 'filter-btn';
+      btn.type = 'button';
+      btn.dataset.col = col.key;
+      btn.innerHTML = escapeHtml(col.label) + ' ▾';
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        togglePopover(col.key);
+      });
+
+      var pop = document.createElement('div');
+      pop.className = 'filter-popover';
+      pop.dataset.col = col.key;
+      pop.addEventListener('click', function(e){ e.stopPropagation(); });
+
+      group.appendChild(btn);
+      group.appendChild(pop);
+      els.filterButtons.appendChild(group);
+    });
+
+    document.addEventListener('click', function(){ closeAllPopovers(); });
+  }
+
+  function closeAllPopovers(){
+    openPopoverCol = null;
+    document.querySelectorAll('.filter-popover').forEach(function(p){ p.classList.remove('open'); });
+    document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  }
+
+  function togglePopover(colKey){
+    var willOpen = openPopoverCol !== colKey;
+    closeAllPopovers();
+    if(!willOpen) return;
+    openPopoverCol = colKey;
+
+    var pop = els.filterButtons.querySelector('.filter-popover[data-col="' + colKey + '"]');
+    var btn = els.filterButtons.querySelector('.filter-btn[data-col="' + colKey + '"]');
+    renderPopoverContent(colKey, pop);
+    pop.classList.add('open');
+    btn.classList.add('active');
+  }
+
+  function renderPopoverContent(colKey, pop){
+    var values = uniqueValues(colKey);
+    var selected = columnFilters[colKey]; // null = all selected
+    pop.innerHTML = '';
+
+    var selectAllRow = document.createElement('label');
+    selectAllRow.className = 'fp-item select-all';
+    var selectAllCb = document.createElement('input');
+    selectAllCb.type = 'checkbox';
+    selectAllCb.checked = selected === null || selected.size === values.length;
+    selectAllRow.appendChild(selectAllCb);
+    selectAllRow.appendChild(document.createTextNode('Select All'));
+    pop.appendChild(selectAllRow);
+
+    var checkboxes = [];
+    values.forEach(function(val){
+      var row = document.createElement('label');
+      row.className = 'fp-item';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = val;
+      cb.checked = selected === null || selected.has(val);
+      row.appendChild(cb);
+      row.appendChild(document.createTextNode(val));
+      pop.appendChild(row);
+      checkboxes.push(cb);
+    });
+
+    selectAllCb.addEventListener('change', function(){
+      checkboxes.forEach(function(cb){ cb.checked = selectAllCb.checked; });
+    });
+    checkboxes.forEach(function(cb){
+      cb.addEventListener('change', function(){
+        selectAllCb.checked = checkboxes.every(function(c){ return c.checked; });
+      });
+    });
+
+    var actions = document.createElement('div');
+    actions.className = 'fp-actions';
+
+    var clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'btn ghost small';
+    clearBtn.textContent = 'Clear';
+    clearBtn.addEventListener('click', function(){
+      columnFilters[colKey] = null;
+      closeAllPopovers();
+      applyFilters();
+    });
+
+    var applyBtn = document.createElement('button');
+    applyBtn.type = 'button';
+    applyBtn.className = 'btn small';
+    applyBtn.textContent = 'Apply';
+    applyBtn.addEventListener('click', function(){
+      var checked = checkboxes.filter(function(cb){ return cb.checked; }).map(function(cb){ return cb.value; });
+      columnFilters[colKey] = (checked.length === values.length) ? null : new Set(checked);
+      closeAllPopovers();
+      applyFilters();
+    });
+
+    actions.appendChild(clearBtn);
+    actions.appendChild(applyBtn);
+    pop.appendChild(actions);
+  }
+
+  function updateFilterButtonStates(){
+    FILTER_COLUMNS.forEach(function(col){
+      var btn = els.filterButtons.querySelector('.filter-btn[data-col="' + col.key + '"]');
+      if(!btn) return;
+      var active = columnFilters[col.key] !== null;
+      btn.classList.toggle('active', active);
+      var countBadge = btn.querySelector('.count');
+      if(active){
+        if(!countBadge){
+          countBadge = document.createElement('span');
+          countBadge.className = 'count';
+          btn.appendChild(countBadge);
+        }
+        countBadge.textContent = columnFilters[col.key].size;
+      } else if(countBadge){
+        countBadge.remove();
+      }
+    });
+  }
+
+  // ---------- filtering + rendering ----------
+
+  function applyFilters(){
+    var searchTerm = els.search.value.trim().toLowerCase();
+
+    filteredQuestions = allQuestions.filter(function(q){
+      var matchesSearch = !searchTerm ||
+        q.question.toLowerCase().indexOf(searchTerm) !== -1 ||
+        q.answer.toLowerCase().indexOf(searchTerm) !== -1;
+
+      var matchesCols = FILTER_COLUMNS.every(function(col){
+        var sel = columnFilters[col.key];
+        if(sel === null) return true;
+        var val = q[col.key] || '(blank)';
+        return sel.has(val);
+      });
+
+      return matchesSearch && matchesCols;
+    });
+
+    currentIndex = 0;
+    updateFilterButtonStates();
+
+    if(filteredQuestions.length === 0){
+      els.emptyState.style.display = 'block';
+      els.tableBody.innerHTML = '';
+      updateStatus();
+      return;
+    }
+
+    els.emptyState.style.display = 'none';
+    renderTable();
+    renderSingle();
+    updateStatus();
+  }
+
+  function updateStatus(){
+    var total = filteredQuestions.length;
+    els.statusText.textContent = total === 0 ? '0 questions' :
+      (total + ' question' + (total === 1 ? '' : 's') + ' matched');
+  }
+
+  // Desktop: excel-style table, every matching row shown at once.
+  function renderTable(){
+    els.tableBody.innerHTML = '';
+    filteredQuestions.forEach(function(q){
+      var tr = document.createElement('tr');
+
+      var tdSrNo = document.createElement('td');
+      tdSrNo.className = 'col-srno';
+      tdSrNo.textContent = q.srNo || '-';
+
+      var tdQuestion = document.createElement('td');
+      tdQuestion.textContent = q.question;
+
+      var tdCategory = document.createElement('td');
+      tdCategory.className = 'col-category';
+      tdCategory.innerHTML = '<span class="tag">' + escapeHtml(q.category) + '</span>';
+
+      var tdLevel = document.createElement('td');
+      tdLevel.className = 'col-category';
+      tdLevel.innerHTML = '<span class="tag">' + escapeHtml(q.level) + '</span>';
+
+      var tdAnswer = document.createElement('td');
+      tdAnswer.className = 'col-answer';
+      var preview = document.createElement('div');
+      preview.className = 'answer-preview';
+      preview.textContent = q.answer;
+      var toggle = document.createElement('button');
+      toggle.className = 'btn ghost small';
+      toggle.type = 'button';
+      toggle.style.marginTop = '6px';
+      toggle.textContent = 'Show full';
+      toggle.addEventListener('click', function(){
+        preview.classList.toggle('answer-preview');
+        var isClamped = preview.classList.contains('answer-preview');
+        toggle.textContent = isClamped ? 'Show full' : 'Show less';
+      });
+      tdAnswer.appendChild(preview);
+      tdAnswer.appendChild(toggle);
+
+      var tdPriority = document.createElement('td');
+      tdPriority.className = 'col-priority';
+      tdPriority.textContent = q.priority || '—';
+
+      tr.appendChild(tdSrNo);
+      tr.appendChild(tdQuestion);
+      tr.appendChild(tdCategory);
+      tr.appendChild(tdLevel);
+      tr.appendChild(tdAnswer);
+      tr.appendChild(tdPriority);
+      els.tableBody.appendChild(tr);
+    });
+  }
+
+  // Mobile: one record at a time, all fields, Previous/Next pagination.
+  function renderSingle(){
+    answerShown = false;
+    var q = filteredQuestions[currentIndex];
+    els.mSrNo.textContent = 'Sr. No. ' + (q.srNo || '-');
+    els.mCategory.textContent = q.category;
+    els.mLevel.textContent = q.level;
+    els.mPriority.textContent = 'Priority: ' + (q.priority || '—');
+    els.mQuestion.textContent = q.question;
+    els.mAnswer.textContent = q.answer;
+    els.mAnswerRow.style.display = 'none';
+    els.showAnswerBtn.textContent = 'Show Answer';
+
+    els.prevBtn.disabled = currentIndex === 0;
+    els.nextBtn.disabled = currentIndex === filteredQuestions.length - 1;
+  }
+
+  function toggleAnswer(){
+    answerShown = !answerShown;
+    els.mAnswerRow.style.display = answerShown ? 'flex' : 'none';
+    els.showAnswerBtn.textContent = answerShown ? 'Hide Answer' : 'Show Answer';
+  }
+
+  function goPrev(){
+    if(currentIndex > 0){ currentIndex--; renderSingle(); updateStatus(); }
+  }
+  function goNext(){
+    if(currentIndex < filteredQuestions.length - 1){ currentIndex++; renderSingle(); updateStatus(); }
+  }
+
+  function clearAllFilters(){
+    columnFilters = { category: null, level: null, priority: null };
+    els.search.value = '';
+    applyFilters();
+  }
+
+  function init(text, source){
+    allQuestions = parseQuestions(text);
+    els.loadingNote.style.display = 'none';
+
+    if(allQuestions.length === 0){
+      els.loadingNote.style.display = 'block';
+      els.loadingNote.className = 'card note error';
+      els.loadingNote.textContent = 'No valid questions found.';
+      return;
+    }
+
+    if(source === 'fallback'){
+      els.loadingNote.style.display = 'block';
+      els.loadingNote.className = 'card note error';
+      els.loadingNote.textContent = 'Could not load que.txt (browsers block local file fetches). Serve this folder with a local server, e.g. "npx serve" or "python -m http.server", then open index.html via http://localhost. Showing a built-in fallback question for now.';
+    }
+
+    buildFilterButtons();
+    applyFilters();
+  }
+
+  els.search.addEventListener('input', applyFilters);
+  els.clearFiltersBtn.addEventListener('click', clearAllFilters);
+  els.showAnswerBtn.addEventListener('click', toggleAnswer);
+  els.prevBtn.addEventListener('click', goPrev);
+  els.nextBtn.addEventListener('click', goNext);
+
+  fetch('que.txt')
+    .then(function(res){
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      return res.text();
+    })
+    .then(function(text){ init(text, 'fetch'); })
+    .catch(function(){ init(FALLBACK_TEXT, 'fallback'); });
+
+})();
+</script>
+</body>
+</html>
