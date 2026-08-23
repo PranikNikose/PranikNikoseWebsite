@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
 <title>Question Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
   // Applied before first paint to avoid a light/dark flash on load.
   (function(){
@@ -19,100 +22,170 @@
 </script>
 <style>
   :root{
-    --bg-grad-1:#0f172a;
-    --bg-grad-2:#111827;
-    --card:#1e293b;
-    --card-2:#273549;
-    --card-3:#2f3d54;
-    --text:#e2e8f0;
-    --muted:#94a3b8;
-    --accent:#6366f1;
-    --accent-2:#818cf8;
-    --border:#334155;
-    --danger:#ef4444;
+    --bg-grad-1:#0b1120;
+    --bg-grad-2:#0f172a;
+    --surface:#161f36;
+    --surface-2:#1c2740;
+    --surface-3:#24304d;
+    --text:#e7ecf7;
+    --muted:#8b96ad;
+    --accent:#7c6ef2;
+    --accent-2:#9b8ffb;
+    --accent-soft:rgba(124,110,242,.16);
+    --border:rgba(255,255,255,.08);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -12px rgba(0,0,0,.55);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+    --danger:#f87171;
+    --tag-cat-bg:rgba(124,110,242,.16); --tag-cat-fg:#b4abfa;
+    --tag-lvl-bg:rgba(45,212,191,.14); --tag-lvl-fg:#5eead4;
+    --tag-pri-bg:rgba(251,191,36,.14); --tag-pri-fg:#fcd34d;
+    --tag-sr-bg:rgba(148,163,184,.14); --tag-sr-fg:#cbd5e1;
   }
   :root[data-theme="light"]{
-    --bg-grad-1:#f1f5f9;
-    --bg-grad-2:#e2e8f0;
-    --card:#ffffff;
-    --card-2:#f1f5f9;
-    --card-3:#e2e8f0;
-    --text:#1e293b;
-    --muted:#64748b;
-    --accent:#6366f1;
-    --accent-2:#4f46e5;
-    --border:#e2e8f0;
+    --bg-grad-1:#f4f6fb;
+    --bg-grad-2:#e9edf6;
+    --surface:#ffffff;
+    --surface-2:#f6f7fb;
+    --surface-3:#eef0f7;
+    --text:#1c2333;
+    --muted:#6b7386;
+    --accent:#6a5cf0;
+    --accent-2:#5647e0;
+    --accent-soft:rgba(106,92,240,.1);
+    --border:rgba(28,35,51,.08);
+    --shadow:0 1px 2px rgba(28,35,51,.04), 0 16px 32px -16px rgba(28,35,51,.16);
+    --shadow-sm:0 1px 2px rgba(28,35,51,.06);
     --danger:#dc2626;
+    --tag-cat-bg:rgba(106,92,240,.1); --tag-cat-fg:#5647e0;
+    --tag-lvl-bg:rgba(13,148,136,.1); --tag-lvl-fg:#0f766e;
+    --tag-pri-bg:rgba(217,119,6,.12); --tag-pri-fg:#b45309;
+    --tag-sr-bg:rgba(100,116,139,.1); --tag-sr-fg:#475569;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:linear-gradient(180deg,var(--bg-grad-1),var(--bg-grad-2));
     color:var(--text);
     min-height:100vh;
     display:flex;
     justify-content:center;
-    padding:16px;
+    padding:20px 16px 40px;
+    -webkit-font-smoothing:antialiased;
     transition:background .2s ease, color .2s ease;
   }
   .app{
     width:100%;
-    max-width:1100px;
+    max-width:1080px;
     display:flex;
     flex-direction:column;
-    gap:16px;
+    gap:18px;
   }
+
+  /* ---------- header ---------- */
   header{
     display:flex;
     align-items:center;
-    justify-content:center;
-    gap:10px;
-    padding:8px 0 0;
-    position:relative;
+    justify-content:space-between;
+    gap:12px;
+    padding:6px 2px;
   }
-  header .header-text{text-align:center;}
-  header h1{margin:0; font-size:1.6rem; letter-spacing:.5px;}
-  header p{margin:4px 0 0; color:var(--muted); font-size:.9rem;}
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#fff;
+    font-size:1.15rem;
+    box-shadow:var(--shadow-sm);
+    flex-shrink:0;
+  }
+  header h1{margin:0; font-size:1.3rem; font-weight:700; letter-spacing:-.01em;}
+  header p{margin:2px 0 0; color:var(--muted); font-size:.82rem;}
   #themeToggle{
-    position:absolute;
-    right:0;
-    top:4px;
     display:flex;
     align-items:center;
     justify-content:center;
     width:40px;
     height:40px;
-    border-radius:999px;
+    border-radius:12px;
     border:1px solid var(--border);
-    background:var(--card-2);
+    background:var(--surface);
     color:var(--text);
-    font-size:1.1rem;
+    font-size:1.05rem;
     cursor:pointer;
     line-height:1;
+    box-shadow:var(--shadow-sm);
+    transition:border-color .15s ease, transform .1s ease;
+    flex-shrink:0;
   }
-  #themeToggle:hover{border-color:var(--accent-2);}
+  #themeToggle:hover{border-color:var(--accent-2); transform:translateY(-1px);}
+  #themeToggle:active{transform:translateY(0);}
 
   .card{
-    background:var(--card);
+    background:var(--surface);
     border:1px solid var(--border);
-    border-radius:14px;
-    padding:16px;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:var(--shadow);
   }
 
   /* ---------- toolbar / filters ---------- */
-  .toolbar{display:flex; flex-direction:column; gap:12px;}
-  .search-row label{display:block; font-size:.75rem; color:var(--muted); margin-bottom:4px;}
+  .toolbar{display:flex; flex-direction:column; gap:14px;}
+  .search-row{position:relative;}
+  .search-row label{
+    display:block; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.04em;
+    color:var(--muted); margin-bottom:6px;
+  }
+  .search-row .search-input-wrap{position:relative;}
+  .search-row .search-icon{
+    position:absolute; left:13px; top:50%; transform:translateY(-50%);
+    color:var(--muted); pointer-events:none; font-size:.95rem;
+  }
   .search-row input{
     width:100%;
-    padding:10px 12px;
-    border-radius:10px;
+    padding:11px 12px 11px 36px;
+    border-radius:11px;
     border:1px solid var(--border);
-    background:var(--card-2);
+    background:var(--surface-2);
     color:var(--text);
-    font-size:.95rem;
+    font-family:inherit;
+    font-size:.92rem;
+    transition:border-color .15s ease, box-shadow .15s ease;
   }
-  .search-row input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .search-row input::placeholder{color:var(--muted);}
+  .search-row input:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+
+  .sheet-row{display:flex; flex-direction:column; gap:6px;}
+  .sheet-row label{
+    display:block; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.04em;
+    color:var(--muted);
+  }
+  .sheet-row select{
+    width:100%;
+    padding:11px 12px;
+    border-radius:11px;
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    color:var(--text);
+    font-family:inherit;
+    font-size:.92rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .sheet-row select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
 
   .filter-buttons{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
   .filter-group{position:relative;}
@@ -120,58 +193,62 @@
     display:flex;
     align-items:center;
     gap:6px;
-    padding:8px 12px;
-    border-radius:8px;
+    padding:7px 12px;
+    border-radius:999px;
     border:1px solid var(--border);
-    background:var(--card-2);
+    background:var(--surface-2);
     color:var(--text);
-    font-size:.85rem;
+    font-family:inherit;
+    font-size:.82rem;
+    font-weight:500;
     cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, color .15s ease;
   }
   .filter-btn:hover{border-color:var(--accent-2);}
-  .filter-btn.active{border-color:var(--accent); color:var(--accent-2);}
+  .filter-btn.active{border-color:var(--accent); color:var(--accent); background:var(--accent-soft);}
   .filter-btn .count{
     background:var(--accent);
     color:#fff;
     border-radius:999px;
-    font-size:.68rem;
+    font-size:.66rem;
+    font-weight:600;
     padding:1px 6px;
   }
 
   .filter-popover{
     display:none;
     position:absolute;
-    top:calc(100% + 6px);
+    top:calc(100% + 8px);
     left:0;
     z-index:30;
     width:220px;
     max-width:80vw;
     max-height:260px;
     overflow-y:auto;
-    background:var(--card-3);
+    background:var(--surface-3);
     border:1px solid var(--border);
-    border-radius:10px;
+    border-radius:12px;
     padding:10px;
-    box-shadow:0 12px 32px rgba(0,0,0,.5);
+    box-shadow:var(--shadow);
   }
   .filter-popover.open{display:block;}
   .filter-popover .fp-item{
     display:flex;
     align-items:center;
     gap:8px;
-    padding:5px 4px;
+    padding:6px 6px;
     font-size:.85rem;
-    border-radius:6px;
+    border-radius:8px;
     cursor:pointer;
   }
-  .filter-popover .fp-item:hover{background:var(--card-2);}
+  .filter-popover .fp-item:hover{background:var(--surface-2);}
   .filter-popover .fp-item.select-all{
     border-bottom:1px solid var(--border);
     margin-bottom:4px;
-    padding-bottom:8px;
+    padding-bottom:9px;
     font-weight:600;
   }
-  .filter-popover input[type="checkbox"]{accent-color:var(--accent);}
+  .filter-popover input[type="checkbox"]{accent-color:var(--accent); width:15px; height:15px;}
   .filter-popover .fp-actions{
     display:flex;
     gap:8px;
@@ -182,91 +259,114 @@
   .filter-popover .fp-actions button{flex:1;}
 
   button.btn{
-    padding:9px 16px;
-    border-radius:8px;
+    padding:10px 18px;
+    border-radius:10px;
     border:none;
     background:var(--accent);
     color:#fff;
+    font-family:inherit;
     font-size:.85rem;
+    font-weight:600;
     cursor:pointer;
+    box-shadow:var(--shadow-sm);
+    transition:background .15s ease, transform .1s ease, box-shadow .15s ease;
   }
-  button.btn:hover{background:var(--accent-2);}
+  button.btn:hover{background:var(--accent-2); box-shadow:0 4px 14px -4px var(--accent-soft);}
+  button.btn:active{transform:translateY(1px);}
   button.btn.ghost{
     background:transparent;
     border:1px solid var(--border);
     color:var(--text);
+    box-shadow:none;
   }
-  button.btn.ghost:hover{border-color:var(--accent-2); color:var(--accent-2);}
-  button.btn.small{padding:6px 10px; font-size:.78rem;}
+  button.btn.ghost:hover{border-color:var(--accent-2); color:var(--accent-2); background:var(--accent-soft);}
+  button.btn.small{padding:6px 11px; font-size:.78rem; border-radius:8px;}
+  button.btn:disabled{opacity:.4; cursor:not-allowed; transform:none; box-shadow:none;}
 
   .status-row{
     display:flex;
+    align-items:center;
     justify-content:space-between;
-    font-size:.85rem;
+    font-size:.82rem;
     color:var(--muted);
+    padding:14px 18px;
   }
+  .status-row .status-text{font-weight:500;}
+  .clear-link{
+    background:none; border:none; color:var(--accent); font-family:inherit;
+    font-size:.82rem; font-weight:600; cursor:pointer; padding:4px;
+  }
+  .clear-link:hover{color:var(--accent-2); text-decoration:underline;}
 
   .empty,.note{
     text-align:center;
     color:var(--muted);
-    font-size:.9rem;
-    padding:20px 8px;
+    font-size:.88rem;
+    padding:32px 16px;
   }
+  .empty .empty-icon{font-size:1.8rem; display:block; margin-bottom:8px;}
   .note.error{color:var(--danger);}
 
-  footer{text-align:center; color:var(--muted); font-size:.75rem; padding:6px 0 20px;}
+  footer{text-align:center; color:var(--muted); font-size:.74rem; padding:4px 12px 8px; line-height:1.5;}
 
   /* ---------- desktop: excel-style table ---------- */
-  #tableView{display:none;}
-  .table-wrap{overflow-x:auto; border-radius:10px; border:1px solid var(--border);}
+  #tableView{display:none; padding:0; overflow:hidden;}
+  .table-wrap{overflow-x:auto;}
   table{width:100%; border-collapse:collapse; min-width:760px;}
   thead th{
     position:sticky; top:0;
-    background:var(--card-2);
+    background:var(--surface-2);
     text-align:left;
-    font-size:.78rem;
-    letter-spacing:.3px;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.05em;
     text-transform:uppercase;
     color:var(--muted);
-    padding:10px 12px;
+    padding:13px 14px;
     border-bottom:1px solid var(--border);
     white-space:nowrap;
   }
   tbody td{
-    padding:12px;
+    padding:14px;
     border-bottom:1px solid var(--border);
-    font-size:.88rem;
+    font-size:.86rem;
+    line-height:1.5;
     vertical-align:top;
   }
   tbody tr:last-child td{border-bottom:none;}
-  tbody tr:hover{background:rgba(255,255,255,.02);}
-  td.col-srno{width:64px; color:var(--muted);}
+  tbody tr{transition:background .1s ease;}
+  tbody tr:hover{background:var(--surface-2);}
+  td.col-srno{width:60px; color:var(--muted); font-variant-numeric:tabular-nums;}
   td.col-category, td.col-priority{white-space:nowrap;}
-  td.col-answer{max-width:420px; white-space:pre-wrap; line-height:1.5;}
+  td.col-answer{max-width:420px; white-space:pre-wrap;}
   .answer-preview{
     display:-webkit-box;
     -webkit-line-clamp:2;
     -webkit-box-orient:vertical;
     overflow:hidden;
+    color:var(--text);
   }
   .tag{
+    display:inline-flex;
     font-size:.72rem;
-    padding:3px 9px;
+    font-weight:600;
+    padding:4px 10px;
     border-radius:999px;
-    background:var(--card-2);
-    border:1px solid var(--border);
-    color:var(--muted);
     white-space:nowrap;
   }
+  .tag-category{background:var(--tag-cat-bg); color:var(--tag-cat-fg);}
+  .tag-level{background:var(--tag-lvl-bg); color:var(--tag-lvl-fg);}
+  .tag-priority{background:var(--tag-pri-bg); color:var(--tag-pri-fg);}
+  .tag-srno{background:var(--tag-sr-bg); color:var(--tag-sr-fg);}
 
   /* ---------- mobile: one record at a time ---------- */
-  #singleView{display:none; flex-direction:column; gap:12px;}
-  .field-row{display:flex; flex-direction:column; gap:2px;}
-  .field-row .field-label{font-size:.7rem; text-transform:uppercase; letter-spacing:.4px; color:var(--muted);}
+  #singleView{display:none; flex-direction:column; gap:14px;}
+  .field-row{display:flex; flex-direction:column; gap:4px;}
+  .field-row .field-label{font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--muted);}
   .field-row .field-value{font-size:.95rem;}
-  .field-row.q .field-value{font-weight:600; font-size:1.05rem; line-height:1.5;}
-  .field-row.a .field-value{white-space:pre-wrap; line-height:1.6; background:var(--card-2); border:1px solid var(--border); border-radius:10px; padding:12px; font-size:.9rem;}
-  .field-inline{display:flex; gap:8px; flex-wrap:wrap;}
+  .field-row.q .field-value{font-weight:600; font-size:1.1rem; line-height:1.5;}
+  .field-row.a .field-value{white-space:pre-wrap; line-height:1.65; background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:14px; font-size:.9rem;}
+  .field-inline{display:flex; gap:6px; flex-wrap:wrap;}
   .pager{display:flex; justify-content:space-between; gap:10px;}
   .pager .btn{flex:1;}
 
@@ -279,31 +379,42 @@
     #singleView{display:flex;}
   }
   @media (max-width:480px){
-    header h1{font-size:1.35rem;}
+    header h1{font-size:1.15rem;}
+    .card{padding:14px; border-radius:14px;}
   }
 </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <div class="header-text">
-      <h1>Question Bank</h1>
-      <p>Loaded from <code>que.txt</code></p>
+    <div class="brand">
+      <div class="brand-mark">📚</div>
+      <div>
+        <h1>Question Bank</h1>
+        <p>Loaded from <code>que.txt</code></p>
+      </div>
     </div>
     <button id="themeToggle" type="button" aria-label="Toggle dark / light mode" title="Toggle dark / light mode">🌙</button>
   </header>
 
   <div class="card toolbar">
+    <div class="sheet-row">
+      <label for="sheetSelect">Sheet</label>
+      <select id="sheetSelect"></select>
+    </div>
     <div class="search-row">
       <label for="search">Search question / answer</label>
-      <input id="search" type="text" placeholder="Type to search...">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input id="search" type="text" placeholder="Type to search...">
+      </div>
     </div>
     <div class="filter-buttons" id="filterButtons"></div>
   </div>
 
   <div class="card status-row">
-    <span id="statusText">0 questions</span>
-    <button class="btn ghost small" id="clearFiltersBtn">Clear Filters</button>
+    <span class="status-text" id="statusText">0 questions</span>
+    <button class="clear-link" id="clearFiltersBtn" type="button">Clear Filters</button>
   </div>
 
   <!-- Desktop: excel-style table, all matching rows -->
@@ -313,11 +424,11 @@
         <thead>
           <tr>
             <th>Sr. No.</th>
-            <th>Question</th>
             <th>Category</th>
             <th>Level</th>
-            <th>Answer</th>
+            <th>Question</th>
             <th>Priority</th>
+            <th>Answer</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -325,33 +436,45 @@
     </div>
   </div>
 
-  <!-- Mobile: one record at a time, all fields, with pagination -->
+  <!-- Mobile: one record at a time, every field always visible, with pagination -->
   <div class="card" id="singleView">
-    <div class="field-inline">
-      <span class="tag" id="mSrNo">Sr. No.</span>
-      <span class="tag" id="mCategory">Category</span>
-      <span class="tag" id="mLevel">Level</span>
-      <span class="tag" id="mPriority">Priority</span>
+    <div class="field-row">
+      <span class="field-label">Sr. No.</span>
+      <span class="field-value" id="mSrNo"></span>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Category</span>
+      <span class="field-value"><span class="tag tag-category" id="mCategory"></span></span>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Level</span>
+      <span class="field-value"><span class="tag tag-level" id="mLevel"></span></span>
     </div>
     <div class="field-row q">
       <span class="field-label">Question</span>
       <span class="field-value" id="mQuestion"></span>
     </div>
-    <div class="field-row a" id="mAnswerRow" style="display:none;">
+    <div class="field-row">
+      <span class="field-label">Priority</span>
+      <span class="field-value"><span class="tag tag-priority" id="mPriority"></span></span>
+    </div>
+    <div class="field-row a">
       <span class="field-label">Answer</span>
       <span class="field-value" id="mAnswer"></span>
     </div>
-    <button class="btn" id="showAnswerBtn" type="button">Show Answer</button>
     <div class="pager">
       <button class="btn ghost" id="prevBtn" type="button">Previous</button>
       <button class="btn" id="nextBtn" type="button">Next</button>
     </div>
   </div>
 
-  <div class="card empty" id="emptyState" style="display:none;">No questions match the current filters.</div>
+  <div class="card empty" id="emptyState" style="display:none;">
+    <span class="empty-icon">🗂️</span>
+    No questions match the current filters.
+  </div>
   <div class="card note" id="loadingNote">Loading questions...</div>
 
-  <footer>Data source: que.txt (Sr. No. / level / Years / Topic / Questions / Answers / Priority Count blocks separated by "|" lines). Only 1 test question is loaded while the UI is being finalized.</footer>
+  <footer>Data source: que.txt (Sr. No. / level / Years / Topic / Questions / Answers / Priority Count blocks separated by "|" lines). Use the Sheet selector to switch between Excel topics/tabs.</footer>
 </div>
 
 <script>
@@ -360,13 +483,15 @@
 
   var FALLBACK_TEXT = 'Sr. No.\tlevel\tYears of Experince\tTopic\tQuestions\tAnswers\tPriority Count\r\n' +
     '1\t\r\n|\r\nFresher\t0-1 Year\r\n|\r\nSpring Boot Fundamentals\r\n|\r\n' +
-    '"What is Spring Boot?"\r\n|\r\n' +
+    '"What is Spring Boot?\r\nWhat problem Spring Boot solves?\r\nWhy Spring Boot over Spring MVC?\r\n' +
+    'Why is Spring Boot popular in enterprise application development?"\r\n|\r\n' +
     '"Spring Boot is an opinionated framework built on top of Spring Framework that simplifies application development by providing:\r\n' +
     '- Auto Configuration\r\n- Embedded Server\r\n- Starter Dependencies\r\n- Production Ready Features\r\n' +
     'Without XML and extensive configuration."\t\r\n|';
 
+  // Category/Topic is treated as the "Sheet" (like an Excel tab) and
+  // selected via the Sheet dropdown, not a column filter popover.
   var FILTER_COLUMNS = [
-    { key: 'category', label: 'Category' },
     { key: 'level', label: 'Level' },
     { key: 'priority', label: 'Priority' }
   ];
@@ -374,14 +499,15 @@
   var allQuestions = [];
   var filteredQuestions = [];
   var currentIndex = 0;
-  var answerShown = false;
 
+  var selectedSheet = 'all';
   // null = no restriction (all values shown); Set = only these values shown
-  var columnFilters = { category: null, level: null, priority: null };
+  var columnFilters = { level: null, priority: null };
   var openPopoverCol = null;
 
   var els = {
     themeToggle: document.getElementById('themeToggle'),
+    sheetSelect: document.getElementById('sheetSelect'),
     search: document.getElementById('search'),
     filterButtons: document.getElementById('filterButtons'),
     statusText: document.getElementById('statusText'),
@@ -394,9 +520,7 @@
     mLevel: document.getElementById('mLevel'),
     mPriority: document.getElementById('mPriority'),
     mQuestion: document.getElementById('mQuestion'),
-    mAnswerRow: document.getElementById('mAnswerRow'),
     mAnswer: document.getElementById('mAnswer'),
-    showAnswerBtn: document.getElementById('showAnswerBtn'),
     prevBtn: document.getElementById('prevBtn'),
     nextBtn: document.getElementById('nextBtn'),
     emptyState: document.getElementById('emptyState'),
@@ -506,6 +630,15 @@
   function uniqueValues(key){
     var vals = allQuestions.map(function(q){ return q[key] || '(blank)'; });
     return Array.from(new Set(vals)).sort();
+  }
+
+  // ---------- sheet selector (one "sheet" per Excel Topic/tab) ----------
+
+  function populateSheetSelect(){
+    var sheets = uniqueValues('category');
+    els.sheetSelect.innerHTML = '<option value="all">All Sheets</option>' +
+      sheets.map(function(s){ return '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>'; }).join('');
+    els.sheetSelect.value = selectedSheet;
   }
 
   // ---------- filter toolbar (Excel-style column filters) ----------
@@ -650,6 +783,8 @@
     var searchTerm = els.search.value.trim().toLowerCase();
 
     filteredQuestions = allQuestions.filter(function(q){
+      var matchesSheet = selectedSheet === 'all' || q.category === selectedSheet;
+
       var matchesSearch = !searchTerm ||
         q.question.toLowerCase().indexOf(searchTerm) !== -1 ||
         q.answer.toLowerCase().indexOf(searchTerm) !== -1;
@@ -661,7 +796,7 @@
         return sel.has(val);
       });
 
-      return matchesSearch && matchesCols;
+      return matchesSheet && matchesSearch && matchesCols;
     });
 
     currentIndex = 0;
@@ -696,16 +831,16 @@
       tdSrNo.className = 'col-srno';
       tdSrNo.textContent = q.srNo || '-';
 
-      var tdQuestion = document.createElement('td');
-      tdQuestion.textContent = q.question;
-
       var tdCategory = document.createElement('td');
       tdCategory.className = 'col-category';
-      tdCategory.innerHTML = '<span class="tag">' + escapeHtml(q.category) + '</span>';
+      tdCategory.innerHTML = '<span class="tag tag-category">' + escapeHtml(q.category) + '</span>';
 
       var tdLevel = document.createElement('td');
       tdLevel.className = 'col-category';
-      tdLevel.innerHTML = '<span class="tag">' + escapeHtml(q.level) + '</span>';
+      tdLevel.innerHTML = '<span class="tag tag-level">' + escapeHtml(q.level) + '</span>';
+
+      var tdQuestion = document.createElement('td');
+      tdQuestion.textContent = q.question;
 
       var tdAnswer = document.createElement('td');
       tdAnswer.className = 'col-answer';
@@ -730,36 +865,27 @@
       tdPriority.textContent = q.priority || '—';
 
       tr.appendChild(tdSrNo);
-      tr.appendChild(tdQuestion);
       tr.appendChild(tdCategory);
       tr.appendChild(tdLevel);
-      tr.appendChild(tdAnswer);
+      tr.appendChild(tdQuestion);
       tr.appendChild(tdPriority);
+      tr.appendChild(tdAnswer);
       els.tableBody.appendChild(tr);
     });
   }
 
-  // Mobile: one record at a time, all fields, Previous/Next pagination.
+  // Mobile: one record at a time, every field always visible, Previous/Next pagination.
   function renderSingle(){
-    answerShown = false;
     var q = filteredQuestions[currentIndex];
-    els.mSrNo.textContent = 'Sr. No. ' + (q.srNo || '-');
+    els.mSrNo.textContent = q.srNo || '-';
     els.mCategory.textContent = q.category;
     els.mLevel.textContent = q.level;
-    els.mPriority.textContent = 'Priority: ' + (q.priority || '—');
+    els.mPriority.textContent = q.priority || '—';
     els.mQuestion.textContent = q.question;
     els.mAnswer.textContent = q.answer;
-    els.mAnswerRow.style.display = 'none';
-    els.showAnswerBtn.textContent = 'Show Answer';
 
     els.prevBtn.disabled = currentIndex === 0;
     els.nextBtn.disabled = currentIndex === filteredQuestions.length - 1;
-  }
-
-  function toggleAnswer(){
-    answerShown = !answerShown;
-    els.mAnswerRow.style.display = answerShown ? 'flex' : 'none';
-    els.showAnswerBtn.textContent = answerShown ? 'Hide Answer' : 'Show Answer';
   }
 
   function goPrev(){
@@ -770,7 +896,9 @@
   }
 
   function clearAllFilters(){
-    columnFilters = { category: null, level: null, priority: null };
+    columnFilters = { level: null, priority: null };
+    selectedSheet = 'all';
+    els.sheetSelect.value = 'all';
     els.search.value = '';
     applyFilters();
   }
@@ -792,6 +920,7 @@
       els.loadingNote.textContent = 'Could not load que.txt (browsers block local file fetches). Serve this folder with a local server, e.g. "npx serve" or "python -m http.server", then open index.html via http://localhost. Showing a built-in fallback question for now.';
     }
 
+    populateSheetSelect();
     buildFilterButtons();
     applyFilters();
   }
@@ -799,9 +928,12 @@
   applyThemeIcon();
   els.themeToggle.addEventListener('click', toggleTheme);
 
+  els.sheetSelect.addEventListener('change', function(){
+    selectedSheet = els.sheetSelect.value;
+    applyFilters();
+  });
   els.search.addEventListener('input', applyFilters);
   els.clearFiltersBtn.addEventListener('click', clearAllFilters);
-  els.showAnswerBtn.addEventListener('click', toggleAnswer);
   els.prevBtn.addEventListener('click', goPrev);
   els.nextBtn.addEventListener('click', goNext);
 
