@@ -85,12 +85,13 @@
   /* ---------- header ---------- */
   header{
     display:flex;
+    flex-wrap:wrap;
     align-items:center;
     justify-content:space-between;
     gap:12px;
     padding:6px 2px;
   }
-  .brand{display:flex; align-items:center; gap:12px;}
+  .brand{display:flex; align-items:center; gap:12px; min-width:0;}
   .brand-mark{
     width:40px; height:40px;
     display:flex; align-items:center; justify-content:center;
@@ -122,6 +123,73 @@
   }
   #themeToggle:hover{border-color:var(--accent-2); transform:translateY(-1px);}
   #themeToggle:active{transform:translateY(0);}
+  .header-actions{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+  #interviewOpenBtn{white-space:nowrap;}
+
+  /* ---------- interview mode: config modal ---------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:rgba(6,10,20,.55);
+    backdrop-filter:blur(2px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+  }
+  .modal{
+    width:100%;
+    max-width:420px;
+    max-height:88vh;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .modal-header{display:flex; align-items:center; justify-content:space-between;}
+  .modal-header h2{margin:0; font-size:1.1rem; font-weight:700;}
+  .modal-close{
+    background:none; border:none; color:var(--muted);
+    font-size:1rem; cursor:pointer; padding:4px; line-height:1;
+  }
+  .modal-close:hover{color:var(--text);}
+  .modal-sub{margin:-8px 0 0; color:var(--muted); font-size:.85rem;}
+  .modal-section{display:flex; flex-direction:column; gap:8px;}
+  .modal-section-label{
+    font-size:.72rem; font-weight:600; text-transform:uppercase;
+    letter-spacing:.04em; color:var(--muted);
+  }
+  .checkbox-list{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    max-height:170px;
+    overflow-y:auto;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:6px;
+    background:var(--surface-2);
+  }
+  .checkbox-list label{
+    display:flex; align-items:center; gap:8px;
+    padding:6px 6px; border-radius:8px; font-size:.86rem; cursor:pointer;
+  }
+  .checkbox-list label:hover{background:var(--surface-3);}
+  .checkbox-list label.select-all{border-bottom:1px solid var(--border); margin-bottom:2px; padding-bottom:8px; font-weight:600;}
+  .checkbox-list input[type="checkbox"]{accent-color:var(--accent); width:15px; height:15px;}
+  .modal-toggle-row{display:flex; align-items:center; gap:8px; font-size:.9rem; font-weight:500; cursor:pointer;}
+  .modal-toggle-row input{accent-color:var(--accent); width:17px; height:17px;}
+  .modal-error{
+    background:rgba(248,113,113,.12); color:var(--danger);
+    border-radius:10px; padding:10px 12px; font-size:.85rem;
+  }
+  .modal-actions{display:flex; justify-content:flex-end; gap:8px;}
+  .modal-actions .btn{flex:0 0 auto;}
+
+  /* ---------- interview mode: active session ---------- */
+  .interview-topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  #interviewCard{display:flex; flex-direction:column; gap:14px;}
 
   .card{
     background:var(--surface);
@@ -337,7 +405,7 @@
   tbody tr{transition:background .1s ease;}
   tbody tr:hover{background:var(--surface-2);}
   td.col-srno{width:60px; color:var(--muted); font-variant-numeric:tabular-nums;}
-  td.col-category, td.col-priority{white-space:nowrap;}
+  td.col-category, td.col-level, td.col-priority{white-space:nowrap;}
   td.col-answer{max-width:420px; white-space:pre-wrap;}
   .answer-preview{
     display:-webkit-box;
@@ -381,6 +449,8 @@
   @media (max-width:480px){
     header h1{font-size:1.15rem;}
     .card{padding:14px; border-radius:14px;}
+    .header-actions{width:100%; justify-content:flex-end;}
+    #interviewOpenBtn{padding:9px 12px; font-size:.8rem;}
   }
 </style>
 </head>
@@ -391,10 +461,13 @@
       <div class="brand-mark">📚</div>
       <div>
         <h1>Question Bank</h1>
-        <p>Loaded from <code>que.txt</code></p>
+        <p>166 real questions, embedded from the Excel workbook</p>
       </div>
     </div>
-    <button id="themeToggle" type="button" aria-label="Toggle dark / light mode" title="Toggle dark / light mode">🌙</button>
+    <div class="header-actions">
+      <button id="interviewOpenBtn" class="btn" type="button">🎯 Interview Mode</button>
+      <button id="themeToggle" type="button" aria-label="Toggle dark / light mode" title="Toggle dark / light mode">🌙</button>
+    </div>
   </header>
 
   <div class="card toolbar">
@@ -415,6 +488,80 @@
   <div class="card status-row">
     <span class="status-text" id="statusText">0 questions</span>
     <button class="clear-link" id="clearFiltersBtn" type="button">Clear Filters</button>
+  </div>
+
+  <!-- Interview Mode: configuration modal -->
+  <div class="modal-overlay" id="interviewModal" style="display:none;">
+    <div class="modal card">
+      <div class="modal-header">
+        <h2>🎯 Interview Mode</h2>
+        <button class="modal-close" id="interviewCloseBtn" type="button" aria-label="Close">✕</button>
+      </div>
+      <p class="modal-sub">Pick which sheets and priorities to draw from, then start.</p>
+
+      <div class="modal-section">
+        <span class="modal-section-label">Sheets</span>
+        <div class="checkbox-list" id="interviewSheetList"></div>
+      </div>
+
+      <div class="modal-section">
+        <span class="modal-section-label">Priority</span>
+        <div class="checkbox-list" id="interviewPriorityList"></div>
+      </div>
+
+      <label class="modal-toggle-row">
+        <input type="checkbox" id="interviewRandomize" checked>
+        <span>Random order</span>
+      </label>
+
+      <div class="modal-error" id="interviewError" style="display:none;"></div>
+
+      <div class="modal-actions">
+        <button class="btn ghost" id="interviewCancelBtn" type="button">Cancel</button>
+        <button class="btn" id="interviewStartBtn" type="button">Start Interview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interview Mode: active session, one question at a time -->
+  <div class="card" id="interviewView" style="display:none;">
+    <div class="interview-topbar">
+      <span class="status-text" id="interviewProgress">Question 1 of 1</span>
+      <button class="clear-link" id="interviewEndBtn" type="button">End Interview</button>
+    </div>
+
+    <div id="interviewCard">
+      <div class="field-inline">
+        <span class="tag tag-srno" id="iSrNo"></span>
+        <span class="tag tag-category" id="iCategory"></span>
+        <span class="tag tag-level" id="iLevel"></span>
+        <span class="tag tag-priority" id="iPriority"></span>
+      </div>
+      <div class="field-row q">
+        <span class="field-label">Question</span>
+        <span class="field-value" id="iQuestion"></span>
+      </div>
+      <div class="field-row a" id="iAnswerRow" style="display:none;">
+        <span class="field-label">Answer</span>
+        <span class="field-value" id="iAnswer"></span>
+      </div>
+      <button class="btn" id="iRevealBtn" type="button">Reveal Answer</button>
+      <div class="pager">
+        <button class="btn ghost" id="iPrevBtn" type="button">Previous</button>
+        <button class="btn" id="iNextBtn" type="button">Next</button>
+      </div>
+    </div>
+
+    <div id="interviewDone" style="display:none;">
+      <div class="empty">
+        <span class="empty-icon">🏁</span>
+        Interview complete — you went through every question in this session.
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="interviewExitBtn" type="button">Exit to Browse</button>
+        <button class="btn" id="interviewRestartBtn" type="button">Restart Same Session</button>
+      </div>
+    </div>
   </div>
 
   <!-- Desktop: excel-style table, all matching rows -->
@@ -474,20 +621,1343 @@
   </div>
   <div class="card note" id="loadingNote">Loading questions...</div>
 
-  <footer>Data source: que.txt (Sr. No. / level / Years / Topic / Questions / Answers / Priority Count blocks separated by "|" lines). Use the Sheet selector to switch between Excel topics/tabs.</footer>
+  <footer>Data is embedded directly in this file (DATA array in the script) — extracted from the Excel workbook, no external file to load. Use the Sheet selector to switch between Excel topics/tabs.</footer>
 </div>
 
 <script>
 (function(){
   "use strict";
 
-  var FALLBACK_TEXT = 'Sr. No.\tlevel\tYears of Experince\tTopic\tQuestions\tAnswers\tPriority Count\r\n' +
-    '1\t\r\n|\r\nFresher\t0-1 Year\r\n|\r\nSpring Boot Fundamentals\r\n|\r\n' +
-    '"What is Spring Boot?\r\nWhat problem Spring Boot solves?\r\nWhy Spring Boot over Spring MVC?\r\n' +
-    'Why is Spring Boot popular in enterprise application development?"\r\n|\r\n' +
-    '"Spring Boot is an opinionated framework built on top of Spring Framework that simplifies application development by providing:\r\n' +
-    '- Auto Configuration\r\n- Embedded Server\r\n- Starter Dependencies\r\n- Production Ready Features\r\n' +
-    'Without XML and extensive configuration."\t\r\n|';
+  var DATA = [
+  {
+    "srNo": "1",
+    "category": "Core Java Basics",
+    "level": "General",
+    "question": "Swap two variables without using a third variable.",
+    "answer": "Using arithmetic:\na = a + b;\nb = a - b;\na = a - b; \n\nOr using XOR:\na = a ^ b;\nb = a ^ b;\na = a ^ b; \n\nXOR is safer for integers since it avoids potential overflow with large sums.",
+    "priority": "LinkedIn-1"
+  },
+  {
+    "srNo": "2",
+    "category": "Java",
+    "level": "General",
+    "question": "Reverse string.",
+    "answer": "String str = \"Pranik\";\nString reversed = new StringBuilder(str).reverse().toString();",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Java",
+    "level": "General",
+    "question": "Anagram check.",
+    "answer": "String str1 = \"Listen\";\nString str2 = \"Silent\"; \n\nchar[] arr1 = str1.toUpperCase().toCharArray(); // LISTEN\nchar[] arr2 = str2.toUpperCase().toCharArray(); // SILENT\n\nArrays.sort(arr1); // a -> b : E I L N S T\nArrays.sort(arr2); // a -> b : E I L N S T\n\nboolean res = Arrays.equals(arr1,arr2);",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Java",
+    "level": "General",
+    "question": "Anagram: Two strings are called anagrams if they contain the same characters with the same frequency, but in a different order.",
+    "answer": "String str1 = \"Listen\";\nString str2 = \"Silent\"; \n\nchar[] arr1 = str1.toUpperCase().toCharArray(); // LISTEN\nchar[] arr2 = str2.toUpperCase().toCharArray(); // SILENT\n\nArrays.sort(arr1); // a -> b : E I L N S T\nArrays.sort(arr2); // a -> b : E I L N S T\n\nboolean res = Arrays.equals(arr1,arr2);",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Java",
+    "level": "General",
+    "question": "Example: listen and silent → ✅ Anagrams.",
+    "answer": "String str1 = \"Listen\";\nString str2 = \"Silent\"; \n\nchar[] arr1 = str1.toUpperCase().toCharArray(); // LISTEN\nchar[] arr2 = str2.toUpperCase().toCharArray(); // SILENT\n\nArrays.sort(arr1); // a -> b : E I L N S T\nArrays.sort(arr2); // a -> b : E I L N S T\n\nboolean res = Arrays.equals(arr1,arr2);",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Java",
+    "level": "General",
+    "question": "Palindrome.",
+    "answer": "String str = \"madam\";\n\nString rev = new StringBuilder(str).reverse().toString();\n\nboolean res = str.equals(rev);",
+    "priority": "1"
+  },
+  {
+    "srNo": "4",
+    "category": "Java",
+    "level": "General",
+    "question": "Palindrome: A string or number that reads the same forward and backward.",
+    "answer": "String str = \"madam\";\n\nString rev = new StringBuilder(str).reverse().toString();\n\nboolean res = str.equals(rev);",
+    "priority": "1"
+  },
+  {
+    "srNo": "4",
+    "category": "Java",
+    "level": "General",
+    "question": "Example: madam → ✅ Palindrome  ,  121 → ✅ Palindrome",
+    "answer": "String str = \"madam\";\n\nString rev = new StringBuilder(str).reverse().toString();\n\nboolean res = str.equals(rev);",
+    "priority": "1"
+  },
+  {
+    "srNo": "5",
+    "category": "Java",
+    "level": "General",
+    "question": "Write a method to count the frequency of each character in a string,",
+    "answer": "String str = \"apple\"; // a-1, p-2, l-1, e-1\n\nMap<Character, Integer> freqMap = new HashMap<>();\n\nfor (char c : str.toCharArray()) {\n    int count = 0;\n\n    for (int i = 0; i < str.length(); i++) {\n        if (c == str.charAt(i)) {\n            count++;\n        }\n    }\n\n    freqMap.put(c, count);\n}\n\nSystem.out.println(freqMap);",
+    "priority": "1"
+  },
+  {
+    "srNo": "5",
+    "category": "Java",
+    "level": "General",
+    "question": "apple -> a=1 , p=2 , l=1, e=1",
+    "answer": "String str = \"apple\"; // a-1, p-2, l-1, e-1\n\nMap<Character, Integer> freqMap = new HashMap<>();\n\nfor (char c : str.toCharArray()) {\n    int count = 0;\n\n    for (int i = 0; i < str.length(); i++) {\n        if (c == str.charAt(i)) {\n            count++;\n        }\n    }\n\n    freqMap.put(c, count);\n}\n\nSystem.out.println(freqMap);",
+    "priority": "1"
+  },
+  {
+    "srNo": "6",
+    "category": "Java",
+    "level": "General",
+    "question": "Count Palindromic Subsequences - major code",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Java",
+    "level": "General",
+    "question": "Write a function in Java to find the length of the longest substring without repeating characters in a given string.",
+    "answer": "",
+    "priority": "1"
+  },
+  {
+    "srNo": "7",
+    "category": "Java",
+    "level": "General",
+    "question": "aabcabc",
+    "answer": "",
+    "priority": "1"
+  },
+  {
+    "srNo": "8",
+    "category": "Java",
+    "level": "General",
+    "question": "comparing two element of array are same or not",
+    "answer": "boolean res = Arrays.equals(chars1,chars2);",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Java",
+    "level": "General",
+    "question": "arr1 = [3,2,5,7]",
+    "answer": "boolean res = Arrays.equals(chars1,chars2);",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Java",
+    "level": "General",
+    "question": "arr2 = [2,3,5,7]",
+    "answer": "boolean res = Arrays.equals(chars1,chars2);",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "Real-World Debugging",
+    "level": "General",
+    "question": "Toll-booth log parser has a bug. LogEntry(String logLine) parses lines like 34400.409 SXY288 210E ENTRY (timestamp, license plate, location+direction, booth type) by splitting on a single space: logLine.split(\" \"). The provided JUnit tests fail. Find and fix the bug.",
+    "answer": "The bug is in the split logic, not the field indices.\nlogLine.split(\" \") breaks if the log line has irregular or multiple whitespace between tokens (or leading/trailing whitespace), producing empty tokens that shift the indices and throw NumberFormatException/ArrayIndexOutOfBoundsException. \nFix: split on one-or-more whitespace characters instead of a single space — String[] tokens = logLine.strip().split(\"\\\\s+\"); — which reliably handles any run of spaces/tabs between fields so tokens[0..3] map correctly to timestamp, licensePlate, location+direction, and boothType.",
+    "priority": "1"
+  },
+  {
+    "srNo": "10",
+    "category": "SQL",
+    "level": "General",
+    "question": "Find 2nd highest salary",
+    "answer": "SELECT MAX(salary)\nFROM employee\nWHERE salary < (SELECT MAX(salary) FROM employee );",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Java and what are its main features?",
+    "answer": "Java is a high-level, object-oriented, and platform-independent programming language. It follows the WORA (Write Once, Run Anywhere) principle through the JVM. \nIts main features include security, robustness, multithreading, portability, scalability, and automatic garbage collection.",
+    "priority": "1"
+  },
+  {
+    "srNo": "1",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Why we choose java language?",
+    "answer": "Java is a high-level, object-oriented, and platform-independent programming language. It follows the WORA (Write Once, Run Anywhere) principle through the JVM. \nIts main features include security, robustness, multithreading, portability, scalability, and automatic garbage collection.",
+    "priority": "1"
+  },
+  {
+    "srNo": "2",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between JDK, JRE, and JVM?",
+    "answer": "JDK, JRE, and JVM are components of the Java platform. \nJDK (Java Development Kit) is used for developing Java applications and contains JRE, development tools, and libraries. \nJRE (Java Runtime Environment) provides the environment required to run Java applications and contains the JVM and supporting libraries. \nJVM (Java Virtual Machine) is responsible for executing Java bytecode and enables Java's platform independence.",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What happens when a Java program is executed?",
+    "answer": "When a Java program is executed, the Java compiler (javac) first converts the source code into bytecode and generates a .class file.\nThe JVM then loads this bytecode into memory, verifies it, and starts execution from the main() method, which acts as the entry point of the program.\nThe JVM converts the bytecode into machine code and executes the program.",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the purpose of the main() method?",
+    "answer": "The main() method is the entry point of a Java application. \nWhen a Java program is executed, the JVM starts execution from the main() method and then executes the remaining code from there. \nWithout a valid main() method, the JVM cannot start a standalone Java program.",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are primitive data types in Java?",
+    "answer": "Primitive data types are the basic built-in data types provided by Java that store actual values directly.\nJava has 8 primitive data types: byte, short, int, long, float, double, char, and boolean.",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is type casting? Explain implicit and explicit casting.",
+    "answer": "Type casting is the process of converting one data type into another. \nImplicit casting is an automatic conversion from a smaller data type to a larger data type.\nexplicit casting is a manual conversion from a larger data type to a smaller data type and may result in dataloss.",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between local, instance, and static variables?",
+    "answer": "Local Variable → Declared inside a method/block; accessible only within thatmethod/block;\nInstance Variable → Declared inside a class but outside methods; each object gets its own copy.\nStatic Variable → Declared with static; shared among all objects; only one copy exists per class.",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are operators in Java?",
+    "answer": "Operators are special symbols in Java used to perform operations on variables and values.\nArithmetic: +, -, *, /, %\nRelational: ==, !=, >, <, >=, <=\nLogical: &&, ||\nBitwise: &, `\nAssignment: =, +=, -=, *=, /=, %=\nUnary: ++, --, +, -, !\nTernary: ?:\nShift: <<, >>, >>>",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "Java Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between == and equals()?",
+    "answer": "a == compares references for objects and values for primitive data types\na .equals() compares the actual content of objects",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "OOP Concepts",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a class and an object?",
+    "answer": "A class is a blueprint or template that defines the properties (fields) and behaviors (methods) of an object.\nAn object is an instance of a class that contains actual data and can perform actions defined by the class.",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "What is JUnit and why is it used in Java applications?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "What are the benefits of unit testing?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "What is the difference between manual testing and unit testing?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "Which dependency is required to use JUnit 5 in a Maven project?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "What is the difference between JUnit 4 and JUnit 5?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "What is a test case in JUnit?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "What is the purpose of the @Test annotation?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "How do you execute a JUnit test?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "What is the role of the JUnit framework in the SDLC?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "JUnit Basics",
+    "level": "Fresher (0-1 Year)",
+    "question": "How does JUnit help improve code quality?",
+    "answer": "JUnit improves code quality by catching bugs early through automated regression testing, encouraging modular/testable design, enabling safe refactoring (tests confirm behavior didn't break), and serving as executable documentation of expected behavior.",
+    "priority": "LinkedIn-1"
+  },
+  {
+    "srNo": "1",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Maven and why is it used in Java projects?",
+    "answer": "Maven is a build automation and dependency management tool. It manages libraries, compiles code, runs tests and packages applications using pom.xml.",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What problems does Maven solve compared to manual dependency management?",
+    "answer": "It automatically downloads libraries, resolves versions and keeps builds consistent across all developers.",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the key features of Maven?",
+    "answer": "Dependency management, build automation, standard project structure, plugins and repositories.",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a POM file in Maven?",
+    "answer": "POM (pom.xml) is Maven's main configuration file. It contains project details, dependencies and build settings.",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the full form of POM?",
+    "answer": "Project Object Model.",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the default name of the Maven configuration file?",
+    "answer": "pom.xml",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What information is typically stored inside a pom.xml file?",
+    "answer": "Project info, dependencies, plugins, repositories, properties and profiles.",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the role of the groupId element?",
+    "answer": "Identifies the organization or company that owns the project.",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the purpose of artifactId in Maven?",
+    "answer": "Uniquely identifies the project/library within a group.",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "Maven Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is version in Maven coordinates?",
+    "answer": "Specifies the release version of the artifact.",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is JDBC and why is it used?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the main components of JDBC architecture?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a JDBC driver?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the different types of JDBC drivers?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Which JDBC driver type is most commonly used today and why?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the role of the DriverManager class?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between JDBC API and JDBC Driver?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What packages are commonly used in JDBC programming?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the purpose of the Connection interface?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "JDBC Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the purpose of the Statement interface?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the Spring Framework?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the main modules of the Spring Framework?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What problems does Spring solve in enterprise application development?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Inversion of Control (IoC)?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Dependency Injection (DI)?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the advantages of Dependency Injection?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a Spring Bean?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the Spring IoC Container?",
+    "answer": "The IoC Container is the core of Spring that manages the lifecycle and configuration of application objects (beans) - it creates, wires (injects dependencies into), and manages beans based on configuration (XML, annotations, or Java config), implemented via BeanFactory (basic) or ApplicationContext (advanced, most commonly used).",
+    "priority": "LinkedIn-1"
+  },
+  {
+    "srNo": "9",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the differences between BeanFactory and ApplicationContext?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "Spring Framework Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the role of ApplicationContext in Spring?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Hibernate?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the advantages of Hibernate over JDBC?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is ORM (Object Relational Mapping)?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "How does Hibernate simplify database operations?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the core components of Hibernate?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a SessionFactory in Hibernate?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a Session in Hibernate?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the role of Transaction in Hibernate?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Hibernate Configuration?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "Hibernate Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the purpose of hibernate.cfg.xml?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Spring Security and why is it used?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What security problems does Spring Security solve?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the core modules of Spring Security?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is authentication?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is authorization?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between authentication and authorization?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the default username and password in Spring Security?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What happens when Spring Security is added to a Spring Boot project?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the SecurityFilterChain?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "Spring Security Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a security filter?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Spring Boot?",
+    "answer": "Spring Boot is an opinionated framework built on top of Spring Framework that simplifies application development by providing:\n• Auto Configuration\n• Embedded Server\n• Starter Dependencies\n• Production Ready Features\nWithout XML and extensive configuration.\n\nIt solves the problems of complex configuration, dependency management, and external server setup required in traditional Spring MVC.\n\nCompared to Spring MVC, Spring Boot enables faster development with minimal configuration, making it the preferred choice for building modern, production-ready applications.\n\nSpring Boot is popular in enterprise application development because it reduces configuration and boilerplate code, enables rapid development, provides production-ready features, and simplifies the development of scalable and maintainable applications.",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What problem Spring Boot solves?",
+    "answer": "Spring Boot is an opinionated framework built on top of Spring Framework that simplifies application development by providing:\n• Auto Configuration\n• Embedded Server\n• Starter Dependencies\n• Production Ready Features\nWithout XML and extensive configuration.\n\nIt solves the problems of complex configuration, dependency management, and external server setup required in traditional Spring MVC.\n\nCompared to Spring MVC, Spring Boot enables faster development with minimal configuration, making it the preferred choice for building modern, production-ready applications.\n\nSpring Boot is popular in enterprise application development because it reduces configuration and boilerplate code, enables rapid development, provides production-ready features, and simplifies the development of scalable and maintainable applications.",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Why Spring Boot over Spring MVC?",
+    "answer": "Spring Boot is an opinionated framework built on top of Spring Framework that simplifies application development by providing:\n• Auto Configuration\n• Embedded Server\n• Starter Dependencies\n• Production Ready Features\nWithout XML and extensive configuration.\n\nIt solves the problems of complex configuration, dependency management, and external server setup required in traditional Spring MVC.\n\nCompared to Spring MVC, Spring Boot enables faster development with minimal configuration, making it the preferred choice for building modern, production-ready applications.\n\nSpring Boot is popular in enterprise application development because it reduces configuration and boilerplate code, enables rapid development, provides production-ready features, and simplifies the development of scalable and maintainable applications.",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Why is Spring Boot popular in enterprise application development?",
+    "answer": "Spring Boot is an opinionated framework built on top of Spring Framework that simplifies application development by providing:\n• Auto Configuration\n• Embedded Server\n• Starter Dependencies\n• Production Ready Features\nWithout XML and extensive configuration.\n\nIt solves the problems of complex configuration, dependency management, and external server setup required in traditional Spring MVC.\n\nCompared to Spring MVC, Spring Boot enables faster development with minimal configuration, making it the preferred choice for building modern, production-ready applications.\n\nSpring Boot is popular in enterprise application development because it reduces configuration and boilerplate code, enables rapid development, provides production-ready features, and simplifies the development of scalable and maintainable applications.",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "How is Spring Boot different from the Spring Framework?",
+    "answer": "Spring Framework = Foundation (more configuration).\nSpring Boot = Spring Framework + Auto Configuration + Starter Dependencies + Embedded Server + Production Ready Features",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the main advantages of using Spring Boot?",
+    "answer": "Auto-Configuration – Auto-configures the Spring Boot based on the dependencies/libraries available in the classpath.\nStarter Dependencies – Predefined dependency packages that contain all required libraries for a specific functionality. \nEmbedded Server – Comes with embedded servers like Tomcat, no need to deploy applications on external servers.\nRapid Development – Reduces boilerplate code and setup time, allowing developers to focus more on business logic.\nProduction-Ready Features – Provides Actuator for monitoring and managing applications health, metrics, and status",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is an opinionated framework in the context of Spring Boot?",
+    "answer": "Opinionated = Spring Boot makes common configuration decisions for you, so you can focus on business logic instead of setup",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the purpose of the @SpringBootApplication annotation?",
+    "answer": "used on the main class to bootstrap and start a Spring Boot application, combining @Configuration, @EnableAutoConfiguration, and @ComponentScan into a single annotation.\n\nif No @SpringBootApplication → Application may not work properly\nif Add: @Configuration, @EnableAutoConfiguration, @ComponentScan → Works exactly the same\n\n1. @Configuration → Marks the class as a source of Spring bean definitions.\n2. @EnableAutoConfiguration → enables the Auto-Configuration mechanism & Auto-configures the Spring Boot based on the dependencies/libraries available in the classpath.\n3. @ComponentScan → Scans packages for Spring components (@Component, @Service, @Repository, @Controller) and registers them as Spring beans.",
+    "priority": "1"
+  },
+  {
+    "srNo": "5",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Without @SpringBootApplication annotation will it work ?",
+    "answer": "used on the main class to bootstrap and start a Spring Boot application, combining @Configuration, @EnableAutoConfiguration, and @ComponentScan into a single annotation.\n\nif No @SpringBootApplication → Application may not work properly\nif Add: @Configuration, @EnableAutoConfiguration, @ComponentScan → Works exactly the same\n\n1. @Configuration → Marks the class as a source of Spring bean definitions.\n2. @EnableAutoConfiguration → enables the Auto-Configuration mechanism & Auto-configures the Spring Boot based on the dependencies/libraries available in the classpath.\n3. @ComponentScan → Scans packages for Spring components (@Component, @Service, @Repository, @Controller) and registers them as Spring beans.",
+    "priority": "1"
+  },
+  {
+    "srNo": "5",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Which annotations are included within @SpringBootApplication ?",
+    "answer": "used on the main class to bootstrap and start a Spring Boot application, combining @Configuration, @EnableAutoConfiguration, and @ComponentScan into a single annotation.\n\nif No @SpringBootApplication → Application may not work properly\nif Add: @Configuration, @EnableAutoConfiguration, @ComponentScan → Works exactly the same\n\n1. @Configuration → Marks the class as a source of Spring bean definitions.\n2. @EnableAutoConfiguration → enables the Auto-Configuration mechanism & Auto-configures the Spring Boot based on the dependencies/libraries available in the classpath.\n3. @ComponentScan → Scans packages for Spring components (@Component, @Service, @Repository, @Controller) and registers them as Spring beans.",
+    "priority": "1"
+  },
+  {
+    "srNo": "6",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "How do you create a Spring Boot project?",
+    "answer": "Spring Initializr → select project details, add dependency, generate project & import in IDE. Start.spring.io \nSpring Initializr generates a ready-to-useSpring Boot project with selected dependencies and configurations.",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Spring Initializr?",
+    "answer": "Spring Initializr → select project details, add dependency, generate project & import in IDE. Start.spring.io \nSpring Initializr generates a ready-to-useSpring Boot project with selected dependencies and configurations.",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are starters in Spring Boot?",
+    "answer": "Spring Boot starters are predefined dependency packages provided by Spring Boot that contain all the required libraries for a specific functionality. \nspring-boot-starter-web → For building web applications and RESTful APIs. provides required libraries, embedded Tomcat, and Jackson for JSON processing.\nspring-boot-starter-data-jpa → For database access using JPA.\nspring-boot-starter-security → For application security.\n\nThey simplify dependency management by allowing developers to add a single starter dependency instead of multiple individual dependencies.",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Spring Boot Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the purpose of spring-boot-starter-web?",
+    "answer": "Spring Boot starters are predefined dependency packages provided by Spring Boot that contain all the required libraries for a specific functionality. \nspring-boot-starter-web → For building web applications and RESTful APIs. provides required libraries, embedded Tomcat, and Jackson for JSON processing.\nspring-boot-starter-data-jpa → For database access using JPA.\nspring-boot-starter-security → For application security.\n\nThey simplify dependency management by allowing developers to add a single starter dependency instead of multiple individual dependencies.",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Dependency Injection & Beans",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Dependency Injection?",
+    "answer": "Dependency Injection (DI) is a design pattern where Spring creates and injects dependent objects (beans) into a class instead of the class creating them itself, reducing tight coupling and improving maintainability.\n\nInternally :\n1. Component Scanning → Spring uses @ComponentScan to scan classes annotated with @Component, @Service, @Controller, and @Repository.\n2. Bean Creation → Based on the scanning, Spring creates and registers beans in the IoC Container.\n3. Dependency Resolution → When a bean require sanother bean as a dependency, Spring searches the IoC Container for the corresponding bean and resolves the dependency.\n4. Dependency Injection → Spring injects the required bean automatically using @Autowired or Constructor Injection.\n5. Bean Ready for Use → The fully initialized bean is readyfor use.",
+    "priority": "1"
+  },
+  {
+    "srNo": "8",
+    "category": "Dependency Injection & Beans",
+    "level": "Fresher (0–1 Year)",
+    "question": "How dependency injection work internally?",
+    "answer": "Dependency Injection (DI) is a design pattern where Spring creates and injects dependent objects (beans) into a class instead of the class creating them itself, reducing tight coupling and improving maintainability.\n\nInternally :\n1. Component Scanning → Spring uses @ComponentScan to scan classes annotated with @Component, @Service, @Controller, and @Repository.\n2. Bean Creation → Based on the scanning, Spring creates and registers beans in the IoC Container.\n3. Dependency Resolution → When a bean require sanother bean as a dependency, Spring searches the IoC Container for the corresponding bean and resolves the dependency.\n4. Dependency Injection → Spring injects the required bean automatically using @Autowired or Constructor Injection.\n5. Bean Ready for Use → The fully initialized bean is readyfor use.",
+    "priority": "1"
+  },
+  {
+    "srNo": "9",
+    "category": "Dependency Injection & Beans",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between @Component, @Controller, @RestController, @Service, and @Repository?",
+    "answer": "• @Component → Generic bean. Create an bean of this class and manage its lifecycle in the Spring IoC Container.\n• @Controller → Handles HTTP requests in Spring MVC and returns a view (or works with @ResponseBody).\n• @RestController → Handles HTTP requests in Spring MVC and returns a Data (JSON or XML)\n• @Service → Business logic layer.\n• @Repository → Database layer and provides exception translation for persistence exceptions.",
+    "priority": "1"
+  },
+  {
+    "srNo": "10",
+    "category": "Dependency Injection & Beans",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the purpose of the @Autowired annotation?",
+    "answer": "• @Autowired is used to automatically inject dependent Spring beans into a class, reducing the need for manual object creation.\n1. Constructor Injection  (Recommended) → @Autowired optional (single constructor)  \n2. Field Injection → @Autowired required\n3. Setter Injection → @Autowired usually required",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a microservices architecture?",
+    "answer": "A microservices architecture is a software architecture where an application is divided into small, independent, loosely coupled services. \nEach service is responsible for a specific business capability, has its own database (ideally), and can be developed, deployed, scaled, and maintained independently.",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "How does a microservice differ from a monolithic application?",
+    "answer": "A monolithic application is built as a single, tightly coupled application where all modules share the same codebase and are deployed together. \nA microservices architecture divides the application into small, independent services, each service is responsible for a specific business capability and capable of being developed, deployed, maintained and scaled independently.",
+    "priority": "1"
+  },
+  {
+    "srNo": "2",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Difference between microservices and monolithic application?",
+    "answer": "A monolithic application is built as a single, tightly coupled application where all modules share the same codebase and are deployed together. \nA microservices architecture divides the application into small, independent services, each service is responsible for a specific business capability and capable of being developed, deployed, maintained and scaled independently.",
+    "priority": "1"
+  },
+  {
+    "srNo": "3",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the main advantages of microservices?",
+    "answer": "The main advantages of microservices are :\nindependent deployment, independent scalability, fault isolation, faster development, easier maintenance, better team ownership, and technology flexibility. \n\nDifferent features of an application can be developed, deployed, and scaled independently.\nIf one service fails, the other services continue to work normally. This makes microservices more scalable, reliable, and suitable for large applications.",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the disadvantages of microservices?",
+    "answer": "complex deployment, network latency, data consistency challenges, distributed transactions, difficult debugging, monitoring overhead, higher infrastructure cost, and increased operational complexity.",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is service independence in microservices?",
+    "answer": "Service independence means that each microservice can be developed, deployed, tested, scaled, and maintained independently without requiring changes or redeployment of other services. \nEvery service owns its own business logic and, ideally, its own database.",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Why are microservices considered loosely coupled?",
+    "answer": "Microservices are considered loosely coupled because each service is independent and interacts with other services only through well-defined APIs or asynchronous messages, without depending on another service's internal implementation or database. \nThis allows services to be changed, deployed, or scaled independently with minimal impact on others.",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a bounded context in microservices?",
+    "answer": "Bounded Context means dividing the Candidate Registration Portal into clearly defined business areas, where each area owns its own data and business rules.\n\nA bounded context is a logical business boundary within which a domain model, terminology, and business rules remain consistent. \nIn microservices, each bounded context is typically implemented as an independent service with its own business logic and database. \nIn the Candidate Registration Portal, for example, Authentication, Application, Payment, Slot Booking, Result, and Certificate each represent separate bounded contexts because they have different responsibilities, rules, and data. Separating them into bounded contexts reduces coupling, improves maintainability, and allows teams to develop and deploy services independently.",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is meant by \"single responsibility\" for a microservice?",
+    "answer": "Single responsibility means a microservice should perform only one business function. \nA microservice should have only one business responsibility. So, it should change only when that business function changes.\nFor example, in the Candidate Registration Portal, the Payment Service handles only payment-related tasks, while the Slot Booking Service handles only seat booking. \nSince each service has a single responsibility, they can be developed, deployed, scaled, and maintained independently.",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "How do microservices communicate with each other?",
+    "answer": "Microservices communicate with each other mainly in two ways:\n1. Synchronous communication using REST APIs or gRPC (Google Remote Procedure Call), where One service sends a request and waits for a response.\n2. Asynchronous communication using message brokers like Kafka or RabbitMQ, where One service sends a message or event, and the other processes it later.\nThe choice depends on the business requirement.",
+    "priority": "1"
+  },
+  {
+    "srNo": "10",
+    "category": "Microservices Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the common protocols used in microservices communication?",
+    "answer": "The most common communication protocols in microservices are:\n• HTTP/REST – The most widely used protocol for synchronous communication.\n• gRPC – High-performance communication between internal microservices.\n• Kafka – Event streaming for asynchronous communication.\n• RabbitMQ – Message queue for reliable asynchronous communication.\n\nThe choice depends on whether the communication is synchronous or asynchronous and the application's requirements.",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "DSA",
+    "level": "General",
+    "question": "Binary search pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "DSA",
+    "level": "General",
+    "question": "Bubble sort pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "DSA",
+    "level": "General",
+    "question": "Brute force pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "DSA",
+    "level": "General",
+    "question": "Sliding window pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "DSA",
+    "level": "General",
+    "question": "Two pointer pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "DSA",
+    "level": "General",
+    "question": "Char frequency",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is an API?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What does API stand for?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Why are APIs used in software applications?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between an API and a web service?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between frontend and backend communication through APIs?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a client in API communication?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a server in API communication?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is an endpoint in an API?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a request in an API?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "API Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a response in an API?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a database?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "2",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is DBMS?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the advantages of using a DBMS over a file system?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are the different types of databases?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is RDBMS?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between DBMS and RDBMS?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a table in a relational database?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a row and a column in a table?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a schema in a database?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "DBMS Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is metadata?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "Design Patterns",
+    "level": "General",
+    "question": "Singleton pattern — implement a thread-safe version",
+    "answer": "Implement a thread-safe Singleton using double-checked locking with a volatile instance field - check if the instance is null, synchronize only if it is, check again inside the synchronized block, then create the instance. This avoids synchronizing every call while staying thread-safe. An even simpler, JVM-guaranteed approach is an enum singleton.",
+    "priority": "LinkedIn-1"
+  },
+  {
+    "srNo": "2",
+    "category": "Design Pattern",
+    "level": "General",
+    "question": "Factory pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "3",
+    "category": "Design Pattern",
+    "level": "General",
+    "question": "Builder pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "4",
+    "category": "Design Pattern",
+    "level": "General",
+    "question": "Strategy pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "5",
+    "category": "Design Pattern",
+    "level": "General",
+    "question": "Observer pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "6",
+    "category": "Design Pattern",
+    "level": "General",
+    "question": "Adapter pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "7",
+    "category": "Design Pattern",
+    "level": "General",
+    "question": "Proxy pattern",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Artificial Intelligence (AI)?",
+    "answer": "",
+    "priority": "1"
+  },
+  {
+    "srNo": "2",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between AI, Machine Learning, and Deep Learning?",
+    "answer": "",
+    "priority": "1"
+  },
+  {
+    "srNo": "3",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is Generative AI?",
+    "answer": "",
+    "priority": "1"
+  },
+  {
+    "srNo": "4",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What are some popular Generative AI applications?",
+    "answer": "",
+    "priority": "1"
+  },
+  {
+    "srNo": "5",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a Large Language Model (LLM)?",
+    "answer": "",
+    "priority": "1"
+  },
+  {
+    "srNo": "6",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a prompt in Generative AI?",
+    "answer": "",
+    "priority": "1"
+  },
+  {
+    "srNo": "7",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is prompt engineering?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "8",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is the difference between training and inference?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "9",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "What is a token in an LLM?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "10",
+    "category": "AI & GenAI Fundamentals",
+    "level": "Fresher (0–1 Year)",
+    "question": "Why do LLMs have token limits?",
+    "answer": "",
+    "priority": ""
+  },
+  {
+    "srNo": "1",
+    "category": "React",
+    "level": "General",
+    "question": "React vs Angular",
+    "answer": "React is a UI library focused solely on the view layer using a component-based model with JSX and a virtual DOM, offering flexibility since routing/state management are added via separate libraries (React Router, Redux). Angular is a full-fledged, opinionated framework (bundling routing, forms, HTTP client, dependency injection) using TypeScript and a real DOM with two-way data binding out of the box.",
+    "priority": "LinkedIn-1"
+  },
+  {
+    "srNo": "2",
+    "category": "React",
+    "level": "General",
+    "question": "Virtual DOM",
+    "answer": "The Virtual DOM is an in-memory, lightweight representation of the actual DOM that React uses to batch and optimize updates - when state changes, React builds a new virtual DOM tree, diffs it against the previous one, and applies only the minimal set of real DOM updates needed, which is far faster than directly manipulating the DOM on every change.",
+    "priority": "LinkedIn-1"
+  },
+  {
+    "srNo": "3",
+    "category": "React",
+    "level": "General",
+    "question": "useEffect()",
+    "answer": "useEffect() lets you run side effects (data fetching, subscriptions, manual DOM manipulation) in function components after render. It takes a dependency array to control when it re-runs (empty array = run once on mount, specific deps = run when those values change), and can return a cleanup function that runs before the next effect or on unmount.",
+    "priority": "LinkedIn-1"
+  },
+  {
+    "srNo": "4",
+    "category": "React",
+    "level": "General",
+    "question": "useMemo() vs useCallback()",
+    "answer": "useMemo() memoizes a computed value, recalculating it only when its dependencies change (useful for expensive calculations). useCallback() memoizes a function reference itself so it doesn't get recreated on every render (useful for passing stable callbacks to child components to avoid unnecessary re-renders).",
+    "priority": "LinkedIn-1"
+  },
+  {
+    "srNo": "5",
+    "category": "React",
+    "level": "General",
+    "question": "How to optimize React application performance",
+    "answer": "Optimize React performance using React.memo to skip re-rendering components with unchanged props, useMemo/useCallback to avoid expensive recalculations and unstable function references, code-splitting with React.lazy for smaller initial bundles, virtualization (react-window) for long lists, and avoiding unnecessary state/context updates.",
+    "priority": "LinkedIn-1"
+  }
+];
 
   // Category/Topic is treated as the "Sheet" (like an Excel tab) and
   // selected via the Sheet dropdown, not a column filter popover.
@@ -496,7 +1966,7 @@
     { key: 'priority', label: 'Priority' }
   ];
 
-  var allQuestions = [];
+  var allQuestions = DATA;
   var filteredQuestions = [];
   var currentIndex = 0;
 
@@ -504,6 +1974,14 @@
   // null = no restriction (all values shown); Set = only these values shown
   var columnFilters = { level: null, priority: null };
   var openPopoverCol = null;
+
+  // Interview Mode: separate session state, independent of the browse
+  // filters above. sheets/priorities are Sets of allowed values (never
+  // null here — always built explicitly from the checked boxes).
+  var interviewQuestions = [];
+  var interviewIndex = 0;
+  var interviewAnswerShown = false;
+  var lastInterviewConfig = null; // { sheets: Set, priorities: Set, randomize: bool } for "Restart Same Session"
 
   var els = {
     themeToggle: document.getElementById('themeToggle'),
@@ -524,7 +2002,35 @@
     prevBtn: document.getElementById('prevBtn'),
     nextBtn: document.getElementById('nextBtn'),
     emptyState: document.getElementById('emptyState'),
-    loadingNote: document.getElementById('loadingNote')
+    loadingNote: document.getElementById('loadingNote'),
+
+    interviewOpenBtn: document.getElementById('interviewOpenBtn'),
+    interviewModal: document.getElementById('interviewModal'),
+    interviewCloseBtn: document.getElementById('interviewCloseBtn'),
+    interviewCancelBtn: document.getElementById('interviewCancelBtn'),
+    interviewStartBtn: document.getElementById('interviewStartBtn'),
+    interviewSheetList: document.getElementById('interviewSheetList'),
+    interviewPriorityList: document.getElementById('interviewPriorityList'),
+    interviewRandomize: document.getElementById('interviewRandomize'),
+    interviewError: document.getElementById('interviewError'),
+
+    interviewView: document.getElementById('interviewView'),
+    interviewProgress: document.getElementById('interviewProgress'),
+    interviewEndBtn: document.getElementById('interviewEndBtn'),
+    interviewCard: document.getElementById('interviewCard'),
+    interviewDone: document.getElementById('interviewDone'),
+    interviewExitBtn: document.getElementById('interviewExitBtn'),
+    interviewRestartBtn: document.getElementById('interviewRestartBtn'),
+    iSrNo: document.getElementById('iSrNo'),
+    iCategory: document.getElementById('iCategory'),
+    iLevel: document.getElementById('iLevel'),
+    iPriority: document.getElementById('iPriority'),
+    iQuestion: document.getElementById('iQuestion'),
+    iAnswerRow: document.getElementById('iAnswerRow'),
+    iAnswer: document.getElementById('iAnswer'),
+    iRevealBtn: document.getElementById('iRevealBtn'),
+    iPrevBtn: document.getElementById('iPrevBtn'),
+    iNextBtn: document.getElementById('iNextBtn')
   };
 
   // ---------- dark / light theme ----------
@@ -550,82 +2056,6 @@
     return div.innerHTML;
   }
 
-  function stripQuotes(str){
-    var s = str.trim();
-    if(s.charAt(0) === '"') s = s.slice(1);
-    if(s.charAt(s.length - 1) === '"') s = s.slice(0, -1);
-    return s.replace(/[\t\s]+$/,'').trim();
-  }
-
-  // que.txt is a tab-separated export where each cell of a record is
-  // rendered on its own line(s) and records/fields are separated by
-  // lines that are exactly "|". Columns per record:
-  // [SrNo, "level<TAB>years", Topic, "Question1\nQuestion2...", "Answer text", (optional Priority)]
-  function parseQuestions(text){
-    var norm = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    var lines = norm.split('\n');
-
-    var chunks = [];
-    var current = [];
-    var started = false;
-
-    lines.forEach(function(line){
-      if(/^sr\.?\s*no\.?/i.test(line.trim())) return; // header row
-      if(line.trim() === '|'){
-        if(started){ chunks.push(current.join('\n')); }
-        current = [];
-        return;
-      }
-      if(!started){
-        if(line.trim() === '') return; // skip leading blank lines
-        started = true;
-      }
-      current.push(line);
-    });
-    if(started && current.some(function(l){return l.trim() !== '';})){
-      chunks.push(current.join('\n'));
-    }
-
-    var records = [];
-    for(var i = 0; i + 4 < chunks.length; i += 5){
-      records.push({
-        srNo: chunks[i].trim(),
-        levelYears: chunks[i+1],
-        topic: chunks[i+2].trim(),
-        questionsRaw: chunks[i+3],
-        answersRaw: chunks[i+4]
-      });
-    }
-
-    var out = [];
-    records.forEach(function(rec){
-      var levelParts = rec.levelYears.split('\t').map(function(s){return s.trim();}).filter(Boolean);
-      var level = levelParts[0] || 'General';
-      var years = levelParts[1] || '';
-      var topic = rec.topic || 'General';
-      var answer = stripQuotes(rec.answersRaw);
-      var questionsBlock = stripQuotes(rec.questionsRaw);
-      // Priority Count isn't populated in que.txt yet, so it's blank
-      // until the source data adds it as its own "|"-delimited chunk.
-      var priority = '';
-
-      questionsBlock.split('\n')
-        .map(function(q){return q.trim();})
-        .filter(Boolean)
-        .forEach(function(q){
-          out.push({
-            srNo: rec.srNo,
-            question: q,
-            answer: answer,
-            category: topic,
-            level: level + (years ? ' (' + years + ')' : ''),
-            priority: priority
-          });
-        });
-    });
-
-    return out;
-  }
 
   function uniqueValues(key){
     var vals = allQuestions.map(function(q){ return q[key] || '(blank)'; });
@@ -836,7 +2266,7 @@
       tdCategory.innerHTML = '<span class="tag tag-category">' + escapeHtml(q.category) + '</span>';
 
       var tdLevel = document.createElement('td');
-      tdLevel.className = 'col-category';
+      tdLevel.className = 'col-level';
       tdLevel.innerHTML = '<span class="tag tag-level">' + escapeHtml(q.level) + '</span>';
 
       var tdQuestion = document.createElement('td');
@@ -903,22 +2333,187 @@
     applyFilters();
   }
 
-  function init(text, source){
-    allQuestions = parseQuestions(text);
-    els.loadingNote.style.display = 'none';
+  // ---------- Interview Mode ----------
 
-    if(allQuestions.length === 0){
-      els.loadingNote.style.display = 'block';
-      els.loadingNote.className = 'card note error';
-      els.loadingNote.textContent = 'No valid questions found.';
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function buildCheckboxList(container, values){
+    container.innerHTML = '';
+
+    var selectAllLabel = document.createElement('label');
+    selectAllLabel.className = 'select-all';
+    var selectAllCb = document.createElement('input');
+    selectAllCb.type = 'checkbox';
+    selectAllCb.checked = true;
+    selectAllLabel.appendChild(selectAllCb);
+    selectAllLabel.appendChild(document.createTextNode('Select All'));
+    container.appendChild(selectAllLabel);
+
+    var checkboxes = [];
+    values.forEach(function(val){
+      var label = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = val;
+      cb.checked = true;
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(val));
+      container.appendChild(label);
+      checkboxes.push(cb);
+    });
+
+    selectAllCb.addEventListener('change', function(){
+      checkboxes.forEach(function(cb){ cb.checked = selectAllCb.checked; });
+    });
+    checkboxes.forEach(function(cb){
+      cb.addEventListener('change', function(){
+        selectAllCb.checked = checkboxes.every(function(c){ return c.checked; });
+      });
+    });
+
+    return checkboxes;
+  }
+
+  var interviewSheetCheckboxes = [];
+  var interviewPriorityCheckboxes = [];
+
+  function openInterviewModal(){
+    els.interviewError.style.display = 'none';
+    interviewSheetCheckboxes = buildCheckboxList(els.interviewSheetList, uniqueValues('category'));
+    interviewPriorityCheckboxes = buildCheckboxList(els.interviewPriorityList, uniqueValues('priority'));
+    els.interviewRandomize.checked = true;
+    els.interviewModal.style.display = 'flex';
+  }
+
+  function closeInterviewModal(){
+    els.interviewModal.style.display = 'none';
+  }
+
+  function startInterviewFromModal(){
+    var sheets = interviewSheetCheckboxes.filter(function(cb){ return cb.checked; }).map(function(cb){ return cb.value; });
+    var priorities = interviewPriorityCheckboxes.filter(function(cb){ return cb.checked; }).map(function(cb){ return cb.value; });
+    var randomize = els.interviewRandomize.checked;
+
+    if(sheets.length === 0 || priorities.length === 0){
+      els.interviewError.textContent = 'Pick at least one sheet and one priority value to start.';
+      els.interviewError.style.display = 'block';
       return;
     }
 
-    if(source === 'fallback'){
+    var config = { sheets: new Set(sheets), priorities: new Set(priorities), randomize: randomize };
+    var pool = buildInterviewPool(config);
+
+    if(pool.length === 0){
+      els.interviewError.textContent = 'No questions match that combination. Try selecting more sheets/priorities.';
+      els.interviewError.style.display = 'block';
+      return;
+    }
+
+    lastInterviewConfig = config;
+    closeInterviewModal();
+    launchInterview(pool);
+  }
+
+  function buildInterviewPool(config){
+    var pool = allQuestions.filter(function(q){
+      var sheetVal = q.category || '(blank)';
+      var priorityVal = q.priority || '(blank)';
+      return config.sheets.has(sheetVal) && config.priorities.has(priorityVal);
+    });
+    return config.randomize ? shuffle(pool) : pool;
+  }
+
+  function launchInterview(pool){
+    interviewQuestions = pool;
+    interviewIndex = 0;
+
+    els.tableView.style.display = 'none';
+    els.singleView.style.display = 'none';
+    els.emptyState.style.display = 'none';
+    document.querySelector('.toolbar').style.display = 'none';
+    document.querySelector('.status-row').style.display = 'none';
+
+    els.interviewView.style.display = 'block';
+    els.interviewDone.style.display = 'none';
+    els.interviewCard.style.display = 'flex';
+    renderInterviewQuestion();
+  }
+
+  function renderInterviewQuestion(){
+    interviewAnswerShown = false;
+    var q = interviewQuestions[interviewIndex];
+    els.iSrNo.textContent = q.srNo || '-';
+    els.iCategory.textContent = q.category;
+    els.iLevel.textContent = q.level;
+    els.iPriority.textContent = q.priority || '—';
+    els.iQuestion.textContent = q.question;
+    els.iAnswer.textContent = q.answer;
+    els.iAnswerRow.style.display = 'none';
+    els.iRevealBtn.style.display = 'inline-block';
+    els.iRevealBtn.textContent = 'Reveal Answer';
+
+    els.iPrevBtn.disabled = interviewIndex === 0;
+    els.interviewProgress.textContent = 'Question ' + (interviewIndex + 1) + ' of ' + interviewQuestions.length;
+  }
+
+  function revealInterviewAnswer(){
+    interviewAnswerShown = true;
+    els.iAnswerRow.style.display = 'flex';
+    els.iRevealBtn.style.display = 'none';
+  }
+
+  function interviewPrev(){
+    if(interviewIndex > 0){
+      interviewIndex--;
+      renderInterviewQuestion();
+    }
+  }
+
+  function interviewNext(){
+    if(interviewIndex < interviewQuestions.length - 1){
+      interviewIndex++;
+      renderInterviewQuestion();
+    } else {
+      els.interviewCard.style.display = 'none';
+      els.interviewDone.style.display = 'block';
+      els.interviewProgress.textContent = 'Finished — ' + interviewQuestions.length + ' of ' + interviewQuestions.length;
+    }
+  }
+
+  function endInterview(){
+    els.interviewView.style.display = 'none';
+    document.querySelector('.toolbar').style.display = 'flex';
+    document.querySelector('.status-row').style.display = 'flex';
+    // Clear the inline display:none that launchInterview() set — without
+    // this, browse mode's table/card view stays hidden forever, since an
+    // inline style overrides the CSS media-query rules that normally
+    // control #tableView/#singleView visibility.
+    els.tableView.style.display = '';
+    els.singleView.style.display = '';
+    applyFilters();
+  }
+
+  function restartInterviewSession(){
+    if(!lastInterviewConfig) return;
+    var pool = buildInterviewPool(lastInterviewConfig);
+    launchInterview(pool);
+  }
+
+  function init(){
+    if(allQuestions.length === 0){
       els.loadingNote.style.display = 'block';
       els.loadingNote.className = 'card note error';
-      els.loadingNote.textContent = 'Could not load que.txt (browsers block local file fetches). Serve this folder with a local server, e.g. "npx serve" or "python -m http.server", then open index.html via http://localhost. Showing a built-in fallback question for now.';
+      els.loadingNote.textContent = 'No questions embedded — add entries to the DATA array in the script.';
+      return;
     }
+    els.loadingNote.style.display = 'none';
 
     populateSheetSelect();
     buildFilterButtons();
@@ -937,13 +2532,21 @@
   els.prevBtn.addEventListener('click', goPrev);
   els.nextBtn.addEventListener('click', goNext);
 
-  fetch('que.txt')
-    .then(function(res){
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      return res.text();
-    })
-    .then(function(text){ init(text, 'fetch'); })
-    .catch(function(){ init(FALLBACK_TEXT, 'fallback'); });
+  els.interviewOpenBtn.addEventListener('click', openInterviewModal);
+  els.interviewCloseBtn.addEventListener('click', closeInterviewModal);
+  els.interviewCancelBtn.addEventListener('click', closeInterviewModal);
+  els.interviewModal.addEventListener('click', function(e){
+    if(e.target === els.interviewModal) closeInterviewModal();
+  });
+  els.interviewStartBtn.addEventListener('click', startInterviewFromModal);
+  els.iRevealBtn.addEventListener('click', revealInterviewAnswer);
+  els.iPrevBtn.addEventListener('click', interviewPrev);
+  els.iNextBtn.addEventListener('click', interviewNext);
+  els.interviewEndBtn.addEventListener('click', endInterview);
+  els.interviewExitBtn.addEventListener('click', endInterview);
+  els.interviewRestartBtn.addEventListener('click', restartInterviewSession);
+
+  init();
 
 })();
 </script>
