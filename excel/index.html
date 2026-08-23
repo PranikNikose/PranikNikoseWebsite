@@ -546,6 +546,7 @@
   td.col-meta, th.col-meta{width:150px;}
   td.col-question, th.col-question{width:34%;}
   td.col-answer, th.col-answer{width:auto; white-space:pre-wrap;}
+  .q-priority{margin-top:6px;}
   .meta-grid{display:flex; flex-direction:column; gap:6px;}
   .meta-row{display:flex; flex-wrap:wrap; gap:6px; align-items:center;}
   .meta-row .tag-category{max-width:100%; white-space:normal; overflow-wrap:break-word; text-align:left;}
@@ -693,8 +694,8 @@
         <span class="tag tag-sheet" id="iSheet"></span>
         <span class="tag tag-category" id="iCategory"></span>
         <span class="tag tag-level" id="iLevel"></span>
-        <span class="tag tag-priority" id="iPriority"></span>
       </div>
+      <div class="q-priority"><span class="tag tag-priority" id="iPriority"></span></div>
       <div class="field-row q">
         <span class="field-label">Question</span>
         <div id="iQuestionList"></div>
@@ -740,29 +741,16 @@
 
   <!-- Mobile: one record at a time, every field always visible, with pagination -->
   <div class="card" id="singleView">
-    <div class="field-row">
-      <span class="field-label">Sr. No.</span>
-      <span class="field-value" id="mSrNo"></span>
+    <div class="field-inline">
+      <span class="tag tag-srno" id="mSrNo"></span>
+      <span class="tag tag-sheet" id="mSheet"></span>
+      <span class="tag tag-category" id="mCategory"></span>
+      <span class="tag tag-level" id="mLevel"></span>
     </div>
-    <div class="field-row">
-      <span class="field-label">Sheet</span>
-      <span class="field-value"><span class="tag tag-sheet" id="mSheet"></span></span>
-    </div>
-    <div class="field-row">
-      <span class="field-label">Category</span>
-      <span class="field-value"><span class="tag tag-category" id="mCategory"></span></span>
-    </div>
-    <div class="field-row">
-      <span class="field-label">Level</span>
-      <span class="field-value"><span class="tag tag-level" id="mLevel"></span></span>
-    </div>
+    <div class="q-priority"><span class="tag tag-priority" id="mPriority"></span></div>
     <div class="field-row q">
       <span class="field-label">Question</span>
       <span class="field-value" id="mQuestion"></span>
-    </div>
-    <div class="field-row">
-      <span class="field-label">Priority</span>
-      <span class="field-value"><span class="tag tag-priority" id="mPriority"></span></span>
     </div>
     <div class="field-row a">
       <span class="field-label">Answer</span>
@@ -1167,8 +1155,10 @@
     filteredQuestions.forEach(function(q){
       var tr = document.createElement('tr');
 
-      // Sr.No/Sheet/Category/Level/Priority merged into one column (three
-      // stacked rows of tag badges) so Question/Answer get most of the row width.
+      // Sr.No/Sheet/Category/Level merged into one column (three stacked
+      // rows of tag badges) so Question/Answer get most of the row width.
+      // Priority lives with the Question instead (see below) -- it's the
+      // one field the user wants to stand out, not blend into this list.
       var tdMeta = document.createElement('td');
       tdMeta.className = 'col-meta';
       tdMeta.innerHTML =
@@ -1182,13 +1172,19 @@
           '</div>' +
           '<div class="meta-row">' +
             '<span class="tag tag-level">' + escapeHtml(q.level) + '</span>' +
-            '<span class="tag tag-priority">' + escapeHtml(q.priority || '—') + '</span>' +
           '</div>' +
         '</div>';
 
+      // Priority renders as its own line directly below the question text
+      // -- moved out of the Details column so it stands out next to the
+      // thing it's actually about, instead of getting lost among the
+      // other small meta tags. Sits AFTER the question (not before) so
+      // the question is read first, priority second.
       var tdQuestion = document.createElement('td');
       tdQuestion.className = 'col-question';
-      tdQuestion.innerHTML = q.question;
+      tdQuestion.innerHTML =
+        '<div class="q-text">' + q.question + '</div>' +
+        '<div class="q-priority"><span class="tag tag-priority">' + escapeHtml(q.priority || '—') + '</span></div>';
 
       var tdAnswer = document.createElement('td');
       tdAnswer.className = 'col-answer';
