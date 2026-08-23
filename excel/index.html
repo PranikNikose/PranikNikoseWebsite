@@ -381,6 +381,7 @@
   var openPopoverCol = null;
 
   var els = {
+    themeToggle: document.getElementById('themeToggle'),
     search: document.getElementById('search'),
     filterButtons: document.getElementById('filterButtons'),
     statusText: document.getElementById('statusText'),
@@ -401,6 +402,23 @@
     emptyState: document.getElementById('emptyState'),
     loadingNote: document.getElementById('loadingNote')
   };
+
+  // ---------- dark / light theme ----------
+
+  function currentTheme(){
+    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  }
+
+  function applyThemeIcon(){
+    els.themeToggle.textContent = currentTheme() === 'light' ? '☀️' : '🌙';
+  }
+
+  function toggleTheme(){
+    var next = currentTheme() === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem('theme', next); }catch(e){}
+    applyThemeIcon();
+  }
 
   function escapeHtml(str){
     var div = document.createElement('div');
@@ -777,6 +795,9 @@
     buildFilterButtons();
     applyFilters();
   }
+
+  applyThemeIcon();
+  els.themeToggle.addEventListener('click', toggleTheme);
 
   els.search.addEventListener('input', applyFilters);
   els.clearFiltersBtn.addEventListener('click', clearAllFilters);
