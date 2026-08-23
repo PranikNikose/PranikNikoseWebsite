@@ -39,7 +39,6 @@
     --tag-cat-bg:rgba(124,110,242,.16); --tag-cat-fg:#b4abfa;
     --tag-lvl-bg:rgba(45,212,191,.14); --tag-lvl-fg:#5eead4;
     --tag-pri-bg:rgba(251,191,36,.14); --tag-pri-fg:#fcd34d;
-    --tag-sr-bg:rgba(148,163,184,.14); --tag-sr-fg:#cbd5e1;
     --tag-sheet-bg:rgba(59,130,246,.16); --tag-sheet-fg:#93c5fd;
     --code-bg:#0d1424;
     --code-fg:#cbd5e1;
@@ -68,7 +67,6 @@
     --tag-cat-bg:rgba(106,92,240,.1); --tag-cat-fg:#5647e0;
     --tag-lvl-bg:rgba(13,148,136,.1); --tag-lvl-fg:#0f766e;
     --tag-pri-bg:rgba(217,119,6,.12); --tag-pri-fg:#b45309;
-    --tag-sr-bg:rgba(100,116,139,.1); --tag-sr-fg:#475569;
     --tag-sheet-bg:rgba(37,99,235,.1); --tag-sheet-fg:#1d4ed8;
     --code-bg:#f3f4f8;
     --code-fg:#2a2f3a;
@@ -561,7 +559,6 @@
   .tag-category{background:var(--tag-cat-bg); color:var(--tag-cat-fg);}
   .tag-level{background:var(--tag-lvl-bg); color:var(--tag-lvl-fg);}
   .tag-priority{background:var(--tag-pri-bg); color:var(--tag-pri-fg);}
-  .tag-srno{background:var(--tag-sr-bg); color:var(--tag-sr-fg);}
   .tag-sheet{background:var(--tag-sheet-bg); color:var(--tag-sheet-fg);}
 
   /* ---------- mobile: one record at a time ---------- */
@@ -695,11 +692,11 @@
         <span class="tag tag-category" id="iCategory"></span>
         <span class="tag tag-level" id="iLevel"></span>
       </div>
-      <div class="q-priority"><span class="tag tag-priority" id="iPriority"></span></div>
       <div class="field-row q">
         <span class="field-label">Question</span>
         <div id="iQuestionList"></div>
       </div>
+      <div class="q-priority"><span class="tag tag-priority" id="iPriority"></span></div>
       <div class="field-row a" id="iAnswerRow" style="display:none;">
         <span class="field-label">A:</span>
         <span class="field-value" id="iAnswer"></span>
@@ -742,16 +739,15 @@
   <!-- Mobile: one record at a time, every field always visible, with pagination -->
   <div class="card" id="singleView">
     <div class="field-inline">
-      <span class="tag tag-srno" id="mSrNo"></span>
       <span class="tag tag-sheet" id="mSheet"></span>
       <span class="tag tag-category" id="mCategory"></span>
       <span class="tag tag-level" id="mLevel"></span>
     </div>
-    <div class="q-priority"><span class="tag tag-priority" id="mPriority"></span></div>
     <div class="field-row q">
       <span class="field-label">Question</span>
       <span class="field-value" id="mQuestion"></span>
     </div>
+    <div class="q-priority"><span class="tag tag-priority" id="mPriority"></span></div>
     <div class="field-row a">
       <span class="field-label">Answer</span>
       <span class="field-value" id="mAnswer"></span>
@@ -817,7 +813,6 @@
     tableView: document.getElementById('tableView'),
     tableBody: document.getElementById('tableBody'),
     singleView: document.getElementById('singleView'),
-    mSrNo: document.getElementById('mSrNo'),
     mSheet: document.getElementById('mSheet'),
     mCategory: document.getElementById('mCategory'),
     mLevel: document.getElementById('mLevel'),
@@ -1155,16 +1150,18 @@
     filteredQuestions.forEach(function(q){
       var tr = document.createElement('tr');
 
-      // Sr.No/Sheet/Category/Level merged into one column (three stacked
-      // rows of tag badges) so Question/Answer get most of the row width.
-      // Priority lives with the Question instead (see below) -- it's the
-      // one field the user wants to stand out, not blend into this list.
+      // Sheet/Category/Level merged into one column (three stacked rows of
+      // tag badges) so Question/Answer get most of the row width. Sr.No
+      // isn't shown -- the user found a per-question serial number didn't
+      // look good, and it's not useful revision info anyway (Interview
+      // Mode already excludes it for the same reason). Priority lives with
+      // the Question instead (see below) -- it's the one field the user
+      // wants to stand out, not blend into this list.
       var tdMeta = document.createElement('td');
       tdMeta.className = 'col-meta';
       tdMeta.innerHTML =
         '<div class="meta-grid">' +
           '<div class="meta-row">' +
-            '<span class="tag tag-srno">' + escapeHtml(q.srNo || '-') + '</span>' +
             '<span class="tag tag-sheet">' + escapeHtml(q.sheet) + '</span>' +
           '</div>' +
           '<div class="meta-row">' +
@@ -1200,7 +1197,6 @@
   // Mobile: one record at a time, every field always visible, Previous/Next pagination.
   function renderSingle(){
     var q = filteredQuestions[currentIndex];
-    els.mSrNo.textContent = q.srNo || '-';
     els.mSheet.textContent = q.sheet;
     els.mCategory.textContent = q.category;
     els.mLevel.textContent = q.level;
