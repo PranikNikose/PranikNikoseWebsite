@@ -439,6 +439,20 @@
     box-shadow:var(--shadow);
   }
   .filter-popover.open{display:block;}
+  .filter-popover .fp-search{
+    width:100%;
+    padding:8px 11px;
+    margin-bottom:10px;
+    border-radius:8px;
+    border:1.5px solid var(--border);
+    background:var(--surface-2);
+    color:var(--text);
+    font-family:inherit;
+    font-size:.82rem;
+    transition:border-color .15s ease;
+  }
+  .filter-popover .fp-search::placeholder{color:var(--muted);}
+  .filter-popover .fp-search:focus{outline:none; border-color:var(--accent);}
   .filter-popover .chip-group{margin-bottom:10px;}
   .filter-popover .fp-actions{
     display:flex;
@@ -1066,10 +1080,32 @@
     var selected = columnFilters[colKey]; // null = wildcard ("All")
     pop.innerHTML = '';
 
+    // Topic (category) alone can run to 100+ distinct values -- a search
+    // box narrows the chip list live as you type, so you don't have to
+    // scan/scroll a huge list to multi-select a few. Other filter groups
+    // (Sheet/Level/Priority) stay small enough that a search box would
+    // just be clutter, so this is scoped to 'category' only.
+    if(colKey === 'category'){
+      var searchInput = document.createElement('input');
+      searchInput.type = 'text';
+      searchInput.className = 'fp-search';
+      searchInput.placeholder = 'Search topics...';
+      pop.appendChild(searchInput);
+    }
+
     var chipGroupEl = document.createElement('div');
     chipGroupEl.className = 'chip-group';
     pop.appendChild(chipGroupEl);
     var group = buildChipGroup(chipGroupEl, values, 'All', selected);
+
+    if(colKey === 'category'){
+      searchInput.addEventListener('input', function(){
+        var term = searchInput.value.trim().toLowerCase();
+        group.chips.forEach(function(c){
+          c.style.display = c.dataset.value.toLowerCase().indexOf(term) === -1 ? 'none' : '';
+        });
+      });
+    }
 
     var actions = document.createElement('div');
     actions.className = 'fp-actions';
@@ -1406,7 +1442,11 @@
     var priorities = chipGroupSelected(interviewPriorityChips);
     var randomize = els.interviewRandomize.checked;
     var countRaw = els.interviewCountInput.value.trim();
-    var count = countRaw === '' ? null : parseInt(countRaw, 10);
+    // Whole numbers only, matched against the raw string -- parseInt()
+    // alone would silently truncate "5.7" to 5 with no feedback that the
+    // decimal was dropped, which reads as the input ignoring what was
+    // typed rather than rejecting it.
+    var count = countRaw === '' ? null : (/^\d+$/.test(countRaw) ? parseInt(countRaw, 10) : NaN);
 
     if((sheets && sheets.length === 0) || (levels && levels.length === 0) || (priorities && priorities.length === 0)){
       els.interviewError.textContent = 'Pick at least one sheet, one level, and one priority value (or leave a group on its wildcard chip) to start.';
