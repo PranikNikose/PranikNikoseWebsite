@@ -1,0 +1,25 @@
+# Source Excel workbook: kept locally as the source of truth for
+# extract_data.py, but never needed by the deployed site (index.html has
+# the data embedded directly) and may contain personal info (see the HR
+# sheet exclusion in RULES.md) that shouldn't end up in a public repo's
+# history. If you want it version-controlled somewhere, do that
+# separately/privately -- don't remove this line without thinking about
+# where the file is about to be published.
+*.xlsx
+
+# Ephemeral sync artifacts (see RULES.md section 12 / extract_data.py) --
+# extracted_questions.json is a debugging intermediate that only survives
+# a failed run; *.bak files are the safety backups clear_data.py/
+# add_sheets.py/smart_sync.py/extract_data.py write before overwriting
+# index.html. Neither is meant to be committed.
+extracted_questions.json
+*.bak
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
