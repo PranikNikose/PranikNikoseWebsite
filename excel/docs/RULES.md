@@ -73,7 +73,7 @@ plain text. Real sheets: HR, Coding, CoreJava, Adv. Java, Junit, Maven,
 JDBC, Spring Frmwrk, Hibernate, Spring Sec., SpringBoot, Microservices,
 DSA, API, RDBMS, Design Pattern, AI, React.
 
-Currently embedded: **996 questions across 4 sheets** — CoreJava (320),
+Currently embedded: **997 questions across 4 sheets** — CoreJava (321),
 SpringBoot (291), Microservices (315), Coding (70) — at full row count,
 per the user's explicit selective-sync requests (SYNC_EXCEL.md §2b,
 `add_sheets.py` for Coding). The other 12 non-HR sheets are not yet in
@@ -769,7 +769,7 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
   Interview Mode (§7) is reveal-based practice, not a quiz.
 - Don't add more question data beyond what's actually in the source Excel
   without being asked, and never fabricate Q&A content (§3).
-- **Currently 996 questions across 4 sheets (CoreJava, SpringBoot,
+- **Currently 997 questions across 4 sheets (CoreJava, SpringBoot,
   Microservices, Coding) at full row count — the other 12 non-HR sheets
   are not yet in `DATA` on purpose.** The user adds sheets deliberately,
   one selective sync at a time — do not treat "test it", "fix bugs", or
