@@ -73,14 +73,15 @@ plain text. Real sheets: HR, Coding, CoreJava, Adv. Java, Junit, Maven,
 JDBC, Spring Frmwrk, Hibernate, Spring Sec., SpringBoot, Microservices,
 DSA, API, RDBMS, Design Pattern, AI, React.
 
-Currently embedded: **926 questions across 3 sheets** — CoreJava (320),
-SpringBoot (291), Microservices (315) — at full row count, per the user's
-explicit selective-sync request (SYNC_EXCEL.md §2b). The other 13 non-HR
-sheets are not yet in `DATA`; add them the same way (either individually
-via §2b, or all at once via §2) when asked. `HR` is excluded (personal
-PII — see below). `Adv. Java` is genuinely empty in the source (1 header
-row only, no data) — that's real workbook state, not a bug, and applies
-whenever it's synced in.
+Currently embedded: **996 questions across 4 sheets** — CoreJava (320),
+SpringBoot (291), Microservices (315), Coding (70) — at full row count,
+per the user's explicit selective-sync requests (SYNC_EXCEL.md §2b,
+`add_sheets.py` for Coding). The other 12 non-HR sheets are not yet in
+`DATA`; add them the same way (either individually via §2b, or all at
+once via §2) when asked. `HR` is excluded (personal PII — see below).
+`Adv. Java` is genuinely empty in the source (1 header row only, no
+data) — that's real workbook state, not a bug, and applies whenever it's
+synced in.
 
 **Column layout is NOT uniform across sheets** — read each sheet's header
 row and map columns by name (`sr`, `level`, `years`, `topic`, `question`,
@@ -757,10 +758,10 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
   Interview Mode (§7) is reveal-based practice, not a quiz.
 - Don't add more question data beyond what's actually in the source Excel
   without being asked, and never fabricate Q&A content (§3).
-- **Currently 926 questions across 3 sheets (CoreJava, SpringBoot,
-  Microservices) at full row count — the other 13 non-HR sheets are not
-  yet in `DATA` on purpose.** The user adds sheets deliberately, one
-  selective sync at a time — do not treat "test it", "fix bugs", or
+- **Currently 996 questions across 4 sheets (CoreJava, SpringBoot,
+  Microservices, Coding) at full row count — the other 12 non-HR sheets
+  are not yet in `DATA` on purpose.** The user adds sheets deliberately,
+  one selective sync at a time — do not treat "test it", "fix bugs", or
   "enhance the UI" as an implicit green light to expand `DATA`. Only add
   more sheets/rows when the user explicitly asks (see SYNC_EXCEL.md §2b
   for the selective-sheet procedure, §2 for a full sync).
