@@ -29,55 +29,64 @@ before you touch anything. This run must not violate any of it.
 via `find_workbook()`: it reads whatever single `.xlsx` file is sitting in
 the project root. Check that exactly one is present and it's the file the user
 intends to sync from (if there's more than one, the script will refuse to
-run and list them rather than guessing). If the user told you the sheet
-names/layout changed, update `extract_data.py`'s `SHEETS` list accordingly
-— otherwise leave the script's logic untouched.
+run and list them rather than guessing).
 
-## 2. Decide what SHEETS should contain
+## 2. Decide which sheets to target
 
-`SHEETS` in `extract_data.py` is the definitive list of "which sheets are
-currently synced into `DATA`" — every run **fully re-derives `DATA` from
-scratch** out of whatever `SHEETS` lists at that moment (this is not a
-merge with whatever was already in `index.html`; it's a plain full
-overwrite of the `DATA` array). That means:
+**There is no hardcoded sheet list to edit anymore.** Running
+`python scripts/extract_data.py` with no arguments re-derives `DATA` from
+scratch out of whatever sheets are CURRENTLY embedded in `index.html`
+(read back via `read_current_data()`) — a plain resync always mirrors
+current state, it can never go stale against a hand-maintained constant.
+That means:
 
-- **To add a sheet**: add its name to `SHEETS` alongside whatever's
-  already there (don't remove the existing entries) — the next run will
-  contain the old sheets AND the new one. Sheet names must match the real
-  Excel tab names exactly (see RULES.md §3 for the full list) — don't
-  guess a name, check it against the workbook.
-- **To remove a sheet** (or replace the whole set with something
-  different): narrow/replace `SHEETS` to exactly what should remain —
-  the next run will contain only what's listed, dropping anything else
-  that used to be in `DATA`.
-- **Before changing `SHEETS`, confirm with the user which of the above
-  they mean** if it's ambiguous ("just add X" vs. "only sync X now") —
-  don't assume.
+- **A plain run just refreshes what's already synced** — it does NOT add
+  or remove sheets by itself.
+- **To add a sheet**: use `add_sheets.py <Sheet>` (or `--all`, which now
+  reads every real, non-HR tab straight from the workbook) — see
+  `docs/RULES.md` §12. A plain `extract_data.py` run afterward will then
+  include it too, since it mirrors current state.
+- **To target an explicit, different set** (e.g. to deliberately drop a
+  sheet, or resync only a subset) — pass sheet names as CLI arguments,
+  which override the data-driven default for that one run:
+  ```
+  python scripts/extract_data.py CoreJava SpringBoot
+  ```
+  Sheet names must match the real Excel tab names exactly — check via
+  `python scripts/list_sheets.py` (or `manage.bat`'s "Data Summary")
+  rather than guessing/relying on RULES.md §3's list, which may lag a
+  workbook that's had tabs added/renamed since it was last updated.
+- **Before targeting an explicit different set, confirm with the user
+  what they mean** if it's ambiguous ("just add X" vs. "only sync X
+  now") — don't assume.
 - HR stays excluded regardless — see RULES.md's note on personal PII.
 
 ## 3. Decide the row count
 
-Open `extract_data.py` and check `ROWS_PER_SHEET`:
+Row count is configurable via `config.json` (repo root) — `"rows_per_sheet"`:
 
-```python
-ROWS_PER_SHEET = None   # full dataset
-ROWS_PER_SHEET = 10     # sampled/testing cap
+```json
+"rows_per_sheet": null   // full dataset
+"rows_per_sheet": 10     // sampled/testing cap
 ```
 
 **The user invoking this runbook (or asking to sync specific sheets) is
 itself their explicit go-ahead to pull the full row count for what's
 being synced** — you don't need to ask again unless they specifically
-said "just a sample" or similar. Leave every other constant/rule in the
-script untouched (column-mapping-by-header logic, rich-text handling, the
-"join phrasings with or, keep questionParts" behavior, the Sr.No
-positional-fallback rule, the Years→Level mapping — none of that changes
-here).
+said "just a sample" or similar. Leave every other rule in
+`extract_data.py` untouched (column-mapping-by-header logic, rich-text
+handling, the "join phrasings with or, keep questionParts" behavior, the
+Sr.No positional-fallback rule, the Years→Level mapping — none of that
+changes here).
 
 ## 4. Run it
 
 ```
 python scripts/extract_data.py
 ```
+
+(or `manage.bat` → option 3, Full Resync — it chains straight into the
+verification script afterward automatically)
 
 This does everything in one step: extracts from the `.xlsx`, prints a
 per-sheet row count, backs up the current `index.html` to
@@ -130,10 +139,10 @@ investigating further.
   result.
 - `index.html.bak` (the pre-run backup) can be left in place or deleted
   once you've confirmed the new `index.html` is correct — it's not
-  tracked as a source file, just a safety net for this one run.
-- Leave `extract_data.py`'s `SHEETS`/`ROWS_PER_SHEET` at whatever values
-  this run used — don't revert them back to a narrower/sampled state
-  unless the user asks to.
+  tracked as a source file, just a safety net for this one run
+  (`manage.bat` option 10 restores it with one click if needed).
+- Leave `config.json`'s `rows_per_sheet` at whatever value this run used —
+  don't revert it back to a sampled state unless the user asks to.
 - Tell the user: new total question count, new sheet count, and confirm
   RULES.md was not modified as part of this run (unless they separately
   asked for a rule change alongside the sync — call that out explicitly

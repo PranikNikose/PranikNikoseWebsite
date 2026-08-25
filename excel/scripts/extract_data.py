@@ -24,14 +24,23 @@ back over index.html. If the DATA array can't be found in index.html at
 all, the script raises an error and writes nothing (never guesses where
 to put the data).
 
-To change WHICH sheets get pulled, or to switch between a sampled/testing
-row cap and the full dataset, edit the SHEETS/ROWS_PER_SHEET constants
-below before running -- see docs/SYNC_EXCEL.md for guidance on what values to
-use for common requests ("sync everything", "just these 3 sheets", etc).
+**Which sheets get pulled is data-driven, not a hardcoded list**: with no
+arguments, this re-extracts exactly whatever sheets are CURRENTLY present
+in index.html's DATA (read back via read_current_data()) -- a plain
+`python scripts/extract_data.py` always mirrors current state, so it can
+never silently go stale the way a hand-maintained constant could. To
+target a specific, different set of sheets instead (e.g. to deliberately
+drop one), pass them as CLI arguments:
+    python scripts/extract_data.py CoreJava SpringBoot Microservices
+
+The row cap (full dataset vs. a sampled/testing cap) is configurable via
+config.json's "rows_per_sheet" key (repo root) instead of a constant here
+-- see scripts/config.py. Leave it null/absent for the full dataset.
 """
 
-import openpyxl, json, html as htmlmod, re, os, glob
+import openpyxl, json, html as htmlmod, re, os, glob, sys
 from openpyxl.cell.rich_text import CellRichText, TextBlock
+import config as cfg
 
 # This script lives in scripts/ -- resolve everything relative to the
 # PROJECT ROOT (this file's parent's parent), not the current working
@@ -65,18 +74,10 @@ def find_workbook():
 
 
 WORKBOOK = find_workbook()
-SHEETS = ['CoreJava', 'SpringBoot', 'Microservices']  # HR excluded: personal PII, see docs/RULES.md
 
-# Every real, non-HR sheet in the workbook -- used by add_sheets.py's
-# "--all" mode and by smart_sync.py. Keep in sync with docs/RULES.md section 3
-# if the workbook's tabs are ever renamed/added/removed.
-ALL_KNOWN_SHEETS = ['Coding', 'CoreJava', 'Adv. Java', 'Junit', 'Maven', 'JDBC',
-                     'Spring Frmwrk', 'Hibernate', 'Spring Sec.', 'SpringBoot',
-                     'Microservices', 'DSA', 'API', 'RDBMS', 'Design Pattern',
-                     'AI', 'React']
-
-# Full row count for these 3 user-selected sheets (docs/SYNC_EXCEL.md sec 2b).
-ROWS_PER_SHEET = None
+# Row cap is configurable (config.json "rows_per_sheet") rather than a
+# hardcoded constant -- None/absent = full dataset. See scripts/config.py.
+ROWS_PER_SHEET = cfg.load_config()['rows_per_sheet']
 
 OR_SEPARATOR_HTML = ' <em>or</em> '
 OR_SEPARATOR_PLAIN = ' or '
@@ -233,13 +234,16 @@ def answer_html_and_plain(cell_value):
 
 
 def extract(sheets=None, rows_per_sheet=None):
-    """sheets/rows_per_sheet default to the module-level SHEETS/
-    ROWS_PER_SHEET constants (used when running this script directly);
-    other scripts (add_sheets.py, smart_sync.py) pass their own so they
-    don't have to mutate this module's globals to control what gets
-    pulled."""
+    """With no `sheets` arg, defaults to whatever sheets are CURRENTLY in
+    index.html's DATA (read_current_data()) -- data-driven, not a
+    hardcoded list, so a plain re-run always mirrors current state rather
+    than risking going stale against a hand-maintained constant.
+    add_sheets.py/smart_sync.py pass their own explicit `sheets` so they
+    control exactly what gets pulled regardless of current state.
+    `rows_per_sheet` defaults to the module-level ROWS_PER_SHEET (itself
+    sourced from config.json, see scripts/config.py)."""
     if sheets is None:
-        sheets = SHEETS
+        sheets = sorted(set(q['sheet'] for q in read_current_data()))
     if rows_per_sheet is None:
         rows_per_sheet = ROWS_PER_SHEET
 
@@ -371,10 +375,25 @@ def splice_into_index_html(questions, html_path=INDEX_HTML):
 
 
 if __name__ == '__main__':
-    questions, counts = extract()
-    print("rows taken per sheet:")
-    print(json.dumps(counts, indent=2))
-    print("total questions:", len(questions))
+    # No args: mirror whatever's currently synced (data-driven default).
+    # Explicit args: target exactly that set instead (e.g. to drop a sheet).
+    # --quiet/-q is filtered out of the sheet-name args, not treated as one.
+    quiet = '--quiet' in sys.argv or '-q' in sys.argv
+    argv_sheets = [a for a in sys.argv[1:] if a not in ('--quiet', '-q')]
+    cli_sheets = argv_sheets if argv_sheets else None
+
+    if not quiet:
+        if cli_sheets:
+            print("Targeting sheets from command line: " + ', '.join(cli_sheets))
+        else:
+            print("No sheets given -- re-syncing whatever's currently in index.html's DATA.")
+
+    questions, counts = extract(sheets=cli_sheets)
+
+    if not quiet:
+        print("rows taken per sheet:")
+        print(json.dumps(counts, indent=2))
+        print("total questions:", len(questions))
 
     debug_json_path = os.path.join(PROJECT_ROOT, 'extracted_questions.json')
     with open(debug_json_path, 'w', encoding='utf-8') as f:
@@ -387,6 +406,10 @@ if __name__ == '__main__':
     # so clean it up now rather than leaving it to accumulate.
     os.remove(debug_json_path)
 
-    print("\nSpliced " + str(len(questions)) + " questions into " + INDEX_HTML + "'s DATA array.")
-    print("Previous version backed up to " + backup_path + " -- if this run")
-    print("looks wrong, restore it by copying that file back over " + INDEX_HTML + ".")
+    if quiet:
+        print("Full Resync: OK -- " + str(len(questions)) + " questions across " +
+              str(len(counts)) + " sheet(s) (" + ', '.join(sorted(counts)) + ").")
+    else:
+        print("\nSpliced " + str(len(questions)) + " questions into " + INDEX_HTML + "'s DATA array.")
+        print("Previous version backed up to " + backup_path + " -- if this run")
+        print("looks wrong, restore it by copying that file back over " + INDEX_HTML + ".")
