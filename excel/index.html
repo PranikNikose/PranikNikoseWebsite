@@ -1172,12 +1172,13 @@
   // ---------- filtering + rendering ----------
 
   function applyFilters(){
-    var searchTerm = els.search.value.trim().toLowerCase();
+    var searchTerms = els.search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
 
     filteredQuestions = allQuestions.filter(function(q){
-      var matchesSearch = !searchTerm ||
-        (q.questionPlain || '').toLowerCase().indexOf(searchTerm) !== -1 ||
-        (q.answerPlain || '').toLowerCase().indexOf(searchTerm) !== -1;
+      var haystack = (q.questionPlain || '').toLowerCase() + ' ' + (q.answerPlain || '').toLowerCase();
+      var matchesSearch = searchTerms.every(function(term){
+        return haystack.indexOf(term) !== -1;
+      });
 
       var matchesCols = FILTER_COLUMNS.every(function(col){
         var sel = columnFilters[col.key];

@@ -335,6 +335,17 @@ see §2.
     remove it again on that same reasoning.
 - **Search box**: free-text search across `questionPlain` + `answerPlain`.
   Not a fixed-value popover (search isn't a value list).
+  - **Multi-keyword AND matching, not one literal substring.** The typed
+    input is split on whitespace into separate terms; a row matches only
+    if **every** term appears somewhere in that row's combined
+    `questionPlain` + `answerPlain` text (order-independent, terms can
+    appear anywhere/either field). This replaced an earlier single-
+    substring match (`indexOf(searchTerm)`) that required the whole typed
+    string to appear verbatim and in order — so `HashMap Hashtable`
+    matched nothing even though "Difference between HashMap and
+    Hashtable?" exists, since the literal phrase "hashmap hashtable"
+    never occurs. The user explicitly asked for this. Don't revert to
+    single-substring matching without being asked.
 - "Clear Filters" resets: all four column filters (Sheet/Topic/Level/
   Priority) → null, search → empty.
 - **All four browse-mode filter popovers (Sheet/Topic/Level/Priority) use
