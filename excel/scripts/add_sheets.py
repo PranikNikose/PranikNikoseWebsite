@@ -32,7 +32,7 @@ def main():
     current = ed.read_current_data()
     existing_sheets = set(q['sheet'] for q in current)
 
-    real_sheet_names = [s for s in ed.wb.sheetnames if s != 'HR']
+    real_sheet_names = list(ed.wb.sheetnames)
 
     if args == ['--all']:
         targets = real_sheet_names

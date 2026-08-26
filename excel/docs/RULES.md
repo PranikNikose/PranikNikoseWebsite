@@ -73,15 +73,17 @@ plain text. Real sheets: HR, Coding, CoreJava, Adv. Java, Junit, Maven,
 JDBC, Spring Frmwrk, Hibernate, Spring Sec., SpringBoot, Microservices,
 DSA, API, RDBMS, Design Pattern, AI, React.
 
-Currently embedded: **997 questions across 4 sheets** — CoreJava (321),
-SpringBoot (291), Microservices (315), Coding (70) — at full row count,
+Currently embedded: **998 questions across 4 sheets** — CoreJava (320),
+SpringBoot (292), Microservices (316), Coding (70) — at full row count,
 per the user's explicit selective-sync requests (SYNC_EXCEL.md §2b,
-`add_sheets.py` for Coding). The other 12 non-HR sheets are not yet in
+`add_sheets.py` for Coding). The remaining sheets (including `HR` and two
+tabs not yet in the catalog above, `DevOps`/`Caching`) are not yet in
 `DATA`; add them the same way (either individually via §2b, or all at
-once via §2) when asked. `HR` is excluded (personal PII — see below).
-`Adv. Java` is genuinely empty in the source (1 header row only, no
-data) — that's real workbook state, not a bug, and applies whenever it's
-synced in.
+once via §2) when asked. `HR` used to be hard-excluded everywhere
+(personal PII) — see the note below on why that's no longer a code-level
+block. `Adv. Java` is genuinely empty in the source (1 header row only,
+no data) — that's real workbook state, not a bug, and applies whenever
+it's synced in.
 
 **Column layout is NOT uniform across sheets** — read each sheet's header
 row and map columns by name (`sr`, `level`, `years`, `topic`, `question`,
@@ -130,9 +132,22 @@ objects to the `DATA` array — never make up new Q&A content.
 
 **Note on the HR sheet:** it contains personal, identifying content (the
 user's real name, employer, and career details) written as first-person
-interview answers. Since this app deploys to public GitHub Pages, don't
-pull rows from HR into `DATA` without the user explicitly confirming they
-want that personal content made public.
+interview answers. Since this app deploys to public GitHub Pages, adding
+its rows to `DATA` makes that personal content public once pushed/
+deployed — this was originally a hard, code-level exclusion (`add_sheets.py`/
+`add_sheets_menu.py`/`list_sheets.py` all filtered `HR` out by name, so it
+never appeared as a pickable option anywhere). **The user explicitly asked
+for HR to be included** ("add it now" / "i want hr in it", after being
+told exactly what it contains and that this project deploys publicly) —
+the code-level exclusion was removed from all three scripts at that
+request; HR now behaves like any other sheet in every listing/picker.
+As of this note, HR itself has NOT yet been synced into `DATA` (0 rows) —
+Claude was blocked by the auto-mode permission classifier from running
+the actual extraction (`add_sheets.py HR`), so the user was asked to run
+that command themselves in their own terminal. If HR ever needs
+re-excluding (the user changes their mind), reinstate the `!= 'HR'`
+filter in those three scripts and note it here again — don't silently
+re-add it without being asked, symmetric with how it was removed.
 
 ## 4. Rich text formatting must be preserved, not flattened
 
@@ -959,14 +974,15 @@ safe:
     anything, since this app has no real multi-user "admin" system to
     gate it with — the typed phrase is the stand-in the user asked for.
     Backs up `index.html` first, same as every script here.
-  - **`add_sheets.py <Sheet> [<Sheet> ...]`** (or `--all` for every real,
-    non-HR tab **read live from the workbook** — `[s for s in
-    ed.wb.sheetnames if s != 'HR']`, not a hardcoded list; previously
-    resolved via a curated `ed.ALL_KNOWN_SHEETS` constant that had to be
-    hand-updated whenever the workbook's tabs changed, replaced for the
-    same data-driven/configurable reasoning as `extract_data.py`'s
-    `SHEETS` above) — adds sheets that AREN'T already in `DATA`; any
-    requested sheet that's already present is skipped and left completely
+  - **`add_sheets.py <Sheet> [<Sheet> ...]`** (or `--all` for every real
+    tab **read live from the workbook** — `list(ed.wb.sheetnames)`, not a
+    hardcoded list; previously resolved via a curated `ed.ALL_KNOWN_SHEETS`
+    constant that had to be hand-updated whenever the workbook's tabs
+    changed, replaced for the same data-driven/configurable reasoning as
+    `extract_data.py`'s `SHEETS` above; `HR` was also filtered out of this
+    list by name until the user explicitly asked for it to be included —
+    see the HR note in §3) — adds sheets that AREN'T already in `DATA`;
+    any requested sheet that's already present is skipped and left completely
     untouched, never re-extracted or overwritten. Always pulls the full
     row count for whatever it adds. This is what makes "add a sheet"
     additive without needing separate merge logic in `extract_data.py`
@@ -1052,15 +1068,17 @@ safe:
 - **`list_sheets.py`** — a 6th standalone script, also read-only (reads the
   workbook's real tab names via the already-loaded `extract_data.wb` plus
   `read_current_data()`; never writes anything). **Lists every real tab
-  straight from the workbook itself (`wb.sheetnames`, `HR` excluded by
-  name) — no curated/hardcoded sheet list involved at all** — so a
-  brand-new Excel tab shows up immediately as a normal, addable row, and
+  straight from the workbook itself (`wb.sheetnames`) — no curated/
+  hardcoded sheet list involved at all** — so a brand-new Excel tab shows
+  up immediately as a normal, addable row, and
   every sheet it lists is already addable via `add_sheets.py` (which also
   now checks unrecognized names against the live workbook, not a
   constant — see above). Each row shows sync status (`synced` + row
-  count, or `NOT synced`). This exists so `manage.bat`'s Add Sheet option
-  can show real sheet names instead of requiring the user to type one
-  blind. Was originally filtered through a curated `ALL_KNOWN_SHEETS`
+  count, or `NOT synced`) — `HR` included, since the user asked for it to
+  stop being specially hidden here too (see §3's HR note). This exists so
+  `manage.bat`'s Add Sheet option can show real sheet names instead of
+  requiring the user to type one blind. Was originally filtered through a
+  curated `ALL_KNOWN_SHEETS`
   constant (only showing catalogued sheets, with anything else pushed
   into a separate footnote) — changed after the user asked "can't it
   identify all sheets from Excel" and, pointedly, two real tabs (`DevOps`,
@@ -1075,8 +1093,10 @@ safe:
   Exists because several real tab names carry easy-to-mistype punctuation
   (`Adv. Java`, `Spring Frmwrk`, `Spring Sec.`) — the user asked "what if
   someone wrongly types a name, can't we use a key/value pick instead?"
-  A bad number (out of range, non-numeric) is rejected outright with
-  nothing extracted, rather than being passed through to
+  `HR` is included in this numbered list (see §3's HR note — it was
+  excluded here by name until the user explicitly asked otherwise). A bad
+  number (out of range, non-numeric) is rejected outright with nothing
+  extracted, rather than being passed through to
   `extract_data.py`'s `wb[sheet]` lookup as a literal (which would raise
   a `KeyError`/crash instead of a clean rejection). Shares the same
   extract-and-splice primitives as `add_sheets.py` (`ed.extract()` +

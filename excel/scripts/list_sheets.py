@@ -20,11 +20,10 @@ def main():
     for q in current:
         counts[q['sheet']] = counts.get(q['sheet'], 0) + 1
 
-    # Read every real tab directly from the workbook (HR excluded by name,
-    # personal PII -- see docs/RULES.md sec 3). Fully data-driven -- no
-    # hardcoded sheet-name list to keep in sync; a brand-new tab added in
-    # Excel (e.g. "DevOps") shows up here immediately.
-    known = [s for s in ed.wb.sheetnames if s != 'HR']
+    # Read every real tab directly from the workbook. Fully data-driven --
+    # no hardcoded sheet-name list to keep in sync; a brand-new tab added
+    # in Excel (e.g. "DevOps") shows up here immediately.
+    known = list(ed.wb.sheetnames)
 
     print('Workbook: ' + ed.WORKBOOK)
     print()

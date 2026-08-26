@@ -25,7 +25,7 @@ def main():
     for q in current:
         counts[q['sheet']] = counts.get(q['sheet'], 0) + 1
 
-    real_sheet_names = [s for s in ed.wb.sheetnames if s != 'HR']
+    real_sheet_names = list(ed.wb.sheetnames)
     not_synced = [s for s in real_sheet_names if s not in counts]
 
     print('%-18s %-14s %s' % ('Sheet', 'Status', 'Rows'))
