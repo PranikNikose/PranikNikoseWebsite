@@ -527,8 +527,8 @@ only via a button with no equally-visible way back except an in-context
   Random')`, and matched with `priorityBucketsFor(q.priority)` in
   `buildInterviewPool()` (a question can match more than one bucket, e.g.
   `"LinkedIn-1"` is both `Not Blank` and `LinkedIn` — included if ANY
-  checked bucket matches). **This is scoped to Interview Mode only** —
-  browse mode's Priority filter popover (`FILTER_COLUMNS`/
+  checked bucket matches). **This bucketing is scoped to Interview Mode
+  only** — browse mode's Priority filter popover (`FILTER_COLUMNS`/
   `columnFilters`) still shows every raw value as its own chip, unchanged.
   - **Why**: the source Excel's raw `priority` values are noisy —
     `0/1/2/3/4/7` (exact counts) plus case/spelling variants of the same
@@ -540,8 +540,23 @@ only via a button with no equally-visible way back except an in-context
     only the Interview Mode selector, since exact counts/spelling aren't
     meaningful for picking a practice set — "has any priority signal at
     all", "was it asked on LinkedIn", and "blank vs not" are. Don't
-    collapse browse mode's Priority filter the same way unless asked —
-    that filter is meant to show/inspect the real data as-is.
+    collapse/bucket browse mode's raw Priority value list the same way
+    unless asked — that filter is meant to show/inspect the real data
+    as-is.
+  - **One exception, added at explicit request**: browse mode's Priority
+    popover gets one extra synthetic chip, **`Non Blank`**
+    (`NON_BLANK_PRIORITY` in `index.html`), alongside every real raw
+    value — not a replacement for any of them. It isn't a real Excel
+    value; matching it is a special case in `applyFilters()`'s
+    `matchesCols`: a row matches if its `priority` is non-blank AND `Non
+    Blank` is checked, in addition to (not instead of) the normal
+    exact-value check — so checking `Non Blank` together with a specific
+    value like `LinkedIn-1` still works as an OR, same superset semantics
+    as Interview Mode's `Not Blank` bucket. This is the one deliberately
+    approved exception to "browse mode's Priority filter shows raw values
+    only" above — don't extend the same synthetic-chip treatment to
+    Sheet/Topic/Level, or bucket/collapse the rest of Priority's raw
+    values, without being asked again.
 - **`level` values ARE normalized at extraction time** (`normalize_level()`
   in `extract_data.py`) — unlike Priority (above), the user explicitly
   asked for Level's near-duplicates to be deduped, not just worked around
