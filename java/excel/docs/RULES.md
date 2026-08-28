@@ -329,8 +329,9 @@ see §2.
 
 - **Sheet is a multi-select filter pill, NOT a single-select `<select>`.**
   `FILTER_COLUMNS` = **Sheet** (`sheet` field), **Topic** (`category`),
-  **Level**, **Priority**, in that order — all four use the exact same
-  Excel-style popover pattern (checkboxes, "Select All", Apply/Clear).
+  **Level**, **Priority**, **Answer** (see below), in that order — all
+  five use the exact same Excel-style popover pattern (checkboxes,
+  "Select All", Apply/Clear).
   There used to be a standalone `<select id="sheetSelect">` dropdown that
   could only pick one sheet (or "All Sheets") at a time — the user
   explicitly asked why multi-select wasn't available for Sheet like the
@@ -364,33 +365,47 @@ see §2.
     Hashtable?" exists, since the literal phrase "hashmap hashtable"
     never occurs. The user explicitly asked for this. Don't revert to
     single-substring matching without being asked.
-- "Clear Filters" resets: all four column filters (Sheet/Topic/Level/
-  Priority) → null, search → empty.
-- **All four browse-mode filter popovers (Sheet/Topic/Level/Priority) use
-  the same chip multi-select pattern as Interview Mode's config modal**
-  (`buildChipGroup()`/`chipGroupSelected()`, §7) — NOT a checkbox list.
-  Sheet gets its own dedicated trigger row/button above Search
-  (`#sheetFilterBtn`/`#sheetFilterPopover`); Topic/Level/Priority render
-  as pill buttons in `#filterButtons` below Search. Both trigger styles
-  share one popover open/close/render implementation via the
-  `popoverRefs` lookup and `renderFilterPopoverChips()` (built once in
+- "Clear Filters" resets: all five column filters (Sheet/Topic/Level/
+  Priority/Answer) → null, search → empty.
+- **All five browse-mode filter popovers (Sheet/Topic/Level/Priority/
+  Answer) use the same chip multi-select pattern as Interview Mode's
+  config modal** (`buildChipGroup()`/`chipGroupSelected()`, §7) — NOT a
+  checkbox list. Sheet gets its own dedicated trigger row/button above
+  Search (`#sheetFilterBtn`/`#sheetFilterPopover`); Topic/Level/Priority/
+  Answer render as pill buttons in `#filterButtons` below Search. Both
+  trigger styles share one popover open/close/render implementation via
+  the `popoverRefs` lookup and `renderFilterPopoverChips()` (built once in
   `buildFilterButtons()`). There is no `.fp-item` checkbox pattern
   anywhere in this app anymore, and no standalone `<select>` for Sheet —
   don't reintroduce either; a past version of this doc described that
   older checkbox-based architecture, which was fully replaced.
-- **Topic's popover gets a search box (`.fp-search`), the other three
-  don't.** Topic (`category`) can run to 100+ distinct values (mixing
-  several synced sheets), which is too many to scan/scroll through even
-  as wrapped chips — a text input above the chip-group filters which
-  chips are visible as you type (`chip.style.display`, matched against
+- **Topic's popover gets a search box (`.fp-search`), the others don't.**
+  Topic (`category`) can run to 100+ distinct values (mixing several
+  synced sheets), which is too many to scan/scroll through even as
+  wrapped chips — a text input above the chip-group filters which chips
+  are visible as you type (`chip.style.display`, matched against
   `chip.dataset.value` case-insensitively), while the wildcard "All" chip
   always stays visible so the filter can always be cleared. Filtering
   which chips are VISIBLE never touches which are SELECTED — a chip
   picked before typing a search term stays selected even while hidden
   from view, and `chipGroupSelected()` still reports it on Apply. Sheet/
-  Level/Priority don't get this search box — their value counts (a
-  handful each) don't need it; only add it elsewhere if that value count
-  grows enough to need it too, don't add it everywhere by default.
+  Level/Priority/Answer don't get this search box — their value counts (a
+  handful each, and Answer is fixed at exactly two) don't need it; only
+  add it elsewhere if that value count grows enough to need it too, don't
+  add it everywhere by default.
+- **Answer is a filter on presence, not on a real per-row value** —
+  `FILTER_COLUMNS`' `answer` entry doesn't correspond to raw distinct
+  values like the other four (an answer is long free-form rich text, not
+  a categorical field), so it bypasses `uniqueValues()` entirely and
+  always shows exactly two fixed synthetic chips: `ANSWER_FILTER_VALUES =
+  ['Blank', 'Non Blank']`. Matched in `applyFilters()`'s `matchesCols` by
+  a special case on `col.key === 'answer'`: `Non Blank` if
+  `answerPlain.trim()` is non-empty, `Blank` otherwise — the same
+  has-an-answer-or-not test `answerHtmlOrPlaceholder()` already used for
+  rendering the "No answer added in Excel yet." placeholder (§5), just
+  reused for filtering. Added at explicit user request, the same
+  "blank/non-blank" naming convention as Priority's `Non Blank` chip
+  (above) — don't rename the two bucket labels without being asked.
 
 ## 7. Interview Mode
 
@@ -789,11 +804,13 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
   content in the raw file even though `extract_data.py` never reads it
   into `DATA` — don't want that ending up in a public repo's git history.
   If the user wants the workbook tracked somewhere, that's a separate,
-  explicit decision, not the default. Also ignored: `*.bak` (the safety
-  backups `extract_data.py`/`clear_data.py`/`add_sheets.py`/
-  `smart_sync.py` write before overwriting `index.html`, §12),
-  `extracted_questions.json` (only survives a failed sync run), Python's
-  `__pycache__/`, and common OS/editor cruft.
+  explicit decision, not the default. Also ignored: `*.bak` (the
+  timestamped safety backups every sync/remove/clear/restore script
+  writes into `bkp/` before overwriting `index.html`, keeping only the
+  newest 5 — §12; the `*.bak` pattern already covers the whole `bkp/`
+  folder, no separate line needed), `extracted_questions.json` (only
+  survives a failed sync run), Python's `__pycache__/`, and common OS/
+  editor cruft.
 
 ## 11. General change discipline
 
@@ -890,8 +907,10 @@ safe:
   config, and this project has no build step to work around that. The
   sync scripts live in `scripts/` (`extract_data.py`, `add_sheets.py`,
   `smart_sync.py`, `clear_data.py`, `remove_sheet.py`, plus
-  `add_sheets_menu.py`/`list_sheets.py`/`verify_index.py`/`edit_config.py`
-  — see the full script rundown below); the detailed docs live in `docs/`
+  `add_sheets_menu.py`/`list_sheets.py`/`verify_index.py`/`edit_config.py`/
+  `check_stale.py`/`restore_backup.py` — see the full script rundown
+  below); backups land in a `bkp/` folder alongside `scripts/` at the repo
+  root (git-ignored, §10), not tracked; the detailed docs live in `docs/`
   (`RULES.md` — this file — and `SYNC_EXCEL.md`). `README.md`, `CLAUDE.md`,
   `.gitignore`, and the `.xlsx` workbook stay at the root alongside
   `index.html`. Every script resolves paths off `PROJECT_ROOT =
@@ -926,11 +945,18 @@ safe:
   and a human (or Claude) did the splice into `index.html` by hand as a
   separate reviewed step — the user explicitly asked whether this would
   work without Claude at all, so the splice was moved into the script
-  itself. Before overwriting, it backs up the current `index.html` to
-  `index.html.bak` (restore by copying that back over `index.html` if a
-  run looks wrong) — if `var DATA = [ ... ];` can't be found in
-  `index.html` at all, it raises and writes nothing rather than guessing
-  where to put the data. `extracted_questions.json` is written mid-run as
+  itself. Before overwriting, it backs up the current `index.html` into
+  `bkp/` as a timestamped `index.html.<timestamp>.bak`, pruning to keep
+  only the newest 5 (`BACKUPS_TO_KEEP` in `extract_data.py`) — restore via
+  `restore_backup.py`'s numbered picker (or manage.bat option 11), or by
+  copying the right file back over `index.html` by hand. This replaced an
+  earlier single always-overwritten `index.html.bak` — the user pointed
+  out that a run several syncs ago was unrecoverable once a later run
+  clobbered the one backup slot; keeping the last 5 means a bad run
+  doesn't have to be caught immediately to still be undoable. If
+  `var DATA = [ ... ];` can't be found in `index.html` at all, it raises
+  and writes nothing rather than guessing where to put the data.
+  `extracted_questions.json` is written mid-run as
   a debugging intermediate but auto-deleted after a successful splice —
   it only survives if the splice step itself failed, for troubleshooting.
 - **To re-sync after the Excel changes**: just run `python
@@ -1160,26 +1186,54 @@ safe:
   and reasonably flagged that there was no way to change `server_port`/
   `rows_per_sheet` without opening a script file by hand, undermining the
   "configurable, not hardcoded" point of `config.json` in the first place.
-- **`manage.bat`** (repo root) — a menu launcher over all 9 scripts above
+- **`check_stale.py`** — a 10th standalone script, read-only, never
+  touches `index.html`/the workbook. Compares the `.xlsx` workbook's mtime
+  against `index.html`'s mtime and prints a one-line heads-up if the
+  workbook was modified more recently — nothing at all otherwise (silence
+  is the common case). `manage.bat` runs this exactly once, right at
+  launch before the menu is first shown — NOT on every return-to-menu
+  loop (it sits above the `:menu` label, which the "done" loop jumps back
+  to without re-running it). Exists so editing the workbook and then
+  forgetting to sync doesn't silently leave the app showing stale data —
+  the user asked for this specifically after being burned by exactly that
+  once. Purely a heads-up, never blocks/prompts/exits.
+- **`restore_backup.py`** — an 11th standalone script, the interactive
+  picker for `bkp/`'s backups (see `splice_into_index_html()`'s
+  keep-last-5 scheme above). Lists up to the 5 kept backups for
+  `index.html`, newest first, with each one's timestamp and question
+  count, and takes a single numbered pick rather than always restoring
+  blindly "the last one" — useful when the run you want to undo wasn't
+  the most recent one. Confirms with a plain `Y/N` prompt (same pattern
+  as `remove_sheet.py`). **Restoring is a full raw-file copy of the
+  chosen backup over `index.html`, not a DATA-only splice** — a backup
+  can predate a code edit to `index.html` itself, not just a data sync,
+  so restoring has to undo everything about that run, not just its data.
+  The current `index.html` is itself backed up into `bkp/` first (same
+  scheme), so restoring is itself undoable, not a one-way door.
+- **`manage.bat`** (repo root) — a menu launcher over all 11 scripts above
   plus local-dev/workflow conveniences, so the user can do any of this by
   double-clicking without opening VS Code/a terminal:
-  - Smart Sync / Add Sheet / Full Resync / Remove Sheet each auto-chain
-    into `verify_index.py` immediately afterward (so the standard §11
-    post-change check happens without a separate manual step) — **Clear
-    Data deliberately does NOT auto-verify**, since an intentionally-empty
-    `DATA` would just report a spurious-looking "0 questions" rather than
-    signal a real problem.
+  - Runs `check_stale.py` once at launch, before the menu is shown (see
+    above) — printed above the menu banner, not tucked into any one
+    action.
+  - Smart Sync / Add Sheet / Full Resync / Remove Sheet / Restore Backup
+    each auto-chain into `verify_index.py` immediately afterward (so the
+    standard §11 post-change check happens without a separate manual
+    step) — **Clear Data deliberately does NOT auto-verify**, since an
+    intentionally-empty `DATA` would just report a spurious-looking "0
+    questions" rather than signal a real problem.
   - Add Sheet delegates to `add_sheets_menu.py` — a numbered pick, not a
     typed sheet name (see above).
   - Data Summary (`list_sheets.py` standalone), Verify, Serve Locally
     (delegates to `scripts/serve.py` — Python's `http.server` on the
     `config.json`-configured port, with the browser auto-opened; not
     hardcoded in `manage.bat` itself), Open `index.html` directly
-    (`file://`), Open the `.xlsx` workbook directly, Restore Last Backup
-    (copies `index.html.bak` back over `index.html`, gated behind a typed
-    `YES` confirmation, mirroring `clear_data.py`'s confirm-phrase
-    pattern), and View/Edit Settings (`edit_config.py` — see above) round
-    out the menu.
+    (`file://`), Open the `.xlsx` workbook directly, Restore Backup
+    (delegates to `restore_backup.py`'s numbered picker over the last 5
+    backups in `bkp/` — see above; this replaced an earlier version that
+    always restored the single `index.html.bak` behind a typed `YES`
+    confirmation), and View/Edit Settings (`edit_config.py` — see above)
+    round out the menu.
   - **Every action prints a `[%TIME%] <action> starting/done` line**
     (Windows `%TIME%`, e.g. `[18:41:53.63]`) — added alongside the
     `--quiet` verify change above, same "concise and readable, and show

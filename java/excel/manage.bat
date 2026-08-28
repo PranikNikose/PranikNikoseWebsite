@@ -2,6 +2,8 @@
 setlocal
 cd /d "%~dp0"
 
+python scripts\check_stale.py
+
 :menu
 echo.
 echo ============================================
@@ -22,7 +24,7 @@ echo    9. Open index.html      (opens the file directly, no server)
 echo.
 echo   -- Other --
 echo   10. Open Excel Workbook  (opens the .xlsx source file directly)
-echo   11. Restore Last Backup  (index.html.bak - undo the most recent sync)
+echo   11. Restore Backup       (pick from the last 5 backups in bkp/)
 echo   12. View/Edit Settings   (server port, row cap - config.json)
 echo   13. Exit
 echo.
@@ -109,19 +111,10 @@ python scripts\edit_config.py
 goto done
 
 :restore_backup
-echo [%TIME%] Restore Last Backup
-if not exist "%~dp0index.html.bak" (
-  echo No index.html.bak found -- nothing to restore.
-  goto done
-)
-echo This will overwrite the current index.html with index.html.bak.
-set /p confirm="Type YES to confirm: "
-if /i "%confirm%"=="YES" (
-  copy /y "%~dp0index.html.bak" "%~dp0index.html" >nul
-  echo [%TIME%] Restored.
-) else (
-  echo [%TIME%] Cancelled -- nothing changed.
-)
+echo [%TIME%] Restore Backup
+python scripts\restore_backup.py
+python scripts\verify_index.py --quiet
+echo [%TIME%] done.
 goto done
 
 :done

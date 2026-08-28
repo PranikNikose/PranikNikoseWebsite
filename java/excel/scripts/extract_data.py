@@ -18,11 +18,13 @@ nothing else in index.html is touched). Rich text (bold/italic/underline/
 color) is preserved automatically via openpyxl's rich_text mode, exactly
 as it's formatted in the workbook.
 
-Before overwriting, the previous index.html is backed up to
-index.html.bak -- if a run looks wrong, restore it by copying that file
-back over index.html. If the DATA array can't be found in index.html at
-all, the script raises an error and writes nothing (never guesses where
-to put the data).
+Before overwriting, the previous index.html is backed up into bkp/ as a
+timestamped file, keeping only the newest 5 -- if a run looks wrong,
+restore via restore_backup.py's numbered picker (or manage.bat option
+11), or by copying the right bkp/*.bak file back over index.html by
+hand. If the DATA array can't be found in index.html at all, the script
+raises an error and writes nothing (never guesses where to put the
+data).
 
 **Which sheets get pulled is data-driven, not a hardcoded list**: with no
 arguments, this re-extracts exactly whatever sheets are CURRENTLY present
@@ -38,7 +40,7 @@ config.json's "rows_per_sheet" key (repo root) instead of a constant here
 -- see scripts/config.py. Leave it null/absent for the full dataset.
 """
 
-import openpyxl, json, html as htmlmod, re, os, glob, sys
+import openpyxl, json, html as htmlmod, re, os, glob, sys, datetime
 from openpyxl.cell.rich_text import CellRichText, TextBlock
 import config as cfg
 
@@ -323,6 +325,9 @@ def extract(sheets=None, rows_per_sheet=None):
 INDEX_HTML = os.path.join(PROJECT_ROOT, 'index.html')
 DATA_ARRAY_RE = re.compile(r'var DATA = (\[[\s\S]*?\]);\n')
 
+BACKUP_DIR = os.path.join(PROJECT_ROOT, 'bkp')
+BACKUPS_TO_KEEP = 5
+
 
 def to_js_array_literal(questions):
     js = json.dumps(questions, ensure_ascii=False)
@@ -345,12 +350,28 @@ def read_current_data(html_path=INDEX_HTML):
     return json.loads(m.group(1).replace('<\\/', '</'))
 
 
+def prune_old_backups(basename):
+    """Keeps only the newest BACKUPS_TO_KEEP backup files for `basename`
+    (e.g. 'index.html') in BACKUP_DIR -- deletes the rest. Filenames are
+    timestamped as '<basename>.<YYYYMMDD_HHMMSS_ffffff>.bak', which sorts
+    lexicographically the same as chronologically, so a plain name sort
+    is enough to find the oldest ones without touching file mtimes."""
+    pattern = os.path.join(BACKUP_DIR, basename + '.*.bak')
+    existing = sorted(glob.glob(pattern))
+    for old_path in existing[:-BACKUPS_TO_KEEP]:
+        os.remove(old_path)
+
+
 def splice_into_index_html(questions, html_path=INDEX_HTML):
     """Full overwrite of index.html's `var DATA = [ ... ];` array -- the
-    one and only thing this touches. Backs up the previous index.html to
-    `<html_path>.bak` first, so a bad run can be undone by copying that
-    back over index.html. Raises (and writes nothing) if the DATA array
-    can't be found, rather than guessing where to put it."""
+    one and only thing this touches. Backs up the previous index.html
+    first into BACKUP_DIR (bkp/) as a timestamped '<name>.<timestamp>.bak'
+    file, keeping only the newest BACKUPS_TO_KEEP (older ones pruned
+    automatically) -- so a bad run can be undone by copying the right
+    backup back over index.html, and a run from a while ago isn't lost
+    just because a later run overwrote the one-and-only '.bak' that used
+    to exist. Raises (and writes nothing) if the DATA array can't be
+    found, rather than guessing where to put it."""
     with open(html_path, encoding='utf-8') as f:
         current_html = f.read()
 
@@ -364,9 +385,13 @@ def splice_into_index_html(questions, html_path=INDEX_HTML):
     new_block = 'var DATA = ' + to_js_array_literal(questions) + ';\n'
     new_html = current_html[:m.start()] + new_block + current_html[m.end():]
 
-    backup_path = html_path + '.bak'
+    os.makedirs(BACKUP_DIR, exist_ok=True)
+    basename = os.path.basename(html_path)
+    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+    backup_path = os.path.join(BACKUP_DIR, basename + '.' + timestamp + '.bak')
     with open(backup_path, 'w', encoding='utf-8') as f:
         f.write(current_html)
+    prune_old_backups(basename)
 
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(new_html)

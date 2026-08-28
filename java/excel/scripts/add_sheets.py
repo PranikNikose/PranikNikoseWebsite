@@ -9,13 +9,14 @@ Usage:
     python scripts/add_sheets.py React "Design Pattern"
     python scripts/add_sheets.py --all
 
---all pulls every real, non-HR tab currently in the workbook (read live
-via openpyxl, not a hardcoded list) -- so a brand-new Excel tab is picked
-up automatically without any code changes.
+--all pulls every real tab currently in the workbook (read live via
+openpyxl, not a hardcoded list) -- so a brand-new Excel tab is picked up
+automatically without any code changes.
 
 Always pulls the FULL row count for whatever it adds (not the sampled/
 testing cap) -- adding a sheet on purpose is itself the go-ahead to pull
-everything for it. Backs up index.html to index.html.bak first.
+everything for it. Backs up index.html into bkp/ (timestamped, keeps the
+last 5) first.
 """
 
 import sys

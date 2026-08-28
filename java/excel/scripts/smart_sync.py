@@ -43,7 +43,8 @@ full regardless of --quiet.
 
 Only touches sheets that are ALREADY in index.html (use add_sheets.py to
 bring in a sheet for the first time). Always pulls the full row count for
-whatever sheets it re-checks. Backs up index.html to index.html.bak first.
+whatever sheets it re-checks. Backs up index.html into bkp/ first
+(timestamped, keeps the last 5).
 """
 
 import sys

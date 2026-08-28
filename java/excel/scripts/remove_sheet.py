@@ -7,7 +7,7 @@ was, re-extracted fresh from Excel.
 
 Lists every sheet currently IN DATA with its row count, numbered, and
 lets the user pick by number -- so a typo just picks nothing instead of
-silently matching the wrong sheet name. Confirms with a plain y/N prompt
+silently matching the wrong sheet name. Confirms with a plain Y/N prompt
 before writing (the numbered pick already rules out fat-finger sheet
 selection, so a typed phrase isn't needed on top of it). Only removes
 whole sheets; use smart_sync.py if you want row-level removal (rows
@@ -16,10 +16,10 @@ deleted from Excel itself).
 Usage:
     python scripts/remove_sheet.py
 
-Backs up the current index.html to index.html.bak first (via
-splice_into_index_html) -- to undo, copy that file back over index.html
-before running anything else (a later script run will overwrite
-index.html.bak with ITS OWN backup, so don't wait).
+Backs up the current index.html into bkp/ first (via
+splice_into_index_html, timestamped, keeps the last 5) -- to undo, copy
+the newest bkp/*.bak file back over index.html, or use
+restore_backup.py's numbered picker.
 """
 
 import extract_data as ed
