@@ -872,9 +872,11 @@ safe:
   place, not a hypothetical to design around.
 - **Project hierarchy**: `index.html` MUST stay at the repo root — GitHub
   Pages (§10) only serves from the root or a `/docs` folder without extra
-  config, and this project has no build step to work around that. The 4
+  config, and this project has no build step to work around that. The
   sync scripts live in `scripts/` (`extract_data.py`, `add_sheets.py`,
-  `smart_sync.py`, `clear_data.py`); the detailed docs live in `docs/`
+  `smart_sync.py`, `clear_data.py`, `remove_sheet.py`, plus
+  `add_sheets_menu.py`/`list_sheets.py`/`verify_index.py`/`edit_config.py`
+  — see the full script rundown below); the detailed docs live in `docs/`
   (`RULES.md` — this file — and `SYNC_EXCEL.md`). `README.md`, `CLAUDE.md`,
   `.gitignore`, and the `.xlsx` workbook stay at the root alongside
   `index.html`. Every script resolves paths off `PROJECT_ROOT =
@@ -890,8 +892,8 @@ safe:
   need) is the one authoritative extraction pipeline: reads the `.xlsx`
   with `openpyxl(rich_text=True)`, applies every rule in §3/§4 (column
   mapping by header name per sheet, rich-text preservation, one-Excel-row-
-  one-entry with `questionParts` for alternate phrasings, HR exclusion,
-  the row cap from `config.json`), and **writes the result straight into
+  one-entry with `questionParts` for alternate phrasings, the row cap from
+  `config.json`), and **writes the result straight into
   `index.html`'s `var DATA = [ ... ];` array itself** (full overwrite of
   just that array, via `splice_into_index_html()`).
 - **The workbook filename is NOT hardcoded** — `find_workbook()` auto-
@@ -922,8 +924,8 @@ safe:
   live serve
   check) before considering the sync done — the script writing
   successfully doesn't by itself prove the result is correct. (Or use
-  `manage.bat` option 3, which chains straight into `verify_index.py`
-  automatically.)
+  `manage.bat` option 5 (Full Resync), which chains straight into
+  `verify_index.py` automatically.)
 - **`extract_data.py` has NO hardcoded sheet list anymore.** Originally a
   module-level `SHEETS = ['CoreJava', 'SpringBoot', 'Microservices']`
   constant controlled a plain run's scope, requiring a manual code edit
@@ -1037,22 +1039,26 @@ safe:
   SYNC_EXCEL.md §5 that were previously done by hand each time: both
   inline `<script>` blocks parse (`node --check`), every
   `getElementById('...')` call has a matching `id="..."`, and a data
-  sanity pass (total + per-sheet counts, `HR` == 0, at least one rich-text
-  sample, at least one multi-phrasing sample). Requires `node` on PATH for
-  the syntax check. Run standalone (`python scripts/verify_index.py`) or
-  via `manage.bat` option 6 — run it after any manual edit to `index.html`
-  as a quick sanity pass, though it doesn't replace judgment (it can't
-  catch a rendering/behavior regression, only structural/data breakage).
+  sanity pass (total + per-sheet counts, at least one rich-text sample, at
+  least one multi-phrasing sample). Requires `node` on PATH for the syntax
+  check. Run standalone (`python scripts/verify_index.py`) or via
+  `manage.bat` option 7 — run it after any manual edit to `index.html` as
+  a quick sanity pass, though it doesn't replace judgment (it can't catch
+  a rendering/behavior regression, only structural/data breakage).
+  **No longer hard-checks HR == 0** — that check predated the user's
+  explicit decision to include HR (§3's HR note) and was removed once
+  noticed contradicting that decision; HR is a normal sheet like any
+  other now.
   **Supports `--quiet`/`-q`**: on success, collapses the normal 3-section,
   ~20-line breakdown into one summary line (`Verify: OK -- syntax OK, ids
-  55/55, 997 questions across 4 sheet(s), HR=0.`); on failure, still prints
+  55/55, 1029 questions across 5 sheet(s).`); on failure, still prints
   full detail for whatever failed (never hides a real problem, only
   compresses the passing case). Added after the user said the auto-chained
-  verify output (after every Smart Sync/Add Sheet/Full Resync) made
-  `manage.bat` "not properly readable" and asked for concise logs —
-  `manage.bat`'s auto-chained calls use `--quiet`; the standalone Verify
-  menu option (6) still calls it without the flag, since choosing that
-  option IS explicitly asking for the full detail.
+  verify output (after every Smart Sync/Add Sheet/Full Resync/Remove
+  Sheet) made `manage.bat` "not properly readable" and asked for concise
+  logs — `manage.bat`'s auto-chained calls use `--quiet`; the standalone
+  Verify menu option (7) still calls it without the flag, since choosing
+  that option IS explicitly asking for the full detail.
   **`smart_sync.py` and `extract_data.py` gained the same `--quiet` flag**
   after a follow-up "reduce the logs more, for the WHOLE manage.bat" ask —
   same principle: `--quiet` drops decorative/after-the-fact detail
@@ -1105,11 +1111,29 @@ safe:
   extract-and-splice primitives as `add_sheets.py` (`ed.extract()` +
   `ed.splice_into_index_html()`) rather than duplicating logic — it's a
   different front-end onto the same add operation, not a separate
-  mechanism. `manage.bat`'s Add Sheet option (2) calls this instead of the
+  mechanism. `manage.bat`'s Add Sheet option (3) calls this instead of the
   old two-step (`list_sheets.py` then a free-text `set /p`) — `add_sheets.py`
   itself is unchanged and still available for CLI/scripted use with exact
   names or `--all`.
-- **`edit_config.py`** — an 8th standalone script: an interactive prompt to
+- **`remove_sheet.py`** — an 8th standalone script, the removal
+  counterpart to `add_sheets_menu.py`: lists every sheet currently IN
+  `DATA` (with row counts), takes a single numbered pick, and splices
+  `DATA` back in with that sheet's rows dropped — Excel itself is
+  untouched, so `add_sheets_menu.py` brings the sheet back later exactly
+  as it currently exists there. Confirms with a plain `y/N` prompt before
+  writing — unlike `clear_data.py`'s typed confirm-phrase gate, since the
+  numbered sheet pick here already rules out selecting the wrong sheet by
+  accident; the user explicitly asked for `y/N` over a typed phrase.
+  Added because the existing
+  removal path (`smart_sync.py`'s per-row removal, gated on rows that no
+  longer exist *in the Excel source itself*) had no way to temporarily
+  drop a whole sheet the user still wants to keep in Excel — the user
+  asked for exactly that ("remove sheet 1 - HR", intending to re-add it
+  later). Shares `extract_data.py`'s `read_current_data()`/
+  `splice_into_index_html()`, no duplicated logic. `manage.bat`'s Remove
+  Sheet option (4) calls this, then auto-chains into `verify_index.py`
+  same as Smart Sync/Add Sheet/Full Resync.
+- **`edit_config.py`** — a 9th standalone script: an interactive prompt to
   view/change `config.json`'s settings (`server_port`, `rows_per_sheet`)
   without hand-editing JSON. Blank input at either prompt keeps the
   current value; `"full"`/`"none"`/`"null"` clears `rows_per_sheet` back
@@ -1121,11 +1145,11 @@ safe:
   and reasonably flagged that there was no way to change `server_port`/
   `rows_per_sheet` without opening a script file by hand, undermining the
   "configurable, not hardcoded" point of `config.json` in the first place.
-- **`manage.bat`** (repo root) — a menu launcher over all 8 scripts above
+- **`manage.bat`** (repo root) — a menu launcher over all 9 scripts above
   plus local-dev/workflow conveniences, so the user can do any of this by
   double-clicking without opening VS Code/a terminal:
-  - Smart Sync / Add Sheet / Full Resync each auto-chain into
-    `verify_index.py` immediately afterward (so the standard §11
+  - Smart Sync / Add Sheet / Full Resync / Remove Sheet each auto-chain
+    into `verify_index.py` immediately afterward (so the standard §11
     post-change check happens without a separate manual step) — **Clear
     Data deliberately does NOT auto-verify**, since an intentionally-empty
     `DATA` would just report a spurious-looking "0 questions" rather than
