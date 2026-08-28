@@ -73,10 +73,10 @@ plain text. Real sheets: HR, Coding, CoreJava, Adv. Java, Junit, Maven,
 JDBC, Spring Frmwrk, Hibernate, Spring Sec., SpringBoot, Microservices,
 DSA, API, RDBMS, Design Pattern, AI, React.
 
-Currently embedded: **998 questions across 4 sheets** — CoreJava (320),
-SpringBoot (292), Microservices (316), Coding (70) — at full row count,
-per the user's explicit selective-sync requests (SYNC_EXCEL.md §2b,
-`add_sheets.py` for Coding). The remaining sheets (including `HR` and two
+Currently embedded: **1029 questions across 5 sheets** — CoreJava (320),
+SpringBoot (292), Microservices (316), Coding (70), HR (31) — at full row
+count, per the user's explicit selective-sync requests (SYNC_EXCEL.md
+§2b, `add_sheets.py` for Coding/HR). The remaining sheets (including two
 tabs not yet in the catalog above, `DevOps`/`Caching`) are not yet in
 `DATA`; add them the same way (either individually via §2b, or all at
 once via §2) when asked. `HR` used to be hard-excluded everywhere
@@ -141,13 +141,16 @@ for HR to be included** ("add it now" / "i want hr in it", after being
 told exactly what it contains and that this project deploys publicly) —
 the code-level exclusion was removed from all three scripts at that
 request; HR now behaves like any other sheet in every listing/picker.
-As of this note, HR itself has NOT yet been synced into `DATA` (0 rows) —
-Claude was blocked by the auto-mode permission classifier from running
-the actual extraction (`add_sheets.py HR`), so the user was asked to run
-that command themselves in their own terminal. If HR ever needs
-re-excluding (the user changes their mind), reinstate the `!= 'HR'`
-filter in those three scripts and note it here again — don't silently
-re-add it without being asked, symmetric with how it was removed.
+HR was subsequently synced into `DATA` by the user running the extraction
+themselves (`add_sheets.py HR`) — it now has **31 rows**, same as any
+other synced sheet. `scripts/verify_index.py`'s data-sanity check no
+longer hard-fails on a non-zero HR count (it originally did, a leftover
+from before this decision — that check was removed once it was noticed
+contradicting this rule). If HR ever needs re-excluding (the user changes
+their mind), reinstate the `!= 'HR'` filter in those three scripts, remove
+its 31 rows from `DATA`, and re-add an HR=0 check to `verify_index.py` —
+don't silently re-add any of that without being asked, symmetric with how
+it was removed.
 
 ## 4. Rich text formatting must be preserved, not flattened
 
@@ -784,8 +787,8 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
   Interview Mode (§7) is reveal-based practice, not a quiz.
 - Don't add more question data beyond what's actually in the source Excel
   without being asked, and never fabricate Q&A content (§3).
-- **Currently 997 questions across 4 sheets (CoreJava, SpringBoot,
-  Microservices, Coding) at full row count — the other 12 non-HR sheets
+- **Currently 1029 questions across 5 sheets (CoreJava, SpringBoot,
+  Microservices, Coding, HR) at full row count — the other 12 sheets
   are not yet in `DATA` on purpose.** The user adds sheets deliberately,
   one selective sync at a time — do not treat "test it", "fix bugs", or
   "enhance the UI" as an implicit green light to expand `DATA`. Only add

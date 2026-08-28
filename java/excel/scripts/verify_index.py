@@ -6,8 +6,10 @@ Claude to do it by hand each time:
   1. Both <script> blocks in index.html parse as valid JS (via `node --check`).
   2. Every getElementById('...') call has a matching id="..." in the HTML.
   3. A data sanity pass on the live DATA array: total count, per-sheet
-     counts, confirms HR is 0 (excluded by design), confirms at least one
-     rich-text sample and one multi-phrasing (questionParts) sample exist.
+     counts, confirms at least one rich-text sample and one multi-phrasing
+     (questionParts) sample exist. (HR is a normal sheet now -- the user
+     explicitly asked for it to be included, see docs/RULES.md section 3 --
+     so no special HR=0 check is enforced here.)
 
 Read-only -- never modifies index.html. Requires `node` on PATH (only for
 the syntax check; the rest is pure Python).
@@ -130,12 +132,6 @@ def main():
                 summary['total'] = len(data)
                 summary['sheets'] = len(by_sheet)
 
-                hr_count = by_sheet.get('HR', 0)
-                if hr_count != 0:
-                    ok = fail('HR sheet has ' + str(hr_count) + ' entries -- must be 0 (excluded by design)')
-                else:
-                    log('  OK -- HR sheet has 0 entries (excluded by design)')
-
                 rich = next((q for q in data if '<strong>' in (q.get('answer') or '') or '<em>' in (q.get('answer') or '')), None)
                 if rich:
                     log('  OK -- found a rich-text sample (bold/italic in answer)')
@@ -160,7 +156,7 @@ def main():
         if ok:
             print('Verify: OK -- syntax OK, ids ' + summary.get('ids', '?') + ', ' +
                   str(summary.get('total', '?')) + ' questions across ' +
-                  str(summary.get('sheets', '?')) + ' sheet(s), HR=0.')
+                  str(summary.get('sheets', '?')) + ' sheet(s).')
         else:
             flush_buffer()
 
