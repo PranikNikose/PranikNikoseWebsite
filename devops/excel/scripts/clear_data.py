@@ -32,7 +32,12 @@ def main():
     print('backup gets overwritten the next time ANY of these scripts run --')
     print('move a copy elsewhere first if you might need it long-term.')
     print()
-    typed = input('Type "' + CONFIRM_PHRASE + '" (exactly, case-sensitive) to proceed: ')
+    try:
+        typed = input('Type "' + CONFIRM_PHRASE + '" (exactly, case-sensitive) to proceed: ')
+    except (EOFError, KeyboardInterrupt):
+        print()
+        print('Cancelled -- nothing was changed.')
+        return
 
     if typed != CONFIRM_PHRASE:
         print('Confirmation text did not match -- aborted, nothing was changed.')

@@ -9,6 +9,10 @@ Usage:
     python scripts/add_sheets.py React "Design Pattern"
     python scripts/add_sheets.py --all
 
+--all pulls every real, non-HR tab currently in the workbook (read live
+via openpyxl, not a hardcoded list) -- so a brand-new Excel tab is picked
+up automatically without any code changes.
+
 Always pulls the FULL row count for whatever it adds (not the sampled/
 testing cap) -- adding a sheet on purpose is itself the go-ahead to pull
 everything for it. Backs up index.html to index.html.bak first.
@@ -28,14 +32,16 @@ def main():
     current = ed.read_current_data()
     existing_sheets = set(q['sheet'] for q in current)
 
+    real_sheet_names = list(ed.wb.sheetnames)
+
     if args == ['--all']:
-        targets = ed.ALL_KNOWN_SHEETS
+        targets = real_sheet_names
     else:
         targets = args
-        unknown = [s for s in targets if s not in ed.ALL_KNOWN_SHEETS]
+        unknown = [s for s in targets if s not in real_sheet_names]
         if unknown:
-            print('Warning: not in the known sheet list (will still try, but')
-            print('double-check these match the real Excel tab names exactly):')
+            print('Warning: not found as a tab in the current workbook (will still try,')
+            print('but double-check these match the real Excel tab names exactly):')
             for s in unknown:
                 print('  - ' + s)
             print()

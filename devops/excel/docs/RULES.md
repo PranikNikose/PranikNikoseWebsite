@@ -73,25 +73,17 @@ plain text. Real sheets: HR, Coding, CoreJava, Adv. Java, Junit, Maven,
 JDBC, Spring Frmwrk, Hibernate, Spring Sec., SpringBoot, Microservices,
 DSA, API, RDBMS, Design Pattern, AI, React.
 
-**As of the most recent sync, the workbook and `DATA` are DevOps-focused,
-not Java-focused** — the project pivoted from the original Java/Spring/
-RDBMS interview-prep workbook to a DevOps one (the source file is now
-`All_Study_and_Interview_Questions_Answers_List_0-10YoE_Devops.xlsx`,
-still auto-detected by filename-agnostic `find_workbook()`, see below).
-The old Java-era sheets (CoreJava, SpringBoot, Microservices, Coding,
-Junit, Maven, JDBC, Spring Frmwrk, Hibernate, Spring Sec., Caching, DSA,
-API, RDBMS, Design Pattern, AI, React, Adv. Java, and the old thin
-`DevOps` fragment sheet) no longer exist in the workbook.
-
-Currently embedded: **2,894 questions across 10 sheets** — Linux (275),
-Shell Scripting (250), Jenkins (332), Docker (308), Kubernetes (332),
-Terraform (296), AWS (317), Azure (273), Git (261), Ansible (250) — at
-full row count. The workbook also has 7 more DevOps-topic sheets not yet
-synced into `DATA`: `General-DevOps` (119), `Production-Incident Mgmt`
-(59), `Monitoring-Logging` (41), `Networking` (29), `Security-DevSecOps`
-(26), `Database` (12), `Maven-Build` (5) — add them the same way
-(`add_sheets.py`) when asked. `HR` is excluded (personal PII — see
-below).
+Currently embedded: **1029 questions across 5 sheets** — CoreJava (320),
+SpringBoot (292), Microservices (316), Coding (70), HR (31) — at full row
+count, per the user's explicit selective-sync requests (SYNC_EXCEL.md
+§2b, `add_sheets.py` for Coding/HR). The remaining sheets (including two
+tabs not yet in the catalog above, `DevOps`/`Caching`) are not yet in
+`DATA`; add them the same way (either individually via §2b, or all at
+once via §2) when asked. `HR` used to be hard-excluded everywhere
+(personal PII) — see the note below on why that's no longer a code-level
+block. `Adv. Java` is genuinely empty in the source (1 header row only,
+no data) — that's real workbook state, not a bug, and applies whenever
+it's synced in.
 
 **Column layout is NOT uniform across sheets** — read each sheet's header
 row and map columns by name (`sr`, `level`, `years`, `topic`, `question`,
@@ -140,9 +132,25 @@ objects to the `DATA` array — never make up new Q&A content.
 
 **Note on the HR sheet:** it contains personal, identifying content (the
 user's real name, employer, and career details) written as first-person
-interview answers. Since this app deploys to public GitHub Pages, don't
-pull rows from HR into `DATA` without the user explicitly confirming they
-want that personal content made public.
+interview answers. Since this app deploys to public GitHub Pages, adding
+its rows to `DATA` makes that personal content public once pushed/
+deployed — this was originally a hard, code-level exclusion (`add_sheets.py`/
+`add_sheets_menu.py`/`list_sheets.py` all filtered `HR` out by name, so it
+never appeared as a pickable option anywhere). **The user explicitly asked
+for HR to be included** ("add it now" / "i want hr in it", after being
+told exactly what it contains and that this project deploys publicly) —
+the code-level exclusion was removed from all three scripts at that
+request; HR now behaves like any other sheet in every listing/picker.
+HR was subsequently synced into `DATA` by the user running the extraction
+themselves (`add_sheets.py HR`) — it now has **31 rows**, same as any
+other synced sheet. `scripts/verify_index.py`'s data-sanity check no
+longer hard-fails on a non-zero HR count (it originally did, a leftover
+from before this decision — that check was removed once it was noticed
+contradicting this rule). If HR ever needs re-excluding (the user changes
+their mind), reinstate the `!= 'HR'` filter in those three scripts, remove
+its 31 rows from `DATA`, and re-add an HR=0 check to `verify_index.py` —
+don't silently re-add any of that without being asked, symmetric with how
+it was removed.
 
 ## 4. Rich text formatting must be preserved, not flattened
 
@@ -345,6 +353,17 @@ see §2.
     remove it again on that same reasoning.
 - **Search box**: free-text search across `questionPlain` + `answerPlain`.
   Not a fixed-value popover (search isn't a value list).
+  - **Multi-keyword AND matching, not one literal substring.** The typed
+    input is split on whitespace into separate terms; a row matches only
+    if **every** term appears somewhere in that row's combined
+    `questionPlain` + `answerPlain` text (order-independent, terms can
+    appear anywhere/either field). This replaced an earlier single-
+    substring match (`indexOf(searchTerm)`) that required the whole typed
+    string to appear verbatim and in order — so `HashMap Hashtable`
+    matched nothing even though "Difference between HashMap and
+    Hashtable?" exists, since the literal phrase "hashmap hashtable"
+    never occurs. The user explicitly asked for this. Don't revert to
+    single-substring matching without being asked.
 - "Clear Filters" resets: all four column filters (Sheet/Topic/Level/
   Priority) → null, search → empty.
 - **All four browse-mode filter popovers (Sheet/Topic/Level/Priority) use
@@ -768,21 +787,16 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
   Interview Mode (§7) is reveal-based practice, not a quiz.
 - Don't add more question data beyond what's actually in the source Excel
   without being asked, and never fabricate Q&A content (§3).
-- **Currently 2,894 questions across 10 DevOps sheets (Linux, Shell
-  Scripting, Jenkins, Docker, Kubernetes, Terraform, AWS, Azure, Git,
-  Ansible) at full row count — 7 more non-HR DevOps-topic sheets
-  (`General-DevOps`, `Production-Incident Mgmt`, `Monitoring-Logging`,
-  `Networking`, `Security-DevSecOps`, `Database`, `Maven-Build`) are not
-  yet in `DATA` on purpose.** The project pivoted from its original
-  Java/Spring/RDBMS dataset to this DevOps one — see §3. The user adds
-  sheets deliberately, one selective sync at a time — do not treat "test
-  it", "fix bugs", or "enhance the UI" as an implicit green light to
-  expand `DATA`. Only add more sheets/rows when the user explicitly asks
-  (`add_sheets.py`, see §12).
-- Known source-data quirk, not a bug, left as-is if it recurs: an earlier
-  sheet's (`Junit`, since removed) `level` values used a plain hyphen
-  (`"Fresher (0-1 Year)"`) while other sheets used an en-dash
-  (`"Fresher (0–1 Year)"`) — this is a real
+- **Currently 1029 questions across 5 sheets (CoreJava, SpringBoot,
+  Microservices, Coding, HR) at full row count — the other 12 sheets
+  are not yet in `DATA` on purpose.** The user adds sheets deliberately,
+  one selective sync at a time — do not treat "test it", "fix bugs", or
+  "enhance the UI" as an implicit green light to expand `DATA`. Only add
+  more sheets/rows when the user explicitly asks (see SYNC_EXCEL.md §2b
+  for the selective-sheet procedure, §2 for a full sync).
+- Known source-data quirk, not a bug, left as-is: the `Junit` sheet's
+  `level` values use a plain hyphen (`"Fresher (0-1 Year)"`) while other
+  sheets use an en-dash (`"Fresher (0–1 Year)"`) — this is a real
   inconsistency in the Excel workbook itself, so it shows as two separate
   entries in the Level filter/Interview Mode checklist. Don't silently
   normalize this in code without asking — it's a data question, not a
@@ -796,6 +810,18 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
 - `extracted_questions.json` (the intermediate dump `extract_data.py`
   writes) is ephemeral — delete it after splicing into `index.html`. The
   script itself is **not** ephemeral anymore — see §12.
+- **Every interactive `input()` prompt across the sync scripts
+  (`add_sheets_menu.py`, `edit_config.py`, `clear_data.py`,
+  `smart_sync.py`'s removal-confirmation prompt) is wrapped to handle
+  `EOFError`/`KeyboardInterrupt` gracefully** — a real user hitting Ctrl+C
+  mid-prompt (confirmed via `manage.bat` during development — the
+  workbook's rich-text `openpyxl` parse was mid-flight and the interrupt
+  surfaced as a raw traceback) now gets a clean "Cancelled" message and a
+  normal exit instead of a scary traceback. Destructive-prompt scripts
+  (`clear_data.py`, `smart_sync.py`'s removal step) treat an interrupt the
+  same as any non-matching confirmation input — safest default, nothing
+  gets removed. If a new interactive prompt is added to any script, wrap
+  it the same way.
 - **Defensive robustness fixes applied from a code-review pass
   (`Fix.txt`)**, kept as standing practice:
   - Search (`applyFilters`) reads `(q.questionPlain || '')`/
@@ -846,9 +872,11 @@ safe:
   place, not a hypothetical to design around.
 - **Project hierarchy**: `index.html` MUST stay at the repo root — GitHub
   Pages (§10) only serves from the root or a `/docs` folder without extra
-  config, and this project has no build step to work around that. The 4
+  config, and this project has no build step to work around that. The
   sync scripts live in `scripts/` (`extract_data.py`, `add_sheets.py`,
-  `smart_sync.py`, `clear_data.py`); the detailed docs live in `docs/`
+  `smart_sync.py`, `clear_data.py`, `remove_sheet.py`, plus
+  `add_sheets_menu.py`/`list_sheets.py`/`verify_index.py`/`edit_config.py`
+  — see the full script rundown below); the detailed docs live in `docs/`
   (`RULES.md` — this file — and `SYNC_EXCEL.md`). `README.md`, `CLAUDE.md`,
   `.gitignore`, and the `.xlsx` workbook stay at the root alongside
   `index.html`. Every script resolves paths off `PROJECT_ROOT =
@@ -864,8 +892,8 @@ safe:
   need) is the one authoritative extraction pipeline: reads the `.xlsx`
   with `openpyxl(rich_text=True)`, applies every rule in §3/§4 (column
   mapping by header name per sheet, rich-text preservation, one-Excel-row-
-  one-entry with `questionParts` for alternate phrasings, HR exclusion,
-  the `ROWS_PER_SHEET` cap), and **writes the result straight into
+  one-entry with `questionParts` for alternate phrasings, the row cap from
+  `config.json`), and **writes the result straight into
   `index.html`'s `var DATA = [ ... ];` array itself** (full overwrite of
   just that array, via `splice_into_index_html()`).
 - **The workbook filename is NOT hardcoded** — `find_workbook()` auto-
@@ -895,12 +923,49 @@ safe:
   steps from §11 (JS syntax check, `getElementById`/`id=` cross-check, a
   live serve
   check) before considering the sync done — the script writing
-  successfully doesn't by itself prove the result is correct.
-- **`ROWS_PER_SHEET` in `extract_data.py`** controls how much of each
-  sheet gets pulled — currently `None` (full dataset; was `10` during the
-  early UI-iteration/testing-phase, §11, before the user asked for the
-  real CoreJava/SpringBoot/Microservices data). Only go back to a sampled
-  cap if the user explicitly asks to.
+  successfully doesn't by itself prove the result is correct. (Or use
+  `manage.bat` option 5 (Full Resync), which chains straight into
+  `verify_index.py` automatically.)
+- **`extract_data.py` has NO hardcoded sheet list anymore.** Originally a
+  module-level `SHEETS = ['CoreJava', 'SpringBoot', 'Microservices']`
+  constant controlled a plain run's scope, requiring a manual code edit
+  every time a sheet was added (a real, confirmed footgun: `add_sheets.py`
+  deliberately never touched `SHEETS`, so a later plain `extract_data.py`
+  run would have silently dropped whatever `add_sheets.py` had added,
+  since a run is a full overwrite of `DATA`). Replaced after the user
+  asked for the project's tooling to be data-driven/configurable instead
+  of hardcoded: `extract()` with no `sheets` argument now derives the
+  default from `sorted(set(q['sheet'] for q in read_current_data()))` —
+  i.e. **a plain run always mirrors whatever sheets are currently embedded
+  in `index.html`**, so it can never go stale against a constant someone
+  forgot to update. To target something else (add/drop a sheet for one
+  run), pass sheet names as CLI args instead — `extract(sheets=[...])`
+  already supported this for other scripts to call programmatically; the
+  `__main__` block now also reads `sys.argv[1:]` and passes it through
+  when present (`python scripts/extract_data.py CoreJava SpringBoot`).
+  Don't reintroduce a hardcoded `SHEETS` constant — if a script needs an
+  explicit sheet set, it should derive it from live workbook/DATA state or
+  accept it as an argument, not embed it in source.
+- **Row cap (full dataset vs. sampled/testing) is configurable, not a
+  hardcoded constant.** `config.json` at the repo root (loaded via
+  `scripts/config.py`'s `load_config()`, which falls back to sane
+  defaults if the file is missing/malformed/missing a key — this is
+  convenience config, not something that should ever block a script from
+  running) holds `"rows_per_sheet"`: `null` for the full dataset, an
+  integer for a sampled/testing cap. `extract_data.py` reads
+  `ROWS_PER_SHEET = cfg.load_config()['rows_per_sheet']` at import time
+  instead of hardcoding the value. Currently `null` (full dataset; was a
+  hardcoded `10` during the early UI-iteration/testing-phase, §11, before
+  the user asked for the real CoreJava/SpringBoot/Microservices data).
+  Only go back to a sampled cap if the user explicitly asks to.
+- **`config.json`/`scripts/config.py` is the one shared place for
+  project-wide settings** — currently `server_port` (used by
+  `scripts/serve.py`, see below) and `rows_per_sheet`. `DEFAULTS` in
+  `config.py` documents/enforces the known keys; unknown keys in
+  `config.json` are silently ignored rather than erroring (forward
+  compatible, not strict-schema). If a future setting needs to be
+  configurable rather than hardcoded, add it here rather than as a new
+  constant in some other script.
 - This workflow is also how `questionParts`/rich-text/etc. formatting
   bugs get fixed going forward: fix the extraction logic in
   `extract_data.py`, re-run, re-splice — not by hand-patching individual
@@ -914,17 +979,21 @@ safe:
     anything, since this app has no real multi-user "admin" system to
     gate it with — the typed phrase is the stand-in the user asked for.
     Backs up `index.html` first, same as every script here.
-  - **`add_sheets.py <Sheet> [<Sheet> ...]`** (or `--all` for the whole
-    known workbook, resolved via `ed.ALL_KNOWN_SHEETS` — the same 17-sheet
-    non-HR list from §3, kept in `extract_data.py` so this script and any
-    other tooling can share it instead of re-typing it) — adds sheets that
-    AREN'T already in `DATA`; any requested sheet that's already present
-    is skipped and left completely untouched, never re-extracted or
-    overwritten. Always pulls the full row count for whatever it adds.
-    This is what makes "add a sheet" additive without needing separate
-    merge logic in `extract_data.py` itself — see the note above about
-    `SHEETS` being edited directly for that script's own runs, which is a
-    different, narrower mechanism.
+  - **`add_sheets.py <Sheet> [<Sheet> ...]`** (or `--all` for every real
+    tab **read live from the workbook** — `list(ed.wb.sheetnames)`, not a
+    hardcoded list; previously resolved via a curated `ed.ALL_KNOWN_SHEETS`
+    constant that had to be hand-updated whenever the workbook's tabs
+    changed, replaced for the same data-driven/configurable reasoning as
+    `extract_data.py`'s `SHEETS` above; `HR` was also filtered out of this
+    list by name until the user explicitly asked for it to be included —
+    see the HR note in §3) — adds sheets that AREN'T already in `DATA`;
+    any requested sheet that's already present is skipped and left completely
+    untouched, never re-extracted or overwritten. Always pulls the full
+    row count for whatever it adds. This is what makes "add a sheet"
+    additive without needing separate merge logic in `extract_data.py`
+    itself. An unrecognized name (checked against the live workbook tab
+    list now, not a possibly-stale constant) still gets a warning and
+    still gets attempted, in case of a legitimate off-list rename.
   - **`smart_sync.py [--yes]`** — re-checks every sheet ALREADY in `DATA`
     against the current Excel, field by field (`srNo`, `category`,
     `level`, `question`/`questionParts` incl. rich-text HTML, `answer`
@@ -964,3 +1033,152 @@ safe:
     tampered-field detection and correction, and the duplicate-Sr.No key
     bug above (caught during testing — an early version silently dropped
     18 rows from the diff before occurrence-based keys were added).
+- **`verify_index.py`** — a 5th standalone script, but NOT part of the
+  Excel-sync family above (it never touches `DATA`/`index.html`, read-only
+  throughout). Automates the post-change verification checks from §11/
+  SYNC_EXCEL.md §5 that were previously done by hand each time: both
+  inline `<script>` blocks parse (`node --check`), every
+  `getElementById('...')` call has a matching `id="..."`, and a data
+  sanity pass (total + per-sheet counts, at least one rich-text sample, at
+  least one multi-phrasing sample). Requires `node` on PATH for the syntax
+  check. Run standalone (`python scripts/verify_index.py`) or via
+  `manage.bat` option 7 — run it after any manual edit to `index.html` as
+  a quick sanity pass, though it doesn't replace judgment (it can't catch
+  a rendering/behavior regression, only structural/data breakage).
+  **No longer hard-checks HR == 0** — that check predated the user's
+  explicit decision to include HR (§3's HR note) and was removed once
+  noticed contradicting that decision; HR is a normal sheet like any
+  other now.
+  **Supports `--quiet`/`-q`**: on success, collapses the normal 3-section,
+  ~20-line breakdown into one summary line (`Verify: OK -- syntax OK, ids
+  55/55, 1029 questions across 5 sheet(s).`); on failure, still prints
+  full detail for whatever failed (never hides a real problem, only
+  compresses the passing case). Added after the user said the auto-chained
+  verify output (after every Smart Sync/Add Sheet/Full Resync/Remove
+  Sheet) made `manage.bat` "not properly readable" and asked for concise
+  logs — `manage.bat`'s auto-chained calls use `--quiet`; the standalone
+  Verify menu option (7) still calls it without the flag, since choosing
+  that option IS explicitly asking for the full detail.
+  **`smart_sync.py` and `extract_data.py` gained the same `--quiet` flag**
+  after a follow-up "reduce the logs more, for the WHOLE manage.bat" ask —
+  same principle: `--quiet` drops decorative/after-the-fact detail
+  (`smart_sync.py`: the per-sheet Excel row-count listing, the itemized
+  "changed rows" listing; `extract_data.py`: the JSON per-sheet dump) down
+  to one summary line each (`Smart Sync: OK -- 997 questions, already in
+  sync.` / `Full Resync: OK -- 997 questions across 4 sheet(s) (...).`),
+  but never hides anything decision-critical — `smart_sync.py`'s
+  removed-rows listing (what you're being asked to confirm or decline)
+  always prints in full regardless of the flag. `manage.bat` passes
+  `--quiet` to both when auto-chaining them. A full Smart Sync run through
+  the menu went from ~20 lines to 4. If a new sync script needs the same
+  treatment, follow this pattern: full detail by default, `--quiet` for
+  one summary line on the boring/no-op case, full detail always for
+  anything the user has to make a decision about.
+- **`list_sheets.py`** — a 6th standalone script, also read-only (reads the
+  workbook's real tab names via the already-loaded `extract_data.wb` plus
+  `read_current_data()`; never writes anything). **Lists every real tab
+  straight from the workbook itself (`wb.sheetnames`) — no curated/
+  hardcoded sheet list involved at all** — so a brand-new Excel tab shows
+  up immediately as a normal, addable row, and
+  every sheet it lists is already addable via `add_sheets.py` (which also
+  now checks unrecognized names against the live workbook, not a
+  constant — see above). Each row shows sync status (`synced` + row
+  count, or `NOT synced`) — `HR` included, since the user asked for it to
+  stop being specially hidden here too (see §3's HR note). This exists so
+  `manage.bat`'s Add Sheet option can show real sheet names instead of
+  requiring the user to type one blind. Was originally filtered through a
+  curated `ALL_KNOWN_SHEETS`
+  constant (only showing catalogued sheets, with anything else pushed
+  into a separate footnote) — changed after the user asked "can't it
+  identify all sheets from Excel" and, pointedly, two real tabs (`DevOps`,
+  `Caching`) turned up hidden in that footnote instead of the main list.
+  §3's sheet catalog is now purely descriptive prose (what's been synced
+  and why), not a data source any script depends on — don't reintroduce a
+  hardcoded sheet-name constant that any script reads from.
+- **`add_sheets_menu.py`** — a 7th standalone script, the interactive
+  counterpart to `add_sheets.py`'s CLI form. Lists synced sheets (with row
+  counts) plus a **numbered** list of not-yet-synced sheets, and takes the
+  user's pick as number(s) (or `all`) instead of typed exact tab names.
+  Exists because several real tab names carry easy-to-mistype punctuation
+  (`Adv. Java`, `Spring Frmwrk`, `Spring Sec.`) — the user asked "what if
+  someone wrongly types a name, can't we use a key/value pick instead?"
+  `HR` is included in this numbered list (see §3's HR note — it was
+  excluded here by name until the user explicitly asked otherwise). A bad
+  number (out of range, non-numeric) is rejected outright with nothing
+  extracted, rather than being passed through to
+  `extract_data.py`'s `wb[sheet]` lookup as a literal (which would raise
+  a `KeyError`/crash instead of a clean rejection). Shares the same
+  extract-and-splice primitives as `add_sheets.py` (`ed.extract()` +
+  `ed.splice_into_index_html()`) rather than duplicating logic — it's a
+  different front-end onto the same add operation, not a separate
+  mechanism. `manage.bat`'s Add Sheet option (3) calls this instead of the
+  old two-step (`list_sheets.py` then a free-text `set /p`) — `add_sheets.py`
+  itself is unchanged and still available for CLI/scripted use with exact
+  names or `--all`.
+- **`remove_sheet.py`** — an 8th standalone script, the removal
+  counterpart to `add_sheets_menu.py`: lists every sheet currently IN
+  `DATA` (with row counts), takes a single numbered pick, and splices
+  `DATA` back in with that sheet's rows dropped — Excel itself is
+  untouched, so `add_sheets_menu.py` brings the sheet back later exactly
+  as it currently exists there. Confirms with a plain `y/N` prompt before
+  writing — unlike `clear_data.py`'s typed confirm-phrase gate, since the
+  numbered sheet pick here already rules out selecting the wrong sheet by
+  accident; the user explicitly asked for `y/N` over a typed phrase.
+  Added because the existing
+  removal path (`smart_sync.py`'s per-row removal, gated on rows that no
+  longer exist *in the Excel source itself*) had no way to temporarily
+  drop a whole sheet the user still wants to keep in Excel — the user
+  asked for exactly that ("remove sheet 1 - HR", intending to re-add it
+  later). Shares `extract_data.py`'s `read_current_data()`/
+  `splice_into_index_html()`, no duplicated logic. `manage.bat`'s Remove
+  Sheet option (4) calls this, then auto-chains into `verify_index.py`
+  same as Smart Sync/Add Sheet/Full Resync.
+- **`edit_config.py`** — a 9th standalone script: an interactive prompt to
+  view/change `config.json`'s settings (`server_port`, `rows_per_sheet`)
+  without hand-editing JSON. Blank input at either prompt keeps the
+  current value; `"full"`/`"none"`/`"null"` clears `rows_per_sheet` back
+  to unlimited. Wraps its `input()` calls in `try/except EOFError` — if
+  stdin is ever exhausted mid-prompt (only really possible via
+  non-interactive/piped invocation, never via a real keyboard), it falls
+  back to "keep current value" instead of crashing with a raw traceback.
+  Exists because the user asked whether the menu's options made sense,
+  and reasonably flagged that there was no way to change `server_port`/
+  `rows_per_sheet` without opening a script file by hand, undermining the
+  "configurable, not hardcoded" point of `config.json` in the first place.
+- **`manage.bat`** (repo root) — a menu launcher over all 9 scripts above
+  plus local-dev/workflow conveniences, so the user can do any of this by
+  double-clicking without opening VS Code/a terminal:
+  - Smart Sync / Add Sheet / Full Resync / Remove Sheet each auto-chain
+    into `verify_index.py` immediately afterward (so the standard §11
+    post-change check happens without a separate manual step) — **Clear
+    Data deliberately does NOT auto-verify**, since an intentionally-empty
+    `DATA` would just report a spurious-looking "0 questions" rather than
+    signal a real problem.
+  - Add Sheet delegates to `add_sheets_menu.py` — a numbered pick, not a
+    typed sheet name (see above).
+  - Data Summary (`list_sheets.py` standalone), Verify, Serve Locally
+    (delegates to `scripts/serve.py` — Python's `http.server` on the
+    `config.json`-configured port, with the browser auto-opened; not
+    hardcoded in `manage.bat` itself), Open `index.html` directly
+    (`file://`), Open the `.xlsx` workbook directly, Restore Last Backup
+    (copies `index.html.bak` back over `index.html`, gated behind a typed
+    `YES` confirmation, mirroring `clear_data.py`'s confirm-phrase
+    pattern), and View/Edit Settings (`edit_config.py` — see above) round
+    out the menu.
+  - **Every action prints a `[%TIME%] <action> starting/done` line**
+    (Windows `%TIME%`, e.g. `[18:41:53.63]`) — added alongside the
+    `--quiet` verify change above, same "concise and readable, and show
+    what happened when" ask. Keep this pattern (a start line before the
+    underlying script runs, a matching done line after) if new menu
+    actions are added.
+  - Deliberately has **no git actions** (commit/push) — those stay a
+    separate, explicit, per-session decision per this project's normal
+    change-confirmation discipline, not something to automate into a menu.
+  - Written with **CRLF line endings** (the Windows-native convention for
+    `.bat` files) — if it's ever edited, keep it CRLF; a batch file saved
+    with LF-only endings can behave inconsistently around commands like
+    `pause` reading redirected input, which is also why the "return to
+    menu" step uses `set /p` rather than `pause` (`pause` reads from the
+    console handle directly rather than any redirected stdin, which broke
+    non-interactively-piped testing during development — `set /p` instead
+    made the whole flow both testable and consistent).

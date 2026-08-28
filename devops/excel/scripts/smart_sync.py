@@ -32,6 +32,14 @@ keep their relative order between runs.
 Usage:
     python scripts/smart_sync.py            # interactive: asks before removing anything
     python scripts/smart_sync.py --yes      # non-interactive: auto-confirms removals too
+    python scripts/smart_sync.py --quiet    # condensed output (add to either form above)
+
+--quiet drops the per-sheet Excel row-count listing and the itemized
+"changed rows" listing (both decorative/after-the-fact detail), replacing
+the whole run with one summary line when nothing meaningful needs review.
+It never hides anything decision-critical: the removed-rows listing (the
+thing you're actually being asked to confirm or decline) always prints in
+full regardless of --quiet.
 
 Only touches sheets that are ALREADY in index.html (use add_sheets.py to
 bring in a sheet for the first time). Always pulls the full row count for
@@ -40,6 +48,8 @@ whatever sheets it re-checks. Backs up index.html to index.html.bak first.
 
 import sys
 import extract_data as ed
+
+QUIET = '--quiet' in sys.argv or '-q' in sys.argv
 
 FIELDS_TO_COMPARE = ['srNo', 'category', 'level', 'question',
                       'questionParts', 'answer', 'answerPlain', 'priority']
@@ -75,12 +85,14 @@ def main():
         return
 
     sheets_present = sorted(set(q['sheet'] for q in current))
-    print('Re-checking against Excel: ' + ', '.join(sheets_present))
+    if not QUIET:
+        print('Re-checking against Excel: ' + ', '.join(sheets_present))
     fresh, counts = ed.extract(sheets=sheets_present, rows_per_sheet=None)
-    print('rows currently in Excel per sheet:')
-    for sheet, n in counts.items():
-        print('  ' + sheet + ': ' + str(n))
-    print()
+    if not QUIET:
+        print('rows currently in Excel per sheet:')
+        for sheet, n in counts.items():
+            print('  ' + sheet + ': ' + str(n))
+        print()
 
     old_by_key = keyed_by_identity(current)
     new_by_key = keyed_by_identity(fresh)
@@ -97,12 +109,13 @@ def main():
 
     removed = [old_by_key[key] for key in old_by_key if key not in new_by_key]
 
-    print('Unchanged: ' + str(len(unchanged)))
-    print('Changed:   ' + str(len(changed)))
-    print('Added:     ' + str(len(added)))
-    print('Removed:   ' + str(len(removed)) + ' (in index.html, no longer found in Excel)')
+    if not QUIET:
+        print('Unchanged: ' + str(len(unchanged)))
+        print('Changed:   ' + str(len(changed)))
+        print('Added:     ' + str(len(added)))
+        print('Removed:   ' + str(len(removed)) + ' (in index.html, no longer found in Excel)')
 
-    if changed:
+    if changed and not QUIET:
         print()
         print('Changed rows (field(s) that differed):')
         for old_q, new_q in changed[:25]:
@@ -126,14 +139,21 @@ def main():
             do_remove = True
             print('--yes passed: removing these ' + str(len(removed)) + ' rows.')
         else:
-            typed = input('Type "' + CONFIRM_PHRASE + '" to actually remove these ' +
-                           str(len(removed)) + ' rows (anything else keeps them): ')
+            try:
+                typed = input('Type "' + CONFIRM_PHRASE + '" to actually remove these ' +
+                               str(len(removed)) + ' rows (anything else keeps them): ')
+            except (EOFError, KeyboardInterrupt):
+                print()
+                typed = None
             do_remove = (typed == CONFIRM_PHRASE)
             print('Removing.' if do_remove else 'Keeping them as-is.')
 
     if not changed and not added and not (do_remove and removed):
-        print()
-        print('Nothing to write -- index.html already matches Excel.')
+        if QUIET:
+            print('Smart Sync: OK -- ' + str(len(unchanged)) + ' questions, already in sync.')
+        else:
+            print()
+            print('Nothing to write -- index.html already matches Excel.')
         return
 
     final = list(unchanged)
@@ -144,9 +164,14 @@ def main():
 
     backup_path = ed.splice_into_index_html(final)
 
-    print()
-    print('index.html now has ' + str(len(final)) + ' questions (was ' + str(len(current)) + ').')
-    print('Previous version backed up to ' + backup_path)
+    if QUIET:
+        print('Smart Sync: ' + str(len(changed)) + ' changed, ' + str(len(added)) + ' added, ' +
+              str(len(removed) if do_remove else 0) + ' removed -> ' + str(len(final)) +
+              ' questions (was ' + str(len(current)) + ').')
+    else:
+        print()
+        print('index.html now has ' + str(len(final)) + ' questions (was ' + str(len(current)) + ').')
+        print('Previous version backed up to ' + backup_path)
 
 
 if __name__ == '__main__':
