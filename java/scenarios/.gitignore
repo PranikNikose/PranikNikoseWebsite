@@ -1,0 +1,17 @@
+#Excel file
+*.xlsx
+
+#backup files
+*.bak
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+
+# text file
+*.txt

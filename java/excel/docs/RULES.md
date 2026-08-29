@@ -175,6 +175,31 @@ recover formatting.
 Always also produce the plain-text mirror (`questionPlain`/`answerPlain`) —
 see §2.
 
+**Inline code fences (any sheet, Question or Answer):** a line containing
+exactly ` ``` ` opens a code region, the next ` ``` `-only line closes it
+(typed in Excel via Alt+Enter for the line breaks). Text inside the fence
+loses any rich-text formatting and renders as one syntax-highlighted
+`<pre class="code-block">` — everything outside a fence renders exactly as
+before. This is unrelated to the whole-sheet Coding rule below: fences let
+*any* sheet mix prose and an embedded code snippet in the same cell, where
+the Coding sheet's *entire* answer is already code with no fences needed.
+- **Answer**: fenced and non-fenced portions can interleave freely in one
+  flowing cell (`answer_html_and_plain()` in `extract_data.py`) — matches
+  how the source text actually reads (prose, then a snippet, then more
+  prose).
+- **Question**: each cell line is already treated as its own alternate
+  phrasing, joined with "or" (§2/§3) — a fenced block becomes one more
+  phrasing of its own (`cell_lines()`), not something interleaved with
+  surrounding text on other lines. A fence can't currently span into
+  prose that shares its phrasing; if that's ever needed, this rule needs
+  revisiting, not a silent workaround.
+- Extraction emits plain escaped text in `<pre class="code-block"
+  data-highlight="pending">`; `index.html`'s `highlightFencedCode()` (used
+  by `questionPartsHtml()`, `answerHtmlOrPlaceholder()`, and Interview
+  Mode's question renderer) applies the same `javaHighlight()` tokenizer
+  the Coding sheet uses and drops the pending marker, so both paths render
+  with identical coloring without duplicating the highlighter in Python.
+
 ## 5. Layout: desktop vs. mobile (pure CSS breakpoint, no JS device sniffing)
 
 - Breakpoint: `768px` (`min-width:768px` = desktop, `max-width:767.98px` =
@@ -303,10 +328,13 @@ see §2.
   don't carry manual bold anyway). `.code-block`/`.tok-*` colors are theme
   CSS variables (`--code-bg`, `--code-kw`, etc.) — keep both a dark and a
   light palette in sync with the rest of §8's rule, don't hardcode. This
-  only applies to the **Answer** field of the **Coding** sheet specifically
-  — don't extend it to Question text or to other sheets without being
-  asked; other sheets' answers are prose that happens to mention code
-  tokens (`@Autowired`, `spring-boot-starter-web`), not code blocks.
+  only applies to the **whole Answer field** of the **Coding** sheet
+  specifically — a short inline mention like `@Autowired` or
+  `spring-boot-starter-web` in another sheet's prose is not a code block
+  and should stay plain text. A multi-line snippet embedded in another
+  sheet's Question/Answer is handled by the ```-fence convention in §4
+  instead, which is a separate, narrower mechanism (opt-in per snippet,
+  not a whole-field switch).
 - **Normal (browse) mode and Interview Mode are always both reachable.**
   The header (with the "🎯 Interview Mode" button and theme toggle) is
   never hidden — only `.toolbar`/`.status-row`/`#tableView`/`#singleView`

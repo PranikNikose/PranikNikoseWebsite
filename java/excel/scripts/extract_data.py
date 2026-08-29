@@ -161,18 +161,55 @@ def line_to_plain(line):
     return ''.join(t for t, f in line if t)
 
 
+def split_code_fences(lines):
+    """Splits lines_with_runs() output into ('text', line) / ('code',
+    plain_lines) segments. A line whose text is exactly ``` toggles a code
+    region and is dropped from the output; lines inside a fence lose any
+    rich-text formatting and are collected together into one 'code'
+    segment (see docs/RULES.md section 4). An unclosed fence still becomes
+    a 'code' segment for whatever's left, rather than silently losing it."""
+    segments = []
+    in_code = False
+    code_buf = []
+    for line in lines:
+        if line_to_plain(line).strip() == '```':
+            if in_code:
+                segments.append(('code', code_buf))
+                code_buf = []
+            in_code = not in_code
+            continue
+        if in_code:
+            code_buf.append(line_to_plain(line))
+        else:
+            segments.append(('text', line))
+    if in_code and code_buf:
+        segments.append(('code', code_buf))
+    return segments
+
+
+def code_block_html(code_lines):
+    return ('<pre class="code-block" data-highlight="pending">' +
+            htmlmod.escape('\n'.join(code_lines)) + '</pre>')
+
+
 def cell_lines(cell_value):
-    """Return list of (html, plain) per non-empty line -- used for the
-    Questions cell, where each line is a separate phrasing (see
-    docs/RULES.md: 'one Excel row = one DATA entry, join phrasings with or,
-    keep questionParts as the un-joined list')."""
+    """Return list of (html, plain) per non-empty line/fenced-code-block --
+    used for the Questions cell, where each item is a separate phrasing
+    (see docs/RULES.md: 'one Excel row = one DATA entry, join phrasings
+    with or, keep questionParts as the un-joined list'). A ```-fenced block
+    becomes one phrasing of its own, rendered as code."""
     lines = lines_with_runs(cell_value)
     out = []
-    for line in lines:
-        p = line_to_plain(line).strip()
+    for kind, payload in split_code_fences(lines):
+        if kind == 'code':
+            code_text = '\n'.join(payload).strip('\n')
+            if code_text.strip():
+                out.append((code_block_html(payload), code_text))
+            continue
+        p = line_to_plain(payload).strip()
         if not p:
             continue
-        out.append((line_to_html(line).strip(), p))
+        out.append((line_to_html(payload).strip(), p))
     return out
 
 
@@ -229,10 +266,22 @@ def canonical_level_for_years(years):
 
 
 def answer_html_and_plain(cell_value):
+    """Splits the Answer cell on ```-fences (see split_code_fences()): text
+    outside fences renders as before (rich-text HTML, joined by line); a
+    fenced block renders as one syntax-highlighted <pre class="code-block">
+    (docs/RULES.md section 4), so an answer can mix prose and embedded code
+    in one flowing cell."""
     lines = lines_with_runs(cell_value)
-    html_lines = [line_to_html(l) for l in lines]
-    plain_lines = [line_to_plain(l) for l in lines]
-    return '\n'.join(html_lines).strip(), '\n'.join(plain_lines).strip()
+    html_parts = []
+    plain_parts = []
+    for kind, payload in split_code_fences(lines):
+        if kind == 'code':
+            html_parts.append(code_block_html(payload))
+            plain_parts.append('\n'.join(payload))
+        else:
+            html_parts.append(line_to_html(payload))
+            plain_parts.append(line_to_plain(payload))
+    return '\n'.join(html_parts).strip(), '\n'.join(plain_parts).strip()
 
 
 def extract(sheets=None, rows_per_sheet=None):
