@@ -2,13 +2,7 @@
 Wipes ALL questions from index.html's DATA array back to `[]`.
 
 This is destructive and irreversible except via the backup this script
-makes -- so it requires typed confirmation before writing anything. There
-is no real multi-user "admin" system in this project (it's a single local
-HTML file, not an app with accounts), so "admin approval" here means: you
-have to type an exact confirmation phrase, on purpose, to prove this
-wasn't a misclick. If you want a second person to actually approve it,
-that has to happen outside this script (they tell you to go ahead, then
-you run it and type the phrase).
+makes -- so it requires a Y/N confirmation before writing anything.
 
 Usage:
     python scripts/clear_data.py
@@ -22,8 +16,6 @@ you need one long-term.
 
 import extract_data as ed
 
-CONFIRM_PHRASE = 'CLEAR ALL DATA'
-
 
 def main():
     current = ed.read_current_data()
@@ -34,14 +26,14 @@ def main():
     print('one long-term.')
     print()
     try:
-        typed = input('Type "' + CONFIRM_PHRASE + '" (exactly, case-sensitive) to proceed: ')
+        typed = input('Proceed? (Y/N): ').strip().lower()
     except (EOFError, KeyboardInterrupt):
         print()
         print('Cancelled -- nothing was changed.')
         return
 
-    if typed != CONFIRM_PHRASE:
-        print('Confirmation text did not match -- aborted, nothing was changed.')
+    if typed != 'y':
+        print('Aborted -- nothing was changed.')
         return
 
     backup_path = ed.splice_into_index_html([])

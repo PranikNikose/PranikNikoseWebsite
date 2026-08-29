@@ -1315,9 +1315,19 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
   surfaced as a raw traceback) now gets a clean "Cancelled" message and a
   normal exit instead of a scary traceback. Destructive-prompt scripts
   (`clear_data.py`, `smart_sync.py`'s removal step) treat an interrupt the
-  same as any non-matching confirmation input — safest default, nothing
-  gets removed. If a new interactive prompt is added to any script, wrap
-  it the same way.
+  same as any non-`Y` confirmation input — safest default, nothing gets
+  removed. If a new interactive prompt is added to any script, wrap it the
+  same way.
+- **All confirmation prompts across the sync scripts use a plain `Y/N`
+  answer** (`clear_data.py`, `smart_sync.py`'s removal step,
+  `remove_sheet.py`, `restore_backup.py`) — not a typed phrase. Anything
+  other than `y`/`Y` is treated as "no", including a blank answer or an
+  interrupt. This was a deliberate choice to relax the friction on every
+  destructive/overwriting prompt in the project (an earlier version of
+  `clear_data.py` and `smart_sync.py` required typing an exact phrase like
+  `CLEAR ALL DATA` — don't reintroduce that unless the user asks for it
+  back). If a new destructive prompt is added to any script, use `Y/N` the
+  same way.
 - **Defensive robustness fixes applied from a code-review pass
   (`Fix.txt`)**, kept as standing practice:
   - Search (`applyFilters`) reads `(q.questionPlain || '')`/
@@ -1479,11 +1489,9 @@ safe:
   tasks the user can run without Claude**, all built on top of
   `extract_data.py`'s `extract()`/`read_current_data()`/
   `splice_into_index_html()` (no duplicated extraction logic):
-  - **`clear_data.py`** — wipes `DATA` to `[]`. Destructive; requires
-    typing an exact confirmation phrase (`CLEAR ALL DATA`) before writing
-    anything, since this app has no real multi-user "admin" system to
-    gate it with — the typed phrase is the stand-in the user asked for.
-    Backs up `index.html` first, same as every script here.
+  - **`clear_data.py`** — wipes `DATA` to `[]`. Destructive; requires a
+    `Y/N` confirmation before writing anything. Backs up `index.html`
+    first, same as every script here.
   - **`add_sheets.py <Sheet> [<Sheet> ...]`** (or `--all` for every real
     tab **read live from the workbook** — `list(ed.wb.sheetnames)`, not a
     hardcoded list; previously resolved via a curated `ed.ALL_KNOWN_SHEETS`
@@ -1633,11 +1641,9 @@ safe:
   `DATA` (with row counts), takes a single numbered pick, and splices
   `DATA` back in with that sheet's rows dropped — Excel itself is
   untouched, so `add_sheets_menu.py` brings the sheet back later exactly
-  as it currently exists there. Confirms with a plain `y/N` prompt before
-  writing — unlike `clear_data.py`'s typed confirm-phrase gate, since the
-  numbered sheet pick here already rules out selecting the wrong sheet by
-  accident; the user explicitly asked for `y/N` over a typed phrase.
-  Added because the existing
+  as it currently exists there. Confirms with a plain `Y/N` prompt before
+  writing, same as every destructive prompt in the project. Added because
+  the existing
   removal path (`smart_sync.py`'s per-row removal, gated on rows that no
   longer exist *in the Excel source itself*) had no way to temporarily
   drop a whole sheet the user still wants to keep in Excel — the user

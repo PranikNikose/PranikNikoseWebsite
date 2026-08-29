@@ -38,8 +38,8 @@ Usage:
 "changed rows" listing (both decorative/after-the-fact detail), replacing
 the whole run with one summary line when nothing meaningful needs review.
 It never hides anything decision-critical: the removed-rows listing (the
-thing you're actually being asked to confirm or decline) always prints in
-full regardless of --quiet.
+thing you're actually being asked to confirm or decline with Y/N) always
+prints in full regardless of --quiet.
 
 Only touches sheets that are ALREADY in index.html (use add_sheets.py to
 bring in a sheet for the first time). Always pulls the full row count for
@@ -54,7 +54,6 @@ QUIET = '--quiet' in sys.argv or '-q' in sys.argv
 
 FIELDS_TO_COMPARE = ['srNo', 'category', 'level', 'question',
                       'questionParts', 'answer', 'answerPlain', 'priority']
-CONFIRM_PHRASE = 'REMOVE THESE ROWS'
 
 
 def diff_entry(old, new):
@@ -141,12 +140,12 @@ def main():
             print('--yes passed: removing these ' + str(len(removed)) + ' rows.')
         else:
             try:
-                typed = input('Type "' + CONFIRM_PHRASE + '" to actually remove these ' +
-                               str(len(removed)) + ' rows (anything else keeps them): ')
+                typed = input('Remove these ' + str(len(removed)) +
+                               ' rows? (Y/N): ').strip().lower()
             except (EOFError, KeyboardInterrupt):
                 print()
                 typed = None
-            do_remove = (typed == CONFIRM_PHRASE)
+            do_remove = (typed == 'y')
             print('Removing.' if do_remove else 'Keeping them as-is.')
 
     if not changed and not added and not (do_remove and removed):
