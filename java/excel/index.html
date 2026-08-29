@@ -251,7 +251,18 @@
     font-size:.7rem; font-weight:600; text-transform:uppercase;
     letter-spacing:.04em; color:var(--muted);
   }
+  /* Voice settings collapses behind a <summary> -- it's a sticky
+     localStorage preference, not something re-picked every session, so
+     hiding it by default (no forced height cost) beats showing it every
+     time. Suppress the native disclosure triangle (a "▾" is already in
+     the label text) and give the summary the same look as a plain
+     section label, just clickable. */
+  .voice-details summary{cursor:pointer; list-style:none;}
+  .voice-details summary::-webkit-details-marker{display:none;}
+  .voice-details[open] summary{margin-bottom:8px;}
+  .voice-details .toggle-grid-2{margin-top:0;}
   .chip-group{display:flex; flex-wrap:wrap; gap:6px; align-content:flex-start;}
+  .toggle-grid-2{display:grid; grid-template-columns:1fr 1fr; column-gap:16px;}
   .chip{
     display:inline-flex; align-items:center;
     padding:5px 12px;
@@ -323,6 +334,8 @@
      column width, since a 1-4 digit number doesn't need that much room. */
   .count-input{width:100%; max-width:110px;}
   .match-hint{display:block; margin-top:6px; font-size:.78rem; color:var(--muted);}
+  .modal-hint{margin:2px 0 0; font-size:.78rem; color:var(--muted);}
+  .voice-sub-label{display:block; font-size:.78rem; color:var(--muted); margin-bottom:4px;}
   .modal-section.needs-input .modal-section-label{color:var(--danger);}
   .modal-error{
     background:rgba(248,113,113,.12); color:var(--danger);
@@ -333,6 +346,7 @@
   .modal-actions .btn{flex:0 0 auto;}
   @media (max-width:480px){
     .modal-grid-2{grid-template-columns:1fr;}
+    .toggle-grid-2{grid-template-columns:1fr;}
   }
 
   /* History modal: a scrollable list of session cards -- unlike the
@@ -385,11 +399,25 @@
   .icon-toggle-btn.active, .icon-toggle-btn[aria-pressed="true"]{
     background:var(--accent-soft); border-color:var(--accent); color:var(--accent);
   }
+  .scratch-row{display:flex; gap:8px; align-items:flex-start;}
   .scratch-box{
-    width:100%; min-height:80px; resize:vertical;
+    flex:1; min-height:80px; resize:vertical;
     padding:10px 12px; border-radius:10px; border:1px solid var(--border);
     background:var(--surface-2); color:var(--text);
     font-family:inherit; font-size:.9rem; line-height:1.5;
+  }
+  #iMicBtn.active{background:var(--danger); border-color:var(--danger); color:#fff;}
+  .mic-status{display:block; margin-top:6px; font-size:.8rem; color:var(--danger); font-weight:600;}
+  .score-result{
+    margin-top:8px; padding:10px 12px; border-radius:10px;
+    background:var(--surface-2); border:1px solid var(--border); font-size:.85rem;
+  }
+  .score-result .score-num{font-weight:700; color:var(--accent); font-size:1rem;}
+  #interviewScoreSummary{margin:14px 0;}
+  .score-overall{font-size:1.3rem; font-weight:700; color:var(--accent); margin-bottom:8px;}
+  .score-breakdown-row{
+    display:flex; justify-content:space-between; padding:6px 0;
+    border-top:1px solid var(--border); font-size:.85rem;
   }
   .preset-row{display:flex; gap:8px; align-items:center;}
   .preset-row select{flex:1;}
@@ -771,6 +799,26 @@
         </div>
       </div>
 
+      <details class="modal-section voice-details" id="interviewVoiceSection" style="display:none;">
+        <summary class="modal-section-label">Voice settings ▾</summary>
+        <div class="toggle-grid-2">
+          <div id="interviewVoiceSubBlock" style="display:none;">
+            <label class="voice-sub-label" for="interviewVoiceSelect">Question voice (Read Aloud)</label>
+            <select id="interviewVoiceSelect" class="modal-select"></select>
+          </div>
+          <div id="interviewSttLangSubBlock" style="display:none;">
+            <label class="voice-sub-label" for="interviewSttLangSelect">Your answer's language/accent</label>
+            <select id="interviewSttLangSelect" class="modal-select">
+              <option value="en-US">English (US)</option>
+              <option value="en-GB">English (UK)</option>
+              <option value="en-IN">English (India)</option>
+              <option value="en-AU">English (Australia)</option>
+              <option value="hi-IN">Hindi (हिन्दी)</option>
+            </select>
+          </div>
+        </div>
+      </details>
+
       <div class="modal-section">
         <span class="modal-section-label">Sheets</span>
         <div class="chip-group" id="interviewSheetList"></div>
@@ -805,22 +853,33 @@
 
       <div class="modal-section">
         <span class="modal-section-label">Mix &amp; Extras</span>
-        <label class="modal-toggle-row">
-          <input type="checkbox" id="interviewBalancedMix">
-          <span>Balanced Mix — even split across selected sheets</span>
-        </label>
-        <label class="modal-toggle-row">
-          <input type="checkbox" id="interviewPrioritizeWeak">
-          <span>Prioritize Weak Sheets — favor sheets you've drilled less (from History)</span>
-        </label>
-        <label class="modal-toggle-row">
-          <input type="checkbox" id="interviewScratchToggle">
-          <span>Show a scratch box to write your own answer before revealing</span>
-        </label>
-        <label class="modal-toggle-row">
-          <input type="checkbox" id="interviewAutoRead">
-          <span>Auto-read each question aloud</span>
-        </label>
+        <div class="toggle-grid-2">
+          <label class="modal-toggle-row" title="Even split of your question count across the sheets you selected, instead of skewing toward whichever has more rows.">
+            <input type="checkbox" id="interviewBalancedMix">
+            <span>Balanced Mix</span>
+          </label>
+          <label class="modal-toggle-row" title="Favor sheets you've drilled less or scored worse on, based on your session History.">
+            <input type="checkbox" id="interviewPrioritizeWeak">
+            <span>Prioritize Weak Sheets</span>
+          </label>
+          <label class="modal-toggle-row" title="Write your own answer before revealing the real one.">
+            <input type="checkbox" id="interviewScratchToggle">
+            <span>Scratch box for your answer</span>
+          </label>
+          <label class="modal-toggle-row" title="Speaks each question aloud automatically using your selected voice.">
+            <input type="checkbox" id="interviewAutoRead">
+            <span>Auto-read questions aloud</span>
+          </label>
+          <label class="modal-toggle-row" title="Speech-to-text: your spoken answer is transcribed into the scratch box (Chrome/Edge only).">
+            <input type="checkbox" id="interviewVoiceAnswer">
+            <span>Answer by voice</span>
+          </label>
+          <label class="modal-toggle-row" title="Rule-based 0-10 score on Reveal (length, keyword overlap vs. the reference answer, filler words) -- not AI.">
+            <input type="checkbox" id="interviewScoreAnswers">
+            <span>Score my answers</span>
+          </label>
+        </div>
+        <p class="modal-hint" id="voiceUnsupportedNote" style="display:none;">🔇 Some voice features are hidden — your browser doesn't support them. Try Chrome or Edge.</p>
       </div>
 
       <div class="modal-error" id="interviewError" style="display:none;"></div>
@@ -877,7 +936,13 @@
       <div class="q-priority"><span class="tag tag-priority" id="iPriority"></span></div>
       <div class="field-row" id="iScratchRow" style="display:none;">
         <span class="field-label">Your answer</span>
-        <textarea id="iScratch" class="scratch-box" placeholder="Jot your own answer here first (not saved)..."></textarea>
+        <div class="scratch-row">
+          <textarea id="iScratch" class="scratch-box" placeholder="Jot (or speak) your own answer here first — kept only for this session, not saved to Excel..."></textarea>
+          <button class="icon-toggle-btn" id="iMicBtn" type="button" title="Answer by voice" style="display:none;">🎤</button>
+          <button class="icon-toggle-btn" id="iScratchClearBtn" type="button" title="Clear your answer">🗑️</button>
+        </div>
+        <span class="mic-status" id="iMicStatus" style="display:none;">🔴 Listening…</span>
+        <div class="score-result" id="iScoreResult" style="display:none;"></div>
       </div>
       <div class="field-row a" id="iAnswerRow" style="display:none;">
         <span class="field-label">A:</span>
@@ -895,7 +960,12 @@
         <span class="empty-icon">🏁</span>
         Interview complete — you went through every question in this session.
       </div>
+      <div id="interviewScoreSummary" style="display:none;">
+        <div class="score-overall" id="interviewOverallScore"></div>
+        <div id="interviewScoreBreakdown"></div>
+      </div>
       <div class="modal-actions">
+        <button class="btn ghost" id="interviewExportBtn" type="button" style="display:none;">Export .txt</button>
         <button class="btn ghost" id="interviewExitBtn" type="button">Exit to Browse</button>
         <button class="btn ghost" id="interviewRepeatBtn" type="button">Repeat Same Questions</button>
         <button class="btn" id="interviewRestartBtn" type="button">Restart Same Session</button>
@@ -981,6 +1051,7 @@
   // null here — always built explicitly from the checked boxes).
   var interviewQuestions = [];
   var interviewIndex = 0;
+  var interviewAnswers = []; // parallel to interviewQuestions: { answerText, score, feedback }
   var lastInterviewConfig = null; // { sheets: Set, levels: Set, priorities: Set, randomize: bool, count: number|null } for "Restart Same Session"
 
   var els = {
@@ -1026,6 +1097,9 @@
     interviewPrioritizeWeak: document.getElementById('interviewPrioritizeWeak'),
     interviewScratchToggle: document.getElementById('interviewScratchToggle'),
     interviewAutoRead: document.getElementById('interviewAutoRead'),
+    interviewVoiceAnswer: document.getElementById('interviewVoiceAnswer'),
+    interviewScoreAnswers: document.getElementById('interviewScoreAnswers'),
+    voiceUnsupportedNote: document.getElementById('voiceUnsupportedNote'),
     interviewError: document.getElementById('interviewError'),
     interviewPresetSelect: document.getElementById('interviewPresetSelect'),
     interviewPresetSaveBtn: document.getElementById('interviewPresetSaveBtn'),
@@ -1041,6 +1115,10 @@
     interviewExitBtn: document.getElementById('interviewExitBtn'),
     interviewRepeatBtn: document.getElementById('interviewRepeatBtn'),
     interviewRestartBtn: document.getElementById('interviewRestartBtn'),
+    interviewExportBtn: document.getElementById('interviewExportBtn'),
+    interviewScoreSummary: document.getElementById('interviewScoreSummary'),
+    interviewOverallScore: document.getElementById('interviewOverallScore'),
+    interviewScoreBreakdown: document.getElementById('interviewScoreBreakdown'),
     iSheet: document.getElementById('iSheet'),
     iCategory: document.getElementById('iCategory'),
     iLevel: document.getElementById('iLevel'),
@@ -1048,6 +1126,10 @@
     iQuestionList: document.getElementById('iQuestionList'),
     iScratchRow: document.getElementById('iScratchRow'),
     iScratch: document.getElementById('iScratch'),
+    iMicBtn: document.getElementById('iMicBtn'),
+    iScratchClearBtn: document.getElementById('iScratchClearBtn'),
+    iMicStatus: document.getElementById('iMicStatus'),
+    iScoreResult: document.getElementById('iScoreResult'),
     iAnswerRow: document.getElementById('iAnswerRow'),
     iAnswer: document.getElementById('iAnswer'),
     iRevealBtn: document.getElementById('iRevealBtn'),
@@ -1056,6 +1138,11 @@
     iSpeakBtn: document.getElementById('iSpeakBtn'),
     iVoiceSelect: document.getElementById('iVoiceSelect'),
     iFocusBtn: document.getElementById('iFocusBtn'),
+    interviewVoiceSection: document.getElementById('interviewVoiceSection'),
+    interviewVoiceSubBlock: document.getElementById('interviewVoiceSubBlock'),
+    interviewVoiceSelect: document.getElementById('interviewVoiceSelect'),
+    interviewSttLangSubBlock: document.getElementById('interviewSttLangSubBlock'),
+    interviewSttLangSelect: document.getElementById('interviewSttLangSelect'),
 
     historyOpenBtn: document.getElementById('historyOpenBtn'),
     historyModal: document.getElementById('historyModal'),
@@ -1737,7 +1824,9 @@
       balancedMix: els.interviewBalancedMix.checked,
       prioritizeWeak: els.interviewPrioritizeWeak.checked,
       showScratch: els.interviewScratchToggle.checked,
-      autoRead: els.interviewAutoRead.checked
+      autoRead: els.interviewAutoRead.checked,
+      voiceAnswer: els.interviewVoiceAnswer.checked,
+      scoreAnswers: els.interviewScoreAnswers.checked
     };
   }
 
@@ -1754,6 +1843,8 @@
     els.interviewPrioritizeWeak.checked = !!preset.prioritizeWeak;
     els.interviewScratchToggle.checked = !!preset.showScratch;
     els.interviewAutoRead.checked = !!preset.autoRead;
+    els.interviewVoiceAnswer.checked = !!preset.voiceAnswer;
+    els.interviewScoreAnswers.checked = !!preset.scoreAnswers;
   }
 
   // Saving over an existing name overwrites that preset (no silent
@@ -1776,7 +1867,7 @@
       sheets: state.sheets, levels: state.levels, priorities: state.priorities,
       count: state.count, randomize: state.randomize, balancedMix: state.balancedMix,
       prioritizeWeak: state.prioritizeWeak, showScratch: state.showScratch,
-      autoRead: state.autoRead
+      autoRead: state.autoRead, voiceAnswer: state.voiceAnswer, scoreAnswers: state.scoreAnswers
     };
     if(existingIndex !== -1) presets[existingIndex] = entry;
     else presets.push(entry);
@@ -1857,6 +1948,9 @@
     els.interviewPrioritizeWeak.checked = false;
     els.interviewScratchToggle.checked = false;
     els.interviewAutoRead.checked = false;
+    els.interviewVoiceAnswer.checked = false;
+    els.interviewScoreAnswers.checked = false;
+    els.interviewSttLangSelect.value = getSttLang();
     populateInterviewPresetSelect();
     updateInterviewLiveFeedback();
     els.interviewModal.style.display = 'flex';
@@ -1877,6 +1971,8 @@
     var prioritizeWeak = els.interviewPrioritizeWeak.checked;
     var showScratch = els.interviewScratchToggle.checked;
     var autoRead = els.interviewAutoRead.checked;
+    var voiceAnswer = els.interviewVoiceAnswer.checked;
+    var scoreAnswers = els.interviewScoreAnswers.checked;
     var countRaw = els.interviewCountInput.value.trim();
     // Whole numbers only, matched against the raw string -- parseInt()
     // alone would silently truncate "5.7" to 5 with no feedback that the
@@ -1929,6 +2025,8 @@
       prioritizeWeak: prioritizeWeak,
       showScratch: showScratch,
       autoRead: autoRead,
+      voiceAnswer: voiceAnswer,
+      scoreAnswers: scoreAnswers,
       count: count
     };
     var pool = buildInterviewPool(config);
@@ -1972,6 +2070,27 @@
       sheets.forEach(function(s){ counts[s] = (counts[s] || 0) + share; });
     });
     return counts;
+  }
+
+  // Average past score per sheet, from history entries that had scoring
+  // on (older entries/sessions without it just don't contribute -- no
+  // score data isn't treated as "scored 0"). Used to also weight
+  // Prioritize Weak Sheets toward sheets you've scored poorly on, not
+  // just ones you've drilled less.
+  function computeSheetPerformance(){
+    var history = loadInterviewHistory();
+    var bySheet = {};
+    history.forEach(function(entry){
+      if(!entry.sheetScores) return;
+      Object.keys(entry.sheetScores).forEach(function(s){
+        if(!bySheet[s]) bySheet[s] = { total: 0, count: 0 };
+        bySheet[s].total += entry.sheetScores[s];
+        bySheet[s].count++;
+      });
+    });
+    var avg = {};
+    Object.keys(bySheet).forEach(function(s){ avg[s] = bySheet[s].total / bySheet[s].count; });
+    return avg;
   }
 
   // Largest-remainder allocation: gives each sheet a share of totalCount
@@ -2024,7 +2143,16 @@
       // rarely, rather than being excluded once it's been practiced).
       order = sheetList.slice();
       var drillCounts = computeSheetDrillCounts();
-      var weights = order.map(function(s){ return 1 / (1 + (drillCounts[s] || 0)); });
+      var performance = computeSheetPerformance();
+      var weights = order.map(function(s){
+        var base = 1 / (1 + (drillCounts[s] || 0));
+        // No score history for this sheet -> neutral (factor 1, drill
+        // count alone decides it). A low past average score multiplies
+        // the weight up to 2x (at avg 0); a perfect 10 average leaves it
+        // unchanged -- scoring worse never REDUCES a sheet's chances.
+        var scoreFactor = (s in performance) ? 1 + (10 - performance[s]) / 10 : 1;
+        return base * scoreFactor;
+      });
       quotas = allocateWeightedQuotas(weights, config.count);
     } else {
       // Shuffle which sheets get the "+1" from an uneven even split, so
@@ -2156,10 +2284,36 @@
   // new one before finalizing the old).
   var currentSessionMeta = null;
 
+  // Per-sheet average score for whatever got scored this session (only
+  // meaningful if "Score my answers" was on) -- feeds Prioritize Weak
+  // Sheets' weighting (below) so it can favor sheets you've scored
+  // poorly on, not just sheets you've drilled less.
+  function computeSessionSheetScores(){
+    var bySheet = {};
+    interviewQuestions.forEach(function(q, i){
+      var a = interviewAnswers[i];
+      if(!a || a.score === null) return;
+      if(!bySheet[q.sheet]) bySheet[q.sheet] = { total: 0, count: 0 };
+      bySheet[q.sheet].total += a.score;
+      bySheet[q.sheet].count++;
+    });
+    var result = {};
+    Object.keys(bySheet).forEach(function(s){ result[s] = bySheet[s].total / bySheet[s].count; });
+    return result;
+  }
+
   function finalizeInterviewSession(){
     if(!currentSessionMeta) return;
     var durationSec = Math.max(0, Math.floor((Date.now() - currentSessionMeta.startedAt) / 1000));
     var cfg = currentSessionMeta.config;
+    var sheetScores = computeSessionSheetScores();
+    var scoredCount = Object.keys(sheetScores).length;
+    var avgScore = null;
+    if(scoredCount){
+      var total = 0, n = 0;
+      interviewAnswers.forEach(function(a){ if(a.score !== null){ total += a.score; n++; } });
+      avgScore = total / n;
+    }
     recordInterviewHistoryEntry({
       date: new Date(currentSessionMeta.startedAt).toISOString(),
       sheets: cfg.sheets ? Array.from(cfg.sheets) : null,
@@ -2170,7 +2324,9 @@
       randomize: !!cfg.randomize,
       totalQuestions: currentSessionMeta.totalQuestions,
       reachedCount: Math.min(interviewIndex + 1, currentSessionMeta.totalQuestions),
-      durationSec: durationSec
+      durationSec: durationSec,
+      avgScore: avgScore,
+      sheetScores: sheetScores
     });
     currentSessionMeta = null;
   }
@@ -2183,6 +2339,7 @@
 
     interviewQuestions = pool;
     interviewIndex = 0;
+    interviewAnswers = pool.map(function(){ return { answerText: '', score: null, feedback: null }; });
     currentSessionMeta = {
       startedAt: Date.now(),
       config: lastInterviewConfig,
@@ -2198,7 +2355,11 @@
     els.interviewView.style.display = 'block';
     els.interviewDone.style.display = 'none';
     els.interviewCard.style.display = 'flex';
-    els.iScratchRow.style.display = currentSessionMeta.config.showScratch ? 'flex' : 'none';
+    // Voice answer / scoring both need somewhere to write to -- force the
+    // scratch box on even if the user didn't check it directly.
+    var cfg = currentSessionMeta.config;
+    els.iScratchRow.style.display = (cfg.showScratch || cfg.voiceAnswer || cfg.scoreAnswers) ? 'flex' : 'none';
+    els.iMicBtn.style.display = (STT_SUPPORTED && cfg.voiceAnswer) ? 'flex' : 'none';
     setModeUI(true);
     startInterviewTimer();
     renderInterviewQuestion();
@@ -2208,12 +2369,18 @@
   // as separate "Q." lines instead, per Interview Mode's practice format.
   function renderInterviewQuestion(){
     cancelInterviewSpeech();
+    stopAnswerRecognition();
     var q = interviewQuestions[interviewIndex];
+    var a = interviewAnswers[interviewIndex];
     els.iSheet.textContent = q.sheet;
     els.iCategory.textContent = q.category;
     els.iLevel.textContent = q.level;
     els.iPriority.textContent = q.priority || '—';
-    if(els.iScratchRow.style.display !== 'none') els.iScratch.value = '';
+    // Restores this question's own answer text (if you've been here
+    // before via Prev/Next) instead of always clearing it.
+    if(els.iScratchRow.style.display !== 'none') els.iScratch.value = a.answerText;
+    if(a.score !== null) renderScoreResult({ score: a.score, feedback: a.feedback });
+    else els.iScoreResult.style.display = 'none';
 
     var parts = (q.questionParts && q.questionParts.length) ? q.questionParts : [q.question];
     els.iQuestionList.innerHTML = parts.map(function(part){
@@ -2228,7 +2395,18 @@
     els.iPrevBtn.disabled = interviewIndex === 0;
     els.interviewProgress.textContent = 'Question ' + (interviewIndex + 1) + ' of ' + interviewQuestions.length;
 
-    if(currentSessionMeta.config.autoRead) speakCurrentInterviewQuestion();
+    // Auto-read then auto-listen: if both are on, start the mic only
+    // once the question's actually finished being spoken (not while --
+    // it would otherwise transcribe the TTS audio as your answer). If
+    // only voice-answer is on (no auto-read), start listening right away.
+    var cfg = currentSessionMeta.config;
+    if(cfg.autoRead){
+      speakCurrentInterviewQuestion(function(){
+        if(cfg.voiceAnswer) startAnswerRecognition();
+      });
+    } else if(cfg.voiceAnswer){
+      startAnswerRecognition();
+    }
   }
 
   // ---------- Interview: read question aloud (SpeechSynthesis) ----------
@@ -2293,10 +2471,17 @@
     return a.name.localeCompare(b.name);
   }
 
+  // Two selects show the same voice list and stay in sync (localStorage
+  // is the shared source of truth): one in the config modal (pick before
+  // starting, per the user's request), one in the active session topbar
+  // (switch mid-session too).
+  var VOICE_SELECT_ELS = null; // set lazily -- els isn't built yet at parse time
+
   function populateVoiceSelect(){
     if(!SPEECH_SUPPORTED) return;
     var voices = window.speechSynthesis.getVoices();
     if(!voices.length) return; // getVoices() can return empty until 'voiceschanged' fires
+    if(!VOICE_SELECT_ELS) VOICE_SELECT_ELS = [els.iVoiceSelect, els.interviewVoiceSelect];
 
     // Only the user's named favorites -- everything else is filtered out
     // of the dropdown entirely, not just sorted below them. If NONE of
@@ -2310,11 +2495,20 @@
     var savedUri = null;
     try{ savedUri = localStorage.getItem(VOICE_PREF_KEY); } catch(e){ /* ignore */ }
     var savedStillAvailable = savedUri && list.some(function(v){ return v.voiceURI === savedUri; });
-
-    els.iVoiceSelect.innerHTML = list.map(function(v){
+    var optionsHtml = list.map(function(v){
       return '<option value="' + escapeHtml(v.voiceURI) + '">' + escapeHtml(v.name) + '</option>';
     }).join('');
-    els.iVoiceSelect.value = savedStillAvailable ? savedUri : list[0].voiceURI;
+    var value = savedStillAvailable ? savedUri : list[0].voiceURI;
+
+    VOICE_SELECT_ELS.forEach(function(sel){
+      sel.innerHTML = optionsHtml;
+      sel.value = value;
+    });
+  }
+
+  function setInterviewVoicePreference(uri){
+    try{ localStorage.setItem(VOICE_PREF_KEY, uri); } catch(e){ /* ignore */ }
+    VOICE_SELECT_ELS.forEach(function(sel){ sel.value = uri; });
   }
 
   function getSelectedInterviewVoice(){
@@ -2326,14 +2520,26 @@
     return null;
   }
 
-  function speakCurrentInterviewQuestion(){
-    if(!SPEECH_SUPPORTED) return;
+  // onEnd (optional): called when speech actually finishes -- used to
+  // auto-start the mic only AFTER the question's been read, not while,
+  // so it doesn't pick up the TTS audio itself as your answer.
+  function speakCurrentInterviewQuestion(onEnd){
+    if(!SPEECH_SUPPORTED){ if(onEnd) onEnd(); return; }
     var q = interviewQuestions[interviewIndex];
-    if(!q) return;
+    if(!q){ if(onEnd) onEnd(); return; }
     cancelInterviewSpeech();
     var utterance = new SpeechSynthesisUtterance(q.questionPlain);
     var voice = getSelectedInterviewVoice();
     if(voice) utterance.voice = voice;
+    if(onEnd){
+      // Guards against a stale callback firing after you've already
+      // navigated to a different question (cancel()/rapid Next/Prev can
+      // still fire 'onend' for the utterance being replaced).
+      var indexAtSpeak = interviewIndex;
+      utterance.onend = function(){
+        if(interviewIndex === indexAtSpeak) onEnd();
+      };
+    }
     window.speechSynthesis.speak(utterance);
   }
 
@@ -2354,9 +2560,209 @@
     els.iFocusBtn.setAttribute('aria-pressed', 'false');
   }
 
+  // ---------- Interview: rule-based answer scoring (no AI, no backend) ----------
+  // Proxy for "did you say enough, relevant, well-formed stuff" -- NOT true
+  // correctness/reasoning grading, which would need an LLM call (and a
+  // backend to hold the API key, which this static site doesn't have).
+  // Compares the scratch-box text against the real reference answer.
+  var SCORE_STOPWORDS = ['this','that','with','from','have','been','were','they',
+    'their','which','would','could','should','about','there','these','those',
+    'into','your','also','when','what','where','while','than','then'];
+  var SCORE_FILLER_WORDS = ['um','uh','like','you know','basically','actually','sort of','kind of'];
+
+  function scoreMeaningfulWords(text){
+    var raw = (text || '').toLowerCase().replace(/<[^>]+>/g, ' ').match(/[a-z]{4,}/g) || [];
+    return Array.from(new Set(raw)).filter(function(w){ return SCORE_STOPWORDS.indexOf(w) === -1; });
+  }
+
+  function scoreInterviewAnswer(answerText, referenceText){
+    var words = (answerText || '').trim().split(/\s+/).filter(Boolean);
+    var wordCount = words.length;
+
+    var lengthScore = wordCount === 0 ? 0 : wordCount < 15 ? 1 : wordCount < 40 ? 2 : wordCount < 80 ? 3 : 4;
+
+    var refWords = scoreMeaningfulWords(referenceText);
+    var ansWords = new Set(scoreMeaningfulWords(answerText));
+    var overlap = refWords.filter(function(w){ return ansWords.has(w); }).length;
+    var overlapRatio = refWords.length ? overlap / refWords.length : 0;
+    var keywordScore = Math.round(overlapRatio * 4);
+
+    var sentenceCount = (answerText || '').split(/[.!?]+/).filter(function(s){ return s.trim().length > 0; }).length;
+    var structureBonus = sentenceCount >= 2 ? 1 : 0;
+
+    var lowerAns = (answerText || '').toLowerCase();
+    var fillerCount = SCORE_FILLER_WORDS.reduce(function(sum, f){
+      var re = new RegExp('\\b' + f.replace(/ /g, '\\s+') + '\\b', 'g');
+      return sum + ((lowerAns.match(re) || []).length);
+    }, 0);
+    var fillerPenalty = Math.min(2, Math.floor(fillerCount / 2));
+
+    var score = Math.max(0, Math.min(10, lengthScore + keywordScore + structureBonus - fillerPenalty));
+
+    var feedback;
+    if(wordCount === 0) feedback = 'No answer given.';
+    else if(score >= 8) feedback = 'Strong answer -- good length and relevant detail.';
+    else if(score >= 5) feedback = 'Reasonable answer -- could use more relevant detail.';
+    else feedback = 'Short on relevant detail compared to the reference answer.';
+
+    return { score: score, feedback: feedback };
+  }
+
+  function renderScoreResult(result){
+    els.iScoreResult.innerHTML = '<span class="score-num">' + result.score + '/10</span> — ' + escapeHtml(result.feedback);
+    els.iScoreResult.style.display = 'block';
+  }
+
+  // ---------- Interview: answer by voice (SpeechRecognition) ----------
+  // Separate Web API from SpeechSynthesis (Read Aloud) -- this is speech
+  // INPUT, not output. Reliable in Chrome/Edge only; Firefox/Safari don't
+  // support it, hence the feature-detect + hide-if-unsupported, same
+  // pattern as Read Aloud. Requires a secure context (https or localhost)
+  // -- won't work opened via file://, same limitation §1 already accepts
+  // for anything path-sensitive; GitHub Pages itself is https, so it's
+  // fine there.
+  var SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var STT_SUPPORTED = !!SpeechRecognitionCtor;
+  var answerRecognition = null;
+  var answerRecognizing = false;
+
+  // Speech-to-text recognition language is a SEPARATE setting from the
+  // Read Aloud voice above -- switching the question-reading voice to
+  // e.g. Google हिन्दी does NOT change what language your spoken answer
+  // gets recognized as (a real mix-up the user hit and asked about).
+  // This is the actual lever for answer-recognition accuracy.
+  var STT_LANG_KEY = 'interviewSttLang';
+
+  function getSttLang(){
+    try{
+      var saved = localStorage.getItem(STT_LANG_KEY);
+      if(saved) return saved;
+    } catch(e){ /* ignore */ }
+    return 'en-US';
+  }
+  // True while the user actually wants listening to continue -- separate
+  // from answerRecognizing, which just reflects whether a recognizer
+  // instance is live right now. Chrome's `continuous` mode silently ends
+  // itself after a pause/timeout even though nothing went wrong; without
+  // this flag, that silent stop just looks like "still listening" in the
+  // UI while actually dropping the rest of what you say. onend checks
+  // this and restarts automatically unless the user (or navigation)
+  // explicitly asked to stop.
+  var answerRecognitionWanted = false;
+
+  // Nulls the handlers and aborts synchronously, rather than relying on
+  // the async onend to clean up -- otherwise navigating to the next
+  // question before onend fires lets the OLD recognizer's onresult keep
+  // firing into the NEW question's scratch box (a real race: Q1's mic
+  // still "warm" writes transcript into Q2's textarea).
+  function setMicUI(active){
+    els.iMicBtn.classList.toggle('active', active);
+    els.iMicStatus.style.display = active ? 'block' : 'none';
+  }
+
+  function stopAnswerRecognition(){
+    answerRecognitionWanted = false;
+    if(answerRestartTimer){ clearTimeout(answerRestartTimer); answerRestartTimer = null; }
+    if(!answerRecognition) return;
+    answerRecognition.onresult = null;
+    answerRecognition.onend = null;
+    answerRecognition.onerror = null;
+    try{ answerRecognition.abort(); } catch(e){ /* already stopped */ }
+    answerRecognition = null;
+    answerRecognizing = false;
+    setMicUI(false);
+  }
+
+  function startAnswerRecognition(){
+    if(!STT_SUPPORTED) return;
+    answerRecognitionWanted = true;
+    var baseText = els.iScratch.value ? els.iScratch.value.replace(/\s+$/, '') + ' ' : '';
+    answerRecognition = new SpeechRecognitionCtor();
+    answerRecognition.lang = getSttLang();
+    answerRecognition.continuous = true;
+    answerRecognition.interimResults = true;
+    answerRecognition.onresult = function(e){
+      var interim = '', final = '';
+      for(var i = e.resultIndex; i < e.results.length; i++){
+        var transcript = e.results[i][0].transcript;
+        if(e.results[i].isFinal) final += transcript;
+        else interim += transcript;
+      }
+      if(final) baseText += final + ' ';
+      els.iScratch.value = baseText + interim;
+      syncCurrentAnswerText();
+    };
+    answerRecognition.onend = function(){
+      answerRecognizing = false;
+      syncCurrentAnswerText();
+      if(answerRecognitionWanted) restartAnswerRecognitionSoon();
+      else setMicUI(false);
+    };
+    answerRecognition.onerror = function(e){
+      answerRecognizing = false;
+      // 'not-allowed'/'audio-capture' mean the mic itself is the problem
+      // -- give up instead of restart-looping forever. Other errors
+      // ('no-speech', 'network', ...) are the recoverable kind onend's
+      // auto-restart is meant to ride through -- onerror is always
+      // followed by onend, so no need to also restart from here.
+      if(e.error === 'not-allowed' || e.error === 'audio-capture'){
+        answerRecognitionWanted = false;
+        setMicUI(false);
+      }
+    };
+    try{
+      answerRecognition.start();
+      answerRecognizing = true;
+      setMicUI(true);
+    } catch(e){
+      // Starting immediately after a stop can throw on some browsers --
+      // the previous session hasn't finished releasing the mic yet. This
+      // used to fail silently here, leaving the mic looking "off" while
+      // you kept talking and nothing was captured. Retry instead of
+      // giving up.
+      if(answerRecognitionWanted) restartAnswerRecognitionSoon();
+    }
+  }
+
+  // A short delay before restarting avoids the immediate-restart failure
+  // above in the first place (rather than only recovering from it) --
+  // this is what actually rides through a mid-answer pause instead of
+  // silently dropping everything you say after it.
+  var answerRestartTimer = null;
+  function restartAnswerRecognitionSoon(){
+    setMicUI(false); // brief, honest "not listening right now" instead of pretending it's seamless
+    if(answerRestartTimer) clearTimeout(answerRestartTimer);
+    answerRestartTimer = setTimeout(function(){
+      answerRestartTimer = null;
+      if(answerRecognitionWanted) startAnswerRecognition();
+    }, 300);
+  }
+
+  function toggleAnswerRecognition(){
+    if(answerRecognitionWanted) stopAnswerRecognition();
+    else startAnswerRecognition();
+  }
+
+  // Persists the scratch box's current text against the current question
+  // index -- interviewAnswers is parallel to interviewQuestions, reset
+  // fresh each launchInterview() so Prev/Next can restore per-question
+  // text instead of always clearing it.
+  function syncCurrentAnswerText(){
+    if(!interviewAnswers[interviewIndex]) return;
+    interviewAnswers[interviewIndex].answerText = els.iScratch.value;
+  }
+
   function revealInterviewAnswer(){
+    stopAnswerRecognition(); // don't keep listening once you've moved on to checking the answer
     els.iAnswerRow.style.display = 'flex';
     els.iRevealBtn.style.display = 'none';
+    if(currentSessionMeta && currentSessionMeta.config.scoreAnswers){
+      var q = interviewQuestions[interviewIndex];
+      var result = scoreInterviewAnswer(els.iScratch.value, q.answerPlain);
+      interviewAnswers[interviewIndex].score = result.score;
+      interviewAnswers[interviewIndex].feedback = result.feedback;
+      renderScoreResult(result);
+    }
   }
 
   function interviewPrev(){
@@ -2373,16 +2779,77 @@
     } else {
       stopInterviewTimer();
       cancelInterviewSpeech();
+      stopAnswerRecognition();
       finalizeInterviewSession();
       els.interviewCard.style.display = 'none';
       els.interviewDone.style.display = 'block';
       els.interviewProgress.textContent = 'Finished — ' + interviewQuestions.length + ' of ' + interviewQuestions.length;
+      renderInterviewCompletionScore();
     }
+  }
+
+  // Builds the score summary + per-sheet breakdown shown on the
+  // completion screen, and shows/hides the Export button -- only if
+  // scoring was actually on and at least one question got scored (e.g.
+  // the user might have skipped writing any answers).
+  function renderInterviewCompletionScore(){
+    var scored = interviewAnswers.filter(function(a){ return a.score !== null; });
+    if(!scored.length){
+      els.interviewScoreSummary.style.display = 'none';
+      els.interviewExportBtn.style.display = 'none';
+      return;
+    }
+
+    var overall = scored.reduce(function(sum, a){ return sum + a.score; }, 0) / scored.length;
+    els.interviewOverallScore.textContent = 'Average score: ' + overall.toFixed(1) + '/10';
+
+    var bySheet = {};
+    interviewQuestions.forEach(function(q, i){
+      var a = interviewAnswers[i];
+      if(a.score === null) return;
+      if(!bySheet[q.sheet]) bySheet[q.sheet] = { total: 0, count: 0 };
+      bySheet[q.sheet].total += a.score;
+      bySheet[q.sheet].count++;
+    });
+    els.interviewScoreBreakdown.innerHTML = Object.keys(bySheet).sort().map(function(s){
+      var avg = (bySheet[s].total / bySheet[s].count).toFixed(1);
+      return '<div class="score-breakdown-row"><span>' + escapeHtml(s) + '</span><span>' +
+        avg + '/10 (' + bySheet[s].count + ')</span></div>';
+    }).join('');
+
+    els.interviewScoreSummary.style.display = 'block';
+    els.interviewExportBtn.style.display = 'inline-block';
+  }
+
+  // Plain-text export: question, your answer, the reference answer, and
+  // score per question -- client-side Blob + a throwaway <a download>,
+  // no server involved (works the same on GitHub Pages).
+  function exportInterviewSessionTxt(){
+    var lines = ['Interview Prep Hub -- session export', new Date().toLocaleString(), ''];
+    interviewQuestions.forEach(function(q, i){
+      var a = interviewAnswers[i];
+      lines.push('Q' + (i + 1) + '. [' + q.sheet + '] ' + q.questionPlain);
+      lines.push('Your answer: ' + (a.answerText || '(none)'));
+      if(a.score !== null) lines.push('Score: ' + a.score + '/10 -- ' + a.feedback);
+      lines.push('Reference answer: ' + (q.answerPlain || '(none in Excel yet)'));
+      lines.push('');
+    });
+
+    var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a2 = document.createElement('a');
+    a2.href = url;
+    a2.download = 'interview-session-' + new Date().toISOString().slice(0, 10) + '.txt';
+    document.body.appendChild(a2);
+    a2.click();
+    document.body.removeChild(a2);
+    URL.revokeObjectURL(url);
   }
 
   function endInterview(){
     stopInterviewTimer();
     cancelInterviewSpeech();
+    stopAnswerRecognition();
     disableFocusMode();
     finalizeInterviewSession(); // no-op if already finalized (e.g. "Exit to Browse" after completion)
     setModeUI(false);
@@ -2462,12 +2929,14 @@
       var levelLabel = item.levels ? item.levels.join(', ') : 'Any level';
       var priorityLabel = item.priorities ? item.priorities.join(', ') : 'Any priority';
       var mixLabel = item.balancedMix ? ' · Balanced Mix' : '';
+      var scoreLabel = (item.avgScore !== null && item.avgScore !== undefined) ?
+        ' · ' + item.avgScore.toFixed(1) + '/10' : '';
       return '<div class="history-item">' +
         '<div class="history-top">' +
           '<span class="history-date">' + escapeHtml(formatHistoryDate(item.date)) + '</span>' +
           '<span class="history-duration">' + formatHistoryDuration(item.durationSec) + '</span>' +
         '</div>' +
-        '<div class="history-meta">' + item.reachedCount + ' of ' + item.totalQuestions + ' questions' + mixLabel + '</div>' +
+        '<div class="history-meta">' + item.reachedCount + ' of ' + item.totalQuestions + ' questions' + mixLabel + scoreLabel + '</div>' +
         '<div class="history-meta">Sheets: ' + escapeHtml(sheetsLabel) + '</div>' +
         '<div class="history-meta">Level: ' + escapeHtml(levelLabel) + ' · Priority: ' + escapeHtml(priorityLabel) + '</div>' +
         '<div class="history-actions">' +
@@ -2497,7 +2966,7 @@
       sheets: entry.sheets, levels: entry.levels, priorities: entry.priorities,
       count: entry.totalQuestions, randomize: entry.randomize,
       balancedMix: entry.balancedMix, prioritizeWeak: entry.prioritizeWeak,
-      showScratch: false, autoRead: false
+      showScratch: false, autoRead: false, voiceAnswer: false, scoreAnswers: false
     });
     updateInterviewLiveFeedback();
   }
@@ -2577,7 +3046,7 @@
   els.interviewExitBtn.addEventListener('click', endInterview);
   els.interviewRestartBtn.addEventListener('click', restartInterviewSession);
   els.interviewRepeatBtn.addEventListener('click', repeatInterviewSession);
-  els.iSpeakBtn.addEventListener('click', speakCurrentInterviewQuestion);
+  els.iSpeakBtn.addEventListener('click', function(){ speakCurrentInterviewQuestion(); });
   els.iFocusBtn.addEventListener('click', toggleFocusMode);
   if(SPEECH_SUPPORTED){
     populateVoiceSelect();
@@ -2585,13 +3054,37 @@
     // getVoices() can return [] on the very first call, so this re-runs
     // once the real list is ready. Safe to fire more than once.
     window.speechSynthesis.onvoiceschanged = populateVoiceSelect;
-    els.iVoiceSelect.addEventListener('change', function(){
-      try{ localStorage.setItem(VOICE_PREF_KEY, els.iVoiceSelect.value); } catch(e){ /* ignore */ }
-    });
+    els.iVoiceSelect.addEventListener('change', function(){ setInterviewVoicePreference(els.iVoiceSelect.value); });
+    els.interviewVoiceSelect.addEventListener('change', function(){ setInterviewVoicePreference(els.interviewVoiceSelect.value); });
   } else {
     els.iSpeakBtn.style.display = 'none';
     els.iVoiceSelect.style.display = 'none';
     els.interviewAutoRead.closest('label').style.display = 'none';
+  }
+
+  els.iMicBtn.addEventListener('click', toggleAnswerRecognition);
+  els.iScratch.addEventListener('input', syncCurrentAnswerText);
+  els.iScratchClearBtn.addEventListener('click', function(){
+    stopAnswerRecognition();
+    els.iScratch.value = '';
+    syncCurrentAnswerText();
+    els.iScratch.focus();
+  });
+  els.interviewExportBtn.addEventListener('click', exportInterviewSessionTxt);
+  if(!STT_SUPPORTED) els.interviewVoiceAnswer.closest('label').style.display = 'none';
+  if(!SPEECH_SUPPORTED || !STT_SUPPORTED) els.voiceUnsupportedNote.style.display = 'block';
+
+  // Config-modal Voice section: only shown if at least one of Read
+  // Aloud/answer-recognition is actually usable, and each sub-control
+  // only shown if ITS OWN feature is supported (a browser could support
+  // one but not the other).
+  if(SPEECH_SUPPORTED || STT_SUPPORTED) els.interviewVoiceSection.style.display = 'block';
+  if(SPEECH_SUPPORTED) els.interviewVoiceSubBlock.style.display = 'block';
+  if(STT_SUPPORTED){
+    els.interviewSttLangSubBlock.style.display = 'block';
+    els.interviewSttLangSelect.addEventListener('change', function(){
+      try{ localStorage.setItem(STT_LANG_KEY, els.interviewSttLangSelect.value); } catch(e){ /* ignore */ }
+    });
   }
 
   els.interviewPresetSelect.addEventListener('change', loadSelectedInterviewPreset);

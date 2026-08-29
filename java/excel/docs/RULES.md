@@ -871,20 +871,41 @@ only via a button with no equally-visible way back except an in-context
     (CoreJava drilled 35x, SpringBoot 5x, everything else never drilled,
     count=24): CoreJava's quota came back 0, every never-drilled sheet
     got the largest shares, and the total matched exactly 24.
-- **Scratch box toggle** (`#interviewScratchToggle`, third toggle in the
-  same **"Mix & Extras"** `.modal-section` as Balanced Mix/Prioritize Weak
-  Sheets — folded in there, not its own section, to save vertical space;
-  see the height-fit note below — unchecked by default) — when checked, the
-  active session shows a `#iScratchRow` `<textarea>` between the
-  question and the Reveal Answer button, so you write your own answer
-  first instead of reading the question and immediately flipping to the
-  answer — closer to how an actual interview forces you to commit to an
-  answer before hearing feedback. **Not saved anywhere, not read back
-  when revealing, no correctness check against it** — purely a "write it
-  down first" nudge, cleared (`els.iScratch.value = ''`) on every
-  `renderInterviewQuestion()` call. Don't wire it to `DATA`/localStorage
-  or add any comparison against the real answer without being asked —
-  that would start turning this into scoring, which §11 rules out.
+- **Scratch box toggle** (`#interviewScratchToggle`, in "Mix & Extras")
+  shows `#iScratchRow` between the question and Reveal Answer, so you
+  write your answer first. `interviewAnswers[]` (parallel to
+  `interviewQuestions`) persists each question's text across Prev/Next
+  instead of clearing it — needed so voice answers/scoring below aren't
+  lost on navigation. Still nothing written to `DATA`/`localStorage`.
+- **Answer by voice** (`#interviewVoiceAnswer` + `#iMicBtn`,
+  `SpeechRecognition`/`webkitSpeechRecognition` — separate Web API from
+  Read Aloud's `SpeechSynthesis`, speech IN not OUT). Chrome/Edge only;
+  feature-detected via `STT_SUPPORTED`, hidden if unsupported. Needs a
+  secure context (https/localhost, not `file://`) — fine on GitHub Pages.
+  Transcript streams into the scratch box; forces it visible even if the
+  scratch toggle itself is off.
+- **Score my answers** (`#interviewScoreAnswers`) — rule-based scoring
+  (`scoreInterviewAnswer()`: word-count + keyword-overlap-vs-reference-
+  answer + multi-sentence bonus − filler-word penalty, 0–10), NOT AI —
+  a static site can't safely call an LLM (no way to hide an API key
+  client-side). This is an explicit, deliberate exception to §11's
+  "no scoring mechanics" rule, at the user's request — don't extend
+  scoring elsewhere (browse mode, etc.) without being asked again. Scored
+  on Reveal Answer; completion screen shows an overall average + per-sheet
+  breakdown (`renderInterviewCompletionScore()`); **Export .txt**
+  (`exportInterviewSessionTxt()`) downloads question + your answer +
+  score + reference answer per question, client-side Blob, no server.
+  **Bug fixed**: `stopAnswerRecognition()` used to only call `.stop()` and
+  rely on the async `onend` to clean up -- navigating to the next question
+  before `onend` fired let the old recognizer's `onresult` keep writing
+  into the new question's scratch box. Now nulls handlers + `.abort()`s
+  synchronously. Also: `revealInterviewAnswer()` now stops the mic (it
+  didn't before, so it kept listening after you'd moved on).
+  **Toggle labels shortened** (`interviewScoreAnswers`'s used to be 100+
+  chars) — detail moved to `title` tooltips instead, since 6 stacked
+  toggles in "Mix & Extras" was pushing the modal's height-fit problem
+  (above) back open. `#iScratchClearBtn` (🗑️) added next to the mic to
+  wipe the scratch box without manual select-all.
 - Starting builds the pool (plain, non-balanced path): filter by checked
   sheets/levels/priorities → shuffle if randomized → **then** slice to
   the chosen count (in that order — slicing after shuffling is what
@@ -1257,7 +1278,9 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
 
 - Don't add scoring mechanics (points, correct/incorrect tracking,
   pass/fail results) anywhere — browse mode is a pure reference tool,
-  Interview Mode (§7) is reveal-based practice, not a quiz.
+  Interview Mode (§7) is reveal-based practice, not a quiz. **Exception**:
+  §7's opt-in "Score my answers" rule-based scoring — explicit user
+  request, not a green light to add scoring anywhere else.
 - Don't add more question data beyond what's actually in the source Excel
   without being asked, and never fabricate Q&A content (§3).
 - **Currently 1029 questions across 5 sheets (CoreJava, SpringBoot,
