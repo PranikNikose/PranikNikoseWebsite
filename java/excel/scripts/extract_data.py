@@ -270,18 +270,47 @@ def answer_html_and_plain(cell_value):
     outside fences renders as before (rich-text HTML, joined by line); a
     fenced block renders as one syntax-highlighted <pre class="code-block">
     (docs/RULES.md section 4), so an answer can mix prose and embedded code
-    in one flowing cell."""
+    in one flowing cell. A line that's just "OR" (any case) -- separating
+    two alternate answer phrasings -- renders as a centered italic
+    uppercase divider instead of a plain text line. A blank line
+    immediately touching that divider (either side) is dropped -- the
+    divider's own CSS margin already provides spacing, so a blank Excel
+    line there would just double it under white-space:pre-wrap. No '\\n'
+    is placed directly against a code/OR block in the joined HTML either --
+    both render as block-level elements with their own line break, so a
+    literal adjacent newline under white-space:pre-wrap would add a second,
+    visibly bigger gap on top of it."""
     lines = lines_with_runs(cell_value)
-    html_parts = []
-    plain_parts = []
+    parts = []  # (kind, html, plain), kind in 'code'/'or'/'text'
     for kind, payload in split_code_fences(lines):
         if kind == 'code':
-            html_parts.append(code_block_html(payload))
-            plain_parts.append('\n'.join(payload))
+            parts.append(('code', code_block_html(payload), '\n'.join(payload)))
+        elif line_to_plain(payload).strip().upper() == 'OR':
+            parts.append(('or', '<div class="answer-or-sep">OR</div>', 'OR'))
         else:
-            html_parts.append(line_to_html(payload))
-            plain_parts.append(line_to_plain(payload))
-    return '\n'.join(html_parts).strip(), '\n'.join(plain_parts).strip()
+            parts.append(('text', line_to_html(payload), line_to_plain(payload)))
+
+    def is_blank(p):
+        return p[0] == 'text' and not p[2].strip()
+
+    filtered = []
+    for i, p in enumerate(parts):
+        if is_blank(p):
+            touches_or = ((i > 0 and parts[i - 1][0] == 'or') or
+                          (i + 1 < len(parts) and parts[i + 1][0] == 'or'))
+            if touches_or:
+                continue
+        filtered.append(p)
+
+    BLOCK_KINDS = ('or', 'code')
+    html = ''
+    for i, p in enumerate(filtered):
+        if i > 0 and filtered[i - 1][0] not in BLOCK_KINDS and p[0] not in BLOCK_KINDS:
+            html += '\n'
+        html += p[1]
+
+    plain_parts = [p[2] for p in filtered]
+    return html.strip(), '\n'.join(plain_parts).strip()
 
 
 def extract(sheets=None, rows_per_sheet=None):

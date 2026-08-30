@@ -200,6 +200,14 @@ the Coding sheet's *entire* answer is already code with no fences needed.
   the Coding sheet uses and drops the pending marker, so both paths render
   with identical coloring without duplicating the highlighter in Python.
 
+**"OR" divider line (Answer only):** an Answer cell line whose text is just
+`OR` (typed in any case) — separating two alternate answer phrasings —
+renders as a centered, italic, uppercase `.answer-or-sep` divider instead
+of a plain text line (`answer_html_and_plain()` in `extract_data.py`).
+Plain-case in Excel is fine; the CSS `text-transform:uppercase` (and the
+extractor normalizing the stored text to `OR`) means it always displays
+consistently regardless of how it was typed.
+
 ## 5. Layout: desktop vs. mobile (pure CSS breakpoint, no JS device sniffing)
 
 - Breakpoint: `768px` (`min-width:768px` = desktop, `max-width:767.98px` =
@@ -393,24 +401,14 @@ the Coding sheet's *entire* answer is already code with no fences needed.
     Hashtable?" exists, since the literal phrase "hashmap hashtable"
     never occurs. The user explicitly asked for this. Don't revert to
     single-substring matching without being asked.
-  - **Matched search terms are visually highlighted** in the rendered
-    Question/Answer text (desktop table, mobile card) via
-    `highlightSearchTerms(rootEl, terms)` — wraps each match in `<mark
-    class="search-hl">`, theme-aware via `--search-hl-bg`/`--search-hl-fg`
-    (not the browser's default yellow-on-black `<mark>` look). Operates
-    directly on the DOM by walking text nodes with a `TreeWalker`, NOT by
-    re-building the innerHTML string — this is what lets it highlight
-    safely INSIDE already-rendered rich HTML (bold/italic spans,
-    Coding-sheet syntax-highlighted `<span>`s) without needing to parse
-    or regenerate that markup. Called from `renderTable()`/
-    `renderSingle()` right after they set Question/Answer innerHTML,
-    using the same `currentSearchTerms` `applyFilters()` already computed
-    for the actual filtering — purely cosmetic on top of matching that
-    already happened, never changes which rows are included. Cell/field
-    labels and tags (Sheet/Category/Level/Priority) are NOT highlighted
-    — search only ever matches `questionPlain`/`answerPlain`, so
-    highlighting stays scoped to Question/Answer content, same fields the
-    matching itself covers.
+  - **Matched search terms are NOT visually highlighted** in the rendered
+    Question/Answer text — the search box only filters which rows show,
+    with no `<mark>`/yellow-highlight styling on the matched words
+    themselves. This was implemented once (`highlightSearchTerms()`,
+    wrapping matches in `<mark class="search-hl">` via a DOM `TreeWalker`)
+    and then explicitly removed at the user's request ("I don't want that
+    functionality"). Don't reintroduce match highlighting without being
+    asked again.
 - "Clear Filters" resets: all five column filters (Sheet/Topic/Level/
   Priority/Answer) → null, search → empty.
 - **All five browse-mode filter popovers (Sheet/Topic/Level/Priority/
