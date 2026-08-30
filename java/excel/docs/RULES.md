@@ -1565,9 +1565,25 @@ safe:
     separate "check boldness" logic needed) are replaced; rows newly
     present in Excel are added automatically; rows whose question text no
     longer exists anywhere in Excel are reported but only removed with
-    explicit confirmation (typed phrase, or `--yes` for non-interactive
+    explicit confirmation (`Y/N` prompt, or `--yes` for non-interactive
     runs) — additions/changes are safe to apply automatically, deletions
     are not.
+  - **Row order in `index.html` mirrors `current`'s existing order, not a
+    rebucketed unchanged/changed/added/removed sequence.** An earlier
+    version built the final list as three concatenated blocks (all
+    unchanged rows, then all changed rows, then added, then kept-removed)
+    — which meant editing a question's answer in Excel silently moved it
+    from wherever it sat (e.g. row 6) to the end of the file, since editing
+    bumped it into the "changed" bucket appended after every unchanged row
+    (caught by the user noticing an edited question had jumped to the
+    bottom after Smart Sync). Fixed by walking `current`'s original
+    key order and swapping in the fresh version in place for a changed
+    key, keeping a kept-removed row in its original spot too — only
+    genuinely new (`added`) rows, which have no prior position, are
+    appended at the end. This only prevents future reorders; a row
+    already displaced by the old bug won't move back on its own (its
+    displaced position is now "unchanged") — recover it by hand or via
+    `restore_backup.py`/manage.bat option 11 from before the reorder.
   - All three were tested end-to-end in an isolated sandbox copy (not the
     real `index.html`) before being confirmed working: confirm-phrase
     reject/accept paths, already-present-sheet skip, new-sheet add,

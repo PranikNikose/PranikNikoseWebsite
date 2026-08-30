@@ -98,12 +98,14 @@ def main():
     new_by_key = keyed_by_identity(fresh)
 
     unchanged, changed, added = [], [], []
+    changed_by_key = {}
     for key, new_q in new_by_key.items():
         old_q = old_by_key.get(key)
         if old_q is None:
             added.append(new_q)
         elif diff_entry(old_q, new_q):
             changed.append((old_q, new_q))
+            changed_by_key[key] = new_q
         else:
             unchanged.append(old_q)
 
@@ -156,11 +158,18 @@ def main():
             print('Nothing to write -- index.html already matches Excel.')
         return
 
-    final = list(unchanged)
-    final += [new_q for _, new_q in changed]
+    # Preserve current's original row order -- swap in the fresh version for
+    # a changed row in place, rather than bucketing unchanged/changed/added
+    # into separate blocks (which used to shove every edited row to the end,
+    # regardless of where it actually sat in index.html).
+    final = []
+    for key, old_q in old_by_key.items():
+        if key in changed_by_key:
+            final.append(changed_by_key[key])
+        elif key in new_by_key or not do_remove:
+            final.append(old_q)
+        # else: removed and confirmed -- dropped
     final += added
-    if not do_remove:
-        final += removed
 
     backup_path = ed.splice_into_index_html(final)
 
