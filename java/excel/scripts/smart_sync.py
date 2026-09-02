@@ -53,7 +53,7 @@ import extract_data as ed
 QUIET = '--quiet' in sys.argv or '-q' in sys.argv
 
 FIELDS_TO_COMPARE = ['srNo', 'category', 'level', 'question',
-                      'questionParts', 'answer', 'answerPlain', 'priority']
+                      'questionParts', 'answer', 'answerPlain', 'priority', 'company']
 
 
 def diff_entry(old, new):

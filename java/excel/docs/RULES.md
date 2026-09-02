@@ -56,6 +56,7 @@ Each entry in `DATA` has exactly these fields (all strings):
 | `answer`        | the answer as **HTML** (rich-text formatting preserved, §4)       |
 | `answerPlain`   | the same answer as **plain text**, for search                     |
 | `priority`      | priority tag from Excel (e.g. `LinkedIn-1`, `1`), often blank     |
+| `company`       | `Company` column from Excel (e.g. `TCS`, `LTM`), blank on sheets that don't have this column at all (§5 Company note) |
 
 `question`/`answer`/each item of `questionParts` render via `.innerHTML`
 (they carry real markup). Everything else renders via
@@ -287,6 +288,45 @@ consistently regardless of how it was typed.
   don't move it back before the question, and don't move Priority back
   into the Details column / Sheet-Category-Level tag row without being
   asked.
+- **Company** (new Excel column, added after Priority, not present on
+  every sheet — `find_col(header, 'company')` in `extract_data.py`,
+  empty string when the sheet has no Company column) is filterable AND
+  displayed, following the exact same pattern as Priority rather than
+  the Details column: `tag-company` badge(s) sitting in the same
+  `.q-priority` row right next to `tag-priority` (desktop table, mobile
+  card, Interview Mode `#iCompany`/`#mCompany`). `.q-priority` is
+  `display:flex; gap:6px` so the tags sit side by side.
+  - **A question asked at more than one company is one comma-separated
+    Excel cell** (e.g. `TCS, LTM`), not one entry per company — matches
+    how the user actually asked for it. `companyList(q)` (`index.html`)
+    splits `q.company` on `,` and trims each part; `companyTagsHtml(q)`
+    renders one `tag-company` badge per split value (a single `—` badge
+    when the list is empty) instead of one combined-text tag. The
+    `#mCompany`/`#iCompany` elements are a `.company-tags` wrapper
+    (`display:contents`) rather than the tag itself, so however many
+    badges `companyTagsHtml()` produces sit directly in the parent
+    `.q-priority` flex row, not boxed inside one wrapper tag.
+  - **Filtering matches if ANY of a row's split company values is
+    selected** — `uniqueValues('company')` flattens every row's split
+    list into the popover's chip options (so `TCS, LTM` contributes both
+    `TCS` and `LTM` as separate pickable chips, not one combined chip),
+    and `applyFilters()`'s `company` branch checks
+    `companyList(q).some(c => sel.has(c))` instead of a single exact-value
+    match. Verified with a synthetic `"TCS, LTM"` row: renders as two
+    separate tags, and filtering by either company alone matches it.
+  - Added to `FILTER_COLUMNS` (auto-wires the filter popover UI) AND to
+    the separate hardcoded `columnFilters` object in both places it's
+    declared/reset — **`columnFilters` is NOT derived from
+    `FILTER_COLUMNS`, it's a second hand-maintained object**; forgetting
+    to add a new filter column there throws `Cannot read properties of
+    undefined (reading 'has')` in `applyFilters()` and breaks the entire
+    table (0 rows render) — caught during testing this exact feature. Any
+    future new filter column needs both updated.
+  - `smart_sync.py`'s `FIELDS_TO_COMPARE` also needs the new field name
+    added, or Smart Sync won't detect an Excel-side change to it —
+    `company` is compared as the raw un-split string there, which is
+    fine since any actual text change (adding/removing a company) still
+    differs as a string.
 - **Mobile (<768px):** **one question at a time**, with Previous/Next
   pagination buttons. Top-to-bottom order: Sheet/Category/Level as a
   `.field-inline` row of plain colored `.tag` badges (`tag-sheet`/

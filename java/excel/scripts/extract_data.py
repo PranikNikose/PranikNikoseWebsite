@@ -343,6 +343,7 @@ def extract(sheets=None, rows_per_sheet=None):
         col_questions = find_col(header, 'question')
         col_answers = find_col(header, 'answer')
         col_priority = find_col(header, 'priority', 'proority')
+        col_company = find_col(header, 'company')
 
         taken = 0
         ordinal = 0
@@ -363,6 +364,7 @@ def extract(sheets=None, rows_per_sheet=None):
             years = plain(ws.cell(row=row, column=col_years).value) if col_years else ''
             topic = plain(ws.cell(row=row, column=col_topic).value) if col_topic else ''
             priority = plain(ws.cell(row=row, column=col_priority).value) if col_priority else ''
+            company = plain(ws.cell(row=row, column=col_company).value) if col_company else ''
 
             # Level is now driven entirely by Years, not the Excel's Level
             # column text: a years value that resolves to a band uses that
@@ -392,7 +394,8 @@ def extract(sheets=None, rows_per_sheet=None):
                 'questionParts': question_parts,
                 'answer': answer_html,
                 'answerPlain': answer_plain,
-                'priority': priority
+                'priority': priority,
+                'company': company
             })
             taken += 1
         per_sheet_counts[sheet] = taken
