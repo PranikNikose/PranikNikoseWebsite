@@ -74,7 +74,8 @@ def main():
             tf.write(block)
             tmp_path = tf.name
         try:
-            result = subprocess.run(['node', '--check', tmp_path], capture_output=True, text=True)
+            result = subprocess.run(['node', '--check', tmp_path], capture_output=True,
+                                     text=True, encoding='utf-8')
             if result.returncode == 0:
                 log('  script block ' + str(i) + ': OK (' + str(len(block)) + ' chars)')
             else:
@@ -118,7 +119,8 @@ def main():
             tf.write(node_script)
             tmp_path = tf.name
         try:
-            result = subprocess.run(['node', tmp_path], capture_output=True, text=True)
+            result = subprocess.run(['node', tmp_path], capture_output=True,
+                                     text=True, encoding='utf-8')
             if result.returncode != 0:
                 ok = fail('failed to evaluate DATA array via node:\n' + result.stderr)
             else:

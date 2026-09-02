@@ -1604,6 +1604,17 @@ safe:
   explicit decision to include HR (§3's HR note) and was removed once
   noticed contradicting that decision; HR is a normal sheet like any
   other now.
+  **Both `subprocess.run(['node', ...])` calls pass `encoding='utf-8'`
+  explicitly, not bare `text=True`** — without it, Python decodes the
+  child process's stdout using the OS default codepage (cp1252 on this
+  Windows setup), and a real Unicode character in the Excel data outside
+  that codepage's range crashes the subprocess output reader thread with
+  `UnicodeDecodeError`, silently leaving `result.stdout` as `None` (caught
+  live: a Full Resync that pulled in a new character crashed the data
+  sanity check's `json.loads(None)` right after). `node` itself writes
+  stdout as UTF-8 regardless of OS codepage, so this is purely a
+  Python-side decode setting, not something `extract_data.py`'s own
+  writes need to account for.
   **Supports `--quiet`/`-q`**: on success, collapses the normal 3-section,
   ~20-line breakdown into one summary line (`Verify: OK -- syntax OK, ids
   55/55, 1029 questions across 5 sheet(s).`); on failure, still prints
