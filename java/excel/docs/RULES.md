@@ -463,6 +463,32 @@ consistently regardless of how it was typed.
   anywhere in this app anymore, and no standalone `<select>` for Sheet —
   don't reintroduce either; a past version of this doc described that
   older checkbox-based architecture, which was fully replaced.
+- **Topic/Level/Priority/Company popover options are scoped to the
+  currently selected Sheet(s)** — `sheetScopedQuestions()` filters
+  `allQuestions` down to the selected sheets before `uniqueValues()`
+  builds a column's chip list, so picking Sheet=HR shows only HR's own
+  Topics (23, not the ~203 across all six sheets). One-directional only:
+  Sheet narrows every other filter's options, not the reverse — Sheet's
+  own popover (`uniqueValues('sheet')`) always lists every sheet
+  regardless of other active filters. Answer's popover is unaffected
+  (its two options, Blank/Non Blank, are the fixed `ANSWER_FILTER_VALUES`
+  constant, not derived from `uniqueValues()`). Selecting a value in one
+  of these popovers, then picking a Sheet that no longer contains it,
+  does not auto-clear that selection — it just matches 0 rows until
+  re-picked, a known/accepted edge case, not a bug to silently paper
+  over with auto-reset logic.
+  - **`uniqueValues(key, ignoreSheetScope)`'s second argument exists
+    specifically so Interview Mode's own Sheet/Level chip pickers stay
+    unaffected.** Interview Mode's Level list (`applyInterviewPreset()`,
+    `openInterviewModal()`) calls `uniqueValues('level', true)` — it is a
+    separate, independent selection from browse-mode's Sheet filter (a
+    different screen/state entirely) and must always list every level
+    across all sheets. Without the flag, opening Interview Mode setup
+    while browse-mode had Sheet=HR active silently narrowed its Level
+    picker to HR's own levels too — caught immediately after adding the
+    Sheet-scoping feature, while auditing for the same class of bug. Any
+    future `uniqueValues()` call site outside the browse-mode filter
+    popovers needs the same `true` flag.
 - **Topic's popover gets a search box (`.fp-search`), the others don't.**
   Topic (`category`) can run to 100+ distinct values (mixing several
   synced sheets), which is too many to scan/scroll through even as
