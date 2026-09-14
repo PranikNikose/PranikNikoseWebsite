@@ -258,6 +258,14 @@ def canonical_level_for_years(years):
         return None
     lo = nums[0]
     hi = nums[1] if len(nums) > 1 else nums[0]
+    # A range spanning the ENTIRE band spectrum (e.g. "0-10 Years" on every
+    # row, as seen in HR) isn't a real per-row signal -- it's a blanket
+    # placeholder covering every band at once. Treat it the same as no
+    # Years data at all (falls through to the sheet's raw Level text
+    # instead of forcing everyone into whichever band the midpoint lands
+    # on -- "Mid" here, which would be misleading).
+    if lo <= LEVEL_BANDS[0][0] and hi >= LEVEL_BANDS[-1][1]:
+        return None
     mid = (lo + hi) / 2
     for band_lo, band_hi, name in LEVEL_BANDS:
         if band_lo <= mid <= band_hi:
@@ -360,20 +368,28 @@ def extract(sheets=None, rows_per_sheet=None):
             if not srNo:
                 srNo = str(ordinal)  # source left it blank; use row position within sheet instead
 
-            level = plain(ws.cell(row=row, column=col_level).value) if col_level else ''
+            raw_level = plain(ws.cell(row=row, column=col_level).value) if col_level else ''
             years = plain(ws.cell(row=row, column=col_years).value) if col_years else ''
             topic = plain(ws.cell(row=row, column=col_topic).value) if col_topic else ''
             priority = plain(ws.cell(row=row, column=col_priority).value) if col_priority else ''
             company = plain(ws.cell(row=row, column=col_company).value) if col_company else ''
 
-            # Level is now driven entirely by Years, not the Excel's Level
-            # column text: a years value that resolves to a band uses that
-            # band's name; anything else (years blank, or outside 0-10)
-            # is "General" -- the original Level cell text is not used as
-            # a fallback anymore (per the user's explicit rule).
-            level = canonical_level_for_years(years) or 'General'
+            # Level is driven by Years when it resolves to a real band. When
+            # Years is blank/unparseable, fall back to the sheet's own raw
+            # Level text instead of blindly defaulting to "General" -- e.g.
+            # HR has no Years data at all, but its Level column holds real,
+            # meaningful values (HR/TAE, technical/domain, tech round) that
+            # were previously discarded entirely. Only falls all the way to
+            # "General" when there's neither a valid Years band nor any raw
+            # Level text to fall back on.
+            years_band = canonical_level_for_years(years)
+            level = years_band or raw_level or 'General'
             topic = topic or sheet
-            levelLabel = normalize_level(level + (' (' + years + ')' if years else ''))
+            # Only append the "(X-Y Years)" suffix when Years is what
+            # actually produced this level -- appending it to a raw-Level
+            # fallback (e.g. HR's "HR/TAE") would misleadingly suggest
+            # Years is a meaningful per-row qualifier when it isn't.
+            levelLabel = normalize_level(level + (' (' + years + ')' if years_band and years else ''))
 
             answer_cell = ws.cell(row=row, column=col_answers).value if col_answers else None
             answer_html, answer_plain = answer_html_and_plain(answer_cell)

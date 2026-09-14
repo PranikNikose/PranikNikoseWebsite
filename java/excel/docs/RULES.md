@@ -802,12 +802,10 @@ only via a button with no equally-visible way back except an in-context
   row actually is (see the "don't fabricate/normalize without asking"
   rule below, which still applies to anything NOT covered by the specific
   fold above).
-- **Level is derived entirely from Years — the Excel's Level column text
-  is NOT used at all anymore, not even as a fallback.** This is a
-  user-specified, fixed mapping (`LEVEL_BANDS` in `extract_data.py`,
-  applied via `canonical_level_for_years(years)` — its result becomes
-  `level` directly, replacing the old `canonical or level or 'General'`
-  fallback chain):
+- **Level is derived from Years when Years gives a real per-row signal —
+  the Excel's Level column text is used ONLY as a fallback when it
+  doesn't.** This is a user-specified, fixed mapping (`LEVEL_BANDS` in
+  `extract_data.py`, applied via `canonical_level_for_years(years)`):
   | Years band | Level name       |
   |------------|------------------|
   | 0–1 Year   | Fresher          |
@@ -823,16 +821,33 @@ only via a button with no equally-visible way back except an in-context
   two of the 5 exact bands (not a perfect match to one) still resolves to
   a real band via its midpoint, rather than falling through to
   `General` — that "in-between years still get a real level, not
-  General" behavior was explicitly requested. Only a Years cell with no
-  parseable number, or a midpoint outside 0–10 entirely, becomes
-  `General`. **The original Level-column text is completely ignored now**
-  — not read as a fallback for blank/unparseable Years, not used when it
-  contradicts Years. Applied when re-syncing CoreJava/SpringBoot/
-  Microservices: no behavior change for this data (all rows already
-  cleanly matched one of the 5 bands or had blank Years), confirming the
-  stricter rule is safe against the current dataset. Don't add more bands
-  to `LEVEL_BANDS` or change the `General` fallback without the user
-  specifying the exact name — don't guess one.
+  General" behavior was explicitly requested.
+  **`canonical_level_for_years()` returns `None` (no real signal) in two
+  cases**, both falling through to `raw_level or 'General'` instead of a
+  band name:
+  1. No parseable number in the Years cell at all (blank, or non-numeric text).
+  2. **The parsed range spans the ENTIRE band spectrum** (`lo <= 0 and
+     hi >= 10`) — a blanket placeholder like `0-10 Years` repeated on
+     every row, not a real per-row value. Forcing a midpoint band here
+     (`0-10` → midpoint 5 → "Mid" for every row) would be actively
+     misleading, not just imprecise. Found on HR: Years was blank, then
+     later filled with `0-10 Years` on every row between two sessions of
+     this project — both states previously collapsed HR's Level filter
+     to one flat value (`General`, then `Mid`), silently discarding HR's
+     real Level-column data (`HR/TAE`, `technical/domain`, `tech round`,
+     an interview-round-type label, not an experience level at all) that
+     had been there the whole time. `raw_level` is read BEFORE the Years
+     computation now, and `levelLabel`'s `(X-Y Years)` suffix is only
+     appended when `canonical_level_for_years()` actually returned a
+     band (`years_band` truthy) — not for the raw-Level-text fallback,
+     since a blanket placeholder next to a real Level value would
+     misleadingly look like a meaningful per-row qualifier.
+  Applied when re-syncing CoreJava/SpringBoot/Microservices/RDBMS: no
+  behavior change for that data (every row already cleanly matched one of
+  the 5 bands or had blank Years) — confirming this only changes outcomes
+  for the no-real-signal cases. Don't add more bands to `LEVEL_BANDS` or
+  change the `General` fallback without the user specifying the exact
+  name — don't guess one.
 - **Level values sort in ascending years order in every chip
   list/filter — not alphabetically.** `LEVEL_SORT_ORDER = ['Fresher',
   'Junior to Mid', 'Mid', 'Senior', 'Lead / Architect', 'General']` in
