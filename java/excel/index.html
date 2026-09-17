@@ -723,6 +723,11 @@
   .pager{display:flex; justify-content:space-between; gap:10px;}
   .pager .btn{flex:1;}
 
+  /* ---------- Listen Mode: one record at a time, read aloud ---------- */
+  #listenView{display:none; flex-direction:column; gap:14px;}
+  .listen-status{color:var(--muted); font-size:.82rem; text-align:center;}
+  .listen-controls{display:flex; flex-direction:column; gap:12px; padding-top:6px; border-top:1px solid var(--border);}
+
   @media (min-width:768px){
     #tableView{display:block;}
     #singleView{display:none !important;}
@@ -762,6 +767,7 @@
     <div class="header-actions">
       <div class="mode-toggle" role="tablist" aria-label="Mode">
         <button id="normalModeBtn" class="mode-btn active" type="button" role="tab" aria-selected="true">📖 <span class="label-full">Normal Mode</span><span class="label-short">Normal</span></button>
+        <button id="listenModeBtn" class="mode-btn" type="button" role="tab" aria-selected="false">🎧 <span class="label-full">Listen Mode</span><span class="label-short">Listen</span></button>
         <button id="interviewOpenBtn" class="mode-btn" type="button" role="tab" aria-selected="false">🎯 <span class="label-full">Interview Mode</span><span class="label-short">Interview</span></button>
       </div>
       <button id="historyOpenBtn" type="button" class="header-icon-btn" aria-label="Interview session history" title="Interview session history">🕘 <span class="label-full">History</span></button>
@@ -1025,6 +1031,41 @@
     </div>
   </div>
 
+  <!-- Listen Mode: same filtered pool as Normal Mode, one record read
+       aloud at a time via speechSynthesis instead of read by eye. -->
+  <div class="card" id="listenView" style="display:none;">
+    <div class="field-inline">
+      <span class="tag tag-sheet" id="lSheet"></span>
+      <span class="tag tag-category" id="lCategory"></span>
+      <span class="tag tag-level" id="lLevel"></span>
+    </div>
+    <div class="field-row q">
+      <span class="field-label">Question</span>
+      <span class="field-value" id="lQuestion"></span>
+    </div>
+    <div class="q-priority"><span class="tag tag-priority" id="lPriority"></span><span class="company-tags" id="lCompany"></span></div>
+    <div class="field-row a">
+      <span class="field-label">Answer</span>
+      <span class="field-value" id="lAnswer"></span>
+    </div>
+    <div class="listen-status" id="listenStatus"></div>
+    <div class="listen-controls">
+      <div class="pager">
+        <button class="btn ghost" id="listenPrevBtn" type="button">Previous</button>
+        <button class="btn" id="listenPlayBtn" type="button">▶ Play</button>
+        <button class="btn ghost" id="listenNextBtn" type="button">Next</button>
+      </div>
+      <label class="modal-toggle-row">
+        <input type="checkbox" id="listenAutoAdvance" checked>
+        Continue to next question automatically
+      </label>
+      <div>
+        <label class="voice-sub-label" for="lVoiceSelect">Voice</label>
+        <select id="lVoiceSelect" class="voice-select"></select>
+      </div>
+    </div>
+  </div>
+
   <div class="card empty" id="emptyState" style="display:none;">
     <span class="empty-icon">🗂️</span>
     No questions match the current filters.
@@ -1095,7 +1136,23 @@
     emptyState: document.getElementById('emptyState'),
     loadingNote: document.getElementById('loadingNote'),
 
+    listenView: document.getElementById('listenView'),
+    lSheet: document.getElementById('lSheet'),
+    lCategory: document.getElementById('lCategory'),
+    lLevel: document.getElementById('lLevel'),
+    lPriority: document.getElementById('lPriority'),
+    lCompany: document.getElementById('lCompany'),
+    lQuestion: document.getElementById('lQuestion'),
+    lAnswer: document.getElementById('lAnswer'),
+    listenStatus: document.getElementById('listenStatus'),
+    listenPrevBtn: document.getElementById('listenPrevBtn'),
+    listenPlayBtn: document.getElementById('listenPlayBtn'),
+    listenNextBtn: document.getElementById('listenNextBtn'),
+    listenAutoAdvance: document.getElementById('listenAutoAdvance'),
+    lVoiceSelect: document.getElementById('lVoiceSelect'),
+
     normalModeBtn: document.getElementById('normalModeBtn'),
+    listenModeBtn: document.getElementById('listenModeBtn'),
     interviewOpenBtn: document.getElementById('interviewOpenBtn'),
     interviewModal: document.getElementById('interviewModal'),
     interviewCloseBtn: document.getElementById('interviewCloseBtn'),
@@ -1592,15 +1649,24 @@
       // Interview Mode display-reset bug, see endInterview().
       els.tableView.style.display = 'none';
       els.singleView.style.display = 'none';
+      if(listenModeActive) refreshListenView();
       updateStatus();
       return;
     }
 
     els.emptyState.style.display = 'none';
-    els.tableView.style.display = '';
-    els.singleView.style.display = '';
-    renderTable();
-    renderSingle();
+    // Listen Mode replaces table/single entirely while active -- leave
+    // them hidden (goListenMode() already set that) and refresh the
+    // current listen question instead, rather than re-showing both views
+    // underneath it.
+    if(listenModeActive){
+      refreshListenView();
+    } else {
+      els.tableView.style.display = '';
+      els.singleView.style.display = '';
+      renderTable();
+      renderSingle();
+    }
     updateStatus();
   }
 
@@ -1962,6 +2028,7 @@
   }
 
   function openInterviewModal(){
+    pauseListen(); // don't keep reading aloud behind the config modal
     els.interviewError.style.display = 'none';
     // Nothing pre-selected, not even the wildcard -- user must choose.
     interviewSheetChips = buildChipGroup(els.interviewSheetList, uniqueValues('sheet'), 'All', new Set());
@@ -2261,14 +2328,17 @@
     if(interviewTimerHandle){ clearInterval(interviewTimerHandle); interviewTimerHandle = null; }
   }
 
-  // Keeps the header's Normal/Interview segmented toggle in sync with
-  // which mode is actually active (a running Interview session, not just
-  // the config modal being open).
-  function setModeUI(isInterview){
-    els.normalModeBtn.classList.toggle('active', !isInterview);
-    els.normalModeBtn.setAttribute('aria-selected', String(!isInterview));
-    els.interviewOpenBtn.classList.toggle('active', isInterview);
-    els.interviewOpenBtn.setAttribute('aria-selected', String(isInterview));
+  // Keeps the header's Normal/Listen/Interview segmented toggle in sync
+  // with which mode is actually active (a running Interview session, not
+  // just the config modal being open; Listen Mode being the active view,
+  // not just speech happening to be paused).
+  function setModeUI(mode){
+    els.normalModeBtn.classList.toggle('active', mode === 'normal');
+    els.normalModeBtn.setAttribute('aria-selected', String(mode === 'normal'));
+    els.listenModeBtn.classList.toggle('active', mode === 'listen');
+    els.listenModeBtn.setAttribute('aria-selected', String(mode === 'listen'));
+    els.interviewOpenBtn.classList.toggle('active', mode === 'interview');
+    els.interviewOpenBtn.setAttribute('aria-selected', String(mode === 'interview'));
   }
 
   // ---------- Interview session history (localStorage, per-browser) ----------
@@ -2372,6 +2442,7 @@
       totalQuestions: pool.length
     };
 
+    if(listenModeActive) exitListenMode();
     els.tableView.style.display = 'none';
     els.singleView.style.display = 'none';
     els.emptyState.style.display = 'none';
@@ -2386,7 +2457,7 @@
     var cfg = currentSessionMeta.config;
     els.iScratchRow.style.display = (cfg.showScratch || cfg.voiceAnswer || cfg.scoreAnswers) ? 'flex' : 'none';
     els.iMicBtn.style.display = (STT_SUPPORTED && cfg.voiceAnswer) ? 'flex' : 'none';
-    setModeUI(true);
+    setModeUI('interview');
     startInterviewTimer();
     renderInterviewQuestion();
   }
@@ -2508,7 +2579,7 @@
     if(!SPEECH_SUPPORTED) return;
     var voices = window.speechSynthesis.getVoices();
     if(!voices.length) return; // getVoices() can return empty until 'voiceschanged' fires
-    if(!VOICE_SELECT_ELS) VOICE_SELECT_ELS = [els.iVoiceSelect, els.interviewVoiceSelect];
+    if(!VOICE_SELECT_ELS) VOICE_SELECT_ELS = [els.iVoiceSelect, els.interviewVoiceSelect, els.lVoiceSelect];
 
     // Only the user's named favorites -- everything else is filtered out
     // of the dropdown entirely, not just sorted below them. If NONE of
@@ -2546,6 +2617,182 @@
     }
     return null;
   }
+
+  // ---------- Listen Mode ----------
+  // A third view of the SAME filtered pool Normal Mode shows -- no
+  // separate config/session/pool like Interview Mode, just Sheet/Topic/
+  // Level/Priority/Company/Answer filters + Search staying live while
+  // one question at a time gets read aloud (Question, then Answer)
+  // instead of read by eye. The toolbar/status-row stay visible and
+  // functional the whole time (unlike Interview Mode, which hides them) —
+  // changing a filter re-syncs the current listen position immediately.
+  var listenModeActive = false;
+  var listenIndex = 0;
+  var listenPlaying = false;
+  // Bumped on every stop/nav so a speechSynthesis 'onend' firing late (for
+  // an utterance that's already been cancelled/superseded) can't chain
+  // into reading the wrong question -- same guard pattern as Interview
+  // Mode's speakCurrentInterviewQuestion().
+  var listenUtteranceToken = 0;
+
+  function goListenMode(){
+    if(els.interviewModal.style.display !== 'none') closeInterviewModal();
+    if(els.interviewView.style.display !== 'none') endInterview();
+    if(listenModeActive) return;
+    listenModeActive = true;
+    listenIndex = 0;
+    els.tableView.style.display = 'none';
+    els.singleView.style.display = 'none';
+    els.emptyState.style.display = 'none';
+    setModeUI('listen');
+    renderListenQuestion();
+  }
+
+  function exitListenMode(){
+    if(!listenModeActive) return;
+    pauseListen();
+    listenModeActive = false;
+    els.listenView.style.display = 'none';
+    els.tableView.style.display = '';
+    els.singleView.style.display = '';
+  }
+
+  function currentListenQuestion(){
+    return filteredQuestions[listenIndex] || null;
+  }
+
+  // Pure display update -- never starts/continues speech on its own.
+  function renderListenQuestion(){
+    if(!listenModeActive) return;
+    var total = filteredQuestions.length;
+    if(total === 0){
+      els.listenView.style.display = 'none';
+      els.emptyState.style.display = 'block';
+      return;
+    }
+    if(listenIndex >= total) listenIndex = total - 1;
+    if(listenIndex < 0) listenIndex = 0;
+    els.emptyState.style.display = 'none';
+    els.listenView.style.display = 'flex';
+    var q = filteredQuestions[listenIndex];
+    els.lSheet.textContent = q.sheet;
+    els.lCategory.textContent = q.category;
+    els.lLevel.textContent = q.level;
+    els.lPriority.textContent = q.priority || '—';
+    els.lCompany.innerHTML = companyTagsHtml(q);
+    els.lQuestion.innerHTML = questionPartsHtml(q);
+    els.lAnswer.innerHTML = answerHtmlOrPlaceholder(q);
+    els.listenStatus.textContent = 'Question ' + (listenIndex + 1) + ' of ' + total;
+    els.listenPrevBtn.disabled = listenIndex === 0;
+    els.listenNextBtn.disabled = listenIndex === total - 1;
+  }
+
+  // Called from applyFilters() on every filter/search change -- cheap
+  // no-op when Listen Mode isn't the active view. Stops any in-progress
+  // speech (the old pool's wording/position may no longer apply) rather
+  // than letting it finish reading a question that might not even match
+  // the new filters anymore.
+  function refreshListenView(){
+    if(!listenModeActive) return;
+    pauseListen();
+    listenIndex = 0; // a filter/search change means a different pool -- start from its top, same as currentIndex reset for mobile browse pagination
+    renderListenQuestion();
+  }
+
+  function stopListenSpeech(){
+    listenUtteranceToken++;
+    if(SPEECH_SUPPORTED) window.speechSynthesis.cancel();
+  }
+
+  function setListenPlayButtonLabel(playing){
+    els.listenPlayBtn.textContent = playing ? '⏸ Pause' : '▶ Play';
+  }
+
+  function pauseListen(){
+    stopListenSpeech();
+    listenPlaying = false;
+    setListenPlayButtonLabel(false);
+  }
+
+  function speakListenText(text, onEnd){
+    if(!SPEECH_SUPPORTED || !text || !text.trim()){ if(onEnd) onEnd(); return; }
+    var utterance = new SpeechSynthesisUtterance(text);
+    var voice = getSelectedInterviewVoice();
+    if(voice) utterance.voice = voice;
+    var token = listenUtteranceToken;
+    var settled = false;
+    var timeoutId = null;
+    var settle = function(){
+      if(settled || token !== listenUtteranceToken) return;
+      settled = true;
+      if(timeoutId) clearTimeout(timeoutId);
+      if(onEnd) onEnd();
+    };
+    utterance.onend = settle;
+    utterance.onerror = settle;
+    // speechSynthesis' 'end' event is a known-unreliable part of the Web
+    // Speech API -- it can silently never fire (seen reliably on longer
+    // text in headless testing here; also reported in real Chrome on
+    // backgrounded tabs), which would otherwise leave Listen Mode stuck
+    // mid-utterance forever with no way out except Pause. A generous
+    // per-character timeout (floor/ceiling guarded) force-advances if
+    // 'end' never comes; clearTimeout above cancels it once 'end' (or
+    // 'error') actually does fire first.
+    var estimatedMs = Math.min(60000, Math.max(4000, text.length * 90));
+    timeoutId = setTimeout(settle, estimatedMs);
+    window.speechSynthesis.speak(utterance);
+  }
+
+  // Question, then Answer (or a spoken placeholder if none written yet),
+  // then -- if still playing and auto-advance is checked -- moves to the
+  // next question and repeats. This is the hands-free "just listen"
+  // loop through whatever's currently filtered.
+  function playListenSequence(){
+    if(!listenModeActive || !listenPlaying) return;
+    var q = currentListenQuestion();
+    if(!q){ pauseListen(); return; }
+    speakListenText(q.questionPlain, function(){
+      if(!listenPlaying) return;
+      var answerText = (q.answerPlain && q.answerPlain.trim()) ? q.answerPlain : 'No answer added in Excel yet.';
+      speakListenText(answerText, function(){
+        if(!listenPlaying) return;
+        if(els.listenAutoAdvance.checked && listenIndex < filteredQuestions.length - 1){
+          listenIndex++;
+          renderListenQuestion();
+          playListenSequence();
+        } else {
+          pauseListen();
+        }
+      });
+    });
+  }
+
+  function playListen(){
+    if(!listenModeActive || filteredQuestions.length === 0) return;
+    listenPlaying = true;
+    setListenPlayButtonLabel(true);
+    playListenSequence();
+  }
+
+  function toggleListenPlay(){
+    if(listenPlaying) pauseListen();
+    else playListen();
+  }
+
+  // Prev/Next during playback stop the current utterance and immediately
+  // continue playing from the new question, rather than requiring a
+  // separate Play press -- browsing manually (not playing) just updates
+  // the display without speaking.
+  function listenGoTo(index){
+    var wasPlaying = listenPlaying;
+    stopListenSpeech();
+    listenIndex = Math.max(0, Math.min(filteredQuestions.length - 1, index));
+    renderListenQuestion();
+    if(wasPlaying) playListenSequence();
+  }
+
+  function listenPrev(){ listenGoTo(listenIndex - 1); }
+  function listenNext(){ listenGoTo(listenIndex + 1); }
 
   // onEnd (optional): called when speech actually finishes -- used to
   // auto-start the mic only AFTER the question's been read, not while,
@@ -2879,7 +3126,7 @@
     stopAnswerRecognition();
     disableFocusMode();
     finalizeInterviewSession(); // no-op if already finalized (e.g. "Exit to Browse" after completion)
-    setModeUI(false);
+    setModeUI('normal');
     els.interviewView.style.display = 'none';
     document.querySelector('.toolbar').style.display = 'flex';
     document.querySelector('.status-row').style.display = 'flex';
@@ -2893,14 +3140,20 @@
   }
 
   // "Normal Mode" is the explicit, always-visible way back to browse mode
-  // — if an Interview session is running, end it; otherwise it's a no-op
-  // (already in Normal Mode). Also dismisses the config modal if it's open.
+  // — if an Interview session is running, end it; if Listen Mode is
+  // active, exit it; otherwise it's a no-op (already in Normal Mode).
+  // Also dismisses the config modal if it's open.
   function goNormalMode(){
     if(els.interviewModal.style.display !== 'none'){
       closeInterviewModal();
     }
     if(els.interviewView.style.display !== 'none'){
       endInterview();
+      return;
+    }
+    if(listenModeActive){
+      exitListenMode();
+      setModeUI('normal');
     }
   }
 
@@ -3059,6 +3312,10 @@
   els.nextBtn.addEventListener('click', goNext);
 
   els.normalModeBtn.addEventListener('click', goNormalMode);
+  els.listenModeBtn.addEventListener('click', goListenMode);
+  els.listenPlayBtn.addEventListener('click', toggleListenPlay);
+  els.listenPrevBtn.addEventListener('click', listenPrev);
+  els.listenNextBtn.addEventListener('click', listenNext);
   els.interviewOpenBtn.addEventListener('click', openInterviewModal);
   els.interviewCloseBtn.addEventListener('click', closeInterviewModal);
   els.interviewCancelBtn.addEventListener('click', closeInterviewModal);
@@ -3083,10 +3340,14 @@
     window.speechSynthesis.onvoiceschanged = populateVoiceSelect;
     els.iVoiceSelect.addEventListener('change', function(){ setInterviewVoicePreference(els.iVoiceSelect.value); });
     els.interviewVoiceSelect.addEventListener('change', function(){ setInterviewVoicePreference(els.interviewVoiceSelect.value); });
+    els.lVoiceSelect.addEventListener('change', function(){ setInterviewVoicePreference(els.lVoiceSelect.value); });
   } else {
     els.iSpeakBtn.style.display = 'none';
     els.iVoiceSelect.style.display = 'none';
     els.interviewAutoRead.closest('label').style.display = 'none';
+    // Listen Mode has nothing to actually listen to without TTS support --
+    // hide it entirely rather than offering a mode that can only show text.
+    els.listenModeBtn.style.display = 'none';
   }
 
   els.iMicBtn.addEventListener('click', toggleAnswerRecognition);

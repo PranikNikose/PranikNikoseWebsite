@@ -1863,3 +1863,64 @@ safe:
     console handle directly rather than any redirected stdin, which broke
     non-interactively-piped testing during development — `set /p` instead
     made the whole flow both testable and consistent).
+
+## 13. Listen Mode
+
+A third header mode-toggle button (`#listenModeBtn`, 🎧) alongside Normal/
+Interview. **Unlike Interview Mode, it is NOT a separate config/session/
+pool** — it reads through the exact same `filteredQuestions` Normal Mode
+shows, one record at a time, via `speechSynthesis` (Question, then
+Answer) instead of by eye. The toolbar/status-row (Sheet/Topic/Level/
+Priority/Company/Answer filters + Search) **stay visible and live** the
+whole time Listen Mode is active — this was the explicit ask ("it will
+work simply like normal mode, just... voice will read it"), not an
+Interview-Mode-style separate setup flow.
+
+- **View toggling**: `goListenMode()`/`exitListenMode()` hide/show
+  `#tableView`/`#singleView`/`#listenView` the same way Interview Mode
+  hides them, but deliberately do NOT touch `.toolbar`/`.status-row`
+  (those only get hidden for an active Interview session, per §7).
+  `setModeUI(mode)` takes `'normal'`/`'listen'`/`'interview'` (was a
+  boolean `isInterview` before Listen Mode existed).
+- **Filters stay live while active**: `applyFilters()` calls
+  `refreshListenView()` whenever `listenModeActive` — it stops any
+  in-progress speech (the old pool no longer applies) and resets
+  `listenIndex = 0`, same as browse mode's `currentIndex = 0` reset on
+  every filter change, rather than preserving a numeric position that
+  may point at a completely different question in the new pool.
+- **Playback**: `playListenSequence()` speaks `questionPlain`, then (via
+  nested `onEnd` callbacks) `answerPlain` — or a spoken "No answer added
+  in Excel yet." placeholder if blank — then, if `#listenAutoAdvance` is
+  checked and more questions remain, advances the index and repeats.
+  Prev/Next (`listenGoTo()`) cancel current speech and immediately
+  continue playing from the new question if playback was already
+  running; browsing while paused just updates the display, doesn't start
+  speaking. Reuses Interview Mode's existing voice-picker infrastructure
+  (`#lVoiceSelect` added to `VOICE_SELECT_ELS`, `getSelectedInterviewVoice()`
+  unchanged) rather than duplicating it.
+- **`speechSynthesis`'s `end` event is unreliable — it can silently never
+  fire.** Confirmed directly during testing: a short question fired `end`
+  normally (~2s), but a longer multi-line code-snippet answer left
+  `speechSynthesis.speaking` stuck `true` indefinitely with `end` never
+  firing, even 10+ seconds later — this would have left Listen Mode stuck
+  mid-answer forever with no way out except Pause. `speakListenText()`
+  guards against this with a per-character-estimated `setTimeout` fallback
+  (`Math.min(60000, Math.max(4000, text.length * 90))` ms) that
+  force-advances if `end`/`error` never comes; the fallback is cancelled
+  via `clearTimeout` if `end` does fire first. A `listenUtteranceToken`
+  counter (bumped on every stop/nav, same pattern as Interview Mode's
+  `speakCurrentInterviewQuestion()`) stops a late-firing callback for an
+  already-superseded utterance from chaining into the wrong question. Any
+  future TTS feature that reads longer/unpredictable text needs the same
+  timeout-fallback guard — don't assume `onend` will always fire.
+- **Interop with the other two modes**: entering Interview Mode's config
+  modal (`openInterviewModal()`) calls `pauseListen()` first (don't keep
+  reading aloud behind the modal); actually launching a session
+  (`launchInterview()`) calls `exitListenMode()` if it was active. "Normal
+  Mode" (`goNormalMode()`) exits Listen Mode the same way it ends an
+  Interview session. Hidden entirely (`els.listenModeBtn.style.display =
+  'none'`) when `!SPEECH_SUPPORTED` — a mode that can only show text
+  offers nothing Normal Mode doesn't already do.
+- Markup reuses `#singleView`'s existing `.field-row`/`.field-inline`/
+  `.pager` classes (unscoped from the mobile breakpoint, safe to reuse at
+  any width) rather than introducing parallel styles.
