@@ -56,6 +56,7 @@ Each entry in `DATA` has exactly these fields (all strings):
 | `answer`        | the answer as **HTML** (rich-text formatting preserved, §4)       |
 | `answerPlain`   | the same answer as **plain text**, for search                     |
 | `priority`      | priority tag from Excel (e.g. `LinkedIn-1`, `1`), often blank     |
+| `company`       | `Company` column from Excel (e.g. `TCS`, `LTM`), blank on sheets that don't have this column at all (§5 Company note) |
 
 `question`/`answer`/each item of `questionParts` render via `.innerHTML`
 (they carry real markup). Everything else renders via
@@ -175,6 +176,39 @@ recover formatting.
 Always also produce the plain-text mirror (`questionPlain`/`answerPlain`) —
 see §2.
 
+**Inline code fences (any sheet, Question or Answer):** a line containing
+exactly ` ``` ` opens a code region, the next ` ``` `-only line closes it
+(typed in Excel via Alt+Enter for the line breaks). Text inside the fence
+loses any rich-text formatting and renders as one syntax-highlighted
+`<pre class="code-block">` — everything outside a fence renders exactly as
+before. This is unrelated to the whole-sheet Coding rule below: fences let
+*any* sheet mix prose and an embedded code snippet in the same cell, where
+the Coding sheet's *entire* answer is already code with no fences needed.
+- **Answer**: fenced and non-fenced portions can interleave freely in one
+  flowing cell (`answer_html_and_plain()` in `extract_data.py`) — matches
+  how the source text actually reads (prose, then a snippet, then more
+  prose).
+- **Question**: each cell line is already treated as its own alternate
+  phrasing, joined with "or" (§2/§3) — a fenced block becomes one more
+  phrasing of its own (`cell_lines()`), not something interleaved with
+  surrounding text on other lines. A fence can't currently span into
+  prose that shares its phrasing; if that's ever needed, this rule needs
+  revisiting, not a silent workaround.
+- Extraction emits plain escaped text in `<pre class="code-block"
+  data-highlight="pending">`; `index.html`'s `highlightFencedCode()` (used
+  by `questionPartsHtml()`, `answerHtmlOrPlaceholder()`, and Interview
+  Mode's question renderer) applies the same `javaHighlight()` tokenizer
+  the Coding sheet uses and drops the pending marker, so both paths render
+  with identical coloring without duplicating the highlighter in Python.
+
+**"OR" divider line (Answer only):** an Answer cell line whose text is just
+`OR` (typed in any case) — separating two alternate answer phrasings —
+renders as a centered, italic, uppercase `.answer-or-sep` divider instead
+of a plain text line (`answer_html_and_plain()` in `extract_data.py`).
+Plain-case in Excel is fine; the CSS `text-transform:uppercase` (and the
+extractor normalizing the stored text to `OR`) means it always displays
+consistently regardless of how it was typed.
+
 ## 5. Layout: desktop vs. mobile (pure CSS breakpoint, no JS device sniffing)
 
 - Breakpoint: `768px` (`min-width:768px` = desktop, `max-width:767.98px` =
@@ -254,6 +288,45 @@ see §2.
   don't move it back before the question, and don't move Priority back
   into the Details column / Sheet-Category-Level tag row without being
   asked.
+- **Company** (new Excel column, added after Priority, not present on
+  every sheet — `find_col(header, 'company')` in `extract_data.py`,
+  empty string when the sheet has no Company column) is filterable AND
+  displayed, following the exact same pattern as Priority rather than
+  the Details column: `tag-company` badge(s) sitting in the same
+  `.q-priority` row right next to `tag-priority` (desktop table, mobile
+  card, Interview Mode `#iCompany`/`#mCompany`). `.q-priority` is
+  `display:flex; gap:6px` so the tags sit side by side.
+  - **A question asked at more than one company is one comma-separated
+    Excel cell** (e.g. `TCS, LTM`), not one entry per company — matches
+    how the user actually asked for it. `companyList(q)` (`index.html`)
+    splits `q.company` on `,` and trims each part; `companyTagsHtml(q)`
+    renders one `tag-company` badge per split value (a single `—` badge
+    when the list is empty) instead of one combined-text tag. The
+    `#mCompany`/`#iCompany` elements are a `.company-tags` wrapper
+    (`display:contents`) rather than the tag itself, so however many
+    badges `companyTagsHtml()` produces sit directly in the parent
+    `.q-priority` flex row, not boxed inside one wrapper tag.
+  - **Filtering matches if ANY of a row's split company values is
+    selected** — `uniqueValues('company')` flattens every row's split
+    list into the popover's chip options (so `TCS, LTM` contributes both
+    `TCS` and `LTM` as separate pickable chips, not one combined chip),
+    and `applyFilters()`'s `company` branch checks
+    `companyList(q).some(c => sel.has(c))` instead of a single exact-value
+    match. Verified with a synthetic `"TCS, LTM"` row: renders as two
+    separate tags, and filtering by either company alone matches it.
+  - Added to `FILTER_COLUMNS` (auto-wires the filter popover UI) AND to
+    the separate hardcoded `columnFilters` object in both places it's
+    declared/reset — **`columnFilters` is NOT derived from
+    `FILTER_COLUMNS`, it's a second hand-maintained object**; forgetting
+    to add a new filter column there throws `Cannot read properties of
+    undefined (reading 'has')` in `applyFilters()` and breaks the entire
+    table (0 rows render) — caught during testing this exact feature. Any
+    future new filter column needs both updated.
+  - `smart_sync.py`'s `FIELDS_TO_COMPARE` also needs the new field name
+    added, or Smart Sync won't detect an Excel-side change to it —
+    `company` is compared as the raw un-split string there, which is
+    fine since any actual text change (adding/removing a company) still
+    differs as a string.
 - **Mobile (<768px):** **one question at a time**, with Previous/Next
   pagination buttons. Top-to-bottom order: Sheet/Category/Level as a
   `.field-inline` row of plain colored `.tag` badges (`tag-sheet`/
@@ -303,10 +376,13 @@ see §2.
   don't carry manual bold anyway). `.code-block`/`.tok-*` colors are theme
   CSS variables (`--code-bg`, `--code-kw`, etc.) — keep both a dark and a
   light palette in sync with the rest of §8's rule, don't hardcode. This
-  only applies to the **Answer** field of the **Coding** sheet specifically
-  — don't extend it to Question text or to other sheets without being
-  asked; other sheets' answers are prose that happens to mention code
-  tokens (`@Autowired`, `spring-boot-starter-web`), not code blocks.
+  only applies to the **whole Answer field** of the **Coding** sheet
+  specifically — a short inline mention like `@Autowired` or
+  `spring-boot-starter-web` in another sheet's prose is not a code block
+  and should stay plain text. A multi-line snippet embedded in another
+  sheet's Question/Answer is handled by the ```-fence convention in §4
+  instead, which is a separate, narrower mechanism (opt-in per snippet,
+  not a whole-field switch).
 - **Normal (browse) mode and Interview Mode are always both reachable.**
   The header (with the "🎯 Interview Mode" button and theme toggle) is
   never hidden — only `.toolbar`/`.status-row`/`#tableView`/`#singleView`
@@ -329,8 +405,9 @@ see §2.
 
 - **Sheet is a multi-select filter pill, NOT a single-select `<select>`.**
   `FILTER_COLUMNS` = **Sheet** (`sheet` field), **Topic** (`category`),
-  **Level**, **Priority**, in that order — all four use the exact same
-  Excel-style popover pattern (checkboxes, "Select All", Apply/Clear).
+  **Level**, **Priority**, **Answer** (see below), in that order — all
+  five use the exact same Excel-style popover pattern (checkboxes,
+  "Select All", Apply/Clear).
   There used to be a standalone `<select id="sheetSelect">` dropdown that
   could only pick one sheet (or "All Sheets") at a time — the user
   explicitly asked why multi-select wasn't available for Sheet like the
@@ -364,33 +441,81 @@ see §2.
     Hashtable?" exists, since the literal phrase "hashmap hashtable"
     never occurs. The user explicitly asked for this. Don't revert to
     single-substring matching without being asked.
-- "Clear Filters" resets: all four column filters (Sheet/Topic/Level/
-  Priority) → null, search → empty.
-- **All four browse-mode filter popovers (Sheet/Topic/Level/Priority) use
-  the same chip multi-select pattern as Interview Mode's config modal**
-  (`buildChipGroup()`/`chipGroupSelected()`, §7) — NOT a checkbox list.
-  Sheet gets its own dedicated trigger row/button above Search
-  (`#sheetFilterBtn`/`#sheetFilterPopover`); Topic/Level/Priority render
-  as pill buttons in `#filterButtons` below Search. Both trigger styles
-  share one popover open/close/render implementation via the
-  `popoverRefs` lookup and `renderFilterPopoverChips()` (built once in
+  - **Matched search terms are NOT visually highlighted** in the rendered
+    Question/Answer text — the search box only filters which rows show,
+    with no `<mark>`/yellow-highlight styling on the matched words
+    themselves. This was implemented once (`highlightSearchTerms()`,
+    wrapping matches in `<mark class="search-hl">` via a DOM `TreeWalker`)
+    and then explicitly removed at the user's request ("I don't want that
+    functionality"). Don't reintroduce match highlighting without being
+    asked again.
+- "Clear Filters" resets: all five column filters (Sheet/Topic/Level/
+  Priority/Answer) → null, search → empty.
+- **All five browse-mode filter popovers (Sheet/Topic/Level/Priority/
+  Answer) use the same chip multi-select pattern as Interview Mode's
+  config modal** (`buildChipGroup()`/`chipGroupSelected()`, §7) — NOT a
+  checkbox list. Sheet gets its own dedicated trigger row/button above
+  Search (`#sheetFilterBtn`/`#sheetFilterPopover`); Topic/Level/Priority/
+  Answer render as pill buttons in `#filterButtons` below Search. Both
+  trigger styles share one popover open/close/render implementation via
+  the `popoverRefs` lookup and `renderFilterPopoverChips()` (built once in
   `buildFilterButtons()`). There is no `.fp-item` checkbox pattern
   anywhere in this app anymore, and no standalone `<select>` for Sheet —
   don't reintroduce either; a past version of this doc described that
   older checkbox-based architecture, which was fully replaced.
-- **Topic's popover gets a search box (`.fp-search`), the other three
-  don't.** Topic (`category`) can run to 100+ distinct values (mixing
-  several synced sheets), which is too many to scan/scroll through even
-  as wrapped chips — a text input above the chip-group filters which
-  chips are visible as you type (`chip.style.display`, matched against
+- **Topic/Level/Priority/Company popover options are scoped to the
+  currently selected Sheet(s)** — `sheetScopedQuestions()` filters
+  `allQuestions` down to the selected sheets before `uniqueValues()`
+  builds a column's chip list, so picking Sheet=HR shows only HR's own
+  Topics (23, not the ~203 across all six sheets). One-directional only:
+  Sheet narrows every other filter's options, not the reverse — Sheet's
+  own popover (`uniqueValues('sheet')`) always lists every sheet
+  regardless of other active filters. Answer's popover is unaffected
+  (its two options, Blank/Non Blank, are the fixed `ANSWER_FILTER_VALUES`
+  constant, not derived from `uniqueValues()`). Selecting a value in one
+  of these popovers, then picking a Sheet that no longer contains it,
+  does not auto-clear that selection — it just matches 0 rows until
+  re-picked, a known/accepted edge case, not a bug to silently paper
+  over with auto-reset logic.
+  - **`uniqueValues(key, ignoreSheetScope)`'s second argument exists
+    specifically so Interview Mode's own Sheet/Level chip pickers stay
+    unaffected.** Interview Mode's Level list (`applyInterviewPreset()`,
+    `openInterviewModal()`) calls `uniqueValues('level', true)` — it is a
+    separate, independent selection from browse-mode's Sheet filter (a
+    different screen/state entirely) and must always list every level
+    across all sheets. Without the flag, opening Interview Mode setup
+    while browse-mode had Sheet=HR active silently narrowed its Level
+    picker to HR's own levels too — caught immediately after adding the
+    Sheet-scoping feature, while auditing for the same class of bug. Any
+    future `uniqueValues()` call site outside the browse-mode filter
+    popovers needs the same `true` flag.
+- **Topic's popover gets a search box (`.fp-search`), the others don't.**
+  Topic (`category`) can run to 100+ distinct values (mixing several
+  synced sheets), which is too many to scan/scroll through even as
+  wrapped chips — a text input above the chip-group filters which chips
+  are visible as you type (`chip.style.display`, matched against
   `chip.dataset.value` case-insensitively), while the wildcard "All" chip
   always stays visible so the filter can always be cleared. Filtering
   which chips are VISIBLE never touches which are SELECTED — a chip
   picked before typing a search term stays selected even while hidden
   from view, and `chipGroupSelected()` still reports it on Apply. Sheet/
-  Level/Priority don't get this search box — their value counts (a
-  handful each) don't need it; only add it elsewhere if that value count
-  grows enough to need it too, don't add it everywhere by default.
+  Level/Priority/Answer don't get this search box — their value counts (a
+  handful each, and Answer is fixed at exactly two) don't need it; only
+  add it elsewhere if that value count grows enough to need it too, don't
+  add it everywhere by default.
+- **Answer is a filter on presence, not on a real per-row value** —
+  `FILTER_COLUMNS`' `answer` entry doesn't correspond to raw distinct
+  values like the other four (an answer is long free-form rich text, not
+  a categorical field), so it bypasses `uniqueValues()` entirely and
+  always shows exactly two fixed synthetic chips: `ANSWER_FILTER_VALUES =
+  ['Blank', 'Non Blank']`. Matched in `applyFilters()`'s `matchesCols` by
+  a special case on `col.key === 'answer'`: `Non Blank` if
+  `answerPlain.trim()` is non-empty, `Blank` otherwise — the same
+  has-an-answer-or-not test `answerHtmlOrPlaceholder()` already used for
+  rendering the "No answer added in Excel yet." placeholder (§5), just
+  reused for filtering. Added at explicit user request, the same
+  "blank/non-blank" naming convention as Priority's `Non Blank` chip
+  (above) — don't rename the two bucket labels without being asked.
 
 ## 7. Interview Mode
 
@@ -446,6 +571,22 @@ only via a button with no equally-visible way back except an in-context
   modal's `z-index:100` covers the active session while open).
 
 **Config modal** (opened via the header's "🎯 Interview Mode" button):
+- **Presets** (`#interviewPresetSelect` + Save Current/Delete buttons, its
+  own `.modal-section` at the very top, above Sheets) — saves the WHOLE
+  modal state (Sheets/Level/Priority picks, count, Random order, Balanced
+  Mix, Prioritize Weak Sheets, scratch box) under a name to `localStorage`
+  (`interviewPresets` key), so a full reconfiguration is one dropdown pick
+  instead of rebuilding every chip/toggle each session. Added at explicit
+  user request. `currentInterviewModalState()` reads the live modal state
+  the same way `startInterviewFromModal()` does; `applyInterviewPreset()`
+  re-runs `buildChipGroup()` for Sheets/Level/Priority with the saved
+  picks as `initialSelected` and sets the plain inputs/checkboxes
+  directly. **Saving over an existing name overwrites that preset**
+  (matched by exact name string) rather than creating a silent duplicate
+  in the dropdown — don't change this to always-append without asking.
+  `localStorage` reads/writes wrapped in `try/catch`, same defensive
+  pattern as history (below) — a private-mode/quota failure degrades to
+  "no presets available," never blocks starting a session.
 - **No scrolling anywhere in this form — a hard requirement, not a nice-
   to-have.** It was previously a tall vertical checkbox list per filter
   group, each internally scrollable (`max-height` + `overflow-y:auto`)
@@ -459,6 +600,43 @@ only via a button with no equally-visible way back except an in-context
   space than one-row-per-value, which is what actually makes "no scroll"
   achievable — don't revert to a vertical checkbox/label list for any
   filter group here.
+- **Modal width was widened from 600px to 720px, then further to 820px**
+  (`.modal{max-width}`),
+  and vertical rhythm tightened (`.modal{gap}` 16px→13px,
+  `.modal-toggle-row{padding}` 9px→6px, `.modal-overlay{padding}`
+  16px→12px, `.modal-overlay .card{padding}` 18px→16px 18px) — after
+  Presets/Prioritize Weak Sheets/the scratch toggle were added, the modal
+  grew tall enough that a modest desktop browser window (short viewport,
+  not maximized) needed page-level scroll to see the whole thing, cutting
+  off the header and action buttons — the user hit this directly and
+  screenshotted it. Widening lets Sheets/Level chips wrap into fewer
+  rows; the spacing trims recover the rest. **This is still a real
+  tension with "no scrolling anywhere," not a permanently solved
+  problem** — every new modal section pushes height back up, and an
+  unusually short window can still need to scroll the page. If this
+  recurs, the next lever is consolidating sections further (as Prioritize
+  Weak Sheets/scratch box were folded into "Mix & Extras" instead of
+  getting their own sections, below) before reaching for internal modal
+  scrolling, which was deliberately rejected once already (the nested-
+  scroll trap mentioned above) — don't reintroduce it without asking.
+  - **Second compaction pass**: after the widen-to-820px change, the user
+    reported the modal STILL didn't fit at their actual 100% zoom (they'd
+    zoomed the browser out to get a screenshot that looked fine — the
+    screenshot wasn't representative of the real problem). Explicitly
+    asked whether to add internal modal scrolling to guarantee a fit; the
+    user said no, keep compacting instead — so the "no scrolling" rule
+    stands, at the cost of needing yet more spacing trims: `.modal-overlay
+    .card{padding}` 16px 18px→14px 16px, `.modal{gap}` 13px→11px,
+    `.modal-header h2{font-size}` 1.15rem→1.1rem, `.modal-close` 30px→28px,
+    `.modal-sub{margin}` -10px→-8px/`{font-size}` .85rem→.82rem,
+    `.modal-section{gap}` 8px→6px, `.modal-section-label{font-size}`
+    .72rem→.7rem, `.chip-group{gap}` 7px→6px, `.chip{padding}`
+    `6px 13px`→`5px 12px`, `.modal-toggle-row{padding}` 6px→4px/`{font-size}`
+    .88rem→.86rem. **If a short-viewport user still hits this after all
+    these rounds, internal modal scrolling is the honest next answer** —
+    don't keep chasing smaller and smaller CSS trims indefinitely; ask
+    again rather than silently reversing the user's "keep compacting"
+    answer from this round.
 - **Layout**: Sheets, Level, and Priority are each their own full-width
   chip-group section, stacked vertically. Question count and the Random
   order toggle are the only pair that share a `.modal-grid-2` row (2
@@ -472,6 +650,40 @@ only via a button with no equally-visible way back except an in-context
   goal. Full-width stacking lets Level wrap into far fewer rows and
   removes the imbalance entirely. Don't re-pair Level and Priority into a
   shared `.modal-grid-2` row without re-checking this.
+  - **Balanced Mix is its own full-width `.modal-section` below the
+    Question count/Order grid row, NOT a second toggle stacked inside
+    the Order half-column.** It was first added stacked under Random
+    order in that half-width column — the same imbalance bug as
+    Level/Priority above, just recreated: `Balanced Mix (even split
+    across selected sheets)`'s label is far too long for a half-width
+    column, so it wrapped awkwardly and looked broken (the user flagged
+    this directly: "UI or check box is not proper"). Moved out to its
+    own full-width row, same fix pattern as Level/Priority's un-pairing.
+    Don't restack a long-label toggle into a half-width grid column
+    without checking it actually fits on one line first.
+  - **Balanced Mix's section carries its own uppercase `.modal-section-
+    label` ("MIX & EXTRAS" — renamed from "MIX" once Prioritize Weak
+    Sheets/the scratch box toggle joined it, see below)**, same as
+    Sheets/Level/Priority — it was initially
+    left without one (Question count/Order's grid row doesn't need one
+    per-cell since each already has its own label), which made the whole
+    section look like an orphaned checkbox floating in dead space rather
+    than a real section, since nothing at the top of that block matched
+    the vertical rhythm every other section has. Don't drop this label if
+    the section is restyled again.
+  - **`.modal-toggle-row input` (both Random order and Balanced Mix) is a
+    fully custom-drawn checkbox (`appearance:none`), not left to native
+    OS/browser rendering with only `accent-color` set.** `accent-color`
+    alone only controls the CHECKED look — the unchecked box's border/
+    background still comes from the OS/browser theme, which on some
+    Windows+Chrome setups rendered as a solid black square even on this
+    app's light theme (a real rendering bug the user hit and screenshotted,
+    not hypothetical). Drawing both states in CSS (bordered box unchecked,
+    accent-filled with a CSS-drawn checkmark when checked) guarantees the
+    same look everywhere and matches the app's rounded/pill visual
+    language (§9) instead of an inconsistent native control. Don't revert
+    to bare `accent-color` styling on a checkbox without re-testing the
+    unchecked state on Windows/Chrome specifically.
 - Chips for **Sheets** (`sheet` field, same real tab names as the
   browse-mode selector — not `category`), **Level**, and **Priority** —
   each an **independent selection state**, not the browse-mode filters.
@@ -492,7 +704,12 @@ only via a button with no equally-visible way back except an in-context
   By default only `allChip` (labeled "All" for Sheets, "🎲 Random" for
   Level/Priority — see below) shows as selected; the individual value
   chips start visually neutral, even though functionally the group still
-  means "include everything" at that point. Clicking any individual chip
+  means "include everything" at that point. **Exception: Interview Mode's
+  config modal now opens with NOTHING selected in Sheets/Level/Priority
+  (`buildChipGroup(..., new Set())`), and Random order unchecked** — user
+  must choose everything before starting; no more "just click Start on
+  defaults." Browse-mode filter popovers are unchanged (still default to
+  wildcard-on). Clicking any individual chip
   turns the wildcard off and toggles just that chip; clicking the wildcard
   always resets the group back to "everything" and clears any individual
   picks. `chipGroupSelected(group)` returns `null` while the wildcard is
@@ -527,8 +744,8 @@ only via a button with no equally-visible way back except an in-context
   Random')`, and matched with `priorityBucketsFor(q.priority)` in
   `buildInterviewPool()` (a question can match more than one bucket, e.g.
   `"LinkedIn-1"` is both `Not Blank` and `LinkedIn` — included if ANY
-  checked bucket matches). **This is scoped to Interview Mode only** —
-  browse mode's Priority filter popover (`FILTER_COLUMNS`/
+  checked bucket matches). **This bucketing is scoped to Interview Mode
+  only** — browse mode's Priority filter popover (`FILTER_COLUMNS`/
   `columnFilters`) still shows every raw value as its own chip, unchanged.
   - **Why**: the source Excel's raw `priority` values are noisy —
     `0/1/2/3/4/7` (exact counts) plus case/spelling variants of the same
@@ -540,8 +757,23 @@ only via a button with no equally-visible way back except an in-context
     only the Interview Mode selector, since exact counts/spelling aren't
     meaningful for picking a practice set — "has any priority signal at
     all", "was it asked on LinkedIn", and "blank vs not" are. Don't
-    collapse browse mode's Priority filter the same way unless asked —
-    that filter is meant to show/inspect the real data as-is.
+    collapse/bucket browse mode's raw Priority value list the same way
+    unless asked — that filter is meant to show/inspect the real data
+    as-is.
+  - **One exception, added at explicit request**: browse mode's Priority
+    popover gets one extra synthetic chip, **`Non Blank`**
+    (`NON_BLANK_PRIORITY` in `index.html`), alongside every real raw
+    value — not a replacement for any of them. It isn't a real Excel
+    value; matching it is a special case in `applyFilters()`'s
+    `matchesCols`: a row matches if its `priority` is non-blank AND `Non
+    Blank` is checked, in addition to (not instead of) the normal
+    exact-value check — so checking `Non Blank` together with a specific
+    value like `LinkedIn-1` still works as an OR, same superset semantics
+    as Interview Mode's `Not Blank` bucket. This is the one deliberately
+    approved exception to "browse mode's Priority filter shows raw values
+    only" above — don't extend the same synthetic-chip treatment to
+    Sheet/Topic/Level, or bucket/collapse the rest of Priority's raw
+    values, without being asked again.
 - **`level` values ARE normalized at extraction time** (`normalize_level()`
   in `extract_data.py`) — unlike Priority (above), the user explicitly
   asked for Level's near-duplicates to be deduped, not just worked around
@@ -570,12 +802,10 @@ only via a button with no equally-visible way back except an in-context
   row actually is (see the "don't fabricate/normalize without asking"
   rule below, which still applies to anything NOT covered by the specific
   fold above).
-- **Level is derived entirely from Years — the Excel's Level column text
-  is NOT used at all anymore, not even as a fallback.** This is a
-  user-specified, fixed mapping (`LEVEL_BANDS` in `extract_data.py`,
-  applied via `canonical_level_for_years(years)` — its result becomes
-  `level` directly, replacing the old `canonical or level or 'General'`
-  fallback chain):
+- **Level is derived from Years when Years gives a real per-row signal —
+  the Excel's Level column text is used ONLY as a fallback when it
+  doesn't.** This is a user-specified, fixed mapping (`LEVEL_BANDS` in
+  `extract_data.py`, applied via `canonical_level_for_years(years)`):
   | Years band | Level name       |
   |------------|------------------|
   | 0–1 Year   | Fresher          |
@@ -591,16 +821,33 @@ only via a button with no equally-visible way back except an in-context
   two of the 5 exact bands (not a perfect match to one) still resolves to
   a real band via its midpoint, rather than falling through to
   `General` — that "in-between years still get a real level, not
-  General" behavior was explicitly requested. Only a Years cell with no
-  parseable number, or a midpoint outside 0–10 entirely, becomes
-  `General`. **The original Level-column text is completely ignored now**
-  — not read as a fallback for blank/unparseable Years, not used when it
-  contradicts Years. Applied when re-syncing CoreJava/SpringBoot/
-  Microservices: no behavior change for this data (all rows already
-  cleanly matched one of the 5 bands or had blank Years), confirming the
-  stricter rule is safe against the current dataset. Don't add more bands
-  to `LEVEL_BANDS` or change the `General` fallback without the user
-  specifying the exact name — don't guess one.
+  General" behavior was explicitly requested.
+  **`canonical_level_for_years()` returns `None` (no real signal) in two
+  cases**, both falling through to `raw_level or 'General'` instead of a
+  band name:
+  1. No parseable number in the Years cell at all (blank, or non-numeric text).
+  2. **The parsed range spans the ENTIRE band spectrum** (`lo <= 0 and
+     hi >= 10`) — a blanket placeholder like `0-10 Years` repeated on
+     every row, not a real per-row value. Forcing a midpoint band here
+     (`0-10` → midpoint 5 → "Mid" for every row) would be actively
+     misleading, not just imprecise. Found on HR: Years was blank, then
+     later filled with `0-10 Years` on every row between two sessions of
+     this project — both states previously collapsed HR's Level filter
+     to one flat value (`General`, then `Mid`), silently discarding HR's
+     real Level-column data (`HR/TAE`, `technical/domain`, `tech round`,
+     an interview-round-type label, not an experience level at all) that
+     had been there the whole time. `raw_level` is read BEFORE the Years
+     computation now, and `levelLabel`'s `(X-Y Years)` suffix is only
+     appended when `canonical_level_for_years()` actually returned a
+     band (`years_band` truthy) — not for the raw-Level-text fallback,
+     since a blanket placeholder next to a real Level value would
+     misleadingly look like a meaningful per-row qualifier.
+  Applied when re-syncing CoreJava/SpringBoot/Microservices/RDBMS: no
+  behavior change for that data (every row already cleanly matched one of
+  the 5 bands or had blank Years) — confirming this only changes outcomes
+  for the no-real-signal cases. Don't add more bands to `LEVEL_BANDS` or
+  change the `General` fallback without the user specifying the exact
+  name — don't guess one.
 - **Level values sort in ascending years order in every chip
   list/filter — not alphabetically.** `LEVEL_SORT_ORDER = ['Fresher',
   'Junior to Mid', 'Mid', 'Senior', 'Lead / Architect', 'General']` in
@@ -613,30 +860,223 @@ only via a button with no equally-visible way back except an in-context
   (both call `uniqueValues('level')`). A value not in `LEVEL_SORT_ORDER`
   (shouldn't happen given the extraction rule above, but kept as a safety
   net) sorts after all 6 known levels, alphabetically among themselves.
-- **Question count** is a free-typed `<input type="number" id=
-  "interviewCountInput">`, not a dropdown — the user explicitly asked why
-  they couldn't type their own number. Blank = "All" (shown as the
-  `placeholder`, e.g. `All (926)`); typing a number uses exactly that many
+- **Question count** is a free-typed `<input type="text" inputmode=
+  "numeric" pattern="[0-9]*" id="interviewCountInput">`, not a dropdown —
+  the user explicitly asked why they couldn't type their own number.
+  **Plain text, not `type="number"`** — changed after the user asked for
+  "textbox only," meaning no native browser spinner (up/down increment)
+  UI cluttering a field that's just a 1-4 digit number; `inputmode=
+  "numeric"` still brings up a numeric keyboard on mobile, and all actual
+  number validation (whole number ≥ 1) already lived in
+  `startInterviewFromModal()`'s JS, not in `type="number"`'s native
+  behavior, so nothing about validation changed when the type did. **Also
+  no longer full-width** — `.count-input{max-width:110px}` overrides
+  `.modal-select`'s default `width:100%`, since the user also asked why
+  it stretched to the whole grid-column width for a value that's only
+  ever a few digits. The now-meaningless `.max` attribute (only had an
+  effect on `type="number"`) was removed from
+  `populateCountPresets()` along with it. Blank still means "All" matching
+  questions functionally, but the field has **no `placeholder` at all
+  now** — it went from `All (926)` to a neutral `Number of questions`
+  hint to no hint whatsoever, in two steps: the original wording read as
+  though the field already had a value/was locked to "All" rather than
+  being empty and freely editable, and once that was fixed the user asked
+  to drop the placeholder entirely rather than replace it with different
+  wording. Don't add a placeholder back to `#interviewCountInput` without
+  being asked. Typing a number uses exactly that many
   (validated as a whole number ≥ 1 before starting, error shown inline
-  otherwise). A `<datalist id="interviewCountPresets">` seeded with the
+  otherwise). **A blank count itself still means "all matching
+  questions" everywhere it's actually used (`buildInterviewPool()`,
+  `buildBalancedInterviewPool()`, saved presets, "Restart Same
+  Session"/"Repeat Same Questions") — only `startInterviewFromModal()`'s
+  submit-time validation (below) now refuses to let a fresh modal
+  session START with it blank.** Restart/Repeat bypass that validation
+  entirely (they relaunch directly off `lastInterviewConfig`, not through
+  the modal), so a session that was already running with a blank count
+  before this change keeps working exactly as before — this is a gate on
+  the Start Interview button, not a change to what blank actually means.
+  A `<datalist id="interviewCountPresets">` seeded with the
   old fixed steps (5/10/15/20/25/30/40/50, filtered to those below the
   total) is still wired to the input via `list=`, so the common values
   remain one click away as suggestions in browsers that support datalist
   — but any number can be typed over them. Populated fresh each time the
   modal opens via `populateCountPresets()`, since `allQuestions.length` is
-  the ceiling (`max` attribute + placeholder). `.modal-select` (shared
+  the ceiling (`max` attribute; no `placeholder` — see above). `.modal-select` (shared
   with this input) must NOT set `cursor:pointer` — that's a leftover from
   when the class styled a `<select>` and made the number input's cursor
   look like a non-interactive picker instead of an I-beam, which read to
   the user as "non-editable". Left as the browser's default input cursor
   now; don't re-add `cursor:pointer` to `.modal-select`.
 - **Random order** toggle (checked by default, Fisher–Yates `shuffle()`).
-- Starting builds the pool: filter by checked sheets/levels/priorities →
-  shuffle if randomized → **then** slice to the chosen count (in that
-  order — slicing after shuffling is what makes "10 random questions"
-  actually random instead of always the same first 10 of the filtered
-  set). Zero checked in any of the three checklists, or an empty resulting
-  pool, → inline error in the modal, don't start.
+- **Balanced Mix** toggle (`#interviewBalancedMix`, unchecked by default,
+  sits right below Random order in the same "Order" `.modal-section`) —
+  added at explicit user request to make a multi-sheet session feel like
+  a real interview panel's mix (some CoreJava, some SpringBoot, some
+  Microservices) instead of skewing toward whichever selected sheet
+  happens to have more rows banked (CoreJava at 320 rows vs Coding at
+  70, say) — the plain path pools every matching question across all
+  selected sheets and shuffles, so a straight random sample naturally
+  overrepresents the larger sheet.
+  - **When checked, `buildInterviewPool()` routes to
+    `buildBalancedInterviewPool()`** instead of the plain pool-then-slice
+    path: the requested count is split as evenly as possible ACROSS the
+    selected sheets (or all real sheets, if the Sheets wildcard is
+    active) first, `Math.floor(count / sheetCount)` each with the
+    remainder handed to a **shuffled** subset of sheets (so it's not
+    always the same sheets favored by the uneven split) — THEN that many
+    questions are picked at random from each sheet's own matching pool
+    independently. Level/Priority filtering (`matchesInterviewLevelPriority()`)
+    applies identically to both paths.
+  - **A sheet with fewer matching questions than its quota just
+    contributes what it has** — the total can end up short of the
+    requested count rather than over-filling from other sheets, same as
+    a real interviewer running out of prepared questions in one area
+    rather than padding it from elsewhere. Don't "fix" this by
+    redistributing shortfall to other sheets without being asked — it
+    was a deliberate simplicity choice, not an oversight.
+  - **Balanced Mix only changes WHICH questions are selected, not
+    presentation order** — Random order still separately controls
+    whether the final list is interleaved (checked) or stays grouped
+    sheet-by-sheet, in the shuffled sheet order the quotas were assigned
+    in (unchecked). The per-sheet picks themselves are always randomly
+    selected from within each sheet regardless of the Random order flag
+    — only the plain (non-balanced) path ties "which N are selected" to
+    Random order the way §7's slicing note below describes.
+  - **With Question count left blank ("All"), Balanced Mix has no
+    effect** — every matching question across the selected sheets is
+    included either way, so there's nothing to split; don't add special
+    handling here, the existing fallback already returns the same result
+    set as the plain path in that case.
+- **Prioritize Weak Sheets** toggle (`#interviewPrioritizeWeak`, same
+  "Mix & Extras" `.modal-section` as Balanced Mix, unchecked by default) — biases
+  the per-sheet quota split toward sheets you've drilled LESS in past
+  sessions (from the history log, below), instead of an even split.
+  Works standalone (checking it alone routes through the same per-sheet-
+  quota mechanism as Balanced Mix, `buildInterviewPool()`'s condition is
+  `config.balancedMix || config.prioritizeWeak`) — you don't need Balanced
+  Mix also checked.
+  - **`computeSheetDrillCounts()`** approximates how much each sheet has
+    been drilled from `interviewHistory`: a session's config records
+    which sheets were CHECKED, not which sheet each individual question
+    came from, so each past session's `reachedCount` is split evenly
+    across the sheets it drew from (or every real sheet, if that session
+    used the Sheets wildcard). Approximate by design, not meant to be
+    exact — good enough for biasing a quota.
+  - **Weighting is Laplace-smoothed inverse frequency**: `weight = 1 / (1
+    + drillCount)`. A never-drilled sheet gets weight 1 (the max); a
+    heavily-drilled one approaches 0 but never hits it exactly — so a
+    well-drilled sheet can still turn up occasionally rather than being
+    excluded outright once practiced.
+  - **`allocateWeightedQuotas(weights, totalCount)`** does largest-
+    remainder rounding (floor each weighted share, then hand out
+    leftover seats to the sheets with the biggest fractional remainder)
+    so quotas always sum to exactly `totalCount` instead of drifting from
+    repeated floor-rounding. Same shortfall behavior as plain Balanced
+    Mix applies: a sheet with fewer matching questions than its quota
+    just contributes what it has.
+  - Verified against the real dataset with a synthetic drill history
+    (CoreJava drilled 35x, SpringBoot 5x, everything else never drilled,
+    count=24): CoreJava's quota came back 0, every never-drilled sheet
+    got the largest shares, and the total matched exactly 24.
+- **Scratch box toggle** (`#interviewScratchToggle`, in "Mix & Extras")
+  shows `#iScratchRow` between the question and Reveal Answer, so you
+  write your answer first. `interviewAnswers[]` (parallel to
+  `interviewQuestions`) persists each question's text across Prev/Next
+  instead of clearing it — needed so voice answers/scoring below aren't
+  lost on navigation. Still nothing written to `DATA`/`localStorage`.
+- **Answer by voice** (`#interviewVoiceAnswer` + `#iMicBtn`,
+  `SpeechRecognition`/`webkitSpeechRecognition` — separate Web API from
+  Read Aloud's `SpeechSynthesis`, speech IN not OUT). Chrome/Edge only;
+  feature-detected via `STT_SUPPORTED`, hidden if unsupported. Needs a
+  secure context (https/localhost, not `file://`) — fine on GitHub Pages.
+  Transcript streams into the scratch box; forces it visible even if the
+  scratch toggle itself is off.
+- **Score my answers** (`#interviewScoreAnswers`) — rule-based scoring
+  (`scoreInterviewAnswer()`: word-count + keyword-overlap-vs-reference-
+  answer + multi-sentence bonus − filler-word penalty, 0–10), NOT AI —
+  a static site can't safely call an LLM (no way to hide an API key
+  client-side). This is an explicit, deliberate exception to §11's
+  "no scoring mechanics" rule, at the user's request — don't extend
+  scoring elsewhere (browse mode, etc.) without being asked again. Scored
+  on Reveal Answer; completion screen shows an overall average + per-sheet
+  breakdown (`renderInterviewCompletionScore()`); **Export .txt**
+  (`exportInterviewSessionTxt()`) downloads question + your answer +
+  score + reference answer per question, client-side Blob, no server.
+  **Bug fixed**: `stopAnswerRecognition()` used to only call `.stop()` and
+  rely on the async `onend` to clean up -- navigating to the next question
+  before `onend` fired let the old recognizer's `onresult` keep writing
+  into the new question's scratch box. Now nulls handlers + `.abort()`s
+  synchronously. Also: `revealInterviewAnswer()` now stops the mic (it
+  didn't before, so it kept listening after you'd moved on).
+  **Toggle labels shortened** (`interviewScoreAnswers`'s used to be 100+
+  chars) — detail moved to `title` tooltips instead, since 6 stacked
+  toggles in "Mix & Extras" was pushing the modal's height-fit problem
+  (above) back open. `#iScratchClearBtn` (🗑️) added next to the mic to
+  wipe the scratch box without manual select-all.
+- Starting builds the pool (plain, non-balanced path): filter by checked
+  sheets/levels/priorities → shuffle if randomized → **then** slice to
+  the chosen count (in that order — slicing after shuffling is what
+  makes "10 random questions" actually random instead of always the same
+  first 10 of the filtered set). An empty resulting pool → inline error
+  in the modal, don't start.
+- **Question count must be explicitly filled in before starting — a
+  blank count no longer counts as a valid default.** This reverses the
+  original design, which treated a blank count (meaning "all matching
+  questions") as perfectly valid — the user explicitly asked for the
+  stricter behavior for Question count specifically.
+  - **Sheets/Level/Priority's wildcard chips ("All"/"🎲 Random") are
+    NOT included in this — they're still a valid choice, same as
+    always.** A stricter version was tried first that also required
+    `sheets !== null` etc. (rejecting the wildcard state entirely, not
+    just an explicitly-emptied selection), matching a literal reading of
+    "every filter must be selected." That immediately confused the user:
+    the wildcard chip is **active by default the instant the modal
+    opens**, before anyone touches anything, so there's no way to tell
+    "I deliberately clicked All" apart from "I never touched it, it's
+    still on its default" — both leave the group at `null` and look
+    pixel-identical. The user clicked "All", saw it highlighted purple,
+    and still got `"Select a Sheet"` — reported as "even if i have
+    selected the sheet as ALL why these errors?" Reverted for
+    Sheets/Level/Priority: `startInterviewFromModal()` now only flags a
+    group as missing if it's an **explicitly emptied** selection
+    (`sheets !== null && sheets.length === 0` — the user deliberately
+    turned the wildcard off, then deselected every individual chip too),
+    not the wildcard state itself. Question count doesn't have this
+    ambiguity problem — blank is visibly, unambiguously "nothing typed,"
+    with no default-active look-alike state to confuse it with — so its
+    stricter check (`countRaw === ''`) stands.
+  - Reports every missing field at once, not just the first (not that
+    there's normally more than one now, in practice — usually just
+    Question count) in a single, plainly-worded error using a natural
+    "a, b and c" list (`missing.slice(0, -1).join(', ') + ' and ' +
+    missing[last]`), e.g. `'Select a Question count before starting.'`
+    An earlier version appended a fixed explanation — `— the "All"/"🎲
+    Random" wildcard chip and a blank count no longer count as a
+    selection.` — to every message regardless of which fields were
+    actually missing, which read oddly and was also simply wrong once
+    the wildcard was reinstated as valid. The user asked for the message
+    to be "optimized" — the explanation of WHY belongs in this doc, not
+    repeated in the UI on every failure.
+  - Don't reintroduce "wildcard chip doesn't count" for Sheets/Level/
+    Priority without solving the underlying ambiguity first (e.g. actual
+    per-group "has the user interacted with this control at all" state
+    tracking, not just reading the resulting selection) — the visual
+    indistinguishability is the real problem, not something a wording
+    change can fix.
+  - **None of the "Mix & Extras" checkboxes (Balanced Mix, Prioritize
+    Weak Sheets, the scratch box toggle) — or Random order — have any
+    validation, and deliberately don't need any.** The user asked why,
+    given Sheets/Level/Priority/Count all got validation treatment. The
+    answer: a checkbox has exactly two states, checked or unchecked, and
+    unchecked is ALWAYS a clear, deliberate-enough "off" — there's no
+    ambiguous default-that-looks-like-a-real-choice state the way the
+    chip-group wildcard had (above) or a genuinely-empty text field has.
+    Unchecked doesn't need to be distinguished from "the user meant to
+    check it but didn't get around to it" — it just means "don't use this
+    feature," which is a completely valid, self-explanatory choice as-is.
+    Adding a "skip this toggle" toggle on top of an already-binary toggle
+    would be redundant (a toggle to decide whether the toggle counts) and
+    was explicitly considered and rejected when the user raised this.
 
 **Active session** (`#interviewView`):
 - Hides the toolbar/status row/table/single view (`applyFilters()`
@@ -653,9 +1093,12 @@ only via a button with no equally-visible way back except an in-context
   the Question `.field-row` and the Answer `.field-row`/Reveal button),
   same relocation/ordering as desktop/mobile (see §6's Priority note).
 - **Question phrasings render as separate stacked lines, not joined with
-  "or", in browse mode (desktop table + mobile)** — but **NOT with
-  Interview Mode's "Q." label**, that's Interview-mode-only, the user
-  explicitly said so when asked. `q.question`/`q.questionPlain` (§3,
+  "or", in browse mode (desktop table + mobile)**, same as Interview Mode
+  (below) — both used to differ on a "Q." label (Interview Mode had one,
+  browse mode never did, per explicit user request at the time), but that
+  label has since been removed from Interview Mode too (see below), so
+  both modes now render plain stacked lines with no prefix label.
+  `q.question`/`q.questionPlain` (§3,
   "or"-joined into one string) still exist in `DATA` and are what search
   matches against, but browse mode doesn't render them directly as HTML
   anymore — it renders from `q.questionParts` via the shared helper
@@ -675,14 +1118,98 @@ only via a button with no equally-visible way back except an in-context
   this as "you changed the font". Don't merge `.q-line` back into
   `.q-part` or apply Interview Mode's font styling to browse mode.
   Interview Mode's own rendering (`renderInterviewQuestion()`) is a
-  separate, untouched inline `.map()` that DOES always add the "Q." label
-  with its own bold/larger `.q-part` styling (even for a single phrasing)
-  — that's Interview Mode's own established convention (see the timer/
-  reveal section below) and is unrelated to browse mode.
+  separate inline `.map()`, still with its own bold/larger `.q-part`
+  styling (even for a single phrasing) — that part is unrelated to browse
+  mode and unaffected by the note below.
+  - **The "Q." label itself was later removed from Interview Mode too**
+    (`<span class="q-label">Q.</span>` dropped from the `.map()` above,
+    and the now-fully-unused `.q-part .q-label` CSS rule deleted) — the
+    user explicitly said they didn't like it, reversing what this section
+    used to call "Interview Mode's own established convention." A
+    question now renders as plain bold/larger `.q-part` lines with no
+    prefix label, in both modes. Don't reintroduce the "Q." label to
+    either mode without being asked again.
 - Then a **"Reveal Answer" button** (labeled "A:" once revealed) shows the
   Answer — the one deliberate exception to §5's "no click to reveal" rule,
   since reveal-then-check is the actual point of practice mode.
   Previous/Next navigate the pool; Previous disabled on the first question.
+- **Read Aloud** (`#iSpeakBtn`, 🔊 icon button in `.interview-topbar`) —
+  speaks the current question's `questionPlain` via the browser's
+  built-in `SpeechSynthesis` API (`speakCurrentInterviewQuestion()`) —
+  no external service, works fine on the static GitHub Pages deploy.
+  Manual click/`R` key by default. **`#interviewAutoRead`** (config modal,
+  "Mix & Extras") makes it automatic instead — checked in
+  `currentSessionMeta.config.autoRead`, fired at the end of
+  `renderInterviewQuestion()`. Safe from autoplay blocking either way,
+  since speech only ever fires from a click-triggered render (Start/Next/
+  Prev), never on page load. `SPEECH_SUPPORTED` feature-checks
+  `'speechSynthesis' in window` once at load and hides the button, voice
+  picker, and Auto-read checkbox entirely if unsupported, rather than
+  showing controls that silently do nothing. Any ongoing speech is
+  cancelled (`cancelInterviewSpeech()`) on every question change, reaching
+  the completion screen, and `endInterview()` — never lets speech from one
+  question keep playing into the next.
+  - **Voice picker** (`#iVoiceSelect`, narrow `<select>` next to
+    `#iSpeakBtn`, capped `max-width:140px`/`110px` on mobile with
+    ellipsis overflow) — `speechSynthesis` doesn't pick a "best" voice on
+    its own, it just uses whatever the browser's default happens to be,
+    which can be flat/robotic even when nicer installed voices exist
+    (Chrome/Edge often ship several "X Online (Natural)"/"Neural"
+    voices). Added after the user compared this app's Read Aloud against
+    another local project's and found the voice quality worse — turned
+    out both use the identical `SpeechSynthesis` API with no third-party
+    TTS service involved in either (confirmed by inspecting the other
+    project's code — plain `SpeechSynthesisUtterance`, no API key, no
+    backend), so the difference was purely which default voice each
+    browser session happened to land on, not anything the code
+    controlled. This picker fixes that by letting the user choose.
+    - **`FAVORITE_VOICE_PATTERNS`** — the user named four specific voices
+      they actually like: `Google US English`, `Google UK English
+      Female`, `Google UK English Male`, `Google हिन्दी`. Matched by exact
+      name (case-insensitive, trimmed) via `favoriteVoiceRank()` — returns
+      the pattern's index (stable preferred order) or `-1` (not a
+      favorite). Don't reorder `FAVORITE_VOICE_PATTERNS` or add more
+      entries without being asked — this list is exactly what the user
+      said they like, not a general "good voices" heuristic.
+    - **`populateVoiceSelect()`'s dropdown shows ONLY these favorites,
+      not the full installed voice list** — filters `speechSynthesis.
+      getVoices()` down to whichever favorites are actually installed,
+      sorted into the declared preferred order (`Google US English`
+      first, so it's the auto-picked default when available). This is a
+      deliberate reversal of an earlier version that sorted favorites to
+      the top of the FULL list — the user explicitly asked to remove
+      everything except their favorites, not just deprioritize the rest.
+      **Fallback**: if NONE of the four favorites are installed on this
+      browser/OS (e.g. a browser without Chrome's Google voices), the
+      dropdown falls back to the full list via `generalVoiceSort()`
+      (English-first, then `voiceQualityScore()` — same heuristic as
+      before) rather than leaving Read Aloud with an empty, unusable
+      dropdown. Verified both paths against mock voice data: favorites
+      present → only those 4 shown, in declared order; favorites absent
+      → full fallback list shown, sorted by the general heuristic.
+    - **Async voice loading**: some browsers (Chrome notably) return `[]`
+      from `getVoices()` on the very first call, populating the real
+      list asynchronously — `populateVoiceSelect()` is called once at
+      load AND wired to `speechSynthesis.onvoiceschanged`, safe to run
+      more than once.
+    - **Persisted via `localStorage`** (`interviewVoiceURI` key, matched
+      by `voiceURI` not name/index, since voice lists can reorder between
+      sessions) — set on the select's `change` event, read back by
+      `populateVoiceSelect()` on the next load if that voice is still
+      available, otherwise falls through to the auto-picked default.
+      `try/catch`-wrapped, same defensive pattern as every other
+      `localStorage` use in this app.
+    - Hidden entirely alongside `#iSpeakBtn` when `!SPEECH_SUPPORTED`.
+- **Focus Mode** (`#iFocusBtn`, 🧘 icon button next to Read Aloud,
+  `toggleFocusMode()`/`disableFocusMode()`) — adds a `focus-mode` class to
+  `<body>` that dims the header (opacity, restored on hover) and enlarges
+  the question/answer text, for a less browsing-app, more immersive
+  session. **Deliberately does NOT hide the header or mode-toggle** — §5's
+  "Normal (browse) mode and Interview Mode are always both reachable, the
+  header is never hidden" rule still applies; dimming (not hiding) is
+  what keeps this compliant while still reducing visual clutter. Reset by
+  `endInterview()` (`disableFocusMode()`) so it doesn't leak into browse
+  mode after a session ends.
 - **Timer**: `#interviewTimer` shows elapsed `MM:SS`, starting the instant
   `launchInterview()` runs (`startInterviewTimer()` — `setInterval` every
   1s off a `Date.now()` start timestamp) so the user can gauge real
@@ -693,9 +1220,18 @@ only via a button with no equally-visible way back except an in-context
   score, not stored/exported anywhere; see the "no quiz mechanics" rule
   below.
 - Reaching Next past the last question shows a completion state with
-  "Exit to Browse" and "Restart Same Session" (re-runs `buildInterviewPool`
-  on the same config — reshuffles if randomize was on) — not a score/
-  pass-fail result.
+  **three** actions — not a score/pass-fail result:
+  - **"Exit to Browse"** returns to browse mode.
+  - **"Restart Same Session"** re-runs `buildInterviewPool()` on the same
+    config — a fresh draw (reshuffles/re-picks if randomize/Balanced
+    Mix/Prioritize Weak Sheets were on), not the same questions.
+  - **"Repeat Same Questions"** (`repeatInterviewSession()`, added at
+    explicit request) instead relaunches with the EXACT array just
+    finished — `interviewQuestions.slice()`, same questions, same order,
+    no rebuild — for drilling one specific set to mastery rather than
+    always getting a new pull. Both call `launchInterview()`, which
+    already finalizes the outgoing session into history before starting
+    the new one (see below) — no special-casing needed for either button.
 - "End Interview" / "Exit to Browse" both return to browse mode via
   `applyFilters()`.
 - **Known bug, fixed**: `endInterview()` must explicitly reset
@@ -705,11 +1241,74 @@ only via a button with no equally-visible way back except an in-context
   normally control browse-view visibility — without the reset, browse mode
   stays permanently hidden after the first Interview Mode session ends.
   Don't drop this reset if `endInterview`/`launchInterview` are touched.
+- **Keyboard shortcuts during an active session**: Space or Enter reveals
+  the answer if hidden, or advances to the next question if already
+  revealed (mirrors a flashcard app's pacing — one key to check, press
+  again to move on); ←/→ are Previous/Next directly; **`R` triggers Read
+  Aloud** (`speakCurrentInterviewQuestion()`, same as clicking `#iSpeakBtn`
+  — added after the user asked why the other actions had shortcuts but
+  Read Aloud didn't; `#iSpeakBtn`'s `title` was updated to `"Read question
+  aloud (R)"` so the shortcut is discoverable from the button itself, not
+  just this doc). Scoped to when `#interviewView` is visible AND the
+  question card (not the completion screen) is showing, and ignored while
+  an `<input>`/`<textarea>` has focus so it never steals keystrokes from a
+  field elsewhere on the page (this is also what keeps `R` from firing
+  while typing in the scratch box). A single `document` `keydown`
+  listener, not per-element — added at explicit request to make a session
+  feel closer to real interview pacing (not reaching for the mouse
+  between every question).
+- **Interview session history** (`#historyModal`, opened via the header's
+  🕘 History button, always visible alongside the mode toggle/theme
+  button): a per-browser `localStorage` log (`interviewHistory` key,
+  capped to the newest 50) of past sessions — date, the Sheets/Level/
+  Priority/Balanced Mix/Random order config used, how many questions were
+  reached vs. the pool size, and how long it took. **This is a log that a
+  session happened, NOT scoring or correctness tracking** — no right/
+  wrong, no pass/fail, consistent with §11's "no quiz mechanics" rule;
+  it's the same spirit as the pacing timer already shown mid-session.
+  - `currentSessionMeta` is set by `launchInterview()` (start time +
+    `lastInterviewConfig` + pool size) and finalized/recorded by
+    `finalizeInterviewSession()`, called from three places so a session
+    is recorded exactly once however it ends: reaching the last question
+    (`interviewNext()`'s completion branch), `endInterview()` (guarded —
+    a no-op if already finalized, e.g. "Exit to Browse" after
+    completion), and the top of `launchInterview()` itself (finalizes
+    whatever was running before — covers "Restart Same Session", which
+    calls `launchInterview()` again without going through `endInterview()`
+    first).
+  - `localStorage` reads/writes are wrapped in `try/catch` throughout
+    (`loadInterviewHistory`/`saveInterviewHistory`/`clearInterviewHistory`)
+    — history is a convenience, a private-mode/quota failure should never
+    block the app, same defensive pattern as the theme toggle's
+    `localStorage` use (§8).
+  - "Clear History" wipes the whole log (no per-entry delete) — simple on
+    purpose, don't add per-entry deletion without being asked.
+  - Each history card has a **"Use this config again"** button
+    (`reuseHistoryConfig()`) — re-opens the config modal pre-filled from
+    that session (via `applyInterviewPreset()`), doesn't auto-start.
+    History doesn't store the originally-typed count, so `totalQuestions`
+    (actual delivered pool size) stands in for it.
+- **Live feedback while configuring** (`updateInterviewLiveFeedback()`,
+  fired on any chip click or count input via event delegation): shows
+  "N questions match your filters" near Question count, and marks
+  (`.needs-input`, red label) whichever of Sheets/Level/Priority/Count
+  still needs input, using the same "missing" rule as
+  `startInterviewFromModal()`'s validation. Doesn't replace that
+  validation — just surfaces it earlier. Also disables `#interviewStartBtn`
+  until everything's filled (`.btn:disabled` styling already existed).
+- **Presets row has a "Start" button** (`#interviewPresetStartBtn`) —
+  loads the selected preset and immediately calls
+  `startInterviewFromModal()`, skipping the extra click. No-op if no
+  preset is picked.
+- **History entries have a "Delete" button** too, not just "Clear
+  History" — `deleteHistoryEntry(index)` removes one entry and
+  re-renders.
 
 This is the one sanctioned exception to "no quiz mechanics" (§11) — a
 practice/reveal/pacing flow, not scoring. The timer is about pacing
 awareness, not performance tracking. Don't add points, correctness
-tracking, or pass/fail results unless asked.
+tracking, or pass/fail results unless asked. (History, above, doesn't
+violate this either — it logs that/when/what, never right-vs-wrong.)
 
 ## 8. Dark / light theme
 
@@ -774,17 +1373,21 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
   content in the raw file even though `extract_data.py` never reads it
   into `DATA` — don't want that ending up in a public repo's git history.
   If the user wants the workbook tracked somewhere, that's a separate,
-  explicit decision, not the default. Also ignored: `*.bak` (the safety
-  backups `extract_data.py`/`clear_data.py`/`add_sheets.py`/
-  `smart_sync.py` write before overwriting `index.html`, §12),
-  `extracted_questions.json` (only survives a failed sync run), Python's
-  `__pycache__/`, and common OS/editor cruft.
+  explicit decision, not the default. Also ignored: `*.bak` (the
+  timestamped safety backups every sync/remove/clear/restore script
+  writes into `bkp/` before overwriting `index.html`, keeping only the
+  newest 5 — §12; the `*.bak` pattern already covers the whole `bkp/`
+  folder, no separate line needed), `extracted_questions.json` (only
+  survives a failed sync run), Python's `__pycache__/`, and common OS/
+  editor cruft.
 
 ## 11. General change discipline
 
 - Don't add scoring mechanics (points, correct/incorrect tracking,
   pass/fail results) anywhere — browse mode is a pure reference tool,
-  Interview Mode (§7) is reveal-based practice, not a quiz.
+  Interview Mode (§7) is reveal-based practice, not a quiz. **Exception**:
+  §7's opt-in "Score my answers" rule-based scoring — explicit user
+  request, not a green light to add scoring anywhere else.
 - Don't add more question data beyond what's actually in the source Excel
   without being asked, and never fabricate Q&A content (§3).
 - **Currently 1029 questions across 5 sheets (CoreJava, SpringBoot,
@@ -819,9 +1422,19 @@ Chosen direction (over "Bold & colorful" and "Dense & professional"):
   surfaced as a raw traceback) now gets a clean "Cancelled" message and a
   normal exit instead of a scary traceback. Destructive-prompt scripts
   (`clear_data.py`, `smart_sync.py`'s removal step) treat an interrupt the
-  same as any non-matching confirmation input — safest default, nothing
-  gets removed. If a new interactive prompt is added to any script, wrap
-  it the same way.
+  same as any non-`Y` confirmation input — safest default, nothing gets
+  removed. If a new interactive prompt is added to any script, wrap it the
+  same way.
+- **All confirmation prompts across the sync scripts use a plain `Y/N`
+  answer** (`clear_data.py`, `smart_sync.py`'s removal step,
+  `remove_sheet.py`, `restore_backup.py`) — not a typed phrase. Anything
+  other than `y`/`Y` is treated as "no", including a blank answer or an
+  interrupt. This was a deliberate choice to relax the friction on every
+  destructive/overwriting prompt in the project (an earlier version of
+  `clear_data.py` and `smart_sync.py` required typing an exact phrase like
+  `CLEAR ALL DATA` — don't reintroduce that unless the user asks for it
+  back). If a new destructive prompt is added to any script, use `Y/N` the
+  same way.
 - **Defensive robustness fixes applied from a code-review pass
   (`Fix.txt`)**, kept as standing practice:
   - Search (`applyFilters`) reads `(q.questionPlain || '')`/
@@ -875,8 +1488,10 @@ safe:
   config, and this project has no build step to work around that. The
   sync scripts live in `scripts/` (`extract_data.py`, `add_sheets.py`,
   `smart_sync.py`, `clear_data.py`, `remove_sheet.py`, plus
-  `add_sheets_menu.py`/`list_sheets.py`/`verify_index.py`/`edit_config.py`
-  — see the full script rundown below); the detailed docs live in `docs/`
+  `add_sheets_menu.py`/`list_sheets.py`/`verify_index.py`/`edit_config.py`/
+  `check_stale.py`/`restore_backup.py` — see the full script rundown
+  below); backups land in a `bkp/` folder alongside `scripts/` at the repo
+  root (git-ignored, §10), not tracked; the detailed docs live in `docs/`
   (`RULES.md` — this file — and `SYNC_EXCEL.md`). `README.md`, `CLAUDE.md`,
   `.gitignore`, and the `.xlsx` workbook stay at the root alongside
   `index.html`. Every script resolves paths off `PROJECT_ROOT =
@@ -911,11 +1526,18 @@ safe:
   and a human (or Claude) did the splice into `index.html` by hand as a
   separate reviewed step — the user explicitly asked whether this would
   work without Claude at all, so the splice was moved into the script
-  itself. Before overwriting, it backs up the current `index.html` to
-  `index.html.bak` (restore by copying that back over `index.html` if a
-  run looks wrong) — if `var DATA = [ ... ];` can't be found in
-  `index.html` at all, it raises and writes nothing rather than guessing
-  where to put the data. `extracted_questions.json` is written mid-run as
+  itself. Before overwriting, it backs up the current `index.html` into
+  `bkp/` as a timestamped `index.html.<timestamp>.bak`, pruning to keep
+  only the newest 5 (`BACKUPS_TO_KEEP` in `extract_data.py`) — restore via
+  `restore_backup.py`'s numbered picker (or manage.bat option 11), or by
+  copying the right file back over `index.html` by hand. This replaced an
+  earlier single always-overwritten `index.html.bak` — the user pointed
+  out that a run several syncs ago was unrecoverable once a later run
+  clobbered the one backup slot; keeping the last 5 means a bad run
+  doesn't have to be caught immediately to still be undoable. If
+  `var DATA = [ ... ];` can't be found in `index.html` at all, it raises
+  and writes nothing rather than guessing where to put the data.
+  `extracted_questions.json` is written mid-run as
   a debugging intermediate but auto-deleted after a successful splice —
   it only survives if the splice step itself failed, for troubleshooting.
 - **To re-sync after the Excel changes**: just run `python
@@ -974,11 +1596,9 @@ safe:
   tasks the user can run without Claude**, all built on top of
   `extract_data.py`'s `extract()`/`read_current_data()`/
   `splice_into_index_html()` (no duplicated extraction logic):
-  - **`clear_data.py`** — wipes `DATA` to `[]`. Destructive; requires
-    typing an exact confirmation phrase (`CLEAR ALL DATA`) before writing
-    anything, since this app has no real multi-user "admin" system to
-    gate it with — the typed phrase is the stand-in the user asked for.
-    Backs up `index.html` first, same as every script here.
+  - **`clear_data.py`** — wipes `DATA` to `[]`. Destructive; requires a
+    `Y/N` confirmation before writing anything. Backs up `index.html`
+    first, same as every script here.
   - **`add_sheets.py <Sheet> [<Sheet> ...]`** (or `--all` for every real
     tab **read live from the workbook** — `list(ed.wb.sheetnames)`, not a
     hardcoded list; previously resolved via a curated `ed.ALL_KNOWN_SHEETS`
@@ -1024,9 +1644,25 @@ safe:
     separate "check boldness" logic needed) are replaced; rows newly
     present in Excel are added automatically; rows whose question text no
     longer exists anywhere in Excel are reported but only removed with
-    explicit confirmation (typed phrase, or `--yes` for non-interactive
+    explicit confirmation (`Y/N` prompt, or `--yes` for non-interactive
     runs) — additions/changes are safe to apply automatically, deletions
     are not.
+  - **Row order in `index.html` mirrors `current`'s existing order, not a
+    rebucketed unchanged/changed/added/removed sequence.** An earlier
+    version built the final list as three concatenated blocks (all
+    unchanged rows, then all changed rows, then added, then kept-removed)
+    — which meant editing a question's answer in Excel silently moved it
+    from wherever it sat (e.g. row 6) to the end of the file, since editing
+    bumped it into the "changed" bucket appended after every unchanged row
+    (caught by the user noticing an edited question had jumped to the
+    bottom after Smart Sync). Fixed by walking `current`'s original
+    key order and swapping in the fresh version in place for a changed
+    key, keeping a kept-removed row in its original spot too — only
+    genuinely new (`added`) rows, which have no prior position, are
+    appended at the end. This only prevents future reorders; a row
+    already displaced by the old bug won't move back on its own (its
+    displaced position is now "unchanged") — recover it by hand or via
+    `restore_backup.py`/manage.bat option 11 from before the reorder.
   - All three were tested end-to-end in an isolated sandbox copy (not the
     real `index.html`) before being confirmed working: confirm-phrase
     reject/accept paths, already-present-sheet skip, new-sheet add,
@@ -1049,6 +1685,17 @@ safe:
   explicit decision to include HR (§3's HR note) and was removed once
   noticed contradicting that decision; HR is a normal sheet like any
   other now.
+  **Both `subprocess.run(['node', ...])` calls pass `encoding='utf-8'`
+  explicitly, not bare `text=True`** — without it, Python decodes the
+  child process's stdout using the OS default codepage (cp1252 on this
+  Windows setup), and a real Unicode character in the Excel data outside
+  that codepage's range crashes the subprocess output reader thread with
+  `UnicodeDecodeError`, silently leaving `result.stdout` as `None` (caught
+  live: a Full Resync that pulled in a new character crashed the data
+  sanity check's `json.loads(None)` right after). `node` itself writes
+  stdout as UTF-8 regardless of OS codepage, so this is purely a
+  Python-side decode setting, not something `extract_data.py`'s own
+  writes need to account for.
   **Supports `--quiet`/`-q`**: on success, collapses the normal 3-section,
   ~20-line breakdown into one summary line (`Verify: OK -- syntax OK, ids
   55/55, 1029 questions across 5 sheet(s).`); on failure, still prints
@@ -1095,6 +1742,14 @@ safe:
   §3's sheet catalog is now purely descriptive prose (what's been synced
   and why), not a data source any script depends on — don't reintroduce a
   hardcoded sheet-name constant that any script reads from.
+  - **Also shows an "Answered" column** per synced sheet — `count / total
+    (pct%)`, using the same has-an-answer-or-not test as the app's
+    Answer filter and `answerHtmlOrPlaceholder()`'s placeholder
+    (`(q.get('answerPlain') or '').strip()` truthy or not) — plus one
+    "Total answered" summary line across every synced sheet. Added so
+    Data Summary answers "where does Excel still need answers written
+    in," not just "which sheets/rows exist." Excel-source completeness,
+    not a quality/correctness judgment on the answers that do exist.
 - **`add_sheets_menu.py`** — a 7th standalone script, the interactive
   counterpart to `add_sheets.py`'s CLI form. Lists synced sheets (with row
   counts) plus a **numbered** list of not-yet-synced sheets, and takes the
@@ -1120,11 +1775,9 @@ safe:
   `DATA` (with row counts), takes a single numbered pick, and splices
   `DATA` back in with that sheet's rows dropped — Excel itself is
   untouched, so `add_sheets_menu.py` brings the sheet back later exactly
-  as it currently exists there. Confirms with a plain `y/N` prompt before
-  writing — unlike `clear_data.py`'s typed confirm-phrase gate, since the
-  numbered sheet pick here already rules out selecting the wrong sheet by
-  accident; the user explicitly asked for `y/N` over a typed phrase.
-  Added because the existing
+  as it currently exists there. Confirms with a plain `Y/N` prompt before
+  writing, same as every destructive prompt in the project. Added because
+  the existing
   removal path (`smart_sync.py`'s per-row removal, gated on rows that no
   longer exist *in the Excel source itself*) had no way to temporarily
   drop a whole sheet the user still wants to keep in Excel — the user
@@ -1145,26 +1798,54 @@ safe:
   and reasonably flagged that there was no way to change `server_port`/
   `rows_per_sheet` without opening a script file by hand, undermining the
   "configurable, not hardcoded" point of `config.json` in the first place.
-- **`manage.bat`** (repo root) — a menu launcher over all 9 scripts above
+- **`check_stale.py`** — a 10th standalone script, read-only, never
+  touches `index.html`/the workbook. Compares the `.xlsx` workbook's mtime
+  against `index.html`'s mtime and prints a one-line heads-up if the
+  workbook was modified more recently — nothing at all otherwise (silence
+  is the common case). `manage.bat` runs this exactly once, right at
+  launch before the menu is first shown — NOT on every return-to-menu
+  loop (it sits above the `:menu` label, which the "done" loop jumps back
+  to without re-running it). Exists so editing the workbook and then
+  forgetting to sync doesn't silently leave the app showing stale data —
+  the user asked for this specifically after being burned by exactly that
+  once. Purely a heads-up, never blocks/prompts/exits.
+- **`restore_backup.py`** — an 11th standalone script, the interactive
+  picker for `bkp/`'s backups (see `splice_into_index_html()`'s
+  keep-last-5 scheme above). Lists up to the 5 kept backups for
+  `index.html`, newest first, with each one's timestamp and question
+  count, and takes a single numbered pick rather than always restoring
+  blindly "the last one" — useful when the run you want to undo wasn't
+  the most recent one. Confirms with a plain `Y/N` prompt (same pattern
+  as `remove_sheet.py`). **Restoring is a full raw-file copy of the
+  chosen backup over `index.html`, not a DATA-only splice** — a backup
+  can predate a code edit to `index.html` itself, not just a data sync,
+  so restoring has to undo everything about that run, not just its data.
+  The current `index.html` is itself backed up into `bkp/` first (same
+  scheme), so restoring is itself undoable, not a one-way door.
+- **`manage.bat`** (repo root) — a menu launcher over all 11 scripts above
   plus local-dev/workflow conveniences, so the user can do any of this by
   double-clicking without opening VS Code/a terminal:
-  - Smart Sync / Add Sheet / Full Resync / Remove Sheet each auto-chain
-    into `verify_index.py` immediately afterward (so the standard §11
-    post-change check happens without a separate manual step) — **Clear
-    Data deliberately does NOT auto-verify**, since an intentionally-empty
-    `DATA` would just report a spurious-looking "0 questions" rather than
-    signal a real problem.
+  - Runs `check_stale.py` once at launch, before the menu is shown (see
+    above) — printed above the menu banner, not tucked into any one
+    action.
+  - Smart Sync / Add Sheet / Full Resync / Remove Sheet / Restore Backup
+    each auto-chain into `verify_index.py` immediately afterward (so the
+    standard §11 post-change check happens without a separate manual
+    step) — **Clear Data deliberately does NOT auto-verify**, since an
+    intentionally-empty `DATA` would just report a spurious-looking "0
+    questions" rather than signal a real problem.
   - Add Sheet delegates to `add_sheets_menu.py` — a numbered pick, not a
     typed sheet name (see above).
   - Data Summary (`list_sheets.py` standalone), Verify, Serve Locally
     (delegates to `scripts/serve.py` — Python's `http.server` on the
     `config.json`-configured port, with the browser auto-opened; not
     hardcoded in `manage.bat` itself), Open `index.html` directly
-    (`file://`), Open the `.xlsx` workbook directly, Restore Last Backup
-    (copies `index.html.bak` back over `index.html`, gated behind a typed
-    `YES` confirmation, mirroring `clear_data.py`'s confirm-phrase
-    pattern), and View/Edit Settings (`edit_config.py` — see above) round
-    out the menu.
+    (`file://`), Open the `.xlsx` workbook directly, Restore Backup
+    (delegates to `restore_backup.py`'s numbered picker over the last 5
+    backups in `bkp/` — see above; this replaced an earlier version that
+    always restored the single `index.html.bak` behind a typed `YES`
+    confirmation), and View/Edit Settings (`edit_config.py` — see above)
+    round out the menu.
   - **Every action prints a `[%TIME%] <action> starting/done` line**
     (Windows `%TIME%`, e.g. `[18:41:53.63]`) — added alongside the
     `--quiet` verify change above, same "concise and readable, and show
@@ -1182,3 +1863,64 @@ safe:
     console handle directly rather than any redirected stdin, which broke
     non-interactively-piped testing during development — `set /p` instead
     made the whole flow both testable and consistent).
+
+## 13. Listen Mode
+
+A third header mode-toggle button (`#listenModeBtn`, 🎧) alongside Normal/
+Interview. **Unlike Interview Mode, it is NOT a separate config/session/
+pool** — it reads through the exact same `filteredQuestions` Normal Mode
+shows, one record at a time, via `speechSynthesis` (Question, then
+Answer) instead of by eye. The toolbar/status-row (Sheet/Topic/Level/
+Priority/Company/Answer filters + Search) **stay visible and live** the
+whole time Listen Mode is active — this was the explicit ask ("it will
+work simply like normal mode, just... voice will read it"), not an
+Interview-Mode-style separate setup flow.
+
+- **View toggling**: `goListenMode()`/`exitListenMode()` hide/show
+  `#tableView`/`#singleView`/`#listenView` the same way Interview Mode
+  hides them, but deliberately do NOT touch `.toolbar`/`.status-row`
+  (those only get hidden for an active Interview session, per §7).
+  `setModeUI(mode)` takes `'normal'`/`'listen'`/`'interview'` (was a
+  boolean `isInterview` before Listen Mode existed).
+- **Filters stay live while active**: `applyFilters()` calls
+  `refreshListenView()` whenever `listenModeActive` — it stops any
+  in-progress speech (the old pool no longer applies) and resets
+  `listenIndex = 0`, same as browse mode's `currentIndex = 0` reset on
+  every filter change, rather than preserving a numeric position that
+  may point at a completely different question in the new pool.
+- **Playback**: `playListenSequence()` speaks `questionPlain`, then (via
+  nested `onEnd` callbacks) `answerPlain` — or a spoken "No answer added
+  in Excel yet." placeholder if blank — then, if `#listenAutoAdvance` is
+  checked and more questions remain, advances the index and repeats.
+  Prev/Next (`listenGoTo()`) cancel current speech and immediately
+  continue playing from the new question if playback was already
+  running; browsing while paused just updates the display, doesn't start
+  speaking. Reuses Interview Mode's existing voice-picker infrastructure
+  (`#lVoiceSelect` added to `VOICE_SELECT_ELS`, `getSelectedInterviewVoice()`
+  unchanged) rather than duplicating it.
+- **`speechSynthesis`'s `end` event is unreliable — it can silently never
+  fire.** Confirmed directly during testing: a short question fired `end`
+  normally (~2s), but a longer multi-line code-snippet answer left
+  `speechSynthesis.speaking` stuck `true` indefinitely with `end` never
+  firing, even 10+ seconds later — this would have left Listen Mode stuck
+  mid-answer forever with no way out except Pause. `speakListenText()`
+  guards against this with a per-character-estimated `setTimeout` fallback
+  (`Math.min(60000, Math.max(4000, text.length * 90))` ms) that
+  force-advances if `end`/`error` never comes; the fallback is cancelled
+  via `clearTimeout` if `end` does fire first. A `listenUtteranceToken`
+  counter (bumped on every stop/nav, same pattern as Interview Mode's
+  `speakCurrentInterviewQuestion()`) stops a late-firing callback for an
+  already-superseded utterance from chaining into the wrong question. Any
+  future TTS feature that reads longer/unpredictable text needs the same
+  timeout-fallback guard — don't assume `onend` will always fire.
+- **Interop with the other two modes**: entering Interview Mode's config
+  modal (`openInterviewModal()`) calls `pauseListen()` first (don't keep
+  reading aloud behind the modal); actually launching a session
+  (`launchInterview()`) calls `exitListenMode()` if it was active. "Normal
+  Mode" (`goNormalMode()`) exits Listen Mode the same way it ends an
+  Interview session. Hidden entirely (`els.listenModeBtn.style.display =
+  'none'`) when `!SPEECH_SUPPORTED` — a mode that can only show text
+  offers nothing Normal Mode doesn't already do.
+- Markup reuses `#singleView`'s existing `.field-row`/`.field-inline`/
+  `.pager` classes (unscoped from the mobile breakpoint, safe to reuse at
+  any width) rather than introducing parallel styles.

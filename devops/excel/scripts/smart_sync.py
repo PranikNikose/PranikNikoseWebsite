@@ -38,12 +38,13 @@ Usage:
 "changed rows" listing (both decorative/after-the-fact detail), replacing
 the whole run with one summary line when nothing meaningful needs review.
 It never hides anything decision-critical: the removed-rows listing (the
-thing you're actually being asked to confirm or decline) always prints in
-full regardless of --quiet.
+thing you're actually being asked to confirm or decline with Y/N) always
+prints in full regardless of --quiet.
 
 Only touches sheets that are ALREADY in index.html (use add_sheets.py to
 bring in a sheet for the first time). Always pulls the full row count for
-whatever sheets it re-checks. Backs up index.html to index.html.bak first.
+whatever sheets it re-checks. Backs up index.html into bkp/ first
+(timestamped, keeps the last 5).
 """
 
 import sys
@@ -52,8 +53,7 @@ import extract_data as ed
 QUIET = '--quiet' in sys.argv or '-q' in sys.argv
 
 FIELDS_TO_COMPARE = ['srNo', 'category', 'level', 'question',
-                      'questionParts', 'answer', 'answerPlain', 'priority']
-CONFIRM_PHRASE = 'REMOVE THESE ROWS'
+                      'questionParts', 'answer', 'answerPlain', 'priority', 'company']
 
 
 def diff_entry(old, new):
@@ -98,12 +98,14 @@ def main():
     new_by_key = keyed_by_identity(fresh)
 
     unchanged, changed, added = [], [], []
+    changed_by_key = {}
     for key, new_q in new_by_key.items():
         old_q = old_by_key.get(key)
         if old_q is None:
             added.append(new_q)
         elif diff_entry(old_q, new_q):
             changed.append((old_q, new_q))
+            changed_by_key[key] = new_q
         else:
             unchanged.append(old_q)
 
@@ -140,12 +142,12 @@ def main():
             print('--yes passed: removing these ' + str(len(removed)) + ' rows.')
         else:
             try:
-                typed = input('Type "' + CONFIRM_PHRASE + '" to actually remove these ' +
-                               str(len(removed)) + ' rows (anything else keeps them): ')
+                typed = input('Remove these ' + str(len(removed)) +
+                               ' rows? (Y/N): ').strip().lower()
             except (EOFError, KeyboardInterrupt):
                 print()
                 typed = None
-            do_remove = (typed == CONFIRM_PHRASE)
+            do_remove = (typed == 'y')
             print('Removing.' if do_remove else 'Keeping them as-is.')
 
     if not changed and not added and not (do_remove and removed):
@@ -156,11 +158,18 @@ def main():
             print('Nothing to write -- index.html already matches Excel.')
         return
 
-    final = list(unchanged)
-    final += [new_q for _, new_q in changed]
+    # Preserve current's original row order -- swap in the fresh version for
+    # a changed row in place, rather than bucketing unchanged/changed/added
+    # into separate blocks (which used to shove every edited row to the end,
+    # regardless of where it actually sat in index.html).
+    final = []
+    for key, old_q in old_by_key.items():
+        if key in changed_by_key:
+            final.append(changed_by_key[key])
+        elif key in new_by_key or not do_remove:
+            final.append(old_q)
+        # else: removed and confirmed -- dropped
     final += added
-    if not do_remove:
-        final += removed
 
     backup_path = ed.splice_into_index_html(final)
 

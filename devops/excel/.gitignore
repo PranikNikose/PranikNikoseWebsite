@@ -1,7 +1,9 @@
 #Excel file
 *.xlsx
 
-#backup files
+#backup files (extract_data.py's splice_into_index_html() writes the last
+#5 sync backups into bkp/ as timestamped *.bak files -- this pattern
+#already covers that whole folder, no separate /bkp/ line needed)
 *.bak
 
 # Python bytecode cache

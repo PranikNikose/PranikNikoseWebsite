@@ -18,11 +18,13 @@ nothing else in index.html is touched). Rich text (bold/italic/underline/
 color) is preserved automatically via openpyxl's rich_text mode, exactly
 as it's formatted in the workbook.
 
-Before overwriting, the previous index.html is backed up to
-index.html.bak -- if a run looks wrong, restore it by copying that file
-back over index.html. If the DATA array can't be found in index.html at
-all, the script raises an error and writes nothing (never guesses where
-to put the data).
+Before overwriting, the previous index.html is backed up into bkp/ as a
+timestamped file, keeping only the newest 5 -- if a run looks wrong,
+restore via restore_backup.py's numbered picker (or manage.bat option
+11), or by copying the right bkp/*.bak file back over index.html by
+hand. If the DATA array can't be found in index.html at all, the script
+raises an error and writes nothing (never guesses where to put the
+data).
 
 **Which sheets get pulled is data-driven, not a hardcoded list**: with no
 arguments, this re-extracts exactly whatever sheets are CURRENTLY present
@@ -38,7 +40,7 @@ config.json's "rows_per_sheet" key (repo root) instead of a constant here
 -- see scripts/config.py. Leave it null/absent for the full dataset.
 """
 
-import openpyxl, json, html as htmlmod, re, os, glob, sys
+import openpyxl, json, html as htmlmod, re, os, glob, sys, datetime
 from openpyxl.cell.rich_text import CellRichText, TextBlock
 import config as cfg
 
@@ -159,18 +161,55 @@ def line_to_plain(line):
     return ''.join(t for t, f in line if t)
 
 
+def split_code_fences(lines):
+    """Splits lines_with_runs() output into ('text', line) / ('code',
+    plain_lines) segments. A line whose text is exactly ``` toggles a code
+    region and is dropped from the output; lines inside a fence lose any
+    rich-text formatting and are collected together into one 'code'
+    segment (see docs/RULES.md section 4). An unclosed fence still becomes
+    a 'code' segment for whatever's left, rather than silently losing it."""
+    segments = []
+    in_code = False
+    code_buf = []
+    for line in lines:
+        if line_to_plain(line).strip() == '```':
+            if in_code:
+                segments.append(('code', code_buf))
+                code_buf = []
+            in_code = not in_code
+            continue
+        if in_code:
+            code_buf.append(line_to_plain(line))
+        else:
+            segments.append(('text', line))
+    if in_code and code_buf:
+        segments.append(('code', code_buf))
+    return segments
+
+
+def code_block_html(code_lines):
+    return ('<pre class="code-block" data-highlight="pending">' +
+            htmlmod.escape('\n'.join(code_lines)) + '</pre>')
+
+
 def cell_lines(cell_value):
-    """Return list of (html, plain) per non-empty line -- used for the
-    Questions cell, where each line is a separate phrasing (see
-    docs/RULES.md: 'one Excel row = one DATA entry, join phrasings with or,
-    keep questionParts as the un-joined list')."""
+    """Return list of (html, plain) per non-empty line/fenced-code-block --
+    used for the Questions cell, where each item is a separate phrasing
+    (see docs/RULES.md: 'one Excel row = one DATA entry, join phrasings
+    with or, keep questionParts as the un-joined list'). A ```-fenced block
+    becomes one phrasing of its own, rendered as code."""
     lines = lines_with_runs(cell_value)
     out = []
-    for line in lines:
-        p = line_to_plain(line).strip()
+    for kind, payload in split_code_fences(lines):
+        if kind == 'code':
+            code_text = '\n'.join(payload).strip('\n')
+            if code_text.strip():
+                out.append((code_block_html(payload), code_text))
+            continue
+        p = line_to_plain(payload).strip()
         if not p:
             continue
-        out.append((line_to_html(line).strip(), p))
+        out.append((line_to_html(payload).strip(), p))
     return out
 
 
@@ -219,6 +258,14 @@ def canonical_level_for_years(years):
         return None
     lo = nums[0]
     hi = nums[1] if len(nums) > 1 else nums[0]
+    # A range spanning the ENTIRE band spectrum (e.g. "0-10 Years" on every
+    # row, as seen in HR) isn't a real per-row signal -- it's a blanket
+    # placeholder covering every band at once. Treat it the same as no
+    # Years data at all (falls through to the sheet's raw Level text
+    # instead of forcing everyone into whichever band the midpoint lands
+    # on -- "Mid" here, which would be misleading).
+    if lo <= LEVEL_BANDS[0][0] and hi >= LEVEL_BANDS[-1][1]:
+        return None
     mid = (lo + hi) / 2
     for band_lo, band_hi, name in LEVEL_BANDS:
         if band_lo <= mid <= band_hi:
@@ -227,10 +274,51 @@ def canonical_level_for_years(years):
 
 
 def answer_html_and_plain(cell_value):
+    """Splits the Answer cell on ```-fences (see split_code_fences()): text
+    outside fences renders as before (rich-text HTML, joined by line); a
+    fenced block renders as one syntax-highlighted <pre class="code-block">
+    (docs/RULES.md section 4), so an answer can mix prose and embedded code
+    in one flowing cell. A line that's just "OR" (any case) -- separating
+    two alternate answer phrasings -- renders as a centered italic
+    uppercase divider instead of a plain text line. A blank line
+    immediately touching that divider (either side) is dropped -- the
+    divider's own CSS margin already provides spacing, so a blank Excel
+    line there would just double it under white-space:pre-wrap. No '\\n'
+    is placed directly against a code/OR block in the joined HTML either --
+    both render as block-level elements with their own line break, so a
+    literal adjacent newline under white-space:pre-wrap would add a second,
+    visibly bigger gap on top of it."""
     lines = lines_with_runs(cell_value)
-    html_lines = [line_to_html(l) for l in lines]
-    plain_lines = [line_to_plain(l) for l in lines]
-    return '\n'.join(html_lines).strip(), '\n'.join(plain_lines).strip()
+    parts = []  # (kind, html, plain), kind in 'code'/'or'/'text'
+    for kind, payload in split_code_fences(lines):
+        if kind == 'code':
+            parts.append(('code', code_block_html(payload), '\n'.join(payload)))
+        elif line_to_plain(payload).strip().upper() == 'OR':
+            parts.append(('or', '<div class="answer-or-sep">OR</div>', 'OR'))
+        else:
+            parts.append(('text', line_to_html(payload), line_to_plain(payload)))
+
+    def is_blank(p):
+        return p[0] == 'text' and not p[2].strip()
+
+    filtered = []
+    for i, p in enumerate(parts):
+        if is_blank(p):
+            touches_or = ((i > 0 and parts[i - 1][0] == 'or') or
+                          (i + 1 < len(parts) and parts[i + 1][0] == 'or'))
+            if touches_or:
+                continue
+        filtered.append(p)
+
+    BLOCK_KINDS = ('or', 'code')
+    html = ''
+    for i, p in enumerate(filtered):
+        if i > 0 and filtered[i - 1][0] not in BLOCK_KINDS and p[0] not in BLOCK_KINDS:
+            html += '\n'
+        html += p[1]
+
+    plain_parts = [p[2] for p in filtered]
+    return html.strip(), '\n'.join(plain_parts).strip()
 
 
 def extract(sheets=None, rows_per_sheet=None):
@@ -263,6 +351,7 @@ def extract(sheets=None, rows_per_sheet=None):
         col_questions = find_col(header, 'question')
         col_answers = find_col(header, 'answer')
         col_priority = find_col(header, 'priority', 'proority')
+        col_company = find_col(header, 'company')
 
         taken = 0
         ordinal = 0
@@ -279,19 +368,28 @@ def extract(sheets=None, rows_per_sheet=None):
             if not srNo:
                 srNo = str(ordinal)  # source left it blank; use row position within sheet instead
 
-            level = plain(ws.cell(row=row, column=col_level).value) if col_level else ''
+            raw_level = plain(ws.cell(row=row, column=col_level).value) if col_level else ''
             years = plain(ws.cell(row=row, column=col_years).value) if col_years else ''
             topic = plain(ws.cell(row=row, column=col_topic).value) if col_topic else ''
             priority = plain(ws.cell(row=row, column=col_priority).value) if col_priority else ''
+            company = plain(ws.cell(row=row, column=col_company).value) if col_company else ''
 
-            # Level is now driven entirely by Years, not the Excel's Level
-            # column text: a years value that resolves to a band uses that
-            # band's name; anything else (years blank, or outside 0-10)
-            # is "General" -- the original Level cell text is not used as
-            # a fallback anymore (per the user's explicit rule).
-            level = canonical_level_for_years(years) or 'General'
+            # Level is driven by Years when it resolves to a real band. When
+            # Years is blank/unparseable, fall back to the sheet's own raw
+            # Level text instead of blindly defaulting to "General" -- e.g.
+            # HR has no Years data at all, but its Level column holds real,
+            # meaningful values (HR/TAE, technical/domain, tech round) that
+            # were previously discarded entirely. Only falls all the way to
+            # "General" when there's neither a valid Years band nor any raw
+            # Level text to fall back on.
+            years_band = canonical_level_for_years(years)
+            level = years_band or raw_level or 'General'
             topic = topic or sheet
-            levelLabel = normalize_level(level + (' (' + years + ')' if years else ''))
+            # Only append the "(X-Y Years)" suffix when Years is what
+            # actually produced this level -- appending it to a raw-Level
+            # fallback (e.g. HR's "HR/TAE") would misleadingly suggest
+            # Years is a meaningful per-row qualifier when it isn't.
+            levelLabel = normalize_level(level + (' (' + years + ')' if years_band and years else ''))
 
             answer_cell = ws.cell(row=row, column=col_answers).value if col_answers else None
             answer_html, answer_plain = answer_html_and_plain(answer_cell)
@@ -312,7 +410,8 @@ def extract(sheets=None, rows_per_sheet=None):
                 'questionParts': question_parts,
                 'answer': answer_html,
                 'answerPlain': answer_plain,
-                'priority': priority
+                'priority': priority,
+                'company': company
             })
             taken += 1
         per_sheet_counts[sheet] = taken
@@ -322,6 +421,9 @@ def extract(sheets=None, rows_per_sheet=None):
 
 INDEX_HTML = os.path.join(PROJECT_ROOT, 'index.html')
 DATA_ARRAY_RE = re.compile(r'var DATA = (\[[\s\S]*?\]);\n')
+
+BACKUP_DIR = os.path.join(PROJECT_ROOT, 'bkp')
+BACKUPS_TO_KEEP = 5
 
 
 def to_js_array_literal(questions):
@@ -345,12 +447,28 @@ def read_current_data(html_path=INDEX_HTML):
     return json.loads(m.group(1).replace('<\\/', '</'))
 
 
+def prune_old_backups(basename):
+    """Keeps only the newest BACKUPS_TO_KEEP backup files for `basename`
+    (e.g. 'index.html') in BACKUP_DIR -- deletes the rest. Filenames are
+    timestamped as '<basename>.<YYYYMMDD_HHMMSS_ffffff>.bak', which sorts
+    lexicographically the same as chronologically, so a plain name sort
+    is enough to find the oldest ones without touching file mtimes."""
+    pattern = os.path.join(BACKUP_DIR, basename + '.*.bak')
+    existing = sorted(glob.glob(pattern))
+    for old_path in existing[:-BACKUPS_TO_KEEP]:
+        os.remove(old_path)
+
+
 def splice_into_index_html(questions, html_path=INDEX_HTML):
     """Full overwrite of index.html's `var DATA = [ ... ];` array -- the
-    one and only thing this touches. Backs up the previous index.html to
-    `<html_path>.bak` first, so a bad run can be undone by copying that
-    back over index.html. Raises (and writes nothing) if the DATA array
-    can't be found, rather than guessing where to put it."""
+    one and only thing this touches. Backs up the previous index.html
+    first into BACKUP_DIR (bkp/) as a timestamped '<name>.<timestamp>.bak'
+    file, keeping only the newest BACKUPS_TO_KEEP (older ones pruned
+    automatically) -- so a bad run can be undone by copying the right
+    backup back over index.html, and a run from a while ago isn't lost
+    just because a later run overwrote the one-and-only '.bak' that used
+    to exist. Raises (and writes nothing) if the DATA array can't be
+    found, rather than guessing where to put it."""
     with open(html_path, encoding='utf-8') as f:
         current_html = f.read()
 
@@ -364,9 +482,13 @@ def splice_into_index_html(questions, html_path=INDEX_HTML):
     new_block = 'var DATA = ' + to_js_array_literal(questions) + ';\n'
     new_html = current_html[:m.start()] + new_block + current_html[m.end():]
 
-    backup_path = html_path + '.bak'
+    os.makedirs(BACKUP_DIR, exist_ok=True)
+    basename = os.path.basename(html_path)
+    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+    backup_path = os.path.join(BACKUP_DIR, basename + '.' + timestamp + '.bak')
     with open(backup_path, 'w', encoding='utf-8') as f:
         f.write(current_html)
+    prune_old_backups(basename)
 
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write(new_html)
