@@ -16,10 +16,69 @@
         --accent2: #14B8A6;
         --border: rgba(99, 102, 241, 0.18);
         --card: rgba(26, 32, 53, 0.8);
+        --nav-bg: rgba(10, 15, 30, 0.88);
+        --panel: rgba(10, 15, 30, 0.6);
+        --card-solid: rgba(30, 35, 60, 0.9);
+        --shadow: rgba(0, 0, 0, 0.3);
+        color-scheme: dark;
+      }
+
+      :root[data-theme="light"] {
+        --bg: #E8EBF3;
+        --bg2: #F3F5FA;
+        --bg3: #DEE3EF;
+        --text: #12152A;
+        --muted: #525C72;
+        --accent: #4338CA;
+        --accent2: #0B8A7E;
+        --border: rgba(67, 56, 202, 0.3);
+        --card: #FFFFFF;
+        --nav-bg: rgba(255, 255, 255, 0.85);
+        --panel: rgba(67, 56, 202, 0.06);
+        --card-solid: #FFFFFF;
+        --shadow: rgba(30, 41, 59, 0.14);
+        color-scheme: light;
+      }
+
+      :root[data-theme="light"] .theme-toggle,
+      :root[data-theme="light"] .knowledge-card,
+      :root[data-theme="light"] .award-card,
+      :root[data-theme="light"] .exp-card,
+      :root[data-theme="light"] .skill-group,
+      :root[data-theme="light"] .project-card,
+      :root[data-theme="light"] .contact-link,
+      :root[data-theme="light"] .cert-card {
+        box-shadow: 0 2px 16px var(--shadow);
       }
 
       html {
         scroll-behavior: smooth;
+      }
+
+      body {
+        transition: background 0.25s ease, color 0.25s ease;
+      }
+
+      /* THEME TOGGLE */
+      .theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        transition: border-color 0.2s, transform 0.2s, background 0.2s;
+      }
+
+      .theme-toggle:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
       }
 
       body {
@@ -41,10 +100,17 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
+        gap: 1.4rem;
         padding: 1.2rem 5vw;
-        background: rgba(10, 15, 30, 0.88);
+        background: var(--nav-bg);
         backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--border);
+      }
+
+      @media (max-width: 640px) {
+        nav {
+          gap: 0.8rem;
+        }
       }
 
       .nav-links {
@@ -556,13 +622,13 @@
       .project-card:hover {
         transform: translateY(-4px);
         border-color: rgba(99, 102, 241, 0.4);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 20px 40px var(--shadow);
       }
 
       /* Featured/spotlight project card */
       .project-card.featured {
         border-color: rgba(99, 102, 241, 0.35);
-        background: rgba(30, 35, 60, 0.9);
+        background: var(--card-solid);
         grid-column: 1 / -1;
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -796,7 +862,7 @@
       .pipeline-detail {
         padding: 1rem 1.1rem;
         border-radius: 8px;
-        background: rgba(10, 15, 30, 0.6);
+        background: var(--panel);
         border: 1px solid var(--border);
       }
 

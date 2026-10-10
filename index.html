@@ -9,6 +9,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 	<link rel="stylesheet" href="css/main.css">
+    <script>
+      (function () {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
    </head>
   <body>
     <nav>
@@ -35,6 +42,7 @@
           <a href="#contact">Contact</a>
         </li>
       </ul>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">🌙</button>
     </nav>
     <!-- HERO -->
     <section id="hero">
@@ -377,7 +385,7 @@
                 <strong>Custom Domain Integration</strong> — DNS configured to expose the application publicly through <code style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent2)"> roulette.praniknikose.top </code>.
               </li>
             </ul>
-            <div style="margin-top:1rem;padding:1rem;background:rgba(10,15,30,0.6);border-radius:8px;border:1px solid var(--border);">
+            <div style="margin-top:1rem;padding:1rem;background:var(--panel);border-radius:8px;border:1px solid var(--border);">
               <div class="arch-label" style="margin-bottom:0.6rem;"> Key Achievements </div>
               <p style="font-size:0.84rem;color:var(--muted);line-height:1.65;"> Designed, built, and deployed a complete production-style application covering full-stack development, Docker containerization, Infrastructure as Code, AWS provisioning, CI/CD automation, image lifecycle management, reverse proxy configuration, automated deployment, and domain integration. Demonstrates practical experience across Java development, DevOps engineering, Terraform, AWS, Docker, GitHub Actions, and modern software delivery practices. </p>
             </div>
@@ -680,6 +688,18 @@
       }
       // Footer year — auto-updates
       document.getElementById('footer-year').textContent = new Date().getFullYear();
+      // Dark/Light mode toggle
+      const themeToggle = document.getElementById('theme-toggle');
+      const syncThemeIcon = () => {
+        themeToggle.textContent = document.documentElement.getAttribute('data-theme') === 'light' ? '☀️' : '🌙';
+      };
+      syncThemeIcon();
+      themeToggle.addEventListener('click', () => {
+        const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        syncThemeIcon();
+      });
       // Scroll to top button
       const scrollBtn = document.getElementById('scroll-top');
       window.addEventListener('scroll', () => {
