@@ -25,6 +25,46 @@
     --red-dim:    rgba(248, 113, 113, .14);
   }
 
+  :root[data-theme="light"]{
+    --bg:#E8EBF3; --surface:#FFFFFF; --surface2:#EEF1F8; --border:rgba(67,56,202,.32); --border-soft:rgba(67,56,202,.16);
+    --dim:#5B6478; --muted:#434B63; --text:#242B42; --text-bright:#12152A;
+    --blue:#4338CA; --blue-dim:rgba(67,56,202,.12);
+    --green:#15803D; --green-dim:rgba(21,128,61,.12);
+    --amber:#B45309; --amber-dim:rgba(180,83,9,.12);
+    --purple:#6D28D9; --purple-dim:rgba(109,40,217,.12);
+    --cyan:#0F766E; --cyan-dim:rgba(15,118,110,.12);
+    --red:#B91C1C; --red-dim:rgba(185,28,28,.12);
+    color-scheme: light;
+  }
+  :root[data-theme="light"] .navbar a:hover{
+    background: rgba(67,56,202,.85); color:#fff;
+  }
+  :root[data-theme="light"] .card,
+  :root[data-theme="light"] .tree-panel,
+  :root[data-theme="light"] .table-panel,
+  :root[data-theme="light"] .flow-panel,
+  :root[data-theme="light"] .cmp-panel,
+  :root[data-theme="light"] .pillar-panel,
+  :root[data-theme="light"] .problem-card,
+  :root[data-theme="light"] .revision-panel,
+  :root[data-theme="light"] .naming-card,
+  :root[data-theme="light"] .navbar,
+  :root[data-theme="light"] .theme-toggle{
+    box-shadow:0 2px 14px rgba(30,41,59,.12);
+  }
+
+  /* THEME TOGGLE */
+  .theme-toggle{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--border); background:var(--surface); color:var(--text-bright);
+    cursor:pointer; font-size:1.15rem; line-height:1;
+    transition:border-color .2s, transform .2s, background .2s;
+  }
+  .theme-toggle:hover{ border-color:var(--blue); transform:translateY(-2px); }
+  .header-right{ display:flex; align-items:center; gap:14px; }
+  body{ transition:background .25s ease, color .25s ease; }
+
   html, body {
     background: var(--bg);
     color: var(--text);

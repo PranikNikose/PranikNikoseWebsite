@@ -6,6 +6,15 @@
 <title>Coding &amp; DSA — Interview Prep (TCS Java/Spring Boot)</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var mode = localStorage.getItem('themeMode') || 'auto';
+    var resolved = mode === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+      : mode;
+    document.documentElement.setAttribute('data-theme', resolved);
+  })();
+</script>
 </head>
 <body>
 <div class="page">
@@ -15,6 +24,7 @@
     <div class="header-top">
       <span class="prompt">$</span>
       <span class="title">Coding &amp; DSA — Interview Prep</span>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Theme: Auto — click to change" title="Auto (follows system)">◐</button>
     </div>
     <div class="subtitle">// Consolidated from "Coding" sheet — questions actually asked in interviews (Priority Count populated)</div>
     <div class="context-bar">
@@ -1444,5 +1454,30 @@ System.out.println(set2.size());  // 1 -> second one rejected as a duplicate</co
   </footer>
 
 </div><!-- /page -->
+<script>
+  // Dark/Light/Auto mode toggle — cycles Auto → Light → Dark
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcons = { auto: '◐', light: '☀', dark: '☾' };
+  const themeLabels = { auto: 'Auto (follows system)', light: 'Light', dark: 'Dark' };
+  const systemQuery = window.matchMedia('(prefers-color-scheme: light)');
+  const getMode = () => localStorage.getItem('themeMode') || 'auto';
+  const resolveTheme = (mode) => mode === 'auto' ? (systemQuery.matches ? 'light' : 'dark') : mode;
+  const applyTheme = (mode) => {
+    document.documentElement.setAttribute('data-theme', resolveTheme(mode));
+    themeToggle.textContent = themeIcons[mode];
+    themeToggle.title = themeLabels[mode];
+    themeToggle.setAttribute('aria-label', `Theme: ${themeLabels[mode]} — click to change`);
+  };
+  applyTheme(getMode());
+  themeToggle.addEventListener('click', () => {
+    const order = ['auto', 'light', 'dark'];
+    const next = order[(order.indexOf(getMode()) + 1) % order.length];
+    localStorage.setItem('themeMode', next);
+    applyTheme(next);
+  });
+  systemQuery.addEventListener('change', () => {
+    if (getMode() === 'auto') applyTheme('auto');
+  });
+</script>
 </body>
 </html>

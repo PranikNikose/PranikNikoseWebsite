@@ -7,11 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var mode = localStorage.getItem('themeMode') || 'auto';
+    var resolved = mode === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+      : mode;
+    document.documentElement.setAttribute('data-theme', resolved);
+  })();
+</script>
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand"><span class="helm">⎈</span>K8s Interview OS</div>
+    <div class="brand">
+      <span class="helm">⎈</span>K8s Interview OS
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Theme: Auto — click to change" title="Auto (follows system)" style="margin-left:auto;">◐</button>
+    </div>
     <p class="tagline">6–7 yr DevOps · Spring Boot on Kubernetes</p>
     <div class="search-wrap">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -941,6 +953,30 @@ const FINAL_TIPS = [
     if(e.key==='/' && document.activeElement!==searchInput){
       e.preventDefault(); searchInput.focus();
     }
+  });
+
+  // Dark/Light/Auto mode toggle — cycles Auto → Light → Dark
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcons = { auto: '◐', light: '☀', dark: '☾' };
+  const themeLabels = { auto: 'Auto (follows system)', light: 'Light', dark: 'Dark' };
+  const systemQuery = window.matchMedia('(prefers-color-scheme: light)');
+  const getMode = () => localStorage.getItem('themeMode') || 'auto';
+  const resolveTheme = (mode) => mode === 'auto' ? (systemQuery.matches ? 'light' : 'dark') : mode;
+  const applyTheme = (mode) => {
+    document.documentElement.setAttribute('data-theme', resolveTheme(mode));
+    themeToggle.textContent = themeIcons[mode];
+    themeToggle.title = themeLabels[mode];
+    themeToggle.setAttribute('aria-label', `Theme: ${themeLabels[mode]} — click to change`);
+  };
+  applyTheme(getMode());
+  themeToggle.addEventListener('click', () => {
+    const order = ['auto', 'light', 'dark'];
+    const next = order[(order.indexOf(getMode()) + 1) % order.length];
+    localStorage.setItem('themeMode', next);
+    applyTheme(next);
+  });
+  systemQuery.addEventListener('change', () => {
+    if (getMode() === 'auto') applyTheme('auto');
   });
 })();
 

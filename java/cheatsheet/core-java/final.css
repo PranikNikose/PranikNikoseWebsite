@@ -3,6 +3,65 @@
   --text:#F0EDE6; --dim:#94A3B8; --dim2:#B7C0CE;
   --cy:#14B8A6; --bl:#6366F1; --gr:#22C55E; --am:#F5A524; --pu:#A78BFA; --re:#F87171; --or:#FB923C;
 }
+
+:root[data-theme="light"]{
+  --bg:#E8EBF3; --panel:#FFFFFF; --panel2:#EEF1F8; --border:rgba(67,56,202,.32); --border-soft:rgba(67,56,202,.16);
+  --text:#12152A; --dim:#5B6478; --dim2:#333B52;
+  --cy:#0F766E; --bl:#4338CA; --gr:#15803D; --am:#B45309; --pu:#6D28D9; --re:#B91C1C; --or:#C2410C;
+  color-scheme: light;
+}
+:root[data-theme="light"] .title,
+:root[data-theme="light"] .toc a:hover,
+:root[data-theme="light"] .toc-part,
+:root[data-theme="light"] .part-divider .part-title,
+:root[data-theme="light"] .section-label.big,
+:root[data-theme="light"] .card-name,
+:root[data-theme="light"] .naming-prefix,
+:root[data-theme="light"] .tree-title,
+:root[data-theme="light"] .pillar-example b,
+:root[data-theme="light"] .table-panel th,
+:root[data-theme="light"] .bottom-grid th,
+:root[data-theme="light"] .perf-table th,
+:root[data-theme="light"] .problem-title,
+:root[data-theme="light"] .qa .q,
+:root[data-theme="light"] .radar-item b,
+:root[data-theme="light"] .flow-box{
+  color:var(--text);
+}
+:root[data-theme="light"] [style*="color:#fff"]{
+  color:var(--text) !important;
+}
+:root[data-theme="light"] .api-desc code{
+  background:rgba(67,56,202,.08);
+}
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .tree-panel,
+:root[data-theme="light"] .table-panel,
+:root[data-theme="light"] .pillar-panel,
+:root[data-theme="light"] .cmp-panel,
+:root[data-theme="light"] .flow-panel,
+:root[data-theme="light"] .problem-card,
+:root[data-theme="light"] .qa,
+:root[data-theme="light"] .revision-panel,
+:root[data-theme="light"] .radar-panel,
+:root[data-theme="light"] .naming-card,
+:root[data-theme="light"] .legend,
+:root[data-theme="light"] .theme-toggle{
+  box-shadow:0 2px 14px rgba(30,41,59,.12);
+}
+
+/* THEME TOGGLE */
+.theme-toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border-radius:50%;
+  border:1px solid var(--border); background:var(--panel); color:var(--text);
+  cursor:pointer; font-size:1.15rem; line-height:1;
+  transition:border-color .2s, transform .2s, background .2s;
+}
+.theme-toggle:hover{ border-color:var(--bl); transform:translateY(-2px); }
+.header-top .theme-toggle{ margin-left:auto; }
+body{ transition:background .25s ease, color .25s ease; }
+
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{

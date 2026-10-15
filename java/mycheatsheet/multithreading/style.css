@@ -27,7 +27,56 @@
     --red-dim:    #3A0D0D;
     --accent:     #6366F1;
     --accent2:    #14B8A6;
+    --code-bg:    var(--bg);
+    --card-solid: rgba(10,15,30,0.55);
+    --shadow:     rgba(0,0,0,0.3);
+    color-scheme: dark;
   }
+
+  :root[data-theme="light"] {
+    --bg:         #E8EBF3;
+    --surface:    #FFFFFF;
+    --border:     rgba(67,56,202,0.3);
+    --dim:        #6B7280;
+    --muted:      #475569;
+    --text:       #1E2433;
+    --text-bright:#0B0F1E;
+
+    --blue:       #1D5FBF;
+    --blue-dim:   rgba(29,95,191,0.12);
+    --green:      #1B7A33;
+    --green-dim:  rgba(27,122,51,0.12);
+    --amber:      #8A6A0A;
+    --amber-dim:  rgba(138,106,10,0.12);
+    --purple:     #6B3FD4;
+    --purple-dim: rgba(107,63,212,0.12);
+    --cyan:       #0E8C80;
+    --cyan-dim:   rgba(14,140,128,0.12);
+    --red:        #C22A22;
+    --red-dim:    rgba(194,42,34,0.12);
+    --accent:     #4338CA;
+    --accent2:    #0B8A7E;
+    --code-bg:    #EEF1F7;
+    --card-solid: #F3F5FA;
+    --shadow:     rgba(30,41,59,0.14);
+    color-scheme: light;
+  }
+
+  :root[data-theme="light"] .theme-toggle,
+  :root[data-theme="light"] .card,
+  :root[data-theme="light"] .legend,
+  :root[data-theme="light"] .naming-card,
+  :root[data-theme="light"] .tree-panel,
+  :root[data-theme="light"] .flow-panel,
+  :root[data-theme="light"] .cmp-panel,
+  :root[data-theme="light"] .problem-card,
+  :root[data-theme="light"] .revision-panel {
+    box-shadow: 0 2px 16px var(--shadow);
+  }
+
+  /* THEME TOGGLE */
+  .theme-toggle { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; font-size:1.05rem; line-height:1; margin-left:auto; transition:border-color .2s, transform .2s, background .2s; }
+  .theme-toggle:hover { border-color: var(--accent); transform: translateY(-2px); }
 
   html { scroll-behavior: smooth; }
 
@@ -221,7 +270,7 @@
   .api-desc { color: var(--muted); }
   .api-desc code {
     color: var(--text);
-    background: var(--bg);
+    background: var(--code-bg);
     padding: 0 4px;
     border-radius: 4px;
   }
@@ -245,7 +294,7 @@
     margin-top: 6px;
   }
   .flow-box {
-    background: var(--bg);
+    background: var(--code-bg);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 5px 11px;
@@ -283,7 +332,7 @@
     gap: 8px;
   }
   .cmp-card {
-    background: rgba(10,15,30,0.55);
+    background: var(--card-solid);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 8px 10px;
@@ -350,7 +399,7 @@
   .problem-code {
     font-size: 11.4px;
     color: var(--text);
-    background: var(--bg);
+    background: var(--code-bg);
     border-radius: 6px;
     padding: 6px 8px;
     white-space: pre;
@@ -392,7 +441,7 @@
     gap: 8px;
   }
   .sizing-card {
-    background: rgba(10,15,30,0.55);
+    background: var(--card-solid);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 8px 10px;

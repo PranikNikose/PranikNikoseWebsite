@@ -18,6 +18,27 @@
   --accent2: #14B8A6;
   --border: rgba(99, 102, 241, 0.18);
   --card: rgba(26, 32, 53, 0.8);
+  --shadow: rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #E8EBF3;
+  --bg2: #F3F5FA;
+  --bg3: #DEE3EF;
+  --text: #12152A;
+  --muted: #525C72;
+  --accent: #4338CA;
+  --accent2: #0B8A7E;
+  --border: rgba(67, 56, 202, 0.3);
+  --card: #FFFFFF;
+  --shadow: rgba(30, 41, 59, 0.14);
+  color-scheme: light;
+}
+
+:root[data-theme="light"] .theme-toggle,
+:root[data-theme="light"] .card {
+  box-shadow: 0 2px 16px var(--shadow);
 }
 
 html {
@@ -32,6 +53,7 @@ body {
   font-size: 16px;
   line-height: 1.7;
   overflow-x: hidden;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 /* Header */
@@ -42,6 +64,32 @@ header {
   border-bottom: 1px solid var(--border);
   position: relative;
   overflow: hidden;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: border-color 0.2s, transform 0.2s, background 0.2s;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
 header::before {

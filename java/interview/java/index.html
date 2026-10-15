@@ -6,6 +6,15 @@
 <title>Core Java — TCS Interview Master Revision (3–8 YoE)</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var mode = localStorage.getItem('themeMode') || 'auto';
+    var resolved = mode === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+      : mode;
+    document.documentElement.setAttribute('data-theme', resolved);
+  })();
+</script>
 </head>
 <body>
 <div class="page">
@@ -15,6 +24,7 @@
     <div class="header-top">
       <span class="prompt">$</span>
       <span class="title">Core Java & OOP — TCS Interview Master Revision</span>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Theme: Auto — click to change" title="Auto (follows system)">◐</button>
     </div>
     <div class="subtitle">// Consolidated from All_Study_and_Interview_Questions_Answers_List (CoreJava sheet) + core-java.html + multithreading.html + multithreading1.html + oops.html — every interview-asked question, fully explained with code.</div>
   </div>
@@ -1502,5 +1512,30 @@ In Spring Boot specifically, patterns like <b>Proxy</b> (AOP/@Transactional), <b
   <div class="footer-note">Sources merged: All_Study_and_Interview_Questions_Answers_List_0-10YoE.xlsx (CoreJava sheet, 110 priority-flagged rows) · core-java.html · multithreading.html · multithreading1.html · oops.html — cross-referenced, deduplicated, and enriched with runnable code examples.</div>
 
 </div>
+<script>
+  // Dark/Light/Auto mode toggle — cycles Auto → Light → Dark
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcons = { auto: '◐', light: '☀', dark: '☾' };
+  const themeLabels = { auto: 'Auto (follows system)', light: 'Light', dark: 'Dark' };
+  const systemQuery = window.matchMedia('(prefers-color-scheme: light)');
+  const getMode = () => localStorage.getItem('themeMode') || 'auto';
+  const resolveTheme = (mode) => mode === 'auto' ? (systemQuery.matches ? 'light' : 'dark') : mode;
+  const applyTheme = (mode) => {
+    document.documentElement.setAttribute('data-theme', resolveTheme(mode));
+    themeToggle.textContent = themeIcons[mode];
+    themeToggle.title = themeLabels[mode];
+    themeToggle.setAttribute('aria-label', `Theme: ${themeLabels[mode]} — click to change`);
+  };
+  applyTheme(getMode());
+  themeToggle.addEventListener('click', () => {
+    const order = ['auto', 'light', 'dark'];
+    const next = order[(order.indexOf(getMode()) + 1) % order.length];
+    localStorage.setItem('themeMode', next);
+    applyTheme(next);
+  });
+  systemQuery.addEventListener('change', () => {
+    if (getMode() === 'auto') applyTheme('auto');
+  });
+</script>
 </body>
 </html>

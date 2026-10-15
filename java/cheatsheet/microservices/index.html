@@ -8,6 +8,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var mode = localStorage.getItem('themeMode') || 'auto';
+    var resolved = mode === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+      : mode;
+    document.documentElement.setAttribute('data-theme', resolved);
+  })();
+</script>
 </head>
 <body>
 <div class="page">
@@ -19,7 +28,10 @@
         <span class="prompt">$</span>
         <span class="title">Microservices — Interview Revision Master</span>
       </div>
-      <div class="toc"><b>5–7 YOE Java / Spring Boot Engineer</b> — Fundamentals · Communication · Discovery/Gateway · Resilience · Distributed Tx/SAGA · Kafka/RabbitMQ · Observability</div>
+      <div class="header-right">
+        <div class="toc"><b>5–7 YOE Java / Spring Boot Engineer</b> — Fundamentals · Communication · Discovery/Gateway · Resilience · Distributed Tx/SAGA · Kafka/RabbitMQ · Observability</div>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Theme: Auto — click to change" title="Auto (follows system)">◐</button>
+      </div>
     </div>
     <div class="subtitle">// Read top-to-bottom once before every interview — definitions, flows, diffs, lifecycles &amp; real scenarios in one page</div>
   </div>
@@ -1017,5 +1029,30 @@ EVENT-101 | ORDER-1001 | ORDER_CREATED | {...} | ts | PENDING</div>
   <footer>Microservices Interview Revision Master — built from your uploaded cheat sheets · read once before every interview</footer>
 
 </div>
+<script>
+  // Dark/Light/Auto mode toggle — cycles Auto → Light → Dark
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcons = { auto: '◐', light: '☀', dark: '☾' };
+  const themeLabels = { auto: 'Auto (follows system)', light: 'Light', dark: 'Dark' };
+  const systemQuery = window.matchMedia('(prefers-color-scheme: light)');
+  const getMode = () => localStorage.getItem('themeMode') || 'auto';
+  const resolveTheme = (mode) => mode === 'auto' ? (systemQuery.matches ? 'light' : 'dark') : mode;
+  const applyTheme = (mode) => {
+    document.documentElement.setAttribute('data-theme', resolveTheme(mode));
+    themeToggle.textContent = themeIcons[mode];
+    themeToggle.title = themeLabels[mode];
+    themeToggle.setAttribute('aria-label', `Theme: ${themeLabels[mode]} — click to change`);
+  };
+  applyTheme(getMode());
+  themeToggle.addEventListener('click', () => {
+    const order = ['auto', 'light', 'dark'];
+    const next = order[(order.indexOf(getMode()) + 1) % order.length];
+    localStorage.setItem('themeMode', next);
+    applyTheme(next);
+  });
+  systemQuery.addEventListener('change', () => {
+    if (getMode() === 'auto') applyTheme('auto');
+  });
+</script>
 </body>
 </html>

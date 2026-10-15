@@ -6,6 +6,15 @@
 <title>Microservices — Priority Interview Q&amp;A</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var mode = localStorage.getItem('themeMode') || 'auto';
+    var resolved = mode === 'auto'
+      ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+      : mode;
+    document.documentElement.setAttribute('data-theme', resolved);
+  })();
+</script>
 </head>
 <body>
 <div class="page">
@@ -16,6 +25,7 @@
         <span class="prompt">$</span>
         <span class="title">Microservices — Priority Interview Q&amp;A</span>
       </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Theme: Auto — click to change" title="Auto (follows system)">◐</button>
     </div>
     <div class="subtitle">// Every question below has actually been asked in a real interview (Priority Count column) — sourced from personal interview history &amp; LinkedIn-shared questions. Revise this file end-to-end and you've covered every microservices question that has come up so far.</div>
     <div class="exam-strip">🎯 <b>Target:</b> TCS — Java / Spring Boot Developer Interview, <b>20 Aug 2026</b> &nbsp;|&nbsp; <b>Experience band:</b> 3–8 YoE &nbsp;|&nbsp; Depth calibrated for mid-to-senior microservices discussions: service discovery, API gateway, inter-service communication, resilience patterns, distributed transactions, Kafka, Kubernetes &amp; cloud.</div>
@@ -447,5 +457,30 @@
   <footer>Generated from All_Study_and_Interview_Questions_Answers_List_0-10YoE.xlsx (Microservices sheet) — 74 priority-flagged questions across 11 sections.</footer>
 
 </div>
+<script>
+  // Dark/Light/Auto mode toggle — cycles Auto → Light → Dark
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcons = { auto: '◐', light: '☀', dark: '☾' };
+  const themeLabels = { auto: 'Auto (follows system)', light: 'Light', dark: 'Dark' };
+  const systemQuery = window.matchMedia('(prefers-color-scheme: light)');
+  const getMode = () => localStorage.getItem('themeMode') || 'auto';
+  const resolveTheme = (mode) => mode === 'auto' ? (systemQuery.matches ? 'light' : 'dark') : mode;
+  const applyTheme = (mode) => {
+    document.documentElement.setAttribute('data-theme', resolveTheme(mode));
+    themeToggle.textContent = themeIcons[mode];
+    themeToggle.title = themeLabels[mode];
+    themeToggle.setAttribute('aria-label', `Theme: ${themeLabels[mode]} — click to change`);
+  };
+  applyTheme(getMode());
+  themeToggle.addEventListener('click', () => {
+    const order = ['auto', 'light', 'dark'];
+    const next = order[(order.indexOf(getMode()) + 1) % order.length];
+    localStorage.setItem('themeMode', next);
+    applyTheme(next);
+  });
+  systemQuery.addEventListener('change', () => {
+    if (getMode() === 'auto') applyTheme('auto');
+  });
+</script>
 </body>
 </html>

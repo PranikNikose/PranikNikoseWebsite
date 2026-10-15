@@ -11,9 +11,11 @@
 	<link rel="stylesheet" href="css/main.css">
     <script>
       (function () {
-        var stored = localStorage.getItem('theme');
-        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-        document.documentElement.setAttribute('data-theme', theme);
+        var mode = localStorage.getItem('themeMode') || 'auto';
+        var resolved = mode === 'auto'
+          ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+          : mode;
+        document.documentElement.setAttribute('data-theme', resolved);
       })();
     </script>
    </head>
@@ -42,7 +44,7 @@
           <a href="#contact">Contact</a>
         </li>
       </ul>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">🌙</button>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Theme: Auto — click to change" title="Auto (follows system)">◐</button>
     </nav>
     <!-- HERO -->
     <section id="hero">
@@ -688,17 +690,28 @@
       }
       // Footer year — auto-updates
       document.getElementById('footer-year').textContent = new Date().getFullYear();
-      // Dark/Light mode toggle
+      // Dark/Light/Auto mode toggle — cycles Auto → Light → Dark
       const themeToggle = document.getElementById('theme-toggle');
-      const syncThemeIcon = () => {
-        themeToggle.textContent = document.documentElement.getAttribute('data-theme') === 'light' ? '☀️' : '🌙';
+      const themeIcons = { auto: '◐', light: '☀', dark: '☾' };
+      const themeLabels = { auto: 'Auto (follows system)', light: 'Light', dark: 'Dark' };
+      const systemQuery = window.matchMedia('(prefers-color-scheme: light)');
+      const getMode = () => localStorage.getItem('themeMode') || 'auto';
+      const resolveTheme = (mode) => mode === 'auto' ? (systemQuery.matches ? 'light' : 'dark') : mode;
+      const applyTheme = (mode) => {
+        document.documentElement.setAttribute('data-theme', resolveTheme(mode));
+        themeToggle.textContent = themeIcons[mode];
+        themeToggle.title = themeLabels[mode];
+        themeToggle.setAttribute('aria-label', `Theme: ${themeLabels[mode]} — click to change`);
       };
-      syncThemeIcon();
+      applyTheme(getMode());
       themeToggle.addEventListener('click', () => {
-        const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        syncThemeIcon();
+        const order = ['auto', 'light', 'dark'];
+        const next = order[(order.indexOf(getMode()) + 1) % order.length];
+        localStorage.setItem('themeMode', next);
+        applyTheme(next);
+      });
+      systemQuery.addEventListener('change', () => {
+        if (getMode() === 'auto') applyTheme('auto');
       });
       // Scroll to top button
       const scrollBtn = document.getElementById('scroll-top');

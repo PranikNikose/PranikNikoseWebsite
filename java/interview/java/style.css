@@ -3,7 +3,27 @@
     --bg:#0A0F1E; --surface:rgba(26,32,53,0.82); --surface2:rgba(32,38,61,0.85); --border:rgba(99,102,241,0.18); --dim:#5B6478; --muted:#94A3B8; --text:#C9D1D9; --text-bright:#F0EDE6;
     --blue:#58A6FF; --blue-dim:#1F3A5F; --green:#3FB950; --green-dim:#1A3A1A; --amber:#E3B341; --amber-dim:#3D2E0A;
     --purple:#BC8CFF; --purple-dim:#2A1A4A; --cyan:#39D4C4; --cyan-dim:#0D2E2B; --red:#F85149; --red-dim:#3A0D0D; --pink:#F778BA;
-    --accent:#6366F1; --accent2:#14B8A6;
+    --accent:#6366F1; --accent2:#14B8A6; --code-bg:#0B0F14; --shadow:rgba(0,0,0,0.3);
+    color-scheme: dark;
+  }
+  :root[data-theme="light"]{
+    --bg:#E8EBF3; --surface:#FFFFFF; --surface2:#F3F5FA; --border:rgba(67,56,202,0.3); --dim:#6B7280; --muted:#475569; --text:#1E2433; --text-bright:#0B0F1E;
+    --blue:#1D5FBF; --blue-dim:rgba(29,95,191,0.12); --green:#1B7A33; --green-dim:rgba(27,122,51,0.12); --amber:#8A6A0A; --amber-dim:rgba(138,106,10,0.12);
+    --purple:#6B3FD4; --purple-dim:rgba(107,63,212,0.12); --cyan:#0E8C80; --cyan-dim:rgba(14,140,128,0.12); --red:#C22A22; --red-dim:rgba(194,42,34,0.12); --pink:#B23E7E;
+    --accent:#4338CA; --accent2:#0B8A7E; --code-bg:#EEF1F7; --shadow:rgba(30,41,59,0.14);
+    color-scheme: light;
+  }
+  :root[data-theme="light"] .theme-toggle,
+  :root[data-theme="light"] .examinfo,
+  :root[data-theme="light"] .legend-bar,
+  :root[data-theme="light"] .toc,
+  :root[data-theme="light"] .ref-panel,
+  :root[data-theme="light"] .mini-card,
+  :root[data-theme="light"] .flow,
+  :root[data-theme="light"] .note,
+  :root[data-theme="light"] .qa-card,
+  :root[data-theme="light"] .revision-panel {
+    box-shadow: 0 2px 16px var(--shadow);
   }
   html{scroll-behavior:smooth;}
   html,body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono','Courier New',monospace;font-size:13.5px;line-height:1.6;}
@@ -16,7 +36,11 @@
   .page{max-width:1180px;margin:0 auto;padding:22px 20px 80px;}
   a{color:var(--blue);}
   a:hover{color:var(--accent2);}
-  code{background:#0B0F14;color:var(--amber);padding:1px 5px;border-radius:3px;font-size:0.93em;border:1px solid var(--border);}
+  code{background:var(--code-bg);color:var(--amber);padding:1px 5px;border-radius:3px;font-size:0.93em;border:1px solid var(--border);}
+
+  /* THEME TOGGLE */
+  .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:1.05rem;line-height:1;margin-left:auto;transition:border-color .2s,transform .2s,background .2s;}
+  .theme-toggle:hover{border-color:var(--accent);transform:translateY(-2px);}
   b{color:var(--text-bright);}
   ::selection{background:rgba(99,102,241,0.35);color:var(--text-bright);}
   ::-webkit-scrollbar{width:10px;height:10px;}
@@ -93,7 +117,7 @@
   .note b{color:var(--amber);}
 
   /* CODE BLOCKS */
-  pre.code{background:#0A0E13;border:1px solid var(--border);border-radius:8px;padding:12px 14px;overflow-x:auto;font-size:12px;line-height:1.6;margin:8px 0 14px;}
+  pre.code{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;overflow-x:auto;font-size:12px;line-height:1.6;margin:8px 0 14px;color:var(--text);}
   pre.code .kw{color:var(--purple);} pre.code .cl{color:var(--amber);} pre.code .st{color:var(--green);}
   pre.code .cm{color:var(--muted);font-style:italic;} pre.code .mt{color:var(--blue);} pre.code .nb{color:var(--cyan);}
 
@@ -106,7 +130,7 @@
   .qa-q{font-weight:700;color:var(--text-bright);font-size:13.5px;line-height:1.5;}
   .qa-badges{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
   .badge{font-size:9.5px;font-weight:700;padding:2.5px 8px;border-radius:20px;white-space:nowrap;letter-spacing:0.02em;}
-  .badge-li{background:#0d2a43;color:#58a6ff;border:1px solid #1f5a8f;}
+  .badge-li{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue);}
   .badge-count{background:var(--green-dim);color:var(--green);border:1px solid #245c2c;}
   .badge-asked{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
   .qa-a{color:var(--text);font-size:12.8px;line-height:1.7;white-space:pre-line;}

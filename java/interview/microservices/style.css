@@ -26,7 +26,51 @@
     --li-blue:    #0A66C2;
     --accent:     #6366F1;
     --accent2:    #14B8A6;
+    --shadow:     rgba(0,0,0,0.3);
+    color-scheme: dark;
   }
+
+  :root[data-theme="light"] {
+    --bg:         #E8EBF3;
+    --surface:    #FFFFFF;
+    --border:     rgba(67,56,202,0.3);
+    --dim:        #6B7280;
+    --muted:      #475569;
+    --text:       #1E2433;
+    --text-bright:#0B0F1E;
+
+    --blue:       #1D5FBF;
+    --blue-dim:   rgba(29,95,191,0.12);
+    --green:      #1B7A33;
+    --green-dim:  rgba(27,122,51,0.12);
+    --amber:      #8A6A0A;
+    --amber-dim:  rgba(138,106,10,0.12);
+    --purple:     #6B3FD4;
+    --purple-dim: rgba(107,63,212,0.12);
+    --cyan:       #0E8C80;
+    --cyan-dim:   rgba(14,140,128,0.12);
+    --red:        #C22A22;
+    --red-dim:    rgba(194,42,34,0.12);
+    --li-blue:    #0A66C2;
+    --accent:     #4338CA;
+    --accent2:    #0B8A7E;
+    --shadow:     rgba(30,41,59,0.14);
+    color-scheme: light;
+  }
+
+  :root[data-theme="light"] .theme-toggle,
+  :root[data-theme="light"] .exam-strip,
+  :root[data-theme="light"] .navbar,
+  :root[data-theme="light"] .stat-card,
+  :root[data-theme="light"] .legend-panel,
+  :root[data-theme="light"] .section-label,
+  :root[data-theme="light"] .qa-card {
+    box-shadow: 0 2px 16px var(--shadow);
+  }
+
+  /* THEME TOGGLE */
+  .theme-toggle { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; font-size:1.05rem; line-height:1; transition:border-color .2s, transform .2s, background .2s; }
+  .theme-toggle:hover { border-color: var(--accent); transform: translateY(-2px); }
 
   html { scroll-behavior: smooth; }
 
@@ -108,6 +152,7 @@
   .qa-num { margin-left: auto; font-size: 10.3px; color: var(--dim); font-weight: 600; }
   .badge { font-size: 9.5px; font-weight: 700; padding: 2.5px 8px; border-radius: 20px; letter-spacing: .02em; white-space: nowrap; }
   .badge-li { background: rgba(10,102,194,0.18); color: #4DA3FF; border: 1px solid rgba(10,102,194,0.5); }
+  :root[data-theme="light"] .badge-li { background: rgba(10,102,194,0.12); color: #0A66C2; border: 1px solid rgba(10,102,194,0.4); }
   .badge-pc { background: var(--green-dim); color: var(--green); border: 1px solid rgba(63,185,80,0.4); }
   .badge-lvl { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
 
