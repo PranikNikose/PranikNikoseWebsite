@@ -1310,17 +1310,39 @@ awareness, not performance tracking. Don't add points, correctness
 tracking, or pass/fail results unless asked. (History, above, doesn't
 violate this either — it logs that/when/what, never right-vs-wrong.)
 
-## 8. Dark / light theme
+## 8. Theme: Auto / Light / Dark
 
-- Theme toggle button (🌙 / ☀️) in the header.
-- Preference persists via `localStorage.setItem('theme', ...)`.
-- On load: saved preference if present, else `prefers-color-scheme`.
-  Applied via a small **synchronous inline `<script>` in `<head>`**,
-  before the stylesheet paints, to avoid a light/dark flash. Don't move
-  this to the bottom of `<body>`.
+- **Three modes, one button** (`#themeToggle`), cycled on click in order
+  Auto (◐) → Light (☀️) → Dark (🌙) → Auto: ◐ Auto follows the OS
+  light/dark setting (live, not just on load); ☀ Light always uses light
+  mode; ☾ Dark always uses dark mode — regardless of what the OS is set
+  to. This replaced an earlier plain two-way Light/Dark toggle at the
+  user's request for a real Auto option.
+- `localStorage['theme']` stores the **mode** (`'auto'`/`'light'`/
+  `'dark'`), not the resolved scheme — `currentThemeMode()` reads it
+  (defaulting to `'auto'` if absent/invalid), `resolvedSchemeForMode()`
+  resolves `'auto'` against `prefers-color-scheme` at the moment it's
+  asked, and the `data-theme="light"|"dark"` DOM attribute (what the CSS
+  actually keys off) always holds the *resolved* scheme, never `'auto'`
+  itself.
+- **Auto keeps tracking the OS preference live for as long as the tab is
+  open** — a `matchMedia('(prefers-color-scheme: light)')` `'change'`
+  listener calls `applyResolvedTheme()` whenever it fires, but only
+  while `currentThemeMode() === 'auto'`; an explicit Light/Dark pin must
+  never move on its own just because the OS setting changed. This is
+  the actual behavior gap that prompted the 3-mode redesign — the old
+  single toggle only snapshotted `prefers-color-scheme` once on first
+  visit, never again.
+- On load: resolved **before the stylesheet paints**, via the same
+  small **synchronous inline `<script>` in `<head>`** as before (reads
+  the saved mode, resolves it, sets `data-theme` immediately) — don't
+  move this to the bottom of `<body>`, it exists specifically to avoid a
+  flash of the wrong theme.
 - All colors are CSS custom properties on `:root` and
-  `:root[data-theme="light"]`. Never hardcode a color in component CSS —
-  add/reuse a variable so both themes stay in sync.
+  `:root[data-theme="light"]` — unchanged by this redesign, since `Auto`
+  still ultimately resolves to one of those two same DOM states, there's
+  no third CSS palette to maintain. Never hardcode a color in component
+  CSS — add/reuse a variable so both themes stay in sync.
 - Toggling must work standalone (flips the DOM attribute + icon) even if
   `localStorage` throws — wrapped in `try/catch`, never blocks the toggle.
 - **Dark palette was tried as a richer, purple-tinted "modern SaaS" look,

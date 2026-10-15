@@ -10,11 +10,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
   // Applied before first paint to avoid a light/dark flash on load.
+  // 'theme' in localStorage holds the MODE ('auto'/'light'/'dark'), not
+  // the resolved scheme -- 'auto' resolves against the OS preference
+  // every time (here, and live via a matchMedia listener once the main
+  // script runs), rather than only snapshotting it once on first visit.
   (function(){
     try{
-      var saved = localStorage.getItem('theme');
-      var theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-      document.documentElement.setAttribute('data-theme', theme);
+      var mode = localStorage.getItem('theme') || 'auto';
+      var resolved = mode === 'auto'
+        ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+        : mode;
+      document.documentElement.setAttribute('data-theme', resolved);
     }catch(e){
       document.documentElement.setAttribute('data-theme', 'dark');
     }
@@ -771,7 +777,7 @@
         <button id="interviewOpenBtn" class="mode-btn" type="button" role="tab" aria-selected="false">🎯 <span class="label-full">Interview Mode</span><span class="label-short">Interview</span></button>
       </div>
       <button id="historyOpenBtn" type="button" class="header-icon-btn" aria-label="Interview session history" title="Interview session history">🕘 <span class="label-full">History</span></button>
-      <button id="themeToggle" type="button" aria-label="Toggle dark / light mode" title="Toggle dark / light mode"><span class="theme-icon" id="themeIcon">🌙</span><span class="label-full" id="themeLabelFull">Dark Mode</span><span class="label-short" id="themeLabelShort">Dark</span></button>
+      <button id="themeToggle" type="button" aria-label="Theme mode (click to cycle Auto / Light / Dark)" title="◐ Auto follows your system light/dark setting.&#10;☀ Light always uses light mode.&#10;☾ Dark always uses dark mode.&#10;(Click to cycle)"><span class="theme-icon" id="themeIcon">🌙</span><span class="label-full" id="themeLabelFull">Dark Mode</span><span class="label-short" id="themeLabelShort">Dark</span></button>
     </div>
   </header>
 
@@ -1226,24 +1232,51 @@
     historyEmpty: document.getElementById('historyEmpty')
   };
 
-  // ---------- dark / light theme ----------
+  // ---------- theme: Auto / Light / Dark ----------
+  // 'Auto' isn't just "whatever the OS said on page load" -- it keeps
+  // tracking the OS preference live for as long as the tab stays open
+  // (via the matchMedia listener below), same as a native app's "Auto"
+  // theme setting would. 'Light'/'Dark' pin the scheme regardless of OS.
 
-  function currentTheme(){
-    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  function currentThemeMode(){
+    try{
+      var mode = localStorage.getItem('theme');
+      return (mode === 'light' || mode === 'dark') ? mode : 'auto';
+    }catch(e){ return 'auto'; }
   }
 
-  function applyThemeIcon(){
-    var isLight = currentTheme() === 'light';
-    els.themeIcon.textContent = isLight ? '☀️' : '🌙';
-    els.themeLabelFull.textContent = isLight ? 'Light Mode' : 'Dark Mode';
-    els.themeLabelShort.textContent = isLight ? 'Light' : 'Dark';
+  function resolvedSchemeForMode(mode){
+    if(mode === 'light' || mode === 'dark') return mode;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
   }
 
-  function toggleTheme(){
-    var next = currentTheme() === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', next);
-    try{ localStorage.setItem('theme', next); }catch(e){}
-    applyThemeIcon();
+  // Re-applies the resolved scheme for whatever mode is currently active
+  // (without changing the mode itself) -- used both after an explicit
+  // mode change and by the live OS-preference listener while in Auto.
+  function applyResolvedTheme(){
+    var mode = currentThemeMode();
+    document.documentElement.setAttribute('data-theme', resolvedSchemeForMode(mode));
+    applyThemeIcon(mode);
+  }
+
+  function applyThemeIcon(mode){
+    var icon = mode === 'auto' ? '◐' : (mode === 'light' ? '☀️' : '🌙');
+    var labelFull = mode === 'auto' ? 'Auto Theme' : (mode === 'light' ? 'Light Mode' : 'Dark Mode');
+    var labelShort = mode === 'auto' ? 'Auto' : (mode === 'light' ? 'Light' : 'Dark');
+    els.themeIcon.textContent = icon;
+    els.themeLabelFull.textContent = labelFull;
+    els.themeLabelShort.textContent = labelShort;
+  }
+
+  function setThemeMode(mode){
+    try{ localStorage.setItem('theme', mode); }catch(e){}
+    applyResolvedTheme();
+  }
+
+  function cycleTheme(){
+    var order = ['auto', 'light', 'dark'];
+    var next = order[(order.indexOf(currentThemeMode()) + 1) % order.length];
+    setThemeMode(next);
   }
 
   function escapeHtml(str){
@@ -3303,8 +3336,16 @@
     applyFilters();
   }
 
-  applyThemeIcon();
-  els.themeToggle.addEventListener('click', toggleTheme);
+  applyThemeIcon(currentThemeMode());
+  els.themeToggle.addEventListener('click', cycleTheme);
+  // Live-follow the OS preference for as long as the tab is open, but
+  // only while in Auto -- an explicit Light/Dark pin should never move
+  // on its own just because the OS setting changed.
+  if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(){
+      if(currentThemeMode() === 'auto') applyResolvedTheme();
+    });
+  }
 
   els.search.addEventListener('input', applyFilters);
   els.clearFiltersBtn.addEventListener('click', clearAllFilters);
