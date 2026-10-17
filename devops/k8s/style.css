@@ -1,12 +1,12 @@
 :root{
-  --bg:#0A0F1E;
-  --bg-alt:#111827;
-  --panel:#111827;
-  --card:rgba(26,32,53,0.78);
+  --bg:#171717;
+  --bg-alt:#1e1e1e;
+  --panel:#1e1e1e;
+  --card:rgba(42,42,42,0.78);
   --card-border:rgba(99,102,241,0.32);
   --card-border-soft:rgba(99,102,241,0.18);
   --text:#F0EDE6;
-  --text-dim:#94A3B8;
+  --text-dim:#9b9b9b;
   --text-faint:#6B7A99;
   --accent:#6366F1;
   --accent-bright:#8b8ef5;
@@ -17,7 +17,7 @@
   --amber-soft:rgba(245,169,78,0.12);
   --red:#f3654f;
   --red-soft:rgba(243,101,79,0.12);
-  --mono-bg:rgba(10,15,30,0.7);
+  --mono-bg:rgba(20,20,20,0.7);
   --radius:12px;
 }
 
@@ -74,7 +74,7 @@ code,.mono,.flow,.cmd,.badge,.qtag{font-family:'JetBrains Mono',monospace;}
 /* ---------- Sidebar ---------- */
 .sidebar{
   position:sticky;top:0;height:100vh;overflow-y:auto;
-  background:rgba(17,24,39,0.85);
+  background:rgba(26,26,26,0.85);
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
   border-right:1px solid var(--card-border-soft);

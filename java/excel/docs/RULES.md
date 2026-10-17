@@ -1318,13 +1318,20 @@ violate this either — it logs that/when/what, never right-vs-wrong.)
   mode; ☾ Dark always uses dark mode — regardless of what the OS is set
   to. This replaced an earlier plain two-way Light/Dark toggle at the
   user's request for a real Auto option.
-- `localStorage['theme']` stores the **mode** (`'auto'`/`'light'`/
+- `localStorage['themeMode']` stores the **mode** (`'auto'`/`'light'`/
   `'dark'`), not the resolved scheme — `currentThemeMode()` reads it
   (defaulting to `'auto'` if absent/invalid), `resolvedSchemeForMode()`
   resolves `'auto'` against `prefers-color-scheme` at the moment it's
   asked, and the `data-theme="light"|"dark"` DOM attribute (what the CSS
   actually keys off) always holds the *resolved* scheme, never `'auto'`
-  itself.
+  itself. **Deliberately a NEW key, not a reuse of the old binary
+  toggle's `localStorage['theme']`** — that old key's values (`'light'`/
+  `'dark'`) would otherwise get silently reinterpreted as an explicit
+  pin under the new 3-mode semantics, so anyone who'd used the app
+  before this redesign would never actually land on Auto (the user hit
+  this directly: their browser still had the old key, so the new toggle
+  looked like it defaulted to Dark instead of Auto). The old key is
+  simply never read anymore — not migrated, not deleted, just ignored.
 - **Auto keeps tracking the OS preference live for as long as the tab is
   open** — a `matchMedia('(prefers-color-scheme: light)')` `'change'`
   listener calls `applyResolvedTheme()` whenever it fires, but only
@@ -1352,10 +1359,25 @@ violate this either — it logs that/when/what, never right-vs-wrong.)
   surfaces, brighter accent, purple-tinted border/shadow glow, plus a
   `.chip:hover` background-tint change that applied in both themes), and
   then the user said **"dark mode i dont like it"** — reverted all of it
-  back to the original values below in the same conversation. Don't
-  re-attempt a dark-mode palette overhaul from scratch without asking
-  first; if dark mode comes up again, ask what specifically feels dated
-  rather than proposing a full repaint.
+  back to the original values at that point in the same conversation.
+- **Dark background/surface/code-block tokens were later changed again,
+  this time to neutral gray** (`--bg-grad-1`/`--bg-grad-2`/`--surface`/
+  `--surface-2`/`--surface-3`/`--text`/`--muted`/`--code-bg`/`--code-fg`)
+  — the user specifically said the dark mode's navy-**blue** tint ("i
+  dont like blue colour of it") was the problem, pointing at a ChatGPT
+  dark-mode screenshot as the target look (flat neutral gray/near-black,
+  `#171717`→`#212121` background, `#2a2a2a`+ surfaces, `#ececec` text, no
+  hue). This is a targeted color-only fix, not the kind of full
+  "modern SaaS" repaint rejected above — don't read this entry as
+  license to redo the rest of the palette (`--accent`/`--accent-2`/
+  `--accent-soft`, the `--tag-*` colors, or the syntax-highlight
+  `--code-kw`/`--code-str`/etc. colors) without being asked; those are
+  untouched on purpose, confirmed against a real screenshot that the
+  purple accent/colored tags still read fine against the new neutral
+  background. **Don't re-attempt a dark-mode palette overhaul from
+  scratch without asking first** — if dark mode comes up again, ask what
+  specifically feels off (as happened here) rather than proposing a full
+  repaint.
 
 ## 9. Visual style: "Clean & minimal"
 

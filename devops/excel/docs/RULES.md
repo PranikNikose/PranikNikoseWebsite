@@ -1310,14 +1310,36 @@ awareness, not performance tracking. Don't add points, correctness
 tracking, or pass/fail results unless asked. (History, above, doesn't
 violate this either — it logs that/when/what, never right-vs-wrong.)
 
-## 8. Dark / light theme
+## 8. Theme: Auto / Light / Dark
 
-- Theme toggle button (🌙 / ☀️) in the header.
-- Preference persists via `localStorage.setItem('theme', ...)`.
-- On load: saved preference if present, else `prefers-color-scheme`.
-  Applied via a small **synchronous inline `<script>` in `<head>`**,
-  before the stylesheet paints, to avoid a light/dark flash. Don't move
-  this to the bottom of `<body>`.
+- **Three modes, one button** (`#themeToggle`), cycled on click in order
+  Auto (◐) → Light (☀️) → Dark (🌙) → Auto: ◐ Auto follows the OS
+  light/dark setting (live, not just on load); ☀ Light always uses light
+  mode; ☾ Dark always uses dark mode — regardless of what the OS is set
+  to. This replaced an earlier plain two-way Light/Dark toggle, applied
+  here to match the same fix made across every other page on the site
+  (`java/excel` first, then propagated everywhere — see that project's
+  RULES.md §8 for the original write-up).
+- `localStorage['themeMode']` stores the **mode** (`'auto'`/`'light'`/
+  `'dark'`), not the resolved scheme — a NEW key, not a reuse of the old
+  binary toggle's `localStorage['theme']` (that old key's values would
+  otherwise get silently reinterpreted as an explicit pin under the new
+  3-mode semantics, so anyone who'd used the app before this change
+  would never actually land on Auto). `currentThemeMode()` reads it
+  (defaulting to `'auto'` if absent/invalid), `resolvedSchemeForMode()`
+  resolves `'auto'` against `prefers-color-scheme` at the moment it's
+  asked, and the `data-theme="light"|"dark"` DOM attribute (what the CSS
+  actually keys off) always holds the *resolved* scheme, never `'auto'`
+  itself.
+- **Auto keeps tracking the OS preference live for as long as the tab is
+  open** — a `matchMedia('(prefers-color-scheme: light)')` `'change'`
+  listener calls `applyResolvedTheme()` whenever it fires, but only
+  while `currentThemeMode() === 'auto'`; an explicit Light/Dark pin must
+  never move on its own just because the OS setting changed.
+- On load: resolved **before the stylesheet paints**, via the same
+  small **synchronous inline `<script>` in `<head>`** as before — don't
+  move this to the bottom of `<body>`, it exists specifically to avoid a
+  flash of the wrong theme.
 - All colors are CSS custom properties on `:root` and
   `:root[data-theme="light"]`. Never hardcode a color in component CSS —
   add/reuse a variable so both themes stay in sync.
@@ -1330,10 +1352,20 @@ violate this either — it logs that/when/what, never right-vs-wrong.)
   surfaces, brighter accent, purple-tinted border/shadow glow, plus a
   `.chip:hover` background-tint change that applied in both themes), and
   then the user said **"dark mode i dont like it"** — reverted all of it
-  back to the original values below in the same conversation. Don't
-  re-attempt a dark-mode palette overhaul from scratch without asking
-  first; if dark mode comes up again, ask what specifically feels dated
-  rather than proposing a full repaint.
+  back to the original values at that point in the same conversation.
+- **Dark background/surface/code-block tokens were later changed again,
+  this time to neutral gray** (`--bg-grad-1`/`--bg-grad-2`/`--surface`/
+  `--surface-2`/`--surface-3`/`--text`/`--muted`/`--code-bg`/`--code-fg`)
+  — the user said the dark mode's navy-**blue** tint was the problem,
+  pointing at a ChatGPT dark-mode screenshot as the target look (flat
+  neutral gray/near-black, `#171717`→`#212121` background, `#2a2a2a`+
+  surfaces, `#ececec` text, no hue). Applied here for consistency with
+  the same fix across every page on the site. Targeted color-only fix —
+  `--accent`/`--accent-2`/`--accent-soft`, the `--tag-*` colors, and the
+  syntax-highlight `--code-kw`/`--code-str`/etc. colors are untouched on
+  purpose. **Don't re-attempt a dark-mode palette overhaul from scratch
+  without asking first** — if dark mode comes up again, ask what
+  specifically feels off rather than proposing a full repaint.
 
 ## 9. Visual style: "Clean & minimal"
 

@@ -1,13 +1,13 @@
 :root {
-    --bg: #0A0F1E;
-    --bg2: #111827;
-    --bg3: #1a2035;
+    --bg: #171717;
+    --bg2: #1e1e1e;
+    --bg3: #262626;
     --text: #F0EDE6;
-    --muted: #94A3B8;
+    --muted: #9b9b9b;
     --accent: #6366F1;
     --accent2: #14B8A6;
     --border: rgba(99, 102, 241, 0.18);
-    --card: rgba(26, 32, 53, 0.8);
+    --card: rgba(42, 42, 42, 0.8);
 }
 
 :root[data-theme="light"] {

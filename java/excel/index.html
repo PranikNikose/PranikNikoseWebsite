@@ -16,7 +16,7 @@
   // script runs), rather than only snapshotting it once on first visit.
   (function(){
     try{
-      var mode = localStorage.getItem('theme') || 'auto';
+      var mode = localStorage.getItem('themeMode') || 'auto';
       var resolved = mode === 'auto'
         ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
         : mode;
@@ -28,13 +28,13 @@
 </script>
 <style>
   :root{
-    --bg-grad-1:#0b1120;
-    --bg-grad-2:#0f172a;
-    --surface:#161f36;
-    --surface-2:#1c2740;
-    --surface-3:#24304d;
-    --text:#e7ecf7;
-    --muted:#8b96ad;
+    --bg-grad-1:#171717;
+    --bg-grad-2:#212121;
+    --surface:#2a2a2a;
+    --surface-2:#303030;
+    --surface-3:#3a3a3a;
+    --text:#ececec;
+    --muted:#9b9b9b;
     --accent:#7c6ef2;
     --accent-2:#9b8ffb;
     --accent-soft:rgba(124,110,242,.16);
@@ -47,8 +47,8 @@
     --tag-pri-bg:rgba(251,191,36,.14); --tag-pri-fg:#fcd34d;
     --tag-sheet-bg:rgba(59,130,246,.16); --tag-sheet-fg:#93c5fd;
     --tag-company-bg:rgba(236,72,153,.16); --tag-company-fg:#f9a8d4;
-    --code-bg:#0d1424;
-    --code-fg:#cbd5e1;
+    --code-bg:#1a1a1a;
+    --code-fg:#d4d4d4;
     --code-kw:#c792ea;
     --code-str:#a5e075;
     --code-num:#f78c6c;
@@ -1240,7 +1240,7 @@
 
   function currentThemeMode(){
     try{
-      var mode = localStorage.getItem('theme');
+      var mode = localStorage.getItem('themeMode');
       return (mode === 'light' || mode === 'dark') ? mode : 'auto';
     }catch(e){ return 'auto'; }
   }
@@ -1269,7 +1269,7 @@
   }
 
   function setThemeMode(mode){
-    try{ localStorage.setItem('theme', mode); }catch(e){}
+    try{ localStorage.setItem('themeMode', mode); }catch(e){}
     applyResolvedTheme();
   }
 

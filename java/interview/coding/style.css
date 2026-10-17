@@ -1,14 +1,14 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:         #0A0F1E;
+    --bg:         #171717;
     --bg-code:    #090C10;
-    --surface:    rgba(26,32,53,0.82);
-    --surface-2:  rgba(32,38,61,0.85);
+    --surface:    rgba(42,42,42,0.82);
+    --surface-2:  rgba(48,48,48,0.85);
     --border:     rgba(99,102,241,0.18);
-    --dim:        #5B6478;
-    --muted:      #94A3B8;
-    --text:       #C9D1D9;
+    --dim:        #737373;
+    --muted:      #9b9b9b;
+    --text:       #d4d4d4;
     --text-bright:#F0EDE6;
 
     --blue:       #58A6FF;

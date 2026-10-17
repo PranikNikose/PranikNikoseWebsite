@@ -1,12 +1,12 @@
 :root{
-  --bg:#0A0F1E; --panel:rgba(26,32,53,.62); --panel2:rgba(17,24,39,.62); --border:rgba(99,102,241,.20); --border-soft:rgba(99,102,241,.12);
-  --text:#F0EDE6; --dim:#94A3B8; --dim2:#B7C0CE;
+  --bg:#171717; --panel:rgba(42,42,42,.62); --panel2:rgba(26,26,26,.62); --border:rgba(99,102,241,.20); --border-soft:rgba(99,102,241,.12);
+  --text:#F0EDE6; --dim:#9b9b9b; --dim2:#B7C0CE;
   --cy:#14B8A6; --bl:#6366F1; --gr:#22C55E; --am:#F5A524; --pu:#A78BFA; --re:#F87171; --or:#FB923C;
 }
 
 :root[data-theme="light"]{
   --bg:#E8EBF3; --panel:#FFFFFF; --panel2:#EEF1F8; --border:rgba(67,56,202,.32); --border-soft:rgba(67,56,202,.16);
-  --text:#12152A; --dim:#5B6478; --dim2:#333B52;
+  --text:#12152A; --dim:#737373; --dim2:#333B52;
   --cy:#0F766E; --bl:#4338CA; --gr:#15803D; --am:#B45309; --pu:#6D28D9; --re:#B91C1C; --or:#C2410C;
   color-scheme: light;
 }

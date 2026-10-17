@@ -1,6 +1,6 @@
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   :root{
-    --bg:#0A0F1E; --surface:rgba(26,32,53,0.82); --surface2:rgba(32,38,61,0.85); --border:rgba(99,102,241,0.18); --dim:#5B6478; --muted:#94A3B8; --text:#C9D1D9; --text-bright:#F0EDE6;
+    --bg:#171717; --surface:rgba(42,42,42,0.82); --surface2:rgba(48,48,48,0.85); --border:rgba(99,102,241,0.18); --dim:#737373; --muted:#9b9b9b; --text:#d4d4d4; --text-bright:#F0EDE6;
     --blue:#58A6FF; --blue-dim:#1F3A5F; --green:#3FB950; --green-dim:#1A3A1A; --amber:#E3B341; --amber-dim:#3D2E0A;
     --purple:#BC8CFF; --purple-dim:#2A1A4A; --cyan:#39D4C4; --cyan-dim:#0D2E2B; --red:#F85149; --red-dim:#3A0D0D; --pink:#F778BA;
     --accent:#6366F1; --accent2:#14B8A6; --code-bg:#0B0F14; --shadow:rgba(0,0,0,0.3);
