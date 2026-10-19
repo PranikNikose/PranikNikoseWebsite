@@ -516,6 +516,28 @@ consistently regardless of how it was typed.
   reused for filtering. Added at explicit user request, the same
   "blank/non-blank" naming convention as Priority's `Non Blank` chip
   (above) — don't rename the two bucket labels without being asked.
+- **Row sort (A → Z / Z → A), independent of filtering** — `sortState =
+  { col, dir }` (`index.html`), set by two buttons (`.fp-sort-btn`) added
+  at the TOP of every filter popover except Answer's (its two values,
+  Blank/Non Blank, aren't real row data worth ordering by), mirroring how
+  Excel's own column-filter dropdown puts Sort A-Z/Z-A above the value
+  checklist as a separate command from the filter itself. Applied in
+  `applyFilters()` via `.sort()` on `filteredQuestions` AFTER filtering,
+  using `sortValueFor(q, col)` (plain `q[col]`, except `company` uses only
+  its first comma-separated value — sorting by the whole joined
+  "TCS, LTM" string would sort oddly against single-company rows) and
+  `localeCompare`. Clicking the already-active sort direction again turns
+  sorting off (back to plain DATA order) rather than re-applying the same
+  sort — there's no separate "off" button. `clearAllFilters()` also
+  resets `sortState` to off, so "Clear Filters" is a full reset of both.
+  A small ▲/▼ arrow renders next to whichever filter button's column is
+  currently sorted (`updateFilterButtonStates()`), so the active sort is
+  visible without reopening its popover. `sortValueFor()`/`sortState` are
+  intentionally separate from `uniqueValues()`'s per-column chip-list
+  ordering (e.g. Level's chips stay band-ordered via `levelSortIndex()`
+  regardless of row sort) — row sort is always plain alphabetical on the
+  raw field value, even for Level, matching literal "A to Z" rather than
+  the band-order semantics used elsewhere.
 
 ## 7. Interview Mode
 

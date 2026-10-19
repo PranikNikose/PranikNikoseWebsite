@@ -548,6 +548,7 @@
     font-weight:600;
     padding:1px 6px;
   }
+  .filter-btn .sort-arrow{color:var(--accent); font-size:.72rem; margin-left:2px;}
 
   /* Chip-based, same as the Interview Mode modal (§ chip-group) — no
      internal scroll. Wide enough that even Sheet (16 values) or Topic (22
@@ -580,6 +581,22 @@
   }
   .filter-popover .fp-search::placeholder{color:var(--muted);}
   .filter-popover .fp-search:focus{outline:none; border-color:var(--accent);}
+  .filter-popover .fp-sort{display:flex; gap:8px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border);}
+  .filter-popover .fp-sort-btn{
+    flex:1;
+    padding:7px 10px;
+    border-radius:8px;
+    border:1.5px solid var(--border);
+    background:var(--surface-2);
+    color:var(--text);
+    font-family:inherit;
+    font-size:.8rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .filter-popover .fp-sort-btn:hover{border-color:var(--accent-2);}
+  .filter-popover .fp-sort-btn.active{border-color:var(--accent); color:var(--accent); background:var(--accent-soft);}
   .filter-popover .chip-group{margin-bottom:10px;}
   .filter-popover .fp-actions{
     display:flex;
@@ -1107,6 +1124,11 @@
   var columnFilters = { sheet: null, category: null, level: null, priority: null, company: null, answer: null };
   var openPopoverCol = null;
 
+  // Row sort (independent of filtering, same as Excel's Sort vs. Filter
+  // being separate commands) -- { col: FILTER_COLUMNS key or null, dir:
+  // 'asc'/'desc' }. null col = no sort applied, rows stay in DATA order.
+  var sortState = { col: null, dir: 'asc' };
+
   // Interview Mode: separate session state, independent of the browse
   // filters above. sheets/priorities are Sets of allowed values (never
   // null here — always built explicitly from the checked boxes).
@@ -1443,6 +1465,20 @@
     return unique.sort();
   }
 
+  // The string a row sorts by for a given column -- 'company' uses its
+  // first comma-separated value (a full joined "TCS, LTM" string would
+  // sort oddly against single-value rows), 'priority' falls back to a
+  // string that always sorts after real values so blank rows land last
+  // in an A-Z sort (and first in Z-A, which reads as "least important
+  // last" either way -- acceptable, not worth a special-case).
+  function sortValueFor(q, col){
+    if(col === 'company'){
+      var list = companyList(q);
+      return list.length ? list[0] : '￿';
+    }
+    return q[col] || '￿';
+  }
+
   // ---------- filter toolbar (Excel-style column filters, incl. Sheet) ----------
 
   // Sheet gets its own dedicated row above Search (its own button/popover,
@@ -1540,6 +1576,33 @@
     var selected = columnFilters[colKey]; // null = wildcard ("All")
     pop.innerHTML = '';
 
+    // Sort A-Z / Z-A -- independent of the filter selection below (same
+    // as Excel's column dropdown: Sort and Filter are separate commands
+    // in the same popover). Not offered for 'answer' -- its values are
+    // the two synthetic Blank/Non Blank buckets, not real row data worth
+    // ordering by.
+    if(colKey !== 'answer'){
+      var sortRow = document.createElement('div');
+      sortRow.className = 'fp-sort';
+      ['asc', 'desc'].forEach(function(dir){
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'fp-sort-btn' + (sortState.col === colKey && sortState.dir === dir ? ' active' : '');
+        btn.textContent = dir === 'asc' ? 'A → Z' : 'Z → A';
+        btn.addEventListener('click', function(){
+          // Clicking the already-active sort direction turns sorting off
+          // entirely, rather than being stuck re-applying the same sort.
+          sortState = (sortState.col === colKey && sortState.dir === dir)
+            ? { col: null, dir: 'asc' }
+            : { col: colKey, dir: dir };
+          closeAllPopovers();
+          applyFilters();
+        });
+        sortRow.appendChild(btn);
+      });
+      pop.appendChild(sortRow);
+    }
+
     // Topic (category) alone can run to 100+ distinct values -- a search
     // box narrows the chip list live as you type, so you don't have to
     // scan/scroll a huge list to multi-select a few. Other filter groups
@@ -1603,14 +1666,16 @@
       var sel = columnFilters[col.key];
       var active = sel !== null;
       ref.btn.classList.toggle('active', active);
+      var isSorted = sortState.col === col.key;
+      var arrowSuffix = isSorted ? (sortState.dir === 'desc' ? ' ▼' : ' ▲') : '';
 
       if(col.key === 'sheet'){
         if(!active){
-          ref.btn.textContent = 'All Sheets';
+          ref.btn.textContent = 'All Sheets' + arrowSuffix;
         } else if(sel.size === 1){
-          ref.btn.textContent = Array.from(sel)[0];
+          ref.btn.textContent = Array.from(sel)[0] + arrowSuffix;
         } else {
-          ref.btn.textContent = sel.size + ' Sheets';
+          ref.btn.textContent = sel.size + ' Sheets' + arrowSuffix;
         }
         return;
       }
@@ -1625,6 +1690,18 @@
         countBadge.textContent = sel.size;
       } else if(countBadge){
         countBadge.remove();
+      }
+
+      var sortBadge = ref.btn.querySelector('.sort-arrow');
+      if(isSorted){
+        if(!sortBadge){
+          sortBadge = document.createElement('span');
+          sortBadge.className = 'sort-arrow';
+          ref.btn.appendChild(sortBadge);
+        }
+        sortBadge.textContent = sortState.dir === 'desc' ? '▼' : '▲';
+      } else if(sortBadge){
+        sortBadge.remove();
       }
     });
   }
@@ -1667,6 +1744,13 @@
 
       return matchesSearch && matchesCols;
     });
+
+    if(sortState.col){
+      var dirMul = sortState.dir === 'desc' ? -1 : 1;
+      filteredQuestions.sort(function(a, b){
+        return sortValueFor(a, sortState.col).localeCompare(sortValueFor(b, sortState.col)) * dirMul;
+      });
+    }
 
     currentIndex = 0;
     updateFilterButtonStates();
@@ -1784,6 +1868,7 @@
 
   function clearAllFilters(){
     columnFilters = { sheet: null, category: null, level: null, priority: null, company: null, answer: null };
+    sortState = { col: null, dir: 'asc' };
     els.search.value = '';
     applyFilters();
   }
