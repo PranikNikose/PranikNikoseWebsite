@@ -775,6 +775,76 @@
     .card{padding:14px; border-radius:14px;}
     .header-actions{width:100%;}
   }
+
+  /* ---------- stopwatch (floating, right edge, every mode) ---------- */
+  .stopwatch-widget{position:fixed; top:50%; right:16px; transform:translateY(-50%); z-index:60;}
+  .sw-collapsed-wrap{position:relative; display:inline-block;}
+  /* A live-updating compact badge, always visible once started -- NOT
+     gated on hover. An earlier version only showed this on :hover, but
+     touch devices have no hover at all, so that helped desktop only;
+     always-visible (while .has-time) gives mobile the same glanceable
+     time with zero interaction needed, which subsumes what hover did
+     anyway. Not the native title attribute either -- that only shows a
+     one-time snapshot from when a hover began, it doesn't keep ticking. */
+  .sw-badge-time{
+    position:absolute; left:50%; bottom:-9px; transform:translateX(-50%);
+    background:var(--accent);
+    color:#fff;
+    border-radius:999px;
+    padding:1px 6px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:.62rem; font-weight:700;
+    white-space:nowrap;
+    box-shadow:var(--shadow-sm);
+    opacity:0; visibility:hidden;
+    pointer-events:none;
+    transition:opacity .12s ease;
+  }
+  .sw-badge-time.has-time{opacity:1; visibility:visible;}
+  .sw-collapsed-btn{
+    width:48px; height:48px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    cursor:grab;
+    touch-action:none;
+    font-size:1.3rem;
+    line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--shadow);
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .sw-collapsed-btn:hover{border-color:var(--accent-2); transform:scale(1.06);}
+  .sw-collapsed-btn.running{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft), var(--shadow);}
+  .sw-panel{
+    width:180px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:14px;
+  }
+  .sw-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px;
+    font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--muted);
+    cursor:grab;
+    touch-action:none;
+  }
+  .stopwatch-widget.dragging .sw-collapsed-btn,
+  .stopwatch-widget.dragging .sw-header{cursor:grabbing;}
+  .sw-close{background:none; border:none; color:var(--muted); font-size:1.15rem; line-height:1; cursor:pointer; padding:0 2px;}
+  .sw-close:hover{color:var(--text);}
+  .sw-display{
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:1.5rem; font-weight:700; text-align:center;
+    color:var(--text);
+    margin-bottom:10px;
+  }
+  .sw-controls{display:flex; gap:8px;}
+  .sw-controls .btn{flex:1; padding:7px 10px; font-size:.8rem;}
 </style>
 </head>
 <body>
@@ -1096,6 +1166,30 @@
   <div class="card note" id="loadingNote">Loading questions...</div>
 </div>
 
+<!-- Stopwatch: a general-purpose manual timer for self-timed revision,
+     independent of Interview Mode's own per-question pacing timer.
+     position:fixed at body level (not inside .app) so it floats on the
+     right edge of the viewport across every mode, not constrained by
+     .app's centered max-width. Collapsed to a small icon button by
+     default; click opens the panel. -->
+<div class="stopwatch-widget" id="stopwatchWidget">
+  <div class="sw-collapsed-wrap" id="swCollapsedWrap">
+    <span class="sw-badge-time" id="swBadgeTime">00:00</span>
+    <button class="sw-collapsed-btn" id="swCollapsedBtn" type="button" aria-label="Open stopwatch" title="Stopwatch">⏱️</button>
+  </div>
+  <div class="sw-panel" id="swPanel" style="display:none;">
+    <div class="sw-header" id="swHeader">
+      <span>Stopwatch</span>
+      <button class="sw-close" id="swCloseBtn" type="button" aria-label="Minimize stopwatch">×</button>
+    </div>
+    <div class="sw-display" id="swDisplay">00:00:00</div>
+    <div class="sw-controls">
+      <button class="btn small" id="swStartPauseBtn" type="button">Start</button>
+      <button class="btn ghost small" id="swResetBtn" type="button">Reset</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -1178,6 +1272,17 @@
     listenNextBtn: document.getElementById('listenNextBtn'),
     listenAutoAdvance: document.getElementById('listenAutoAdvance'),
     lVoiceSelect: document.getElementById('lVoiceSelect'),
+
+    stopwatchWidget: document.getElementById('stopwatchWidget'),
+    swCollapsedWrap: document.getElementById('swCollapsedWrap'),
+    swBadgeTime: document.getElementById('swBadgeTime'),
+    swCollapsedBtn: document.getElementById('swCollapsedBtn'),
+    swPanel: document.getElementById('swPanel'),
+    swHeader: document.getElementById('swHeader'),
+    swCloseBtn: document.getElementById('swCloseBtn'),
+    swDisplay: document.getElementById('swDisplay'),
+    swStartPauseBtn: document.getElementById('swStartPauseBtn'),
+    swResetBtn: document.getElementById('swResetBtn'),
 
     normalModeBtn: document.getElementById('normalModeBtn'),
     listenModeBtn: document.getElementById('listenModeBtn'),
@@ -2912,6 +3017,226 @@
   function listenPrev(){ listenGoTo(listenIndex - 1); }
   function listenNext(){ listenGoTo(listenIndex + 1); }
 
+  // ---------- Stopwatch (floating widget, every mode) ----------
+  // A general-purpose manual timer for self-timed revision -- entirely
+  // separate from Interview Mode's own per-question pacing timer (§7),
+  // which tracks a running session automatically rather than being
+  // something you start/pause/reset by hand. Uses Date.now() deltas
+  // rather than counting 1000ms interval ticks, so pausing/resuming and
+  // any individual tick running slightly late never causes drift.
+  var swElapsedMs = 0;
+  var swRunning = false;
+  var swStartTs = null;
+  var swIntervalId = null;
+
+  function formatStopwatch(ms){
+    var totalSeconds = Math.floor(ms / 1000);
+    var h = Math.floor(totalSeconds / 3600);
+    var m = Math.floor((totalSeconds % 3600) / 60);
+    var s = totalSeconds % 60;
+    function pad(n){ return (n < 10 ? '0' : '') + n; }
+    return pad(h) + ':' + pad(m) + ':' + pad(s);
+  }
+
+  // Shorter form for the small always-visible badge -- drops the hours
+  // segment entirely when it's zero (the common case for a revision
+  // session) so "12:34" fits a tiny pill instead of "00:12:34".
+  function formatStopwatchShort(ms){
+    var totalSeconds = Math.floor(ms / 1000);
+    var h = Math.floor(totalSeconds / 3600);
+    var m = Math.floor((totalSeconds % 3600) / 60);
+    var s = totalSeconds % 60;
+    function pad(n){ return (n < 10 ? '0' : '') + n; }
+    return h > 0 ? (h + ':' + pad(m) + ':' + pad(s)) : (pad(m) + ':' + pad(s));
+  }
+
+  function updateStopwatchDisplay(){
+    var current = swElapsedMs + (swRunning ? (Date.now() - swStartTs) : 0);
+    els.swDisplay.textContent = formatStopwatch(current);
+    els.swBadgeTime.textContent = formatStopwatchShort(current);
+  }
+
+  function toggleStopwatchRun(){
+    if(swRunning){
+      swElapsedMs += Date.now() - swStartTs;
+      swRunning = false;
+      clearInterval(swIntervalId);
+      els.swStartPauseBtn.textContent = 'Start';
+      els.swCollapsedBtn.classList.remove('running');
+    } else {
+      swStartTs = Date.now();
+      swRunning = true;
+      swIntervalId = setInterval(updateStopwatchDisplay, 250);
+      els.swStartPauseBtn.textContent = 'Pause';
+      els.swCollapsedBtn.classList.add('running');
+      els.swBadgeTime.classList.add('has-time'); // only show the badge once it's actually been started
+    }
+    updateStopwatchDisplay();
+    saveStopwatchState();
+  }
+
+  function resetStopwatch(){
+    swElapsedMs = 0;
+    swRunning = false;
+    swStartTs = null;
+    clearInterval(swIntervalId);
+    els.swStartPauseBtn.textContent = 'Start';
+    els.swCollapsedBtn.classList.remove('running');
+    els.swBadgeTime.classList.remove('has-time'); // nothing meaningful to show anymore
+    updateStopwatchDisplay();
+    saveStopwatchState();
+  }
+
+  // ---------- Stopwatch persistence (survives a reload) ----------
+  // Only the widget's dragged POSITION used to persist -- the elapsed
+  // time itself reset to zero on any reload, which is a real problem if
+  // this is genuinely being used to time a revision session and the
+  // page refreshes (even by accident). Saved on every start/pause/reset
+  // transition, plus 'beforeunload' as a safety net for whatever elapsed
+  // time accumulated since the last explicit transition while running.
+  var SW_STATE_KEY = 'stopwatchState';
+
+  function saveStopwatchState(){
+    try{
+      localStorage.setItem(SW_STATE_KEY, JSON.stringify({
+        elapsedMs: swElapsedMs,
+        running: swRunning,
+        startTs: swRunning ? swStartTs : null
+      }));
+    }catch(e){ /* ignore */ }
+  }
+
+  function restoreStopwatchState(){
+    try{
+      var raw = localStorage.getItem(SW_STATE_KEY);
+      if(!raw) return;
+      var state = JSON.parse(raw);
+      if(typeof state.elapsedMs !== 'number') return;
+      swElapsedMs = state.elapsedMs;
+      if(state.running && typeof state.startTs === 'number'){
+        // It was left running -- a real stopwatch keeps going even while
+        // you're not looking at it, so the gap while this page was
+        // closed/reloaded counts too, not just time spent on-page.
+        swElapsedMs += Date.now() - state.startTs;
+        swStartTs = Date.now();
+        swRunning = true;
+        swIntervalId = setInterval(updateStopwatchDisplay, 250);
+        els.swStartPauseBtn.textContent = 'Pause';
+        els.swCollapsedBtn.classList.add('running');
+        els.swBadgeTime.classList.add('has-time');
+      } else if(swElapsedMs > 0){
+        els.swBadgeTime.classList.add('has-time');
+      }
+      updateStopwatchDisplay();
+    }catch(e){ /* ignore -- falls back to a fresh 00:00:00 */ }
+  }
+
+  function openStopwatchPanel(){
+    els.swPanel.style.display = 'block';
+    els.swCollapsedWrap.style.display = 'none';
+    // The panel is much bigger than the collapsed circle -- if the
+    // widget was dragged near an edge, re-clamp now so the freshly-grown
+    // panel doesn't run off-screen.
+    clampStopwatchPosition();
+  }
+
+  function closeStopwatchPanel(){
+    els.swPanel.style.display = 'none';
+    els.swCollapsedWrap.style.display = 'block';
+  }
+
+  // ---------- Stopwatch dragging ----------
+  // Pointer Events unify mouse/touch/pen -- setPointerCapture means
+  // move/up keep firing on the handle element even once the pointer
+  // leaves it, so there's no need for document-level listeners. The
+  // whole collapsed button doubles as its own drag handle (it's small
+  // enough that there's no spare space for a separate grip), so a
+  // movement threshold distinguishes an actual drag from a plain click
+  // that should open the panel -- below the threshold, the click still
+  // fires normally; above it, swJustDragged suppresses that click.
+  var SW_POS_KEY = 'stopwatchPos';
+  var swDrag = null;
+  var swJustDragged = false;
+
+  function clampStopwatchPosition(){
+    var rect = els.stopwatchWidget.getBoundingClientRect();
+    var maxLeft = Math.max(0, window.innerWidth - rect.width);
+    var maxTop = Math.max(0, window.innerHeight - rect.height);
+    var left = Math.min(Math.max(rect.left, 0), maxLeft);
+    var top = Math.min(Math.max(rect.top, 0), maxTop);
+    setStopwatchPosition(left, top);
+  }
+
+  function setStopwatchPosition(left, top){
+    els.stopwatchWidget.style.left = left + 'px';
+    els.stopwatchWidget.style.top = top + 'px';
+    els.stopwatchWidget.style.right = 'auto';
+    els.stopwatchWidget.style.transform = 'none';
+  }
+
+  function saveStopwatchPosition(left, top){
+    try{ localStorage.setItem(SW_POS_KEY, JSON.stringify({ left: left, top: top })); }catch(e){}
+  }
+
+  function restoreStopwatchPosition(){
+    try{
+      var raw = localStorage.getItem(SW_POS_KEY);
+      if(!raw) return;
+      var pos = JSON.parse(raw);
+      if(typeof pos.left === 'number' && typeof pos.top === 'number'){
+        setStopwatchPosition(pos.left, pos.top);
+        clampStopwatchPosition(); // guards against a saved spot from a larger viewport
+      }
+    }catch(e){ /* ignore -- falls back to the default CSS position */ }
+  }
+
+  function stopwatchDragStart(e){
+    // #swHeader is the drag handle, but the × close button lives inside
+    // it -- without this guard, setPointerCapture() below retargets the
+    // eventual mouseup away from the close button to the header (the
+    // capturing element), and browsers don't fire 'click' when mousedown
+    // and the effective mouseup target differ. That silently broke the
+    // close button on every real mouse/touch click, not just drags --
+    // confirmed by comparing a synthetic .click() (unaffected) against a
+    // real pointerdown/up sequence (broken) in a real browser.
+    if(e.target === els.swCloseBtn) return;
+    var rect = els.stopwatchWidget.getBoundingClientRect();
+    swDrag = {
+      startX: e.clientX, startY: e.clientY,
+      origLeft: rect.left, origTop: rect.top,
+      moved: false
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+
+  function stopwatchDragMove(e){
+    if(!swDrag) return;
+    var dx = e.clientX - swDrag.startX;
+    var dy = e.clientY - swDrag.startY;
+    if(!swDrag.moved && (Math.abs(dx) > 4 || Math.abs(dy) > 4)){
+      swDrag.moved = true;
+      els.stopwatchWidget.classList.add('dragging');
+    }
+    if(!swDrag.moved) return;
+    var rect = els.stopwatchWidget.getBoundingClientRect();
+    var maxLeft = Math.max(0, window.innerWidth - rect.width);
+    var maxTop = Math.max(0, window.innerHeight - rect.height);
+    var left = Math.min(Math.max(swDrag.origLeft + dx, 0), maxLeft);
+    var top = Math.min(Math.max(swDrag.origTop + dy, 0), maxTop);
+    setStopwatchPosition(left, top);
+  }
+
+  function stopwatchDragEnd(e){
+    if(!swDrag) return;
+    if(swDrag.moved){
+      els.stopwatchWidget.classList.remove('dragging');
+      var rect = els.stopwatchWidget.getBoundingClientRect();
+      saveStopwatchPosition(rect.left, rect.top);
+      swJustDragged = true; // swallow the click event that follows pointerup
+    }
+    swDrag = null;
+  }
+
   // onEnd (optional): called when speech actually finishes -- used to
   // auto-start the mic only AFTER the question's been read, not while,
   // so it doesn't pick up the TTS audio itself as your answer.
@@ -3442,6 +3767,26 @@
   els.listenPlayBtn.addEventListener('click', toggleListenPlay);
   els.listenPrevBtn.addEventListener('click', listenPrev);
   els.listenNextBtn.addEventListener('click', listenNext);
+  els.swCollapsedBtn.addEventListener('click', function(){
+    if(swJustDragged){ swJustDragged = false; return; } // dragging the button shouldn't also open it
+    openStopwatchPanel();
+  });
+  els.swCloseBtn.addEventListener('click', closeStopwatchPanel);
+  els.swStartPauseBtn.addEventListener('click', toggleStopwatchRun);
+  els.swResetBtn.addEventListener('click', resetStopwatch);
+
+  els.swCollapsedBtn.addEventListener('pointerdown', stopwatchDragStart);
+  els.swCollapsedBtn.addEventListener('pointermove', stopwatchDragMove);
+  els.swCollapsedBtn.addEventListener('pointerup', stopwatchDragEnd);
+  els.swCollapsedBtn.addEventListener('pointercancel', stopwatchDragEnd);
+  els.swHeader.addEventListener('pointerdown', stopwatchDragStart);
+  els.swHeader.addEventListener('pointermove', stopwatchDragMove);
+  els.swHeader.addEventListener('pointerup', stopwatchDragEnd);
+  els.swHeader.addEventListener('pointercancel', stopwatchDragEnd);
+  window.addEventListener('resize', clampStopwatchPosition);
+  window.addEventListener('beforeunload', saveStopwatchState);
+  restoreStopwatchPosition();
+  restoreStopwatchState();
   els.interviewOpenBtn.addEventListener('click', openInterviewModal);
   els.interviewCloseBtn.addEventListener('click', closeInterviewModal);
   els.interviewCancelBtn.addEventListener('click', closeInterviewModal);

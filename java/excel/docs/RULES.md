@@ -1990,3 +1990,130 @@ Interview-Mode-style separate setup flow.
 - Markup reuses `#singleView`'s existing `.field-row`/`.field-inline`/
   `.pager` classes (unscoped from the mobile breakpoint, safe to reuse at
   any width) rather than introducing parallel styles.
+
+## 14. Stopwatch
+
+A floating, collapsible widget (`#stopwatchWidget`) for self-timed
+revision — a manual Start/Pause/Reset timer, **entirely separate from
+Interview Mode's own per-question pacing timer** (§7), which tracks an
+active session automatically rather than being something you control by
+hand.
+
+- **`position:fixed`, placed as a direct sibling of `.app` (not nested
+  inside it)**, right after `.app`'s closing tag — so it floats at a
+  fixed viewport position across every mode (Normal/Listen/Interview)
+  regardless of which view is currently toggled visible, and isn't
+  constrained by `.app`'s own centered `max-width`.
+- **Collapsed by default to a small circular icon button**
+  (`#swCollapsedBtn`, right edge, vertically centered —
+  `top:50%; right:16px; transform:translateY(-50%)`), expanding to a
+  compact panel (`#swPanel`: time display, Start/Pause, Reset, a ×
+  to re-collapse) on click. Only one of the two is ever visible at once,
+  toggled via plain `style.display`, not a CSS class/animation.
+- **No special positioning for mobile** — vertically centering it on the
+  right edge turned out to be the safer default at any width, not just
+  desktop. An earlier version anchored it to the bottom-right corner on
+  narrow screens (a common floating-action-button convention) but that
+  put it directly on top of `#singleView`'s Previous/Next pager once
+  scrolled to an answer long enough to push the pager into that same
+  screen region — confirmed directly by measuring both elements'
+  bounding boxes in a real browser. Vertically centered, it can still
+  overlap incidental content (a tag, some text) depending on scroll
+  position, but never a specific interactive control the way the
+  bottom-right placement did — an acceptable tradeoff for a `fixed`
+  overlay on an unbounded-height scrolling page. Don't reintroduce a
+  bottom-anchored mobile override without re-checking it against the
+  pager the same way.
+- **`Date.now()` delta-based timing, not interval-tick counting** —
+  `swElapsedMs` accumulates real elapsed time across pause/resume
+  cycles; the running display updates via a 250ms `setInterval` purely
+  for redraw cadence, never for the actual time math, so it can't drift
+  from slightly-late ticks the way naively incrementing a counter once
+  per tick would.
+- Pausing freezes the display exactly where it was (verified: display
+  unchanged across a 1s wait while paused); resuming continues
+  accumulating from that same point, not from zero.
+- **Draggable, via Pointer Events** — the collapsed circle and the
+  expanded panel's header (`#swHeader`) are both drag handles (one or
+  the other is always visible, never both). `setPointerCapture()` on
+  `pointerdown` means subsequent `pointermove`/`pointerup` keep firing
+  on the handle even once the pointer leaves its small bounding box, so
+  no document-level listeners are needed. Position is tracked as plain
+  `left`/`top` pixel values (switching away from the default
+  `top:50%; right:16px; transform:translateY(-50%)` centering the first
+  time it's dragged) and clamped to the viewport on every move, on
+  panel open (the panel is much bigger than the collapsed circle, so a
+  position valid for one may not fit the other), and on window resize.
+  Saved to `localStorage['stopwatchPos']` on drag end, restored (and
+  re-clamped, in case the saved spot came from a larger viewport) on
+  load.
+  - **Movement threshold distinguishes a drag from a plain click** — the
+    collapsed circle has to double as both "open the panel" and "drag
+    handle" (it's too small to spare room for a separate grip). Moving
+    more than 4px sets a `moved` flag and `swJustDragged = true` on
+    drag end; the button's `click` handler checks that flag and swallows
+    the click that normally follows `pointerup` when a real drag
+    happened, so dragging the button never also pops the panel open.
+    Verified directly: a plain click (no movement) still opens the
+    panel; a drag of 50px+ does not.
+  - Start/Pause and Reset sit in `.sw-controls`, outside `#swHeader`, so
+    they're never drag handles and need no guard.
+  - **The × close button DOES sit inside `#swHeader`, though** (it's
+    part of the header row), and that one real bug did ship initially:
+    `stopwatchDragStart()`'s `setPointerCapture()` call retargets the
+    eventual `pointerup`/`mouseup` to the capturing element (`#swHeader`)
+    instead of wherever the pointer actually is, and a browser won't
+    fire `click` when the effective mouseup target differs from the
+    mousedown target — so EVERY click on × (not just drags) silently
+    stopped closing the panel. Caught by comparing a synthetic
+    `element.click()` (unaffected, since it never dispatches real
+    pointer events at all) against a realistic pointerdown/pointerup
+    sequence (broken) in an actual browser — the two gave different
+    results, which is what exposed it. Fixed with an early return in
+    `stopwatchDragStart()` for `e.target === els.swCloseBtn`, before
+    `setPointerCapture()` runs, so × gets completely normal event
+    handling. **Any future control added inside `#swHeader` needs the
+    same exclusion** — a drag handle can't safely contain an unguarded
+    interactive child.
+
+**A small live-updating badge (`#swBadgeTime`) sits on the collapsed
+circle, always visible once started** — NOT gated on hover. The first
+version of this was hover-only (a tooltip that appeared on
+`:hover`), but that only helps desktop: touch devices have no hover
+concept at all, so a hover-gated readout is invisible to mobile users
+no matter what. Always-visible (while `.has-time`, the same class
+`toggleStopwatchRun()` adds on start and `resetStopwatch()` removes)
+gives every device the same glanceable time with zero interaction
+needed, which strictly subsumes what hover-only did — there's no
+remaining reason to also keep a separate hover-only variant. Renamed
+from `swHoverTime`/`.sw-hover-time` to `swBadgeTime`/`.sw-badge-time`
+when this changed, since the old name described behavior it no longer
+has. Still not the native `title` attribute, for the same reason as
+before — `title` only shows a one-time snapshot, it doesn't keep
+ticking. `formatStopwatchShort()` (drops the hours segment when zero —
+`"12:34"` instead of `"00:12:34"`) feeds the badge specifically,
+separate from `formatStopwatch()`'s full `HH:MM:SS` for the panel's
+own display — the badge is small enough that hours-when-irrelevant
+would crowd it. Verified directly: visible and ticking while running
+with the pointer nowhere near it (no hover involved at all), hidden
+again after Reset.
+
+**Elapsed time and running state survive a page reload**
+(`localStorage['stopwatchState']`) — previously only the dragged
+*position* persisted; the clock itself reset to `00:00:00` on any
+reload, a real problem if this is genuinely timing a revision session
+and the page refreshes, even by accident. `saveStopwatchState()` runs
+on every Start/Pause/Reset transition, plus on `'beforeunload'` as a
+safety net for elapsed time accumulated since the last explicit
+transition while running. **If it was left running, resuming after
+reload adds the real wall-clock gap since it was left running** (not
+just time spent actively on the page) — `swElapsedMs += Date.now() -
+state.startTs` — matching how an actual physical stopwatch or a
+phone's timer app behaves (it keeps going whether or not you're
+looking at it), not "pause automatically because the tab was closed."
+A paused (not running) state restores exactly as left, with no
+auto-resume. Verified directly: reloading mid-run jumped the display
+forward by the reload gap and kept ticking afterward; reloading while
+paused left the exact same value, unchanged, until Start is pressed
+again; Reset followed by reload comes back to a fresh, hidden-badge
+`00:00:00`.
