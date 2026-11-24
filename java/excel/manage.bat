@@ -26,9 +26,13 @@ echo   -- Other --
 echo   10. Open Excel Workbook  (opens the .xlsx source file directly)
 echo   11. Restore Backup       (pick from the last 5 backups in bkp/)
 echo   12. View/Edit Settings   (server port, row cap - config.json)
-echo   13. Exit
 echo.
-set /p choice="Choose an option (1-13): "
+echo   -- Git --
+echo   13. Git Auto Push        (commit all changes, rebase on remote, push to GitHub)
+echo.
+echo   14. Exit
+echo.
+set /p choice="Choose an option (1-14): "
 
 if "%choice%"=="1" goto data_summary
 if "%choice%"=="2" goto smart_sync
@@ -42,7 +46,8 @@ if "%choice%"=="9" goto open_direct
 if "%choice%"=="10" goto open_excel
 if "%choice%"=="11" goto restore_backup
 if "%choice%"=="12" goto edit_settings
-if "%choice%"=="13" goto end
+if "%choice%"=="13" goto git_push
+if "%choice%"=="14" goto end
 echo Invalid choice.
 goto menu
 
@@ -115,6 +120,51 @@ echo [%TIME%] Restore Backup
 python scripts\restore_backup.py
 python scripts\verify_index.py --quiet
 echo [%TIME%] done.
+goto done
+
+:git_push
+echo [%TIME%] Git Auto Push
+pushd "%~dp0..\.."
+echo.
+echo ===== CHANGES =====
+git status --short
+echo.
+set "MSG="
+set /p MSG=Enter commit message (or press Enter for "update"):
+if "%MSG%"=="" set "MSG=update"
+echo.
+echo ===== STAGING + COMMITTING =====
+git add .
+git commit -m "%MSG%"
+if errorlevel 1 (
+  echo No changes to commit.
+  popd
+  goto done
+)
+echo.
+echo ===== FETCHING + REBASING =====
+git fetch origin
+if errorlevel 1 (
+  echo ERROR: Failed to fetch from GitHub.
+  popd
+  goto done
+)
+git pull --rebase
+if errorlevel 1 (
+  echo REBASE CONFLICT - resolve manually, then: git add . ^& git rebase --continue
+  popd
+  goto done
+)
+echo.
+echo ===== PUSHING =====
+git push
+if errorlevel 1 (
+  echo Push failed.
+  popd
+  goto done
+)
+popd
+echo [%TIME%] pushed to GitHub.
 goto done
 
 :done

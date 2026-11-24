@@ -1912,6 +1912,11 @@ safe:
     always restored the single `index.html.bak` behind a typed `YES`
     confirmation), and View/Edit Settings (`edit_config.py` — see above)
     round out the menu.
+  - Git Auto Push (option 13, Exit is 14) — merged in from the old
+    standalone `AutoPush.bat`: `pushd`s to the git repo root (`..\..`),
+    shows `git status --short`, prompts for a commit message (default
+    `update`), then `add .` → `commit` → `fetch` → `pull --rebase` →
+    `push`, stopping with a message at the first failure.
   - **Every action prints a `[%TIME%] <action> starting/done` line**
     (Windows `%TIME%`, e.g. `[18:41:53.63]`) — added alongside the
     `--quiet` verify change above, same "concise and readable, and show
