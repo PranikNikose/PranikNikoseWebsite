@@ -1,0 +1,3 @@
+
+1. Ded duplicate identified based on Differnt excel and mark them in COlumn called DUplicate and refernce must be ther 
+2. sorting if 4  sheets selected and deduplicated needed then i wnt first all qiestion of 1 sheet then 2 then 3 then 4 
