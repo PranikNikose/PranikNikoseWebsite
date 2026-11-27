@@ -1,3 +1,5 @@
 0. how to bifurgat the code ``` i want java,k8s,docker,shell,sql,yml codes in it same ``` how can we make it. 
 1. Ded duplicate identified based on Differnt excel and mark them in COlumn called DUplicate and refernce must be ther 
 2. sorting if 4  sheets selected and deduplicated needed then i wnt first all qiestion of 1 sheet then 2 then 3 then 4 
+3. in normal mode ther eshould be checkbox to hide answer only questions will be shown. and one icon to show answer against each question if i click the answer will be shown and on recliking answer will be hidden.
+4. if i want to provide an two answers for a single or multiple questions tell me how can i disply it and sho/hide a answwer from one of them 
